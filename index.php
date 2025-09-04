@@ -6,6 +6,18 @@
   <title>Majelis MDPL</title>
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+   <meta charset="UTF-8">
+   <-- !whatsapp-button1! -->
+    <title>WhatsApp Button</title>
+
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Font Awesome untuk ikon WhatsApp -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- JavaScript -->
+    <script src="script.js" defer></script>
 </head>
 <body>
 
@@ -77,5 +89,21 @@
       }
     });
   </script>
+
+<!-- BUTTON WHATSAPP -->
+<div class="whatsapp-container">
+    <button class="whatsapp-button" onclick="bukaWhatsapp()">
+        <i class="fab fa-whatsapp"></i> Hubungi via WhatsApp
+    </button>
+</div>
+
+<script>
+  function bukaWhatsapp() {
+    const nomor = "6283853493130"; // Ganti dengan nomor kamu
+    const url = "https://wa.me/" + nomor;
+    window.open(url, '_blank');
+  }
+</script>
+</div>
 </body>
 </html>
