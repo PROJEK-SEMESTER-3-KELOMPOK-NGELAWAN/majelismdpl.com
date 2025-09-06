@@ -4,6 +4,29 @@ if (!isset($_SESSION["admin"])) {
   header("Location: ../index.php");
   exit();
 }
+
+// Ngambil data trip dari JSON
+$file = __DIR__ . "/trips.json";
+if (file_exists($file)) {
+  $trips = json_decode(file_get_contents($file), true);
+} else {
+  $trips = [];
+}
+
+// Total trip
+$tripAktif = count(array_filter($trips, fn($t) => $t['status'] === "Aktif"));
+
+// Total peserta
+$totalPeserta = array_sum(array_column($trips, 'slot'));
+
+// Jadwal terdekat
+$today = date("Y-m-d");
+$jadwalTerdekat = "Belum ada jadwal";
+$upcoming = array_filter($trips, fn($t) => $t['tanggal'] >= $today);
+if (!empty($upcoming)) {
+  usort($upcoming, fn($a, $b) => strcmp($a['tanggal'], $b['tanggal']));
+  $jadwalTerdekat = $upcoming[0]['nama_gunung'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -30,7 +53,7 @@ if (!isset($_SESSION["admin"])) {
     </div>
 
   <ul class="nav flex-column">
-    <li class="nav-item"><a href="index.php" class="nav-link"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a></li>
+    <li class="nav-item"><a href="index.php" class="nav-link active"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a></li>
     <li class="nav-item"><a href="trip.php" class="nav-link"><i class="bi bi-map-fill"></i> <span>Trip</span></a></li>
     <li class="nav-item"><a href="peserta.php" class="nav-link"><i class="bi bi-people-fill"></i> <span>Peserta</span></a></li>
     <li class="nav-item"><a href="pembayaran.php" class="nav-link"><i class="bi bi-wallet2"></i> <span>Pembayaran</span></a></li>
@@ -46,25 +69,25 @@ if (!isset($_SESSION["admin"])) {
         <div class="col-md-3">
           <div class="card p-3 text-center">
             <h5>Trip Aktif</h5>
-            <p class="fs-4 fw-bold">5</p>
+            <p class="fs-4 fw-bold"><?= $tripAktif ?></p>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card p-3 text-center">
             <h5>Total Peserta</h5>
-            <p class="fs-4 fw-bold">32</p>
+            <p class="fs-4 fw-bold"><?= $totalPeserta ?></p>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card p-3 text-center">
             <h5>Pembayaran Masuk</h5>
-            <p class="fs-4 fw-bold">Rp 15.000.000</p>
+            <p class="fs-4 fw-bold">Rp 0</p>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card p-3 text-center">
             <h5>Jadwal Terdekat</h5>
-            <p class="fs-4 fw-bold">Gunung Rinjani</p>
+            <p class="fs-4 fw-bold"><?= $jadwalTerdekat ?></p>
           </div>
         </div>
       </div>
@@ -73,11 +96,21 @@ if (!isset($_SESSION["admin"])) {
         <h4>Daftar Trip</h4>
         <table class="table table-striped mt-2">
           <thead class="table-dark">
-            <tr><th>Nama Gunung</th><th>Tanggal</th><th>Slot</th></tr>
+            <tr><th>Nama Gunung</th><th>Tanggal</th><th>Slot</th><th>Status</th></tr>
           </thead>
           <tbody>
-            <tr><td>Gunung Semeru</td><td>2025-09-10</td><td>20</td></tr>
-            <tr><td>Gunung Rinjani</td><td>2025-10-05</td><td>15</td></tr>
+            <?php if (empty($trips)): ?>
+              <tr><td colspan="4" class="text-center text-muted">🚫 Belum ada jadwal trip.</td></tr>
+            <?php else: ?>
+              <?php foreach ($trips as $trip): ?>
+              <tr>
+                <td><?= $trip['nama_gunung'] ?></td>
+                <td><?= date("d M Y", strtotime($trip['tanggal'])) ?></td>
+                <td><?= $trip['slot'] ?></td>
+                <td><?= $trip['status'] ?></td>
+              </tr>
+              <?php endforeach; ?>
+            <?php endif; ?>
           </tbody>
         </table>
       </div>
