@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "nama_gunung": "Gunung raung",
+        "tanggal": "2025-09-12",
+        "slot": "10",
+        "status": "Aktif",
+        "gambar": "1757149366_foto2.png"
+    },
+    {
+        "id": 2,
+        "nama_gunung": "Puthuk siwur",
+        "tanggal": "2025-09-19",
+        "slot": "10",
+        "status": "Aktif",
+        "gambar": "1757149449_foto1.png"
+    }
+]
