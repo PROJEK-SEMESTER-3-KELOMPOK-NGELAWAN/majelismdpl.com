@@ -12,6 +12,9 @@ if (!isset($_SESSION["admin"])) {
   <title>Dashboard Admin - Majelis MDPL</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/admin.css">
 </head>
 <body>
@@ -20,7 +23,7 @@ if (!isset($_SESSION["admin"])) {
   <!-- Sidebar -->
   <div class="sidebar p-3 d-flex flex-column" id="sidebar">
     <div class="d-flex align-items-center justify-content-between mb-4">
-      <h2 class="mb-0">Majelis MDPL</h2>
+      <h2 class="mb-0">Menu</h2>
       <button class="btn-toggle" id="toggleBtn">
         <i class="bi bi-list"></i>
       </button>
@@ -37,7 +40,7 @@ if (!isset($_SESSION["admin"])) {
 </div>
 
     <div class="content flex-grow-1 p-4" id="main">
-      <h1>Selamat Datang, <?= $_SESSION["admin"]; ?> 👋</h1>
+      <h1>Dashboard</h1>
 
       <div class="row g-3 my-3">
         <div class="col-md-3">

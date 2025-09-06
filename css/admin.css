@@ -3,27 +3,48 @@ body {
   background: #f4f4f9;
 }
 .sidebar {
-  min-height: 100vh;
+  width: 250px;
+  transition: width 0.3s ease;
   background: #8b5e3c;
-  transition: width 0.3s;
-  width: 220px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  white-space: nowrap;
 }
 .sidebar.collapsed {
   width: 70px;
 }
 .sidebar .nav-link {
   color: #fff;
-  margin: 5px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 10px 15px;
 }
 .sidebar .nav-link:hover {
-  background: #ffd369;
+  background: black;
   border-radius: 5px;
 }
+.sidebar .nav-link span {
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+.sidebar.collapsed .nav-link span {
+  opacity: 0;
+  pointer-events: none;
+}
+.sidebar.collapsed .nav-link {
+  justify-content: center;
+}
 .sidebar h2 {
+  font-family: "Merriweather", serif;
+  margin-left: 20px;
+  font-weight: 700;
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   margin-bottom: 1rem;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s ease;
 }
 .sidebar.collapsed h2,
 .sidebar.collapsed span {
@@ -31,6 +52,12 @@ body {
 }
 .content {
   transition: margin-left 0.3s;
+}
+.content h1 {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: #333;
 }
 .content.expanded {
   margin-left: 80px;
@@ -48,5 +75,27 @@ body {
   cursor: pointer;
 }
 .btn-toggle:hover {
-  color: #ffd369;
+  color: black;
+}
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card img {
+  height: 180px;
+  object-fit: cover;
+}
+
+#tambahModalLabel {
+  font-weight: 700;
+  color: black;
+  border-bottom: 2px solid black;
+  padding-bottom: 6px;
+  margin-bottom: 0;
 }
