@@ -175,6 +175,36 @@ body {
 .btn-login:hover {
   background: #e6be4f;
 }
+.whatsapp-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+}
+
+.whatsapp-button {
+    background-color: #25D366;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 6px #ffffff;
+    transition: background-color 0.3s;
+    font-family: Arial, 'Times New Roman', Times, serif;
+}
+
+.whatsapp-button:hover {
+    background-color: #25D366;
+}
+
+.whatsapp-button i {
+    font-size: 20px;
+}
+
 
 @keyframes fadeIn {
   from {
@@ -185,4 +215,5 @@ body {
     opacity: 1;
     transform: scale(1);
   }
+  
 }
