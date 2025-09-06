@@ -1,21 +1,24 @@
 <?php
 session_start();
 
-// Inisialisasi data trip kosong kalau belum ada
-if (!isset($_SESSION['trips'])) {
-  $_SESSION['trips'] = [];
+$file = __DIR__ . "/trips.json";
+
+if (file_exists($file)) {
+  $trips = json_decode(file_get_contents($file), true);
+} else {
+  $trips = [];
 }
 
-// Tambah trip baru
-if (isset($_POST['tambah'])) {
-  $id = count($_SESSION['trips']) + 1;
-  $nama = $_POST['nama_gunung'];
-  $tanggal = $_POST['tanggal'];
-  $slot = $_POST['slot'];
-  $status = $_POST['status'];
-  $gambar = "default.jpg";
+  // Button tambah
+  if (isset($_POST['tambah'])) {
+    $id = count($trips) + 1;
+    $nama = $_POST['nama_gunung'];
+    $tanggal = $_POST['tanggal'];
+    $slot = $_POST['slot'];
+    $status = $_POST['status'];
+    $gambar = "default.jpg";
 
-  // Proses upload file
+  // Upload gambar
   if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === 0) {
     $targetDir = "../img/";
     $fileName = time() . "_" . basename($_FILES['gambar']['name']);
@@ -26,7 +29,7 @@ if (isset($_POST['tambah'])) {
     }
   }
 
-  $_SESSION['trips'][] = [
+  $trips[] = [
     "id" => $id,
     "nama_gunung" => $nama,
     "tanggal" => $tanggal,
@@ -35,19 +38,24 @@ if (isset($_POST['tambah'])) {
     "gambar" => $gambar
   ];
 
+  file_put_contents($file, json_encode($trips, JSON_PRETTY_PRINT));
+
   header("Location: trip.php");
   exit();
 }
 
-// Hapus trip
+// Button hapus
 if (isset($_GET['hapus'])) {
   $id = $_GET['hapus'];
-  foreach ($_SESSION['trips'] as $key => $trip) {
+  foreach ($trips as $key => $trip) {
     if ($trip['id'] == $id) {
-      unset($_SESSION['trips'][$key]);
+      unset($trips[$key]);
     }
   }
-  $_SESSION['trips'] = array_values($_SESSION['trips']);
+  $trips = array_values($trips);
+
+  file_put_contents($file, json_encode($trips, JSON_PRETTY_PRINT));
+
   header("Location: trip.php");
   exit();
 }
@@ -62,7 +70,7 @@ if (isset($_GET['hapus'])) {
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/admin.css">
   <style>
-    /* Animasi fade-in */
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -82,13 +90,14 @@ if (isset($_GET['hapus'])) {
       <button class="btn-toggle" id="toggleBtn"><i class="bi bi-list"></i></button>
     </div>
     <ul class="nav flex-column">
-      <li class="nav-item"><a href="index.php" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-      <li class="nav-item"><a href="trip.php" class="nav-link active"><i class="bi bi-map-fill"></i> Trip</a></li>
-      <li class="nav-item"><a href="peserta.php" class="nav-link"><i class="bi bi-people-fill"></i> Peserta</a></li>
-      <li class="nav-item"><a href="pembayaran.php" class="nav-link"><i class="bi bi-wallet2"></i> Pembayaran</a></li>
-      <li class="nav-item"><a href="galeri.php" class="nav-link"><i class="bi bi-images"></i> Galeri</a></li>
-      <li class="nav-item"><a href="logout.php" class="nav-link"><i class="bi bi-box-arrow-left"></i> Logout</a></li>
+      <li class="nav-item"><a href="index.php" class="nav-link"><i class="bi bi-speedometer2"></i><span> Dashboard</span></a></li>
+      <li class="nav-item"><a href="trip.php" class="nav-link active"><i class="bi bi-map-fill"></i><span> Trip</span></a></li>
+      <li class="nav-item"><a href="peserta.php" class="nav-link"><i class="bi bi-people-fill"></i><span> Peserta</span></a></li>
+      <li class="nav-item"><a href="pembayaran.php" class="nav-link"><i class="bi bi-wallet2"></i><span> Pembayaran</span></a></li>
+      <li class="nav-item"><a href="galeri.php" class="nav-link"><i class="bi bi-images"></i><span> Galeri</span></a></li>
+      <li class="nav-item"><a href="logout.php" class="nav-link"><i class="bi bi-box-arrow-left"></i><span> Logout</span></a></li>
     </ul>
+
   </div>
 
   <!-- Content -->
@@ -101,36 +110,36 @@ if (isset($_GET['hapus'])) {
     </div>
 
     <div class="row g-4">
-        <?php if (empty($_SESSION['trips'])): ?>
-    <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
-      <p class="text-muted fs-4 fade-text">🚫 Belum ada jadwal trip.</p>
-    </div>
-  <?php else: ?>
-    <?php foreach ($_SESSION['trips'] as $trip) : ?>
-      <div class="col-md-4 fade-text">
-        <div class="card shadow-sm">
-          <img src="../img/<?= $trip['gambar'] ?>" class="card-img-top" alt="<?= $trip['nama_gunung'] ?>">
-          <div class="card-body">
-            <h5 class="card-title"><?= $trip['nama_gunung'] ?></h5>
-            <p class="card-text">
-              📅 <?= date("d M Y", strtotime($trip['tanggal'])) ?><br>
-              🎟️ Slot: <?= $trip['slot'] ?><br>
-              <?= $trip['status'] ?>
-            </p>
-            <div class="d-flex justify-content-between">
-              <a href="#" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Edit</a>
-              <a href="trip.php?hapus=<?= $trip['id'] ?>" onclick="return confirm('Hapus trip ini?');" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Hapus</a>
+      <?php if (empty($trips)): ?>
+        <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
+          <p class="text-muted fs-4 fade-text">🚫 Belum ada jadwal trip.</p>
+        </div>
+      <?php else: ?>
+        <?php foreach ($trips as $trip) : ?>
+          <div class="col-md-4 fade-text">
+            <div class="card shadow-sm">
+              <img src="../img/<?= $trip['gambar'] ?>" class="card-img-top" alt="<?= $trip['nama_gunung'] ?>">
+              <div class="card-body">
+                <h5 class="card-title"><?= $trip['nama_gunung'] ?></h5>
+                <p class="card-text">
+                  📅 <?= date("d M Y", strtotime($trip['tanggal'])) ?><br>
+                  🎟️ Slot: <?= $trip['slot'] ?><br>
+                  <?= $trip['status'] ?>
+                </p>
+                <div class="d-flex justify-content-between">
+                  <a href="#" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Edit</a>
+                  <a href="trip.php?hapus=<?= $trip['id'] ?>" onclick="return confirm('Hapus trip ini?');" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Hapus</a>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    <?php endforeach; ?>
-  <?php endif; ?>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </div>
   </div>
 </div>
 
-<!-- Modal Tambah Trip -->
+<!-- Tambah Trip -->
 <div class="modal fade" id="tambahModal" tabindex="-1" aria-labelledby="tambahModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form method="POST" enctype="multipart/form-data" class="modal-content">
