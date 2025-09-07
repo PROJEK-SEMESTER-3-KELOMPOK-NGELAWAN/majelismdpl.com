@@ -1,15 +1,22 @@
+/* === RESET DASAR === */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: "Poppins", sans-serif;
   line-height: 1.6;
   color: #333;
+  background: #fff;
 }
 
+/* === NAVBAR === */
 .navbar {
   background: #8b5e3c;
   padding: 10px 0;
@@ -53,18 +60,19 @@ body {
 }
 
 .nav-links a:hover {
-  color: #ffd369;
+  color: #AE8340;
 }
 
 .nav-btns .btn {
-  background: #ffd369;
+  background: #AE8340;
   padding: 8px 15px;
   border-radius: 5px;
   text-decoration: none;
-  color: #333;
+  color: #fff;
   font-weight: 600;
 }
 
+/* === HERO SECTION === */
 .hero {
   background: url("../img/Hero.png") center/cover no-repeat;
   height: 100vh;
@@ -104,11 +112,12 @@ body {
   background: #ffd369;
   padding: 10px 20px;
   border-radius: 8px;
-  color: #333;
+  color: #ffffff;
   font-weight: 600;
   text-decoration: none;
 }
 
+/* === LOGIN MODAL === */
 .modal {
   display: none;
   position: fixed;
@@ -123,7 +132,6 @@ body {
 }
 
 .login-box {
-  position: relative;
   background: #fff;
   padding: 30px;
   border-radius: 12px;
@@ -132,6 +140,7 @@ body {
   max-width: 350px;
   text-align: center;
   animation: fadeIn 0.3s ease;
+  position: relative;
 }
 
 .close-btn {
@@ -162,50 +171,177 @@ body {
 
 .btn-login {
   width: 100%;
-  background: #ffd369;
+  background: #AE8340;
   border: none;
   padding: 12px;
   font-weight: 600;
-  color: #333;
+  color: #ffffff;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s;
 }
 
 .btn-login:hover {
-  background: #e6be4f;
+  background: #8b5e3c;
 }
+
+/* === SECTION === */
+section {
+  padding: 60px 20px;
+}
+
+.about img {
+  max-width: 100%;
+}
+
+.hero img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.overlay-text {
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  color: white;
+}
+
+/* === FASILITAS === */
+.fasilitas {
+  text-align: center;
+  padding: 60px 20px;
+  background: url('https://www.transparenttextures.com/patterns/pw-maze-white.png');
+}
+
+.judul-fasilitas .sub {
+  color: orange;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.judul-fasilitas h2 {
+  font-size: 28px;
+  color: #1c1c3f;
+  margin-bottom: 10px;
+}
+
+.judul-fasilitas .deskripsi {
+  max-width: 650px;
+  margin: 0 auto 40px;
+  color: #444;
+  font-size: 15px;
+}
+
+.fasilitas-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  padding: 10px 20px;
+}
+
+.fasilitas-item {
+  min-width: 120px;
+  height: 120px;
+  background: #ffe4b5;
+  border-radius: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 4px 6px rgba(0,0,0,0.15);
+  font-size: 14px;
+  font-weight: 500;
+  color: #1c1c1c;
+}
+
+.fasilitas-item i {
+  font-size: 22px;
+  margin-bottom: 5px;
+}
+
+/* === BENEFITS === */
+.benefits {
+  display: flex;
+  justify-content: space-around;
+  background: #FFF5E6;
+  padding: 40px 0;
+}
+
+.benefit-item {
+  text-align: center;
+  font-weight: bold;
+}
+
+/* === CARD === */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.card {
+  border: 1px solid #ddd;
+  padding: 16px;
+  width: 280px;
+  border-radius: 8px;
+  background: #fff;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* === TESTIMONIAL CARD === */
+.testimonial-card {
+  background: #F3D4A0;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* === FOOTER === */
+footer {
+  text-align: center;
+  background: #5E3D2C;
+  color: white;
+  padding: 20px 0;
+}
+
+/* === WHATSAPP BUTTON === */
 .whatsapp-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 999;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
 }
 
 .whatsapp-button {
-    background-color: #25D366;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 6px #ffffff;
-    transition: background-color 0.3s;
-    font-family: Arial, 'Times New Roman', Times, serif;
+  background-color: #25D366;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.3s;
+  font-family: Arial, sans-serif;
 }
 
 .whatsapp-button:hover {
-    background-color: #25D366;
+  background-color: #1ebe5b;
 }
 
 .whatsapp-button i {
-    font-size: 20px;
+  font-size: 20px;
 }
 
-
+/* === ANIMATIONS === */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -215,5 +351,4 @@ body {
     opacity: 1;
     transform: scale(1);
   }
-  
 }

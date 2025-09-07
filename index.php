@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
    <meta charset="UTF-8">
-   <-- !whatsapp-button1! -->
     <title>WhatsApp Button</title>
 
     <!-- CSS Link -->
@@ -50,6 +49,98 @@
       <a href="#trip" class="btn-hero">Lihat Paket Trip</a>
     </div>
   </section>
+    <section class="section" id="profile">
+    <h2>Profile</h2>
+    <p>Majelis MDPL adalah komunitas yang bergerak dalam kegiatan pendakian gunung secara terorganisir dan aman.</p>
+  </section>
+  <!-- Deskripsi Aplikasi -->
+  <section class="about">
+    <div class="container">
+      <h2>Apa Itu Majelis Open Trip?</h2>
+      <p>Platform pendakian untuk menjelajahi gunung bersama tim profesional.</p>
+      <img src="img/fitur-aplikasi.png" alt="Aplikasi" />
+    </div>
+  </section>
+
+  <!-- Fasilitas Section -->
+  <section class="fasilitas">
+    <div class="judul-fasilitas">
+      <p class="sub">FASILITAS</p>
+      <h2><span class="highlight">Fasilitas</span> Kami</h2>
+      <p class="deskripsi">
+        Nikmati segala kemudahan yang kami sediakan untuk membuat perjalanan wisata Anda di kawasan Gunung Merapi menjadi pengalaman yang tak terlupakan.
+      </p>
+    </div>
+
+    <div class="fasilitas-container">
+      <div class="fasilitas-item">
+        <i class="fas fa-music"></i>
+        <p>Spotify Manual</p>
+      </div>
+      <div class="fasilitas-item">
+        <i class="fas fa-first-aid"></i>
+        <p>P3K</p>
+      </div>
+      <div class="fasilitas-item">
+        <i class="fas fa-camera"></i>
+        <p>Dokumentasi</p>
+      </div>
+      <div class="fasilitas-item">
+        <i class="fas fa-book-open"></i>
+        <p>Cerita Nabi-nabi</p>
+      </div>
+      <div class="fasilitas-item">
+        <i class="fas fa-heart"></i>
+        <p>Jodoh bila beruntung</p>
+      </div>
+    </div>
+  </section>
+  
+<!-- Testimonials -->
+    <section id="testimonials" class="testimonials">
+        <div class="container">
+            <h2><span class="title-large">Apa Kata Mereka?</span></h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card elevation-1">
+                    <p class="testimonial-text">Trip ke Rinjani sangat terorganisir. Guide-nya asik dan perhatian. Saya yang pemula merasa aman banget!</p>
+                    <div class="testimonial-author">
+                        <div class="author-image"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Rudi"></div>
+                        <div class="author-details"><h4>Rudi Saputra</h4><p>Jakarta</p></div>
+                    </div>
+                </div>
+                <div class="testimonial-card elevation-1">
+                    <p class="testimonial-text">Baru pertama kali ikut open trip, tapi langsung jatuh cinta. Banyak teman baru dan pengalaman tak terlupakan.</p>
+                    <div class="testimonial-author">
+                        <div class="author-image"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dewi"></div>
+                        <div class="author-details"><h4>Dewi Lestari</h4><p>Bandung</p></div>
+                    </div>
+                </div>
+                <div class="testimonial-card elevation-1">
+                    <p class="testimonial-text">Sunrise di Bromo, camping di savana, semua sempurna. Majelis MDPL benar-benar profesional!</p>
+                    <div class="testimonial-author">
+                        <div class="author-image"><img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Andi"></div>
+                        <div class="author-details"><h4>Andi Pratama</h4><p>Surabaya</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+  <!-- Kontak -->
+  <section class="contact">
+    <h2>Kontak Kami</h2>
+    <form>
+      <input type="text" placeholder="Nama" required />
+      <textarea placeholder="Pesan" required></textarea>
+      <button type="submit">Kirim</button>
+    </form>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Majelis Open Trip</p>
+  </footer>
+  
 
   <!-- Popup Login -->
   <div id="loginModal" class="modal">
