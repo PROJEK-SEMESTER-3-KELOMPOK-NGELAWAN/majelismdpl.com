@@ -34,6 +34,37 @@ body {
   margin: auto;
   padding: 0 20px;
 }
+.navbar .navbar-logo span {
+  color: var(--primary);
+}
+
+.navbar .navbar-nav a {
+  color: #fff;
+  display: inline-block; /* Perbaikan: sebelumnya 'inline-blocks' (salah) */
+  font-size: 1.3rem;
+  margin: 0 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.navbar .navbar-nav a:hover {
+  color: var(--primary);
+}
+
+/* Efek underline saat hover */
+.navbar .navbar-nav a::after {
+  content: '';
+  display: block;
+  padding-bottom: 0.5rem;
+  border-bottom: 0.1rem solid var(--primary); /* Perbaikan: baris sebelumnya terpotong */
+  transform: scale(0);
+  transition: transform 0.3s ease;
+  transform-origin: left;
+}
+
+.navbar .navbar-nav a:hover::after {
+  transform: scale(1);
+}
 
 .logo {
   display: flex;
