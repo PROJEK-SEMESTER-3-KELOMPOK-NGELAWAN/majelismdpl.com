@@ -144,6 +144,7 @@ if (isset($_POST['edit'])) {
       </button>
     </div>
 
+    <!-- CARD -->
     <div class="row g-4">
       <?php if (empty($trips)): ?>
         <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
