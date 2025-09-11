@@ -9,21 +9,24 @@ if (file_exists($file)) {
   $trips = [];
 }
 
-  // Button tambah
-  if (isset($_POST['tambah'])) {
-    $id = count($trips) + 1;
-    $nama = $_POST['nama_gunung'];
-    $tanggal = $_POST['tanggal'];
-    $slot = $_POST['slot'];
-    $status = $_POST['status'];
-    $gambar = "default.jpg";
+// Button tambah
+if (isset($_POST['tambah'])) {
+  $id = count($trips) + 1;
+  $nama = $_POST['nama_gunung'];
+  $via = $_POST['via_gunung'];
+  $jenis = $_POST['jenis_trip']; 
+  $durasi = ($jenis == "Camp") ? $_POST['durasi'] : "-";
+  $harga = $_POST['harga'];
+  $tanggal = $_POST['tanggal'];
+  $slot = $_POST['slot'];
+  $status = $_POST['status'];
+  $gambar = "default.jpg";
 
   // Upload gambar
   if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === 0) {
     $targetDir = "../img/";
     $fileName = time() . "_" . basename($_FILES['gambar']['name']);
     $targetFile = $targetDir . $fileName;
-
     if (move_uploaded_file($_FILES['gambar']['tmp_name'], $targetFile)) {
       $gambar = $fileName;
     }
@@ -32,6 +35,10 @@ if (file_exists($file)) {
   $trips[] = [
     "id" => $id,
     "nama_gunung" => $nama,
+    "via_gunung" => $via,
+    "jenis_trip" => $jenis,
+    "durasi" => $durasi,
+    "harga" => $harga,
     "tanggal" => $tanggal,
     "slot" => $slot,
     "status" => $status,
@@ -39,7 +46,6 @@ if (file_exists($file)) {
   ];
 
   file_put_contents($file, json_encode($trips, JSON_PRETTY_PRINT));
-
   header("Location: trip.php");
   exit();
 }
@@ -55,10 +61,41 @@ if (isset($_GET['hapus'])) {
   $trips = array_values($trips);
 
   file_put_contents($file, json_encode($trips, JSON_PRETTY_PRINT));
-
   header("Location: trip.php");
   exit();
 }
+
+// Button edit
+if (isset($_POST['edit'])) {
+  $id = $_POST['id'];
+  foreach ($trips as &$trip) {
+    if ($trip['id'] == $id) {
+      $trip['nama_gunung'] = $_POST['nama_gunung'];
+      $trip['via_gunung'] = $_POST['via_gunung'];
+      $trip['jenis_trip'] = $_POST['jenis_trip'];
+      $trip['durasi'] = ($_POST['jenis_trip'] == "Camp") ? $_POST['durasi'] : "-";
+      $trip['harga'] = $_POST['harga'];
+      $trip['tanggal'] = $_POST['tanggal'];
+      $trip['slot'] = $_POST['slot'];
+      $trip['status'] = $_POST['status']; 
+
+      // Cek upload gambar baru
+      if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === 0) {
+        $targetDir = "../img/";
+        $fileName = time() . "_" . basename($_FILES['gambar']['name']);
+        $targetFile = $targetDir . $fileName;
+        if (move_uploaded_file($_FILES['gambar']['tmp_name'], $targetFile)) {
+          $trip['gambar'] = $fileName;
+        }
+      }
+      break;
+    }
+  }
+  file_put_contents($file, json_encode($trips, JSON_PRETTY_PRINT));
+  header("Location: trip.php");
+  exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -70,7 +107,6 @@ if (isset($_GET['hapus'])) {
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/admin.css">
   <style>
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -97,7 +133,6 @@ if (isset($_GET['hapus'])) {
       <li class="nav-item"><a href="galeri.php" class="nav-link"><i class="bi bi-images"></i><span> Galeri</span></a></li>
       <li class="nav-item"><a href="logout.php" class="nav-link"><i class="bi bi-box-arrow-left"></i><span> Logout</span></a></li>
     </ul>
-
   </div>
 
   <!-- Content -->
@@ -109,6 +144,7 @@ if (isset($_GET['hapus'])) {
       </button>
     </div>
 
+    <!-- CARD -->
     <div class="row g-4">
       <?php if (empty($trips)): ?>
         <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
@@ -117,18 +153,61 @@ if (isset($_GET['hapus'])) {
       <?php else: ?>
         <?php foreach ($trips as $trip) : ?>
           <div class="col-md-4 fade-text">
-            <div class="card shadow-sm">
-              <img src="../img/<?= $trip['gambar'] ?>" class="card-img-top" alt="<?= $trip['nama_gunung'] ?>">
-              <div class="card-body">
-                <h5 class="card-title"><?= $trip['nama_gunung'] ?></h5>
-                <p class="card-text">
-                  📅 <?= date("d M Y", strtotime($trip['tanggal'])) ?><br>
-                  🎟️ Slot: <?= $trip['slot'] ?><br>
-                  <?= $trip['status'] ?>
-                </p>
+            <div class="card shadow-sm border-0 rounded-4 h-100 text-center">
+              <div class="position-relative">
+                <!-- Badge Status Trip -->
+                <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2 
+                  <?= $trip['status']=="sold" ? "bg-danger" : "bg-success" ?>">
+                  <i class="bi <?= $trip['status']=="sold" ? "bi-x-circle-fill" : "bi-check-circle-fill" ?>"></i>
+                  <?= $trip['status']=="sold" ? "Sold" : "Available" ?>
+                </span>
+                <!-- Gambar -->
+                <img src="../img/<?= $trip['gambar'] ?>" 
+                    class="card-img-top rounded-top-4" 
+                    alt="<?= $trip['nama_gunung'] ?>" 
+                    style="height:200px; object-fit:cover;">
+              </div>
+              <div class="card-body text-center">
+                <!-- Tanggal & Durasi -->
+                <div class="d-flex justify-content-between small text-muted mb-2">
+                  <span><i class="bi bi-calendar-event"></i> <?= date("d M Y", strtotime($trip['tanggal'])) ?></span>
+                  <span><i class="bi bi-clock"></i> <?= $trip['jenis_trip'] == "Camp" ? $trip['durasi'] : "1 hari" ?></span>
+                </div>
+                <!-- Judul -->
+                <h5 class="card-title fw-bold"><?= $trip['nama_gunung'] ?></h5>
+                <div class="mb-2">
+                  <span class="badge bg-secondary">
+                    <i class="bi bi-flag-fill"></i> <?= $trip['jenis_trip'] ?>
+                  </span>
+                </div>
+                <!-- Rating & Ulasan -->
+                <div class="small text-muted mb-2">
+                  <i class="bi bi-star-fill text-warning"></i> 5 (<?= rand(101, 300) ?>+ ulasan)
+                </div>
+                <!-- Via Gunung -->
+                <div class="small text-muted mb-2">
+                  <i class="bi bi-signpost-2"></i> Via <?= $trip['via_gunung'] ?? '-' ?>
+                </div>
+                <!-- Harga -->
+                <h5 class="fw-bold text-success mb-3">
+                  Rp <?= number_format((int)str_replace(['.', ','], '', $trip['harga']), 0, ',', '.') ?>
+                </h5>
+                <!-- Tombol Aksi -->
                 <div class="d-flex justify-content-between">
-                  <a href="#" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Edit</a>
-                  <a href="trip.php?hapus=<?= $trip['id'] ?>" onclick="return confirm('Hapus trip ini?');" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Hapus</a>
+                <!-- Detail -->
+                <a href="trip_detail.php?id=<?= $trip['id'] ?>" class="btn btn-info btn-sm">
+                  <i class="bi bi-eye"></i> Detail
+                </a>  
+                  <!-- Edit -->
+                  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $trip['id'] ?>">
+                    <i class="bi bi-pencil-square"></i> Edit
+                  </button>
+                  <!-- Hapus -->
+                  <a href="trip.php?hapus=<?= $trip['id'] ?>" 
+                    onclick="return confirm('Hapus trip ini?');" 
+                    class="btn btn-danger btn-sm">
+                    <i class="bi bi-trash"></i> Hapus
+                  </a>
                 </div>
               </div>
             </div>
@@ -138,6 +217,74 @@ if (isset($_GET['hapus'])) {
     </div>
   </div>
 </div>
+
+<!-- Modal Edit Trip -->
+<?php foreach ($trips as $trip) : ?>
+<div class="modal fade" id="editModal<?= $trip['id'] ?>" tabindex="-1" aria-labelledby="editModalLabel<?= $trip['id'] ?>" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" enctype="multipart/form-data" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold text-decoration-underline" id="editModalLabel<?= $trip['id'] ?>"> Edit Trip</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="id" value="<?= $trip['id'] ?>">
+
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-geo-alt-fill"></i> Nama Gunung</label>
+          <input type="text" name="nama_gunung" value="<?= $trip['nama_gunung'] ?>" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-signpost-split"></i> Jenis Trip</label>
+          <select name="jenis_trip" class="form-control jenisTripEdit" data-id="<?= $trip['id'] ?>" required>
+            <option value="Camp" <?= $trip['jenis_trip']=="Camp"?"selected":"" ?>>Camp</option>
+            <option value="Tektok" <?= $trip['jenis_trip']=="Tektok"?"selected":"" ?>>Tektok</option>
+          </select>
+        </div>
+        <div class="mb-3 durasiGroupEdit<?= $trip['id'] ?>" style="<?= $trip['jenis_trip']=="Camp"?"":"display:none;" ?>">
+          <label class="form-label"><i class="bi bi-clock-history"></i> Durasi Camp</label>
+          <input type="text" name="durasi" value="<?= $trip['durasi'] ?>" class="form-control" placeholder="cth: 2 hari 1 malam">
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-cash-coin"></i> Harga Trip / pax</label>
+          <input type="text" name="harga" value="<?= $trip['harga'] ?>" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-calendar-event"></i> Tanggal</label>
+          <input type="date" name="tanggal" value="<?= $trip['tanggal'] ?>" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-people-fill"></i> Slot</label>
+          <input type="number" name="slot" value="<?= $trip['slot'] ?>" class="form-control" required>
+        </div>
+       <div class="mb-3">
+          <label class="form-label"><i class="bi bi-check-circle-fill"></i> Status</label>
+          <select name="status" class="form-control" required>
+            <option value="available" <?= isset($trip) && $trip['status']=="available"?"selected":"" ?>>
+              ✅ Available
+            </option>
+            <option value="sold" <?= isset($trip) && $trip['status']=="sold"?"selected":"" ?>>
+              ❌ Sold
+            </option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-signpost"></i> Via Gunung</label>
+          <input type="text" name="via_gunung" value="<?= $trip['via_gunung'] ?? '' ?>" class="form-control" placeholder="cth: Via Cemoro Kandang">
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-image"></i> Upload Gambar</label>
+          <input type="file" name="gambar" class="form-control" accept="image/*">
+          <small class="text-muted">Kosongkan jika tidak ingin mengganti gambar</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" name="edit" class="btn btn-primary"><i class="bi bi-save"></i> Simpan Perubahan</button>
+      </div>
+    </form>
+  </div>
+</div>
+<?php endforeach; ?>
 
 <!-- Tambah Trip -->
 <div class="modal fade" id="tambahModal" tabindex="-1" aria-labelledby="tambahModalLabel" aria-hidden="true">
@@ -149,27 +296,45 @@ if (isset($_GET['hapus'])) {
       </div>
       <div class="modal-body">
         <div class="mb-3">
-          <label class="form-label">Nama Gunung</label>
+          <label class="form-label"><i class="bi bi-geo-alt-fill"></i> Nama Gunung</label>
           <input type="text" name="nama_gunung" class="form-control" required>
         </div>
         <div class="mb-3">
-          <label class="form-label">Tanggal</label>
+          <label class="form-label"><i class="bi bi-signpost-2"></i> Via Gunung</label>
+          <input type="text" name="via_gunung" class="form-control" placeholder="cth: Via Cemoro Kandang" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-signpost-split"></i> Jenis Trip</label>
+          <select name="jenis_trip" class="form-control" id="jenisTrip" required>
+            <option value="Camp">Camp</option>
+            <option value="Tektok">Tektok</option>
+          </select>
+        </div>
+        <div class="mb-3" id="durasiGroup">
+          <label class="form-label"><i class="bi bi-clock-history"></i> Durasi Camp</label>
+          <input type="text" name="durasi" class="form-control" placeholder="cth: 2 hari 1 malam">
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-cash-coin"></i> Harga Trip / pax</label>
+          <input type="text" name="harga" class="form-control" placeholder="Rp 0" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><i class="bi bi-calendar-event"></i> Tanggal</label>
           <input type="date" name="tanggal" class="form-control" required>
         </div>
         <div class="mb-3">
-          <label class="form-label">Slot</label>
+          <label class="form-label"><i class="bi bi-people-fill"></i> Slot</label>
           <input type="number" name="slot" class="form-control" required>
         </div>
         <div class="mb-3">
-          <label class="form-label">Status</label>
-          <select name="status" class="form-control">
-            <option value="Aktif">Aktif</option>
-            <option value="Penuh">Penuh</option>
-            <option value="Ditutup">Ditutup</option>
+          <label class="form-label"><i class="bi bi-check-circle-fill"></i> Status</label>
+          <select name="status" class="form-control" required>
+            <option value="available">✅ Available</option>
+            <option value="sold">❌ Sold</option>
           </select>
         </div>
         <div class="mb-3">
-          <label class="form-label">Upload Gambar</label>
+          <label class="form-label"><i class="bi bi-image"></i> Upload Gambar</label>
           <input type="file" name="gambar" class="form-control" accept="image/*">
         </div>
       </div>
@@ -188,6 +353,15 @@ if (isset($_GET['hapus'])) {
   toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");
     main.classList.toggle("expanded");
+  });
+
+  document.getElementById("jenisTrip").addEventListener("change", function() {
+    const durasiGroup = document.getElementById("durasiGroup");
+    if (this.value === "Camp") {
+      durasiGroup.style.display = "block";
+    } else {
+      durasiGroup.style.display = "none";
+    }
   });
 </script>
 
