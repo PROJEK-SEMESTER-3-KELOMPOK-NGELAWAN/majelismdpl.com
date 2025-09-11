@@ -1,6 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION["admin"])) {
+// Ubah dari $_SESSION["admin"] menjadi cek role
+if (!isset($_SESSION["role"]) || $_SESSION["role"] !== 'admin') {
   header("Location: ../index.php");
   exit();
 }

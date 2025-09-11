@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
+
 <body>
 
   <!-- Navbar -->
@@ -44,17 +46,21 @@
     <div class="login-box">
       <a href="#" class="close-btn" id="close-login">&times;</a>
       <h2>Login</h2>
+
       <form action="login.php" method="POST">
         <div class="input-group">
-          <input type="text" name="username" placeholder="Username" required />
+          <input type="text" id="username" name="username" placeholder="Username" required />
         </div>
         <div class="input-group">
-          <input type="password" name="password" placeholder="Password" required />
+          <input type="password" id="password" name="password" placeholder="Password" required />
         </div>
         <button type="submit" class="btn-login">Masuk</button>
       </form>
     </div>
   </div>
+
+
+
 
   <script>
     const modal = document.getElementById("loginModal");
@@ -76,6 +82,8 @@
         modal.style.display = "none";
       }
     });
+
   </script>
 </body>
+
 </html>
