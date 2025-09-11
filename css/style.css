@@ -238,58 +238,58 @@ section {
   color: white;
 }
 
-/* === FASILITAS === */
-.fasilitas {
-  text-align: center;
-  padding: 60px 20px;
-  background: url('https://www.transparenttextures.com/patterns/pw-maze-white.png');
+/* === CONTAINER === */
+
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 40px;
 }
 
-.judul-fasilitas .sub {
-  color: orange;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.judul-fasilitas h2 {
-  font-size: 28px;
-  color: #1c1c3f;
-  margin-bottom: 10px;
-}
-
-.judul-fasilitas .deskripsi {
-  max-width: 650px;
-  margin: 0 auto 40px;
-  color: #444;
-  font-size: 15px;
-}
-
-.fasilitas-container {
+.item {
   display: flex;
-  justify-content: center;
-  gap: 30px;
-  flex-wrap: wrap;
-  padding: 10px 20px;
-}
-
-.fasilitas-item {
-  min-width: 120px;
-  height: 120px;
-  background: #ffe4b5;
-  border-radius: 100%;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  box-shadow: 2px 4px 6px rgba(0,0,0,0.15);
-  font-size: 14px;
-  font-weight: 500;
-  color: #1c1c1c;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 20px;
 }
 
-.fasilitas-item i {
-  font-size: 22px;
-  margin-bottom: 5px;
+.left {
+  flex: 1;
+  max-width: 45%;
+}
+
+.left img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.left img:hover {
+  transform: scale(1.05);
+}
+
+.right {
+  flex: 1;
+  max-width: 45%;
+  padding-left: 30px;
+}
+
+.right h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.right p {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.6;
 }
 
 /* === BENEFITS === */
@@ -329,17 +329,133 @@ section {
 
 /* === TESTIMONIAL CARD === */
 .testimonial-card {
-  background: #F3D4A0;
-  padding: 20px;
-  border-radius: 10px;
+    background: #F3D4A0; /* Warna latar belakang */
+    padding: 20px; /* Padding di dalam kartu */
+    border-radius: 10px; /* Membuat sudut kartu melengkung */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Menambahkan bayangan lembut */
+    display: flex; /* Menggunakan flexbox untuk konten dalam kartu */
+    align-items: center; /* Vertikal align konten di tengah */
+    gap: 15px; /* Memberikan jarak antara gambar dan teks */
+    min-width: 300px; /* Membatasi lebar minimum */
+    flex: 1; /* Membuat kartu testimonial mengambil ruang yang sama */
 }
+
+.testimonial-card .testimonial-text {
+    font-size: 16px; /* Ukuran font untuk teks testimonial */
+    color: #333; /* Warna teks */
+    margin-bottom: 10px; /* Memberikan jarak bawah untuk teks */
+}
+
+.testimonial-card .testimonial-author {
+    display: flex; /* Menggunakan flexbox untuk gambar dan detail penulis */
+    align-items: center; /* Memastikan gambar dan detail vertikal rata tengah */
+    gap: 10px; /* Memberikan jarak antara gambar dan teks penulis */
+}
+
+.testimonial-card .author-image img {
+    width: 50px; /* Ukuran gambar profil */
+    height: 50px; /* Ukuran gambar profil */
+    border-radius: 50%; /* Membuat gambar berbentuk lingkaran */
+    object-fit: cover; /* Menjaga gambar tetap proporsional */
+}
+
+.testimonial-card .author-details h4 {
+    font-size: 18px; /* Ukuran nama penulis */
+    font-weight: bold; /* Membuat nama penulis lebih menonjol */
+    color: #333; /* Warna teks nama penulis */
+    margin: 0; /* Menghilangkan margin default */
+}
+
+.testimonial-card .author-details p {
+    font-size: 14px; /* Ukuran font untuk lokasi */
+    color: #666; /* Warna teks lokasi */
+    margin: 0; /* Menghilangkan margin default */
+}
+
 
 /* === FOOTER === */
 footer {
+  background-color: #7f5d3b;
+  color: #fff;
+  padding: 40px 20px;
+  text-align: left;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.footer-left, .footer-right {
+  flex: 1;
+  max-width: 45%;
+  padding: 10px;
+}
+
+.footer-logo img {
+  max-width: 120px;
+  margin-bottom: 20px;
+}
+
+.footer-description {
+  margin-bottom: 20px;
+}
+
+.footer-social a {
+  margin-right: 10px;
+}
+
+.footer-social img {
+  width: 30px;
+  height: 30px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.footer-social img:hover {
+  transform: scale(1.1);
+}
+
+.footer-right {
+  text-align: right;
+}
+
+.footer-right h3 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.footer-right p, .footer-right ul {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.footer-right ul {
+  list-style-type: none;
+}
+
+.footer-right li {
+  margin-bottom: 10px;
+}
+
+.footer-right a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 400;
+  transition: color 0.3s ease-in-out;
+}
+
+.footer-right a:hover {
+  color: #f7a731;
+}
+
+/* Footer Bottom */
+.footer-bottom {
   text-align: center;
-  background: #5E3D2C;
-  color: white;
-  padding: 20px 0;
+  font-size: 14px;
+  margin-top: 30px;
+  color: #ddd;
 }
 
 /* === WHATSAPP BUTTON === */

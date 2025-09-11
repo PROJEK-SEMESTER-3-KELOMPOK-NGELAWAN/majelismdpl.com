@@ -50,51 +50,113 @@
     </div>
   </section>
     <section class="section" id="profile">
-    <h2>Profile</h2>
-    <p>Majelis MDPL adalah komunitas yang bergerak dalam kegiatan pendakian gunung secara terorganisir dan aman.</p>
-  </section>
-  <!-- Deskripsi Aplikasi -->
-  <section class="about">
-    <div class="container">
-      <h2>Apa Itu Majelis Open Trip?</h2>
-      <p>Platform pendakian untuk menjelajahi gunung bersama tim profesional.</p>
-      <img src="img/fitur-aplikasi.png" alt="Aplikasi" />
+    
+    <!-- container -->
+    <section class="container">
+    <div class="item">
+      <div class="left">
+        <img src="path/to/image1.jpg" alt="Image 1">
+      </div>
+      <div class="right">
+        <h3>Banyak Pilihan Destinasi</h3>
+        <p>Mau liburan ke Bandung, Lembang, Yogyakarta, Semarang, Surabaya, Gunung ataupun Laut semuanya ada di Explorer.ID</p>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="left">
+        <img src="path/to/image2.jpg" alt="Image 2">
+      </div>
+      <div class="right">
+        <h3>Banyak Metode Pembayaran</h3>
+        <p>Gak usah pusing, Explorer.ID banyak metode pembayaran kekinian yang bakal bikin kamu lebih nyaman.</p>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="left">
+        <img src="path/to/image3.jpg" alt="Image 3">
+      </div>
+      <div class="right">
+        <h3>Transaksi Aman</h3>
+        <p>Keamanan dan privasi transaksi online Anda menjadi prioritas kami.</p>
+      </div>
     </div>
   </section>
 
-  <!-- Fasilitas Section -->
-  <section class="fasilitas">
-    <div class="judul-fasilitas">
-      <p class="sub">FASILITAS</p>
-      <h2><span class="highlight">Fasilitas</span> Kami</h2>
-      <p class="deskripsi">
-        Nikmati segala kemudahan yang kami sediakan untuk membuat perjalanan wisata Anda di kawasan Gunung Merapi menjadi pengalaman yang tak terlupakan.
-      </p>
+  <!-- CARD -->
+    <div class="row g-4">
+      <?php if (empty($trips)): ?>
+        <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
+          <p class="text-muted fs-4 fade-text">🚫 Belum ada jadwal trip.</p>
+        </div>
+      <?php else: ?>
+        <?php foreach ($trips as $trip) : ?>
+          <div class="col-md-4 fade-text">
+            <div class="card shadow-sm border-0 rounded-4 h-100 text-center">
+              <div class="position-relative">
+                <!-- Badge Status Trip -->
+                <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2 
+                  <?= $trip['status']=="sold" ? "bg-danger" : "bg-success" ?>">
+                  <i class="bi <?= $trip['status']=="sold" ? "bi-x-circle-fill" : "bi-check-circle-fill" ?>"></i>
+                  <?= $trip['status']=="sold" ? "Sold" : "Available" ?>
+                </span>
+                <!-- Gambar -->
+                <img src="../img/<?= $trip['gambar'] ?>" 
+                    class="card-img-top rounded-top-4" 
+                    alt="<?= $trip['nama_gunung'] ?>" 
+                    style="height:200px; object-fit:cover;">
+              </div>
+              <div class="card-body text-center">
+                <!-- Tanggal & Durasi -->
+                <div class="d-flex justify-content-between small text-muted mb-2">
+                  <span><i class="bi bi-calendar-event"></i> <?= date("d M Y", strtotime($trip['tanggal'])) ?></span>
+                  <span><i class="bi bi-clock"></i> <?= $trip['jenis_trip'] == "Camp" ? $trip['durasi'] : "1 hari" ?></span>
+                </div>
+                <!-- Judul -->
+                <h5 class="card-title fw-bold"><?= $trip['nama_gunung'] ?></h5>
+                <div class="mb-2">
+                  <span class="badge bg-secondary">
+                    <i class="bi bi-flag-fill"></i> <?= $trip['jenis_trip'] ?>
+                  </span>
+                </div>
+                <!-- Rating & Ulasan -->
+                <div class="small text-muted mb-2">
+                  <i class="bi bi-star-fill text-warning"></i> 5 (<?= rand(101, 300) ?>+ ulasan)
+                </div>
+                <!-- Via Gunung -->
+                <div class="small text-muted mb-2">
+                  <i class="bi bi-signpost-2"></i> Via <?= $trip['via_gunung'] ?? '-' ?>
+                </div>
+                <!-- Harga -->
+                <h5 class="fw-bold text-success mb-3">
+                  Rp <?= number_format((int)str_replace(['.', ','], '', $trip['harga']), 0, ',', '.') ?>
+                </h5>
+                <!-- Tombol Aksi -->
+                <div class="d-flex justify-content-between">
+                <!-- Detail -->
+                <a href="trip_detail.php?id=<?= $trip['id'] ?>" class="btn btn-info btn-sm">
+                  <i class="bi bi-eye"></i> Detail
+                </a>  
+                  <!-- Edit -->
+                  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $trip['id'] ?>">
+                    <i class="bi bi-pencil-square"></i> Edit
+                  </button>
+                  <!-- Hapus -->
+                  <a href="trip.php?hapus=<?= $trip['id'] ?>" 
+                    onclick="return confirm('Hapus trip ini?');" 
+                    class="btn btn-danger btn-sm">
+                    <i class="bi bi-trash"></i> Hapus
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </div>
-
-    <div class="fasilitas-container">
-      <div class="fasilitas-item">
-        <i class="fas fa-music"></i>
-        <p>Spotify Manual</p>
-      </div>
-      <div class="fasilitas-item">
-        <i class="fas fa-first-aid"></i>
-        <p>P3K</p>
-      </div>
-      <div class="fasilitas-item">
-        <i class="fas fa-camera"></i>
-        <p>Dokumentasi</p>
-      </div>
-      <div class="fasilitas-item">
-        <i class="fas fa-book-open"></i>
-        <p>Cerita Nabi-nabi</p>
-      </div>
-      <div class="fasilitas-item">
-        <i class="fas fa-heart"></i>
-        <p>Jodoh bila beruntung</p>
-      </div>
-    </div>
-  </section>
+  </div>
+</div>
   
 <!-- Testimonials -->
     <section id="testimonials" class="testimonials">
@@ -126,19 +188,47 @@
         </div>
     </section>
 
-  <!-- Kontak -->
-  <section class="contact">
-    <h2>Kontak Kami</h2>
-    <form>
-      <input type="text" placeholder="Nama" required />
-      <textarea placeholder="Pesan" required></textarea>
-      <button type="submit">Kirim</button>
-    </form>
-  </section>
-
   <!-- Footer -->
   <footer>
-    <p>&copy; 2025 Majelis Open Trip</p>
+    <div class="footer-container">
+      <!-- Left Section -->
+      <div class="footer-left">
+        <div class="footer-logo">
+          <img src="path/to/logo.png" alt="Majelis MDPL Logo">
+        </div>
+        <p class="footer-description">
+          ✨ Nikmati pengalaman tak terlupakan bersama Majelis MDPL Open Trip. Ikuti serunya pendakian tektok maupun camping, rasakan panorama puncak yang menakjubkan, dan ciptakan kenangan berharga di setiap perjalanan.
+        </p>
+        <div class="footer-social">
+          <a href="#" target="_blank"><img src="path/to/facebook-icon.png" alt="Facebook"></a>
+          <a href="#" target="_blank"><img src="path/to/instagram-icon.png" alt="Instagram"></a>
+          <a href="#" target="_blank"><img src="path/to/tiktok-icon.png" alt="TikTok"></a>
+        </div>
+      </div>
+
+      <!-- Right Section -->
+      <div class="footer-right">
+        <div class="footer-contact">
+          <h3>Kontak Kami</h3>
+          <p><strong>Alamat Kami:</strong><br>Jl. Asello, Kalivates, Jember 55582</p>
+          <p><strong>Whatsapp:</strong><br>08562889933</p>
+          <p><strong>Email:</strong><br>majelismdpl@gmail.com</p>
+        </div>
+
+        <div class="footer-links">
+          <h3>Quick Link</h3>
+          <ul>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Paket Open Trip</a></li>
+            <li><a href="#">Kontak</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>Copyright &copy; 2025 Majelis MDPL. All rights reserved. Developed with ❤️ by Dimasdwi15</p>
+    </div>
   </footer>
   
 
