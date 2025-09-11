@@ -86,7 +86,6 @@
       </div>
     </div>
   </section>
-
   <!-- CARD -->
     <div class="row g-4">
       <?php if (empty($trips)): ?>
