@@ -34,37 +34,6 @@ body {
   margin: auto;
   padding: 0 20px;
 }
-.navbar .navbar-logo span {
-  color: var(--primary);
-}
-
-.navbar .navbar-nav a {
-  color: #fff;
-  display: inline-block; /* Perbaikan: sebelumnya 'inline-blocks' (salah) */
-  font-size: 1.3rem;
-  margin: 0 1rem;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.navbar .navbar-nav a:hover {
-  color: var(--primary);
-}
-
-/* Efek underline saat hover */
-.navbar .navbar-nav a::after {
-  content: '';
-  display: block;
-  padding-bottom: 0.5rem;
-  border-bottom: 0.1rem solid var(--primary); /* Perbaikan: baris sebelumnya terpotong */
-  transform: scale(0);
-  transition: transform 0.3s ease;
-  transform-origin: left;
-}
-
-.navbar .navbar-nav a:hover::after {
-  transform: scale(1);
-}
 
 .logo {
   display: flex;
@@ -94,6 +63,11 @@ body {
   color: #AE8340;
 }
 
+.nav-btns {
+  display: flex; /* Ensures buttons are aligned horizontally */
+  gap: 10px; /* Adds space between buttons */
+}
+
 .nav-btns .btn {
   background: #AE8340;
   padding: 8px 15px;
@@ -101,7 +75,41 @@ body {
   text-decoration: none;
   color: #fff;
   font-weight: 600;
+  transition: background-color 0.3s;
 }
+
+.nav-btns .btn:hover {
+  background-color: #8b5e3c; /* Darker shade on hover */
+}
+
+/* Navbar Links Hover Effect */
+.navbar .navbar-nav a {
+  color: #fff;
+  display: inline-block;
+  font-size: 1.3rem;
+  margin: 0 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.navbar .navbar-nav a:hover {
+  color: var(--primary);
+}
+
+.navbar .navbar-nav a::after {
+  content: '';
+  display: block;
+  padding-bottom: 0.5rem;
+  border-bottom: 0.1rem solid var(--primary);
+  transform: scale(0);
+  transition: transform 0.3s ease;
+  transform-origin: left;
+}
+
+.navbar .navbar-nav a:hover::after {
+  transform: scale(1);
+}
+
 
 /* === HERO SECTION === */
 .hero {
@@ -239,58 +247,7 @@ section {
 }
 
 /* === FASILITAS === */
-.fasilitas {
-  text-align: center;
-  padding: 60px 20px;
-  background: url('https://www.transparenttextures.com/patterns/pw-maze-white.png');
-}
 
-.judul-fasilitas .sub {
-  color: orange;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.judul-fasilitas h2 {
-  font-size: 28px;
-  color: #1c1c3f;
-  margin-bottom: 10px;
-}
-
-.judul-fasilitas .deskripsi {
-  max-width: 650px;
-  margin: 0 auto 40px;
-  color: #444;
-  font-size: 15px;
-}
-
-.fasilitas-container {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  flex-wrap: wrap;
-  padding: 10px 20px;
-}
-
-.fasilitas-item {
-  min-width: 120px;
-  height: 120px;
-  background: #ffe4b5;
-  border-radius: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 2px 4px 6px rgba(0,0,0,0.15);
-  font-size: 14px;
-  font-weight: 500;
-  color: #1c1c1c;
-}
-
-.fasilitas-item i {
-  font-size: 22px;
-  margin-bottom: 5px;
-}
 
 /* === BENEFITS === */
 .benefits {
