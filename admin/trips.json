@@ -1,17 +1,5 @@
 [
     {
-        "id": 5,
-        "nama_gunung": "Gunung Raung",
-        "via_gunung": "Sumberwringin",
-        "jenis_trip": "Camp",
-        "durasi": "2 Hari 1 Malam",
-        "harga": "300000",
-        "tanggal": "2025-09-09",
-        "slot": "12",
-        "status": "available",
-        "gambar": "1757246845_foto2.png"
-    },
-    {
         "id": 2,
         "nama_gunung": "Gunung Rante",
         "via_gunung": "Bondowoso",
@@ -22,5 +10,21 @@
         "slot": "15",
         "status": "sold",
         "gambar": "1757249125_20240120_135810.jpg"
+    },
+    {
+        "id": 3,
+        "nama_gunung": "Gunung Raung",
+        "via_gunung": "Sumberwringin",
+        "jenis_trip": "Camp",
+        "durasi": "2 Hari 1 Malam",
+        "harga": "300000",
+        "tanggal": "2025-09-20",
+        "slot": "15",
+        "status": "available",
+        "gambar": [
+            "1757617623_68c31dd7ae354_foto1.png",
+            "1757617623_68c31dd7ae849_foto2.png",
+            "1757617623_68c31dd7aefe9_foto3.png"
+        ]
     }
 ]
