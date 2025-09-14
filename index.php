@@ -23,24 +23,26 @@
 <body>
 
   <!-- Navbar -->
-  <header class="navbar">
-    <div class="container nav-content">
-      <div class="logo">
-        <img src="img/majelis.png" alt="Majelis MDPL" />
-        <span>Majelis MDPL</span>
-      </div>
-      <nav class="nav-links">
-        <a href="#">Home</a>
-        <a href="#">Profile</a>
-        <a href="#">Jadwal Pendakian</a>
-        <a href="#">Testimoni</a>
-        <a href="#">Galeri</a>
-      </nav>
-      <div class="nav-btns">
-        <a href="#" id="open-login" class="btn">Login</a>
-      </div>
+<header class="navbar">
+  <div class="container nav-content">
+    <div class="logo">
+      <img src="img/majelis.png" alt="Majelis MDPL" />
+      <span>Majelis MDPL</span>
     </div>
-  </header>
+    <nav class="nav-links">
+      <a href="#">Home</a>
+      <a href="#">Profile</a>
+      <a href="#">Jadwal Pendakian</a>
+      <a href="#">Testimoni</a>
+      <a href="#">Galeri</a>
+    </nav>
+    <div class="nav-btns">
+      <a href="#" id="open-signup" class="btn">Sign Up</a> <!-- Added Sign Up button -->
+      <a href="#" id="open-login" class="btn">Login</a>
+    </div>
+  </div>
+</header>
+
 
   <!-- Hero Section -->
   <section class="hero" id="home">
@@ -52,40 +54,6 @@
     </div>
   </section>
     <section class="section" id="profile">
-    
-  <!-- Fasilitas Section -->
-  <section class="fasilitas">
-    <div class="judul-fasilitas" id="fasilitas">
-      <p class="sub">FASILITAS</p>
-      <h2><span class="highlight">Fasilitas</span> Kami</h2>
-      <p class="deskripsi">
-        Nikmati segala kemudahan yang kami sediakan untuk membuat perjalanan wisata Anda di kawasan Gunung Merapi menjadi pengalaman yang tak terlupakan.
-      </p>
-    </div>
-
-    <div class="fasilitas-container">
-      <div class="fasilitas-item">
-        <i class="fas fa-music"></i>
-        <p>Spotify Manual</p>
-      </div>
-      <div class="fasilitas-item">
-        <i class="fas fa-first-aid"></i>
-        <p>P3K</p>
-      </div>
-      <div class="fasilitas-item">
-        <i class="fas fa-camera"></i>
-        <p>Dokumentasi</p>
-      </div>
-      <div class="fasilitas-item">
-        <i class="fas fa-book-open"></i>
-        <p>Cerita Nabi-nabi</p>
-      </div>
-      <div class="fasilitas-item">
-        <i class="fas fa-heart"></i>
-        <p>Jodoh bila beruntung</p>
-      </div>
-    </div>
-  </section>
   <!-- CARD -->
     <div class="row g-4">
       <?php if (empty($trips)): ?>
