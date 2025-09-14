@@ -1,4 +1,5 @@
 <?php
+// tes ombak
 $host = "localhost"; // Host
 $username = "root";  // Username MySQL
 $password = "";      // Password MySQL

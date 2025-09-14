@@ -1,0 +1,32 @@
+[
+    {
+        "id_payment": 1,
+        "id_booking": 101,
+        "jumlah_bayar": 500000,
+        "tanggal": "2025-09-01",
+        "jenis_pembayaran": "DP",
+        "metode": "Transfer BCA",
+        "sisa_bayar": "10000",
+        "status_pembayaran": "Paid"
+    },
+    {
+        "id_payment": 2,
+        "id_booking": 102,
+        "jumlah_bayar": 750000,
+        "tanggal": "2025-09-05",
+        "jenis_pembayaran": "Pelunasan",
+        "metode": "OVO",
+        "sisa_bayar": "0",
+        "status_pembayaran": "Paid"
+    },
+    {
+        "id_payment": 3,
+        "id_booking": 1,
+        "jumlah_bayar": 0,
+        "tanggal": "2025-09-10",
+        "jenis_pembayaran": "DP",
+        "metode": "",
+        "sisa_bayar": 500000,
+        "status_pembayaran": "DP \/ Belum Lunas"
+    }
+]

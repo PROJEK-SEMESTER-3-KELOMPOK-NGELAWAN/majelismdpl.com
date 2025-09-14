@@ -54,7 +54,6 @@
     </div>
   </section>
     <section class="section" id="profile">
-   
   <!-- CARD -->
     <div class="row g-4">
       <?php if (empty($trips)): ?>
