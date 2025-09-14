@@ -193,6 +193,18 @@ if (isset($_POST['hapus_id'])) {
 </div>
 
 <script>
+
+    // Sidebar toggle
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("main");
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      main.classList.toggle("expanded");
+    });
+    // Sidebar toggle end
+
   // Fungsi Edit
   document.querySelectorAll(".edit-btn").forEach((btn) => {
     btn.addEventListener("click", function() {

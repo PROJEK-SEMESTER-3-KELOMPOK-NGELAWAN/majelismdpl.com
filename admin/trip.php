@@ -408,6 +408,18 @@ if (isset($_POST['edit'])) {
 </div>
 
 <script>
+
+    // Sidebar toggle
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("main");
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      main.classList.toggle("expanded");
+    });
+    // Sidebar toggle end
+
   (function() {
     const inputId = 'gambarInput<?= $trip['id'] ?>';
     const previewId = 'previewContainer<?= $trip['id'] ?>';

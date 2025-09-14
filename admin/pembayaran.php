@@ -137,6 +137,17 @@ $totalUnpaid = count(array_filter($payments, fn($p) => $p['status_pembayaran'] =
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
+// Sidebar toggle
+const sidebar = document.getElementById("sidebar");
+const main = document.getElementById("main");
+const toggleBtn = document.getElementById("toggleBtn");
+
+toggleBtn.addEventListener("click", () => {
+  sidebar.classList.toggle("collapsed");
+  main.classList.toggle("expanded");
+});
+
 // Chart
 const ctx = document.getElementById('paymentChart');
 new Chart(ctx, {
