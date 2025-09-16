@@ -1,503 +1,649 @@
 <?php
-session_start();
-
-$file = __DIR__ . "/trips.json";
-
-if (file_exists($file)) {
-    $trips = json_decode(file_get_contents($file), true);
-} else {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action'])) {
+    header('Content-Type: application/json');
+    $file = 'trips.json';
     $trips = [];
-}
-
-// Fungsi upload multiple file gambar
-function uploadMultipleFiles($files) {
-    $uploadedImages = [];
-    if (!empty($files) && isset($files['name']) && is_array($files['name'])) {
-        $targetDir = "../img/";
-        for ($i = 0; $i < count($files['name']); $i++) {
-            if ($files['error'][$i] === 0) {
-                $fileName = time() . '_' . uniqid() . '_' . basename($files['name'][$i]);
-                $targetFile = $targetDir . $fileName;
-                if (move_uploaded_file($files['tmp_name'][$i], $targetFile)) {
-                    $uploadedImages[] = $fileName;
+    if (file_exists($file)) {
+        $json = file_get_contents($file);
+        $trips = json_decode($json, true);
+        if (!is_array($trips)) $trips = [];
+    }
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!$input) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'msg' => 'Data JSON tidak valid atau kosong']);
+        exit;
+    }
+    if ($_GET['action'] === 'addTrip') {
+        $trips[] = $input;
+    } elseif ($_GET['action'] === 'updateTrip' && isset($input['originalNama'])) {
+        $updated = false;
+        foreach ($trips as &$trip) {
+            if ($trip['nama_gunung'] === $input['originalNama']) {
+                foreach ($input as $key => $value) {
+                    if ($key === 'gambar' && $value === '') {
+                        continue; // jangan ubah gambar kalau empty
+                    }
+                    $trip[$key] = $value;
                 }
+                unset($trip['originalNama']);
+                $updated = true;
+                break;
             }
         }
-    }
-    return $uploadedImages;
-}
-
-// Button tambah
-if (isset($_POST['tambah'])) {
-    $id = (count($trips) > 0) ? max(array_column($trips, 'id')) + 1 : 1;
-    $nama = $_POST['nama_gunung'];
-    $via = $_POST['via_gunung'] ?? '';
-    $jenis = $_POST['jenis_trip'];
-    $durasi = ($jenis == "Camp") ? ($_POST['durasi'] ?? '-') : "-";
-    $harga = $_POST['harga'];
-    $tanggal = $_POST['tanggal'];
-    $slot = $_POST['slot'];
-    $status = $_POST['status'];
-
-    $uploadedImages = uploadMultipleFiles($_FILES['gambar']);
-    $gambar = !empty($uploadedImages) ? $uploadedImages : ["default.jpg"];
-
-    $trips[] = [
-        "id" => $id,
-        "nama_gunung" => $nama,
-        "via_gunung" => $via,
-        "jenis_trip" => $jenis,
-        "durasi" => $durasi,
-        "harga" => $harga,
-        "tanggal" => $tanggal,
-        "slot" => $slot,
-        "status" => $status,
-        "gambar" => $gambar
-    ];
-
-    file_put_contents($file, json_encode($trips, JSON_PRETTY_PRINT));
-    header("Location: trip.php");
-    exit();
-}
-
-// Button hapus
-if (isset($_GET['hapus'])) {
-    $id = $_GET['hapus'];
-    foreach ($trips as $key => $trip) {
-        if ($trip['id'] == $id) {
-            unset($trips[$key]);
+        if (!$updated) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'msg' => 'Trip tidak ditemukan']);
+            exit;
         }
+    } elseif ($_GET['action'] === 'deleteTrip' && isset($input['nama_gunung'])) {
+        $nama = $input['nama_gunung'];
+        $trips = array_filter($trips, fn($t) => $t['nama_gunung'] !== $nama);
+        $trips = array_values($trips);
+    } else {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'msg' => 'Aksi tidak dikenal']);
+        exit;
     }
-    $trips = array_values($trips);
-    file_put_contents($file, json_encode($trips, JSON_PRETTY_PRINT));
-    header("Location: trip.php");
-    exit();
+    if (file_put_contents($file, json_encode($trips, JSON_PRETTY_PRINT))) {
+        echo json_encode(['success' => true]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'msg' => 'Gagal menyimpan data ke file']);
+    }
+    exit;
 }
-
-// Button edit
-if (isset($_POST['edit'])) {
-    $id = $_POST['id'];
-    foreach ($trips as &$trip) {
-        if ($trip['id'] == $id) {
-            $trip['nama_gunung'] = $_POST['nama_gunung'];
-            $trip['via_gunung'] = $_POST['via_gunung'] ?? '';
-            $trip['jenis_trip'] = $_POST['jenis_trip'];
-            $trip['durasi'] = ($_POST['jenis_trip'] == "Camp") ? ($_POST['durasi'] ?? '-') : "-";
-            $trip['harga'] = $_POST['harga'];
-            $trip['tanggal'] = $_POST['tanggal'];
-            $trip['slot'] = $_POST['slot'];
-            $trip['status'] = $_POST['status'];
-
-            $uploadedImages = uploadMultipleFiles($_FILES['gambar']);
-            if (!empty($uploadedImages)) {
-                $trip['gambar'] = $uploadedImages;
-            }
-            break;
-        }
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'getTrips') {
+    header('Content-Type: application/json');
+    $file = 'trips.json';
+    if (file_exists($file)) {
+        $json = file_get_contents($file);
+        echo $json ?: json_encode([]);
+    } else {
+        echo json_encode([]);
     }
-    file_put_contents($file, json_encode($trips, JSON_PRETTY_PRINT));
-    header("Location: trip.php");
-    exit();
+    exit;
 }
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Daftar Trip - Admin | Majelis MDPL</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/admin.css">
-  <style>
-    .btn-detail {
-      background-color: #5a5a5a; 
-      color: white;
-      border: none;
-    }
-    .btn-detail:hover {
-      background-color: #4e4e4e;
-    }
-    .btn-edit {
-      background-color: #f39c12; 
-      color: white;
-      border: none;
-    }
-    .btn-edit:hover {
-      background-color: #e67e22;
-    }
-    .btn-delete {
-      background-color: #dc3545; 
-      color: white;
-      border: none;
-    }
-    .btn-delete:hover {
-      background-color: #c82333;
-    }
-    .card-img-top {
-      height: 200px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    .badge {
-      font-size: 0.9rem;
-      border-radius: 5px;
-    }
-    .card-body {
-      padding: 1.5rem;
-      text-align: center;
-    }
-    .badge-success {
-      background-color: rgba(40, 167, 69, 0.7); 
-      color: white;
-    }
-    .badge-danger {
-      background-color: rgba(220, 53, 69, 0.7); 
-      color: white;
-    }
-    .text-muted {
-      font-size: 0.8rem;
-    }
-    .preview-img {
-      width: 90px;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Trip | Majelis MDPL</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  body {
+    background: #f6f0e8;
+    color: #232323;
+    font-family: "Poppins", Arial, sans-serif;
+    min-height: 100vh;
+    letter-spacing: 0.3px;
+  }
+  .sidebar {
+    background: #a97c50;
+    min-height: 100vh;
+    width: 240px;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 34px;
+    box-shadow: 2px 0 18px rgba(79,56,34,0.06);
+    z-index: 100;
+    transition: width 0.25s;
+  }
+  .sidebar img {
+    width: 43px; height: 43px;
+    border-radius: 11px;
+    background: #fff7eb;
+    border: 2px solid #d9b680;
+    margin-bottom: 13px;
+  }
+  .logo-text {
+    font-size: 1.13em;
+    font-weight: 700;
+    color: #fffbe4;
+    margin-bottom: 30px;
+    letter-spacing: 1.5px;
+  }
+  .sidebar-nav {
+    flex: 1 1 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .nav-link {
+    width: 90%;
+    color: #fff;
+    font-weight: 500;
+    border-radius: 0.7rem;
+    margin-bottom: 5px;
+    padding: 13px 22px;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    gap: 11px;
+    letter-spacing: 0.7px;
+    text-decoration: none;
+    transition: background 0.22s, color 0.22s;
+  }
+  .nav-link.active,
+  .nav-link:hover {
+    background: #432f17;
+    color: #ffd49c;
+  }
+  .logout {
+    color: #fff;
+    background: #c19c72;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  .logout:hover {
+    background: #432f17;
+    color: #fffbe4;
+  }
+  @media (max-width: 800px) {
+    .sidebar {
+      width: 100vw;
       height: 70px;
-      object-fit: cover;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      margin-right: 8px;
-      margin-bottom: 8px;
+      flex-direction: row;
+      padding-top: 0; padding-bottom: 0;
+      bottom: unset; top: 0;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      z-index: 100;
     }
-  </style>
+    .sidebar img,
+    .logo-text {
+      display: none;
+    }
+    .sidebar-nav {
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      height: 70px;
+      margin: 0; padding: 0;
+    }
+    .nav-link,
+    .logout {
+      width: auto;
+      min-width: 70px;
+      font-size: 15px;
+      margin: 0 3px;
+      border-radius: 14px;
+      padding: 8px 10px;
+      justify-content: center;
+    }
+    .logout {
+      order: 99;
+      margin-left: 8px;
+      margin-bottom: 0;
+    }
+  }
+  .main {
+    margin-left: 240px;
+    min-height: 100vh;
+    padding: 0 10px 18px 10px;
+    background: #f6f0e8;
+    transition: margin-left 0.25s;
+  }
+  @media (max-width: 800px) {
+    .main {
+      margin-left: 0;
+      padding-top: 85px;
+    }
+  }
+  .daftar-heading {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #a97c50;
+    margin: 32px 0 18px 0;
+    letter-spacing: 1px;
+  }
+  .trip-card-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    margin: 0 auto;
+    justify-content: flex-start;
+    max-width: calc(350px * 3 + 32px * 2);
+  }
+  .trip-card {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 4px 18px rgba(60,44,33,0.09);
+    overflow: hidden;
+    width: calc((100% - 64px) / 3);
+    min-width: 280px;
+    border: none;
+    transition: box-shadow 0.15s, transform 0.11s;
+    position: relative;
+    padding-bottom: 13px;
+    margin-bottom: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+  }
+  .trip-card:hover {
+    box-shadow: 0 8px 36px 0 rgba(60,44,33,0.14);
+    transform: translateY(-3px) scale(1.01);
+  }
+  .trip-thumb {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 18px 18px 0 0;
+  }
+  .trip-status {
+    position: absolute;
+    top: 15px;
+    left: 18px;
+    z-index: 3;
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .trip-status.available {
+    background: rgba(99, 196, 148, 0.6);
+  }
+  .trip-status.sold {
+    background: rgba(212, 141, 154, 0.6);
+  }
+  .trip-status .bi {
+    font-size: 1.1em;
+    font-weight: 800;
+    margin-right: 2px;
+  }
+  .trip-card-body {
+    padding: 18px 22px 0 22px;
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .trip-meta {
+    font-size: 0.85em;
+    color: #696969;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+  }
+  .trip-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .trip-title {
+    font-size: 1em;
+    font-weight: 700;
+    color: #232323;
+    margin-bottom: 7px;
+    letter-spacing: 0.1px;
+    flex-grow: 0;
+  }
+  .trip-type {
+    background: #d9d9db;
+    color: #2c2b2b;
+    border-radius: 8px;
+    font-size: 0.75em;
+    font-weight: 700;
+    display: inline-block;
+    padding: 2px 8px;
+    margin-bottom: 9px;
+    margin-top: 2px;
+    flex-grow: 0;
+  }
+  .trip-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9em;
+    margin-bottom: 2px;
+    color: #ffbf47;
+    font-weight: 600;
+    justify-content: center;
+    flex-grow: 0;
+  }
+  .trip-rating i {
+    font-size: 1.08em;
+  }
+  .trip-rating .sub {
+    color: #3d3d3d;
+    font-size: 0.95em;
+    margin-left: 6px;
+    font-weight: 400;
+  }
+  .trip-via {
+    font-size: 0.9em;
+    color: #595959;
+    margin-bottom: 3px;
+    margin-left: 1.6px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    justify-content: center;
+    flex-grow: 0;
+  }
+  .trip-via .bi {
+    font-size: 1.01em;
+  }
+  .trip-price {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2ea564;
+    margin: 12px 0 0 0;
+    letter-spacing: 1px;
+    flex-grow: 0;
+  }
+  .btn-action-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: auto;
+  }
+  .btn-action {
+    padding: 5px 12px;
+    font-size: 0.85em;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  .btn-edit {
+    background-color: #007bff;
+  }
+  .btn-edit:hover {
+    background-color: #0056b3;
+  }
+  .btn-delete {
+    background-color: #dc3545;
+  }
+  .btn-delete:hover {
+    background-color: #a71d2a;
+  }
+  .btn-detail {
+    background-color: #28a745;
+  }
+  .btn-detail:hover {
+    background-color: #1a6e2a;
+  }
+  .empty-state {
+    text-align: center;
+    margin: 55px 0 70px 0;
+    color: #c7b597;
+    font-size: 1.23em;
+    font-weight: 500;
+    opacity: 0.8;
+  }
+  @media (max-width: 1100px) {
+    .trip-card-list {
+      justify-content: center;
+      max-width: 100%;
+    }
+    .trip-card {
+      width: 45%;
+      min-width: unset;
+    }
+  }
+  @media (max-width: 700px) {
+    .trip-card {
+      width: 100%;
+    }
+  }
+  
+</style>
 </head>
 <body>
-<div class="d-flex">
-  <!-- Sidebar -->
-  <div class="sidebar p-3 d-flex flex-column" id="sidebar">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-      <h2 class="mb-0">Menu</h2>
-      <button class="btn-toggle" id="toggleBtn"><i class="bi bi-list"></i></button>
-    </div>
-    <ul class="nav flex-column">
-      <li class="nav-item"><a href="index.php" class="nav-link"><i class="bi bi-speedometer2"></i><span> Dashboard</span></a></li>
-      <li class="nav-item"><a href="trip.php" class="nav-link active"><i class="bi bi-map-fill"></i><span> Trip</span></a></li>
-      <li class="nav-item"><a href="peserta.php" class="nav-link"><i class="bi bi-people-fill"></i><span> Peserta</span></a></li>
-      <li class="nav-item"><a href="pembayaran.php" class="nav-link"><i class="bi bi-wallet2"></i><span> Pembayaran</span></a></li>
-      <li class="nav-item"><a href="galeri.php" class="nav-link"><i class="bi bi-images"></i><span> Galeri</span></a></li>
-      <li class="nav-item"><a href="logout.php" class="nav-link"><i class="bi bi-box-arrow-left"></i><span> Logout</span></a></li>
-    </ul>
+<aside class="sidebar">
+  <img src="majelis.jpg" alt="Majelis MDPL" />
+  <div class="logo-text">Majelis MDPL</div>
+  <nav class="sidebar-nav">
+    <a href="index.php" class="nav-link"><i class="bi bi-bar-chart"></i>Dashboard</a>
+    <a href="trip.php" class="nav-link active"><i class="bi bi-signpost-split"></i>Trip</a>
+    <a href="#" class="nav-link"><i class="bi bi-people"></i>Peserta</a>
+    <a href="#" class="nav-link"><i class="bi bi-credit-card"></i>Pembayaran</a>
+    <a href="#" class="nav-link"><i class="bi bi-images"></i>Galeri</a>
+    <a href="#" class="nav-link logout"><i class="bi bi-box-arrow-right"></i>Logout</a>
+  </nav>
+</aside>
+<main class="main">
+  <div class="d-flex justify-content-between align-items-center">
+    <div class="daftar-heading">Daftar Trip</div>
+    <button type="button" class="btn btn-success px-4 py-2" data-bs-toggle="modal" data-bs-target="#tambahTripModal">
+      <i class="bi bi-plus-circle"></i> Tambah Trip
+    </button>
   </div>
-
-  <!-- Content -->
-  <div class="content flex-grow-1 p-4" id="main">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1>Daftar Trip</h1>
-      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#tambahModal">
-        <i class="bi bi-plus-circle"></i> Tambah Trip
-      </button>
-    </div>
-
-    <!-- CARD -->
-    <div class="row g-4">
-      <?php if (empty($trips)): ?>
-        <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
-          <p class="text-muted fs-4">🚫 Belum ada jadwal trip.</p>
-        </div>
-      <?php else: ?>
-        <?php foreach ($trips as $trip) :
-          $mainImage = "default.jpg";
-          if (!empty($trip['gambar'])) {
-              if (is_array($trip['gambar'])) {
-                  $mainImage = $trip['gambar'][0];
-              } else {
-                  $mainImage = $trip['gambar'];
-              }
-          }
-        ?>
-          <div class="col-md-4">
-            <div class="card shadow-sm border-0 rounded-4 h-100 text-center">
-              <div class="position-relative">
-                <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2" 
-                  style="
-                    color: white;
-                    font-size: 0.8rem;
-                    background-color: <?= $trip['status'] == 'sold' ? 'rgba(220, 53, 69, 0.4)' : 'rgba(40, 167, 69, 0.4)' ?>;
-                    border-radius: 20px;
-                    padding: 5px 10px;">
-                  <i class="bi <?= $trip['status'] == 'sold' ? 'bi-x-circle-fill' : 'bi-check-circle-fill' ?>"></i>
-                  <?= $trip['status'] == 'sold' ? 'Sold' : 'Available' ?>
-                </span>
-                <img src="../img/<?= htmlspecialchars($mainImage) ?>" class="card-img-top" alt="<?= htmlspecialchars($trip['nama_gunung']) ?>">
-              </div>
-              <div class="card-body text-center">
-                <div class="d-flex justify-content-between small text-muted mb-2">
-                  <span><i class="bi bi-calendar-event"></i> <?= date("d M Y", strtotime($trip['tanggal'])) ?></span>
-                  <span><i class="bi bi-clock"></i> <?= $trip['jenis_trip'] == "Camp" ? $trip['durasi'] : "1 hari" ?></span>
-                </div>
-                <h5 class="card-title fw-bold"><?= $trip['nama_gunung'] ?></h5>
-                <div class="mb-2">
-                  <span class="badge bg-secondary">
-                    <i class="bi bi-flag-fill"></i> <?= $trip['jenis_trip'] ?>
-                  </span>
-                </div>
-                <div class="small text-muted mb-2">
-                  <i class="bi bi-star-fill text-warning"></i> 5 (<?= rand(101, 300) ?>+ ulasan)
-                </div>
-                <div class="small text-muted mb-2">
-                  <i class="bi bi-signpost-2"></i> Via <?= $trip['via_gunung'] ?? '-' ?>
-                </div>
-                <h5 class="fw-bold text-success mb-3">
-                  Rp <?= number_format((int)str_replace(['.', ','], '', $trip['harga']), 0, ',', '.') ?>
-                </h5>
-                <div class="d-flex justify-content-between">
-                  <a href="trip_detail.php?id=<?= $trip['id'] ?>" class="btn btn-detail btn-sm">
-                    <i class="bi bi-arrow-right"></i> Detail
-                  </a>
-                  <button class="btn btn-edit btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $trip['id'] ?>">
-                    <i class="bi bi-pencil-square"></i> Edit
-                  </button>
-                  <a href="trip.php?hapus=<?= $trip['id'] ?>" onclick="return confirm('Hapus trip ini?');" class="btn btn-delete btn-sm">
-                    <i class="bi bi-trash"></i> Hapus
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Tambah Trip -->
-<div class="modal fade" id="tambahModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div id="tripList" class="trip-card-list"></div>
+  <div id="emptyState" class="empty-state">Belum ada trip.<br>Silakan tambahkan trip baru!</div>
+</main>
+<div class="modal fade" id="tambahTripModal" tabindex="-1" aria-labelledby="tambahTripModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form method="POST" enctype="multipart/form-data" class="modal-content">
+    <form class="modal-content" id="formTambahTrip" enctype="multipart/form-data">
       <div class="modal-header">
-        <h5 class="modal-title">Tambah Trip</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title" id="tambahTripModalLabel"><i class="bi bi-plus-circle me-2"></i>Tambah Trip</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
       </div>
       <div class="modal-body">
-        <!-- Input fields -->
-        <div class="mb-3">
-          <label class="form-label">Nama Gunung</label>
-          <input type="text" name="nama_gunung" class="form-control" required>
+        <div class="mb-2">
+          <label class="form-label fw-bold">Nama Gunung</label>
+          <input type="text" class="form-control" name="nama_gunung" required />
         </div>
-        <div class="mb-3">
-          <label class="form-label">Jenis Trip</label>
-          <select name="jenis_trip" class="form-control" required>
-            <option value="Camp">Camp</option>
+        <div class="mb-2">
+          <label class="form-label fw-bold">Tanggal</label>
+          <input type="date" class="form-control" name="tanggal" required />
+        </div>
+        <div class="mb-2">
+          <label class="form-label fw-bold">Durasi</label>
+          <input type="text" class="form-control" name="durasi" placeholder="misal: 2 Hari 1 Malam" required />
+        </div>
+        <div class="mb-2">
+          <label class="form-label fw-bold">Jenis Trip</label>
+          <select class="form-select" name="jenis_trip" required>
+            <option value="" selected disabled>Pilih...</option>
             <option value="Tektok">Tektok</option>
+            <option value="Camp">Camp</option>
           </select>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Harga Trip / pax</label>
-          <input type="text" name="harga" class="form-control" required>
+        <div class="mb-2">
+          <label class="form-label fw-bold">Harga (Rp)</label>
+          <input type="number" class="form-control" name="harga" required />
         </div>
-        <div class="mb-3">
-          <label class="form-label">Tanggal</label>
-          <input type="date" name="tanggal" class="form-control" required>
+        <div class="mb-2">
+          <label class="form-label fw-bold">Jalur / Via</label>
+          <input type="text" class="form-control" name="via" required />
         </div>
-        <div class="mb-3">
-          <label class="form-label">Slot</label>
-          <input type="number" name="slot" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Status</label>
-          <select name="status" class="form-control" required>
+        <div class="mb-2">
+          <label class="form-label fw-bold">Status</label>
+          <select class="form-select" name="status" required>
             <option value="available">Available</option>
             <option value="sold">Sold</option>
           </select>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Via Gunung</label>
-          <input type="text" name="via_gunung" class="form-control" placeholder="cth: Via Cemoro Kandang">
+        <div class="mb-2">
+          <label class="form-label fw-bold">Upload Gambar</label>
+          <input type="file" class="form-control" name="gambar" accept="image/*" />
+          <img id="preview" alt="Preview Gambar" style="max-width: 150px; margin-top: 10px; display:none; border-radius: 8px;" />
         </div>
-        <div class="mb-3">
-          <label class="form-label">Durasi (hanya untuk Camp)</label>
-          <input type="text" name="durasi" class="form-control" placeholder="cth: 3 Hari">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Upload Gambar (bisa lebih dari satu)</label>
-          <input type="file" name="gambar[]" multiple class="form-control" accept="image/*" id="gambarInputTambah">
-        </div>
-        <div id="previewContainerTambah" class="d-flex flex-wrap gap-2 mb-3"></div>
       </div>
       <div class="modal-footer">
-        <button type="submit" name="tambah" class="btn btn-success">Simpan Trip</button>
+        <button type="submit" class="btn btn-success px-4">Simpan</button>
       </div>
     </form>
   </div>
 </div>
-
-<!-- Modal Edit Trip -->
-<div class="modal fade" id="editModal<?= $trip['id'] ?>" tabindex="-1" aria-labelledby="editModalLabel<?= $trip['id'] ?>" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog">
-    <form method="POST" enctype="multipart/form-data" class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel<?= $trip['id'] ?>">Edit Trip</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" name="id" value="<?= $trip['id'] ?>">
-
-        <div class="mb-3">
-          <label class="form-label">Nama Gunung</label>
-          <input type="text" name="nama_gunung" value="<?= htmlspecialchars($trip['nama_gunung']) ?>" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Jenis Trip</label>
-          <select name="jenis_trip" class="form-control" required>
-            <option value="Camp" <?= ($trip['jenis_trip'] == "Camp") ? "selected" : "" ?>>Camp</option>
-            <option value="Tektok" <?= ($trip['jenis_trip'] == "Tektok") ? "selected" : "" ?>>Tektok</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Harga Trip / pax</label>
-          <input type="text" name="harga" value="<?= htmlspecialchars($trip['harga']) ?>" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Tanggal</label>
-          <input type="date" name="tanggal" value="<?= htmlspecialchars($trip['tanggal']) ?>" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Slot</label>
-          <input type="number" name="slot" value="<?= htmlspecialchars($trip['slot']) ?>" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Status</label>
-          <select name="status" class="form-control" required>
-            <option value="available" <?= ($trip['status'] == "available") ? "selected" : "" ?>>Available</option>
-            <option value="sold" <?= ($trip['status'] == "sold") ? "selected" : "" ?>>Sold</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Via Gunung</label>
-          <input type="text" name="via_gunung" value="<?= htmlspecialchars($trip['via_gunung'] ?? '') ?>" class="form-control" placeholder="cth: Via Cemoro Kandang">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Durasi (hanya untuk Camp)</label>
-          <input type="text" name="durasi" value="<?= htmlspecialchars($trip['durasi']) ?>" class="form-control" placeholder="cth: 3 Hari">
-        </div>
-
-        <!-- Gambar Saat Ini -->
-        <label class="form-label">Gambar Saat Ini</label>
-        <div id="currentImagesContainer<?= $trip['id'] ?>" class="d-flex flex-wrap gap-2 mb-3">
-          <?php 
-            $images = is_array($trip['gambar']) ? $trip['gambar'] : [$trip['gambar'] ?? 'default.jpg'];
-            foreach ($images as $img): ?>
-            <div class="position-relative" style="width:90px; height:70px;">
-              <img src="../img/<?= htmlspecialchars($img) ?>" class="img-thumbnail" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
-              <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 p-1 delete-btn" style="border-radius:50%; font-size:1rem; line-height:1;">&times;</button>
-            </div>
-          <?php endforeach; ?>
-        </div>
-
-        <!-- Upload Gambar Baru -->
-        <div class="mb-3">
-          <label class="form-label">Upload Gambar Baru (bisa lebih dari satu)</label>
-          <input type="file" name="gambar[]" multiple class="form-control" accept="image/*" id="gambarInput<?= $trip['id'] ?>">
-        </div>
-        <div id="previewContainer<?= $trip['id'] ?>" class="d-flex flex-wrap gap-2 mb-3"></div>
-
-      </div>
-      <div class="modal-footer">
-        <button type="submit" name="edit" class="btn btn-primary">Simpan Perubahan</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-
-    // Sidebar toggle
-    const sidebar = document.getElementById("sidebar");
-    const main = document.getElementById("main");
-    const toggleBtn = document.getElementById("toggleBtn");
-
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("collapsed");
-      main.classList.toggle("expanded");
-    });
-    // Sidebar toggle end
-
-  (function() {
-    const inputId = 'gambarInput<?= $trip['id'] ?>';
-    const previewId = 'previewContainer<?= $trip['id'] ?>';
-    const currentImagesId = 'currentImagesContainer<?= $trip['id'] ?>';
-
-    const inputElement = document.getElementById(inputId);
-    const previewContainer = document.getElementById(previewId);
-    const currentImagesContainer = document.getElementById(currentImagesId);
-
-    // Preview gambar baru sebelum upload
-    inputElement.addEventListener('change', () => {
-      previewContainer.innerHTML = '';
-      const files = inputElement.files;
-      if (!files.length) return;
-      Array.from(files).forEach(file => {
-        if (!file.type.startsWith('image/')) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          img.style.width = '90px';
-          img.style.height = '70px';
-          img.style.objectFit = 'cover';
-          img.style.borderRadius = '8px';
-          img.style.boxShadow = '0 2px 6px rgba(0,0,0,0.15)';
-          img.style.marginRight = '8px';
-          img.style.marginBottom = '8px';
-          previewContainer.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-
-    // Hapus gambar saat ini (demo frontend)
-    currentImagesContainer.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const container = this.parentElement;
-        if (container) container.remove();
-        alert('Gambar akan dihapus (frontend only, belum tersambung backend)');
-      });
-    });
-  })();
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  function setupImagePreview(inputId, previewContainerId) {
-    const inputElement = document.getElementById(inputId);
-    const previewContainer = document.getElementById(previewContainerId);
-
-    inputElement.addEventListener('change', () => {
-      previewContainer.innerHTML = '';
-      const files = inputElement.files;
-
-      if (!files.length) return;
-
-      Array.from(files).forEach(file => {
-        if (!file.type.startsWith('image/')) return;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          img.classList.add('preview-img');
-          previewContainer.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-      });
+  let currentEditTripName = null;
+  async function loadTrips() {
+    try {
+      const res = await fetch('trip.php?action=getTrips');
+      if (!res.ok) throw new Error('Gagal memuat data trip');
+      const trips = await res.json();
+      displayTrips(trips);
+    } catch (err) {
+      alert('Gagal memuat data trip');
+      console.error(err);
+    }
+  }
+  function displayTrips(trips) {
+    const list = document.getElementById('tripList');
+    const empty = document.getElementById('emptyState');
+    list.innerHTML = '';
+    if (!Array.isArray(trips) || trips.length === 0) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+    trips.forEach(trip => {
+      list.innerHTML += `
+        <div class="trip-card">
+          <span class="trip-status ${trip.status.toLowerCase()}">
+            <i class="bi bi-${trip.status.toLowerCase() === 'available' ? 'check-circle' : 'x-circle'}"></i> ${trip.status}
+          </span>
+          <img src="${trip.gambar || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80'}" alt="${trip.nama_gunung}" class="trip-thumb" />
+          <div class="trip-card-body">
+            <div class="trip-meta mb-0">
+              <span><i class="bi bi-calendar-event"></i> ${trip.tanggal}</span>
+              <span><i class="bi bi-clock"></i> ${trip.durasi}</span>
+            </div>
+            <div class="trip-title">${trip.nama_gunung}</div>
+            <div class="trip-type mb-1"><i class="bi bi-flag"></i> ${trip.jenis_trip}</div>
+            <div class="trip-rating mb-1">
+              <i class="bi bi-star-fill"></i> ${trip.rating} <span class="sub">(${trip.ulasan}+ ulasan)</span>
+            </div>
+            <div class="trip-via mb-1"><i class="bi bi-signpost-2"></i> Via ${trip.via}</div>
+            <div class="trip-price">Rp ${parseInt(trip.harga).toLocaleString('id-ID')}</div>
+            <div class="btn-action-group">
+              <button class="btn-action btn-edit" data-nama="${trip.nama_gunung}">Edit</button>
+              <button class="btn-action btn-delete" data-nama="${trip.nama_gunung}">Hapus</button>
+              <button class="btn-action btn-detail" data-nama="${trip.nama_gunung}">Detail</button>
+            </div>
+          </div>
+        </div>`;
+    });
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.onclick = async function() {
+        if(confirm('Anda yakin ingin menghapus trip ini?')) {
+          const nama = this.dataset.nama;
+          try {
+            const res = await fetch('trip.php?action=deleteTrip', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nama_gunung: nama })
+            });
+            const result = await res.json();
+            if(result.success) {
+              alert('Trip berhasil dihapus');
+              loadTrips();
+            } else {
+              alert('Gagal menghapus trip');
+            }
+          } catch(e) {
+            alert('Kesalahan saat menghapus trip');
+            console.error(e);
+          }
+        }
+      };
+    });
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+      btn.onclick = function() {
+        const nama = this.dataset.nama;
+        const trip = trips.find(t => t.nama_gunung === nama);
+        if(trip) {
+          currentEditTripName = trip.nama_gunung;
+          const form = document.getElementById('formTambahTrip');
+          form.nama_gunung.value = trip.nama_gunung;
+          form.tanggal.value = trip.tanggal;
+          form.durasi.value = trip.durasi;
+          form.jenis_trip.value = trip.jenis_trip;
+          form.harga.value = trip.harga;
+          form.via.value = trip.via;
+          form.status.value = trip.status;
+          const preview = document.getElementById('preview');
+          preview.src = trip.gambar || '';
+          preview.style.display = trip.gambar ? 'block' : 'none';
+          const modal = new bootstrap.Modal(document.getElementById('tambahTripModal'));
+          modal.show();
+        }
+      };
     });
   }
-
-  // Setup preview untuk modal tambah
-  setupImagePreview('gambarInputTambah', 'previewContainerTambah');
-
-  // Setup preview untuk modal edit masing-masing trip
-  <?php foreach($trips as $trip): ?>
-    setupImagePreview('gambarInputEdit<?= $trip['id'] ?>', 'previewContainerEdit<?= $trip['id'] ?>');
-  <?php endforeach; ?>
+  document.getElementById('formTambahTrip').onsubmit = async function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    let gambarBase64 = '';
+    const fileImg = formData.get('gambar');
+    if(fileImg && fileImg.size > 0) {
+      gambarBase64 = await new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = evt => resolve(evt.target.result);
+        reader.readAsDataURL(fileImg);
+      });
+    } else {
+      const previewSrc = document.getElementById('preview').src;
+      if(currentEditTripName && previewSrc && !previewSrc.startsWith('data:')) {
+        // saat edit dan tidak pilih gambar baru, kirim string kosong supaya php tidak overwrite gambar
+        gambarBase64 = '';
+      } else if(previewSrc && previewSrc.startsWith('data:')) {
+        gambarBase64 = previewSrc;
+      }
+    }
+    const data = {
+      nama_gunung: formData.get('nama_gunung'),
+      tanggal: formData.get('tanggal'),
+      durasi: formData.get('durasi'),
+      jenis_trip: formData.get('jenis_trip'),
+      harga: formData.get('harga'),
+      via: formData.get('via'),
+      status: formData.get('status'),
+      rating: 5,
+      ulasan: Math.floor(Math.random()*100)+101,
+      gambar: gambarBase64
+    };
+    let url = 'trip.php?action=addTrip';
+    if(currentEditTripName) {
+      url = 'trip.php?action=updateTrip';
+      data.originalNama = currentEditTripName;
+    }
+    try {
+      const res = await fetch(url,{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if(result.success) {
+        alert(currentEditTripName ? 'Trip berhasil diperbarui' : 'Trip berhasil disimpan');
+        currentEditTripName = null;
+        form.reset();
+        document.getElementById('preview').style.display = 'none';
+        bootstrap.Modal.getInstance(document.getElementById('tambahTripModal')).hide();
+        loadTrips();
+      } else {
+        alert('Gagal menyimpan trip');
+      }
+    } catch(e) {
+      alert('Kesalahan saat menyimpan trip');
+      console.error(e);
+    }
+  };
+  loadTrips();
 </script>
 </body>
 </html>
