@@ -1,5 +1,21 @@
 let currentEditTripId = null;
 
+// Helper untuk toast sweetalert
+function showToast(type, message) {
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon: type,
+    title: message,
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+    customClass: {
+      popup: 'colored-toast'
+    }
+  });
+}
+
 async function loadTrips() {
   try {
     const res = await fetch('../backend/trip-api.php?action=getTrips');
@@ -7,7 +23,7 @@ async function loadTrips() {
     const trips = await res.json();
     displayTrips(trips);
   } catch (err) {
-    alert('Gagal memuat data trip');
+    showToast('error', 'Gagal memuat data trip');
     console.error(err);
   }
 }
@@ -48,8 +64,17 @@ function displayTrips(trips) {
 
   document.querySelectorAll('.btn-delete').forEach(btn => {
     btn.onclick = async function() {
-      if (confirm('Anda yakin ingin menghapus trip ini?')) {
-        const id_trip = this.dataset.id;
+      const id_trip = this.dataset.id;
+      const { isConfirmed } = await Swal.fire({
+        title: 'Hapus Trip?',
+        text: "Data akan dihapus permanen.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal',
+        reverseButtons: true
+      });
+      if (isConfirmed) {
         try {
           const formData = new FormData();
           formData.append('id_trip', id_trip);
@@ -59,13 +84,13 @@ function displayTrips(trips) {
           });
           const result = await res.json();
           if (result.success) {
-            alert('Trip berhasil dihapus');
+            showToast('success', 'Trip berhasil dihapus');
             loadTrips();
           } else {
-            alert('Gagal menghapus trip');
+            showToast('error', 'Gagal menghapus trip');
           }
         } catch (e) {
-          alert('Kesalahan saat menghapus trip');
+          showToast('error', 'Kesalahan saat menghapus trip');
           console.error(e);
         }
       }
@@ -119,17 +144,17 @@ document.getElementById('formTambahTrip').onsubmit = async function(e) {
     });
     const result = await res.json();
     if (result.success) {
-      alert(currentEditTripId ? 'Trip berhasil diperbarui' : 'Trip berhasil disimpan');
+      showToast('success', currentEditTripId ? 'Trip berhasil diperbarui' : 'Trip berhasil disimpan');
       currentEditTripId = null;
       form.reset();
       document.getElementById('preview').style.display = 'none';
       bootstrap.Modal.getInstance(document.getElementById('tambahTripModal')).hide();
       loadTrips();
     } else {
-      alert(result.msg || 'Gagal menyimpan trip');
+      showToast('error', result.msg || 'Gagal menyimpan trip');
     }
   } catch (e) {
-    alert('Kesalahan saat menyimpan trip');
+    showToast('error', 'Kesalahan saat menyimpan trip');
     console.error(e);
   }
 };
