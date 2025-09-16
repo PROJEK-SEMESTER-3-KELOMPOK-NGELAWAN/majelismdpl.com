@@ -410,7 +410,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
 </head>
 <body>
 <aside class="sidebar">
-  <img src="majelis.jpg" alt="Majelis MDPL" />
+  <img src="../img/majelis.png" alt="Majelis MDPL" />
   <div class="logo-text">Majelis MDPL</div>
   <nav class="sidebar-nav">
     <a href="index.php" class="nav-link"><i class="bi bi-bar-chart"></i>Dashboard</a>

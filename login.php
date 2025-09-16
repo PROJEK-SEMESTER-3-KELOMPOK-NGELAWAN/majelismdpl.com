@@ -13,7 +13,7 @@ if (empty($username) || empty($password)) {
 }
 
 // URL endpoint API login
-$api_url = 'http://localhost/projek-web-semester-3/backend/login-api.php';
+$api_url = 'http://localhost/majelismdpl.com/backend/login-api.php';
 
 // Data yang akan dikirim ke API
 $data = [
