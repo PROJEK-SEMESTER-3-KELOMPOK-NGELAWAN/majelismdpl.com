@@ -50,38 +50,7 @@
               <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
               <div class="carousel-track">
                   <!-- Card Destinasi -->
-                  <div class="destination-card">
-                      <img src="img/gambar1.jpg" alt="Jogja" />
-                      <div class="card-info">
-                          <div class="card-title">Jogja Jalan Jalan +</div>
-                          <div class="card-meta"><i class="fas fa-map-marker-alt"></i> Jogja &nbsp; <i class="fas fa-star"></i> 5</div>
-                          <div class="card-price">Rp. 1.650.000</div>
-                        </div>
-                    </div>
-                  <div class="destination-card">
-                      <img src="img/gambar2.jpg" alt="Dieng Culture Festival" />
-                      <div class="card-info">
-                          <div class="card-title">Dieng Culture Festival</div>
-                          <div class="card-meta"><i class="fas fa-map-marker-alt"></i> Dieng &nbsp; <i class="fas fa-star"></i> 5</div>
-                          <div class="card-price">Rp. 1.350.000</div>
-                        </div>
-                    </div>
-                  <div class="destination-card">
-                      <img src="img/gambar3.jpg" alt="Adventure" />
-                      <div class="card-info">
-                          <div class="card-title">Adventure With DJ...</div>
-                          <div class="card-meta"><i class="fas fa-map-marker-alt"></i> Karimun &nbsp; <i class="fas fa-star"></i> 5</div>
-                          <div class="card-price">Rp. 3.000.000</div>
-                        </div>
-                    </div>
-                  <div class="destination-card">
-                      <img src="img/Herooo.jpg" alt="Lombok Overland" />
-                      <div class="card-info">
-                          <div class="card-title">Overland Lombok ...</div>
-                          <div class="card-meta"><i class="fas fa-map-marker-alt"></i> Lombok &nbsp; <i class="fas fa-star"></i> 5</div>
-                          <div class="card-price">Rp. 3.800.000</div>
-                        </div>
-                    </div>
+                  <!-- trip ini diambil dari file frontend/trip-user.js -->
                   <!-- Tambahkan lagi card di sini jika perlu -->
                 </div>
               <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
@@ -342,6 +311,7 @@
   <!-- Script -->
   <script src="/majelismdpl.com/frontend/registrasi.js"></script>
   <script src="/majelismdpl.com/frontend/login.js"></script>
+  <script src="/majelismdpl.com/frontend/trip-user.js"></script>
 
 
   <script>
