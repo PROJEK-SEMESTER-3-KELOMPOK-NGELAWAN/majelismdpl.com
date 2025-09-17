@@ -8,6 +8,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       background: #f6f0e8;
@@ -288,7 +290,7 @@
       <a href="#" class="nav-link"><i class="bi bi-people"></i>Peserta</a>
       <a href="#" class="nav-link"><i class="bi bi-credit-card"></i>Pembayaran</a>
       <a href="#" class="nav-link"><i class="bi bi-images"></i>Galeri</a>
-      <a href="#" class="nav-link logout"><i class="bi bi-box-arrow-right"></i>Logout</a>
+      <a href="logout.php" class="nav-link logout"><i class="bi bi-box-arrow-right"></i>Logout</a>
     </nav>
   </aside>
   <!-- Main Content -->
@@ -403,6 +405,23 @@
           y: { ticks: { color: '#bc6ff1', font: { family: 'Poppins' } }, grid: { color: '#f5ede0'} }
         }
       }
+    });
+
+    // SweetAlert2 Logout Confirmation
+    document.querySelector('.sidebar-nav .logout').addEventListener('click', function(event) {
+      event.preventDefault();
+      Swal.fire({
+        title: 'Konfirmasi Logout',
+        text: 'Apakah anda yakin ingin logout?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, logout',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = this.href;
+        }
+      });
     });
   </script>
 </body>

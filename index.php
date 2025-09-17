@@ -335,6 +335,7 @@
 
   <!-- Script -->
   <script src="/majelismdpl.com/frontend/registrasi.js"></script>
+  <script src="/majelismdpl.com/frontend/login.js"></script>
 
 
   <script>

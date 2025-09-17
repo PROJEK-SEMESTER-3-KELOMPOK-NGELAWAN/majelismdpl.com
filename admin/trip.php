@@ -408,7 +408,7 @@
       <a href="#" class="nav-link"><i class="bi bi-people"></i>Peserta</a>
       <a href="#" class="nav-link"><i class="bi bi-credit-card"></i>Pembayaran</a>
       <a href="#" class="nav-link"><i class="bi bi-images"></i>Galeri</a>
-      <a href="#" class="nav-link logout"><i class="bi bi-box-arrow-right"></i>Logout</a>
+      <a href="logout.php" class="nav-link logout"><i class="bi bi-box-arrow-right"></i>Logout</a>
     </nav>
   </aside>
   <main class="main">

@@ -1,40 +1,41 @@
 <?php
-include('koneksi.php'); // Menghubungkan ke database
+session_start();
+header('Content-Type: application/json');
+require_once 'koneksi.php';
 
-// Ambil data input dari form
-$username = $_POST['username'];
-$password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-// Query untuk mencari pengguna berdasarkan username
-$query = "SELECT * FROM users WHERE username = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
+    if (!$username || !$password) {
+        echo json_encode(['success' => false, 'message' => 'Username dan password wajib diisi']);
+        exit;
+    }
 
-// Cek apakah pengguna ditemukan
-if ($result->num_rows > 0) {
-    $user = $result->fetch_assoc();
-    
-    // Verifikasi password tanpa hashing
-    if ($password == $user['password']) {
-        // Login berhasil, cek role dan arahkan
-        if ($user['role'] == 'admin') {
-            // Arahkan ke halaman admin
-            echo json_encode(["message" => "Login berhasil", "role" => "admin"]);
-            
+    $stmt = $conn->prepare("SELECT id_user, username, password, role FROM users WHERE username = ?");
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
+        exit;
+    }
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['id_user'] = $user['id_user'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+            echo json_encode(['success' => true, 'role' => $user['role']]);
         } else {
-            // Arahkan ke halaman utama (index.php)
-            echo json_encode(["message" => "Login berhasil", "role" => "user"]);
+            echo json_encode(['success' => false, 'message' => 'Username atau password salah']);
         }
     } else {
-        // Password salah
-        echo json_encode(["message" => "Password salah", "status" => false]);
+        echo json_encode(['success' => false, 'message' => 'Username tidak ditemukan']);
     }
+    $stmt->close();
 } else {
-    // Username tidak ditemukan
-    echo json_encode(["message" => "Username tidak ditemukan", "status" => false]);
+    echo json_encode(['success'=>false,'message'=>'Metode tidak diizinkan']);
 }
-
-$conn->close();
 ?>
