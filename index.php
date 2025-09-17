@@ -235,21 +235,27 @@
   </section>
 
   <!-- POPUP LOGIN -->
-  <div id="loginModal" class="modal">
-    <div class="login-box">
-      <a href="#" class="close-btn" id="close-login">&times;</a>
-      <h2>Login</h2>
-      <form action="login.php" method="POST">
-        <div class="input-group">
-          <input type="text" name="username" placeholder="Username" required />
-        </div>
-        <div class="input-group">
-          <input type="password" name="password" placeholder="Password" required />
-        </div>
-        <button type="submit" class="btn-login">Masuk</button>
-      </form>
-    </div>
+<div id="loginModal" class="modal">
+  <div class="login-box">
+    <a href="#" class="close-btn" id="close-login">&times;</a>
+    <h2>Login</h2>
+    <form action="login.php" method="POST">
+      <div class="input-group">
+        <input type="text" name="username" placeholder="Username" required />
+      </div>
+      <div class="input-group">
+        <input type="password" name="password" placeholder="Password" required />
+      </div>
+      <button type="submit" class="btn-login">Masuk</button>
+      <div style="text-align:center;margin-top:13px;">
+        <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
+          Lupa password?
+        </a>
+      </div>
+    </form>
   </div>
+</div>
+
 
   <!-- POPUP SIGN UP (layout 2 kolom + alamat full width) -->
   <div id="signUpModal" class="modal">
@@ -343,7 +349,7 @@
       const nomor = "6283853493130";
       const url = "https://wa.me/" + nomor;
       window.open(url, "_blank");
-    }
+    } 
 
     // ====== util animasi modal (sesuai CSS .open/.closing) ======
     const OPEN = "open";
