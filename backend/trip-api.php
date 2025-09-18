@@ -37,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
         }
     }
 
-
     // AddTrip
     if ($action === 'addTrip') {
         $stmt = $conn->prepare(
@@ -51,16 +50,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
         $success = $stmt->execute();
         if (!$success) {
             echo json_encode(['success' => false, 'msg' => $stmt->error]);
-        } else {
-            echo json_encode(['success' => true]);
+            $stmt->close();
+            exit;
         }
+        $id = $stmt->insert_id;
         $stmt->close();
+
+        // Ambil data trip terbaru
+        $q = $conn->prepare("SELECT * FROM paket_trips WHERE id_trip = ?");
+        $q->bind_param("i", $id);
+        $q->execute();
+        $result = $q->get_result();
+        $newTrip = $result->fetch_assoc();
+        $q->close();
+
+        echo json_encode(['success' => true, 'data' => $newTrip]);
         exit;
     }
 
     // UpdateTrip
     if ($action === 'updateTrip' && isset($_POST['id_trip'])) {
-        // jika tidak upload gambar baru, ambil gambar lama
         if ($gambarPath === '') {
             $q = $conn->prepare("SELECT gambar FROM paket_trips WHERE id_trip=?");
             $q->bind_param("i", $_POST['id_trip']);
@@ -79,8 +88,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
             $nama_gunung, $tanggal, $slot, $durasi, $jenis_trip, $harga, $via_gunung, $status, $gambarPath, $_POST['id_trip']
         );
         $success = $stmt->execute();
+        if (!$success) {
+            echo json_encode(['success' => false, 'msg' => $stmt->error]);
+            $stmt->close();
+            exit;
+        }
         $stmt->close();
-        echo json_encode(['success' => $success]);
+
+        // Ambil data trip terbaru yang diupdate
+        $q = $conn->prepare("SELECT * FROM paket_trips WHERE id_trip = ?");
+        $q->bind_param("i", $_POST['id_trip']);
+        $q->execute();
+        $result = $q->get_result();
+        $updatedTrip = $result->fetch_assoc();
+        $q->close();
+
+        echo json_encode(['success' => true, 'data' => $updatedTrip]);
         exit;
     }
 

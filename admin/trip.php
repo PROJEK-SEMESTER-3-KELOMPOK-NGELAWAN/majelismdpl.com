@@ -235,11 +235,12 @@
     }
 
     .trip-card-body {
-      padding: 18px 22px 0 22px;
+      padding: 18px 22px 18px 22px; 
       position: relative;
       flex-grow: 1;
       display: flex;
       flex-direction: column;
+      justify-content: flex-start; 
     }
 
     .trip-meta {
@@ -258,25 +259,26 @@
     }
 
     .trip-title {
-      font-size: 1em;
+      font-size: 1.15em;
       font-weight: 700;
       color: #232323;
-      margin-bottom: 7px;
-      letter-spacing: 0.1px;
-      flex-grow: 0;
+      margin-bottom: 10px;
+      letter-spacing: 0.15px;
+      text-align: center;
     }
 
     .trip-type {
       background: #d9d9db;
       color: #2c2b2b;
-      border-radius: 8px;
-      font-size: 0.75em;
+      border-radius: 12px;
+      font-size: 0.85em;
       font-weight: 700;
-      display: inline-block;
-      padding: 2px 8px;
-      margin-bottom: 9px;
-      margin-top: 2px;
-      flex-grow: 0;
+      display: inline-flex;
+      padding: 4px 16px;
+      margin: 0 auto 12px auto;
+      justify-content: center;
+      align-items: center;
+      max-width: max-content;
     }
 
     .trip-rating {
@@ -305,13 +307,12 @@
     .trip-via {
       font-size: 0.9em;
       color: #595959;
-      margin-bottom: 3px;
-      margin-left: 1.6px;
+      margin-bottom: 12px;
+      text-align: center;
       display: flex;
-      align-items: center;
-      gap: 3px;
       justify-content: center;
-      flex-grow: 0;
+      align-items: center;
+      gap: 6px;
     }
 
     .trip-via .bi {
@@ -319,19 +320,19 @@
     }
 
     .trip-price {
-      font-size: 1.1em;
-      font-weight: bold;
+      font-size: 1.2em;
+      font-weight: 700;
       color: #2ea564;
-      margin: 12px 0 0 0;
-      letter-spacing: 1px;
-      flex-grow: 0;
+      margin-top: auto; 
+      text-align: center;
+      letter-spacing: 1.5px;
     }
 
     .btn-action-group {
       display: flex;
       justify-content: center;
       gap: 15px;
-      margin-top: auto;
+      margin-top: 10px;
     }
 
     .btn-action {
@@ -405,9 +406,9 @@
     <nav class="sidebar-nav">
       <a href="index.php" class="nav-link"><i class="bi bi-bar-chart"></i>Dashboard</a>
       <a href="trip.php" class="nav-link active"><i class="bi bi-signpost-split"></i>Trip</a>
-      <a href="#" class="nav-link"><i class="bi bi-people"></i>Peserta</a>
-      <a href="#" class="nav-link"><i class="bi bi-credit-card"></i>Pembayaran</a>
-      <a href="#" class="nav-link"><i class="bi bi-images"></i>Galeri</a>
+      <a href="peserta.php" class="nav-link"><i class="bi bi-people"></i>Peserta</a>
+      <a href="pembayaran.php" class="nav-link"><i class="bi bi-credit-card"></i>Pembayaran</a>
+      <a href="galeri.php" class="nav-link"><i class="bi bi-images"></i>Galeri</a>
       <a href="logout.php" class="nav-link logout"><i class="bi bi-box-arrow-right"></i>Logout</a>
     </nav>
   </aside>
