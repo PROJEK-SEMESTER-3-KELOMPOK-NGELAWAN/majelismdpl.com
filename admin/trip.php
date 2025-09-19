@@ -147,7 +147,7 @@
     .main {
       margin-left: 240px;
       min-height: 100vh;
-      padding: 0 10px 18px 10px;
+      padding: 20px 25px;
       background: #f6f0e8;
       transition: margin-left 0.25s;
     }
