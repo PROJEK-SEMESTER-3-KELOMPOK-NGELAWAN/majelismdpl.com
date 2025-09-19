@@ -429,6 +429,8 @@
           <h5 class="modal-title" id="tambahTripModalLabel"><i class="bi bi-plus-circle me-2"></i>Tambah Trip</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
+
+        <!-- POP UP MENAMBAHKAN TRIP -->
         <div class="modal-body">
           <div class="mb-2">
             <label class="form-label fw-bold">Nama Gunung</label>
@@ -477,6 +479,8 @@
             <img id="preview" alt="Preview Gambar" style="max-width: 150px; margin-top: 10px; display:none; border-radius: 8px;" />
           </div>
         </div>
+
+
         <div class="modal-footer">
           <button type="submit" class="btn btn-success px-4">Simpan</button>
         </div>
