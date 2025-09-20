@@ -433,7 +433,7 @@
       </tbody>
     </table>
 
-    <!-- Modal Edit Peserta - Tambahkan sebelum closing </body> -->
+    <!-- Modal Edit Peserta-->
     <div class="modal fade" id="editPesertaModal" tabindex="-1" aria-labelledby="editPesertaModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">

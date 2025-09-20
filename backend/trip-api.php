@@ -5,7 +5,6 @@ require_once 'koneksi.php';
 $action = $_GET['action'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
-
     // DeleteTrip
     if ($action === 'deleteTrip' && isset($_POST['id_trip'])) {
         $stmt = $conn->prepare("DELETE FROM paket_trips WHERE id_trip=?");
@@ -123,4 +122,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'getTrips') {
     echo json_encode($trips);
     exit;
 }
+
 ?>
