@@ -239,18 +239,10 @@
 </style>
 </head>
 <body>
-<aside class="sidebar">
- <img src="../img/majelis.png" alt="Majelis MDPL" />
- <div class="logo-text">Majelis MDPL</div>
- <nav class="sidebar-nav">
-  <a href="index.php" class="nav-link"><i class="bi bi-bar-chart"></i>Dashboard</a>
-  <a href="trip.php" class="nav-link"><i class="bi bi-signpost-split"></i>Trip</a>
-  <a href="peserta.php" class="nav-link"><i class="bi bi-people"></i>Peserta</a>
-  <a href="pembayaran.php" class="nav-link active"><i class="bi bi-credit-card"></i>Pembayaran</a>
-  <a href="galeri.php" class="nav-link"><i class="bi bi-images"></i>Galeri</a>
-  <a href="logout.php" class="nav-link logout"><i class="bi bi-box-arrow-right"></i>Logout</a>
-</nav>
-</aside>
+
+  <!-- Include Sidebar -->
+<?php include 'sidebar.php'; ?>
+
 <main class="main">
  <div class="daftar-heading">Daftar Pembayaran</div>
  <div class="payment-summary">

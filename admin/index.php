@@ -319,38 +319,29 @@
     }
 
     .stat-value {
-    transition: all 0.3s ease;
-}
+      transition: all 0.3s ease;
+    }
 
-.stat-value.updating {
-    color: #a97c50;
-    transform: scale(1.1);
-}
+    .stat-value.updating {
+      color: #a97c50;
+      transform: scale(1.1);
+    }
 
-.card-stat {
-    transition: transform 0.2s ease;
-}
+    .card-stat {
+      transition: transform 0.2s ease;
+    }
 
-.card-stat:hover {
-    transform: translateY(-2px);
-}
-
+    .card-stat:hover {
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 
 <body>
-  <aside class="sidebar">
-    <img src="../img/majelis.png" alt="Majelis MDPL" />
-    <div class="logo-text">Majelis MDPL</div>
-    <nav class="sidebar-nav">
-      <a href="index.php" class="nav-link active"><i class="bi bi-bar-chart"></i>Dashboard</a>
-      <a href="trip.php" class="nav-link"><i class="bi bi-signpost-split"></i>Trip</a>
-      <a href="peserta.php" class="nav-link"><i class="bi bi-people"></i>Peserta</a>
-      <a href="pembayaran.php" class="nav-link"><i class="bi bi-credit-card"></i>Pembayaran</a>
-      <a href="galeri.php" class="nav-link"><i class="bi bi-images"></i>Galeri</a>
-      <a href="logout.php" class="nav-link logout"><i class="bi bi-box-arrow-right"></i>Logout</a>
-    </nav>
-  </aside>
+
+  <!-- Include Sidebar -->
+  <?php include 'sidebar.php'; ?>
+
   <main class="main">
     <div class="main-header">
       <h2>Dashboard Admin</h2>
@@ -397,7 +388,7 @@
       <h3>Statistik Peserta Bulanan</h3>
       <canvas id="pesertaChart" height="90"></canvas>
     </section>
-    
+
     <section class="data-table-section">
       <h3>Riwayat Aktivitas Terbaru</h3>
       <table>
