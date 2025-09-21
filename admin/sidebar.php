@@ -1,3 +1,7 @@
+<?php
+require_once 'auth_check.php';
+?>
+
 <!-- Sidebar -->
 <aside class="custom-sidebar" id="customSidebar">
     <!-- Hamburger Button di dalam sidebar -->

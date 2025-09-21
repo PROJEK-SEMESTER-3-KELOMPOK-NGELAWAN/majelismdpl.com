@@ -27,6 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['id_user'] = $user['id_user'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
+            $_SESSION['last_activity'] = time();
+            
+            // Set flag khusus untuk admin
+            if ($user['role'] === 'admin') {
+                $_SESSION['admin_logged_in'] = true;
+            }
+            
+            // Pastikan session tersimpan sebelum redirect
+            session_write_close();
+            
             echo json_encode(['success' => true, 'role' => $user['role']]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Username atau password salah']);
