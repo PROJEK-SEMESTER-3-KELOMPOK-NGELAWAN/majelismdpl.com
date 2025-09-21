@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Hash password
-    $hashed = password_hash($password, PASSWORD_DEFAULT); // bcrypt [web:3][web:6]
+    $hashed = password_hash($password, PASSWORD_DEFAULT);
 
     // Siapkan prepared statement
     $stmt = $conn->prepare(

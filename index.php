@@ -10,6 +10,109 @@
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    .google-signup-section {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .btn-google {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      background-color: #fff;
+      color: #3c4043;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer !important;
+      transition: background-color 0.2s;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1000;
+      pointer-events: auto !important;
+      box-sizing: border-box;
+    }
+
+    .btn-google:hover {
+      background-color: #f8f9fa;
+      border-color: #c6c6c6;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-google:active {
+      background-color: #e8f0fe;
+      transform: translateY(1px);
+    }
+
+    .divider {
+      position: relative;
+      margin: 15px 0;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: #dadce0;
+      z-index: 1;
+    }
+
+    .divider span {
+      background-color: white;
+      padding: 0 15px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* UNTUK CSS POP UP LOGIN */
+    .google-login-section {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* CSS untuk tombol Google sudah ada dari sebelumnya */
+    .btn-google {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      background-color: #fff;
+      color: #3c4043;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer !important;
+      transition: background-color 0.2s;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1000;
+      pointer-events: auto !important;
+      box-sizing: border-box;
+    }
+
+    .btn-google:hover {
+      background-color: #f8f9fa;
+      border-color: #c6c6c6;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-google:active {
+      background-color: #e8f0fe;
+      transform: translateY(1px);
+    }
+  </style>
 </head>
 
 <body>
@@ -36,29 +139,29 @@
 
   <!-- Hero -->
   <div class="hero-section">
-      <!-- Background layer -->
-      <div class="hero-bg-custom"></div>
-     
-      <img class="hero-bg" src="img/Herooo.jpg" alt="Healing" />
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-          <h1>Kamu Pusing?<br>Yuk Healing</h1>
-          <p>Mau Explore berbagai pilihan trip buat nikmatin weekendmu? <br>
-            Temukan semuanya di sini.</p>
-          <button class="hero-btn">Lihat Semua <i class="fas fa-arrow-right"></i></button>
-          <div class="destination-carousel">
-              <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
-              <div class="carousel-track">
-                  <!-- Card Destinasi -->
-                  <!-- trip ini diambil dari file frontend/trip-user.js -->
-                  <!-- Tambahkan lagi card di sini jika perlu -->
-                </div>
-              <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
-            </div>
-        </div>
+    <!-- Background layer -->
+    <div class="hero-bg-custom"></div>
+
+    <img class="hero-bg" src="img/Herooo.jpg" alt="Healing" />
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Kamu Pusing?<br>Yuk Healing</h1>
+      <p>Mau Explore berbagai pilihan trip buat nikmatin weekendmu? <br>
+        Temukan semuanya di sini.</p>
+      <button class="hero-btn">Lihat Semua <i class="fas fa-arrow-right"></i></button>
+      <div class="destination-carousel">
+        <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+        <div class="carousel-track">
+          <!-- Card Destinasi -->
+          <!-- trip ini diambil dari file frontend/trip-user.js -->
+          <!-- Tambahkan lagi card di sini jika perlu -->
+
+        </div>
+        <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
   </div>
   <script src="carousel.js"></script>
-
 
   <!-- profile -->
   <section class="why-explorer">
@@ -204,26 +307,39 @@
   </section>
 
   <!-- POPUP LOGIN -->
-<div id="loginModal" class="modal">
-  <div class="login-box">
-    <a href="#" class="close-btn" id="close-login">&times;</a>
-    <h2>Login</h2>
-    <form action="login.php" method="POST">
-      <div class="input-group">
-        <input type="text" name="username" placeholder="Username" required />
-      </div>
-      <div class="input-group">
-        <input type="password" name="password" placeholder="Password" required />
-      </div>
-      <button type="submit" class="btn-login">Masuk</button>
-      <div style="text-align:center;margin-top:13px;">
-        <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
-          Lupa password?
-        </a>
-      </div>
-    </form>
+  <div id="loginModal" class="modal">
+    <div class="login-box">
+      <a href="#" class="close-btn" id="close-login">&times;</a>
+      <h2>Login</h2>
+
+      <form action="login.php" method="POST">
+        <div class="input-group">
+          <input type="text" name="username" placeholder="Username" required />
+        </div>
+        <div class="input-group">
+          <input type="password" name="password" placeholder="Password" required />
+        </div>
+
+        <!-- Tombol Login dengan Google -->
+        <div class="divider">
+          <span>atau</span>
+        </div>
+        <div class="google-login-section">
+          <button type="button" id="googleLoginBtn" class="btn-google">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+            Login with Google
+          </button>
+        </div>
+
+        <button type="submit" class="btn-login">Masuk</button>
+        <div style="text-align:center;margin-top:13px;">
+          <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
+            Lupa password?
+          </a>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 
 
   <!-- POPUP SIGN UP (layout 2 kolom + alamat full width) -->
@@ -258,6 +374,19 @@
 
         <button type="submit" class="btn-login">Daftar</button>
       </form>
+
+      <!-- Tombol Sign Up dengan Google -->
+      <div class="divider">
+        <span>atau</span>
+      </div>
+      <div class="google-signup-section">
+        <button type="button" id="googleSignUpBtn" class="btn-google">
+          <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+          Sign up with Google
+        </button>
+      </div>
+
+
     </div>
   </div>
 
@@ -300,7 +429,6 @@
     </div>
   </footer>
 
-
   <!-- Tombol WhatsApp -->
   <div class="whatsapp-container">
     <button class="whatsapp-button" onclick="bukaWhatsapp()">
@@ -308,18 +436,28 @@
     </button>
   </div>
 
-  <!-- Script -->
-  <script src="/majelismdpl.com/frontend/registrasi.js"></script>
-  <script src="/majelismdpl.com/frontend/login.js"></script>
-  <script src="/majelismdpl.com/frontend/trip-user.js"></script>
+  <!-- Load SweetAlert first -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
+  <!-- Global functions that might be needed -->
   <script>
     function bukaWhatsapp() {
       const nomor = "6283853493130";
       const url = "https://wa.me/" + nomor;
       window.open(url, "_blank");
-    } 
+    }
+
+    // Global function untuk Google OAuth (fallback)
+    function handleGoogleOAuth() {
+      console.log("Global handleGoogleOAuth called");
+      window.location.href = window.location.origin + "/majelismdpl.com/backend/google-oauth.php";
+    }
+
+    // Global function untuk Google Login (fallback)
+    function handleGoogleLogin() {
+      console.log("Global handleGoogleLogin called");
+      window.location.href = window.location.origin + "/majelismdpl.com/backend/google-oauth.php?type=login";
+    }
 
     // ====== util animasi modal (sesuai CSS .open/.closing) ======
     const OPEN = "open";
@@ -342,52 +480,94 @@
       }, DURATION);
     }
 
-    // ====== LOGIN MODAL ======
-    const loginModal = document.getElementById("loginModal");
-    const openLogin = document.getElementById("open-login");
-    const closeLogin = document.getElementById("close-login");
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Main script DOMContentLoaded executed');
 
-    openLogin.addEventListener("click", (e) => {
-      e.preventDefault();
-      openModal(loginModal);
-    });
-    closeLogin.addEventListener("click", (e) => {
-      e.preventDefault();
-      closeModal(loginModal);
-    });
-    loginModal.addEventListener("click", (e) => {
-      if (e.target === loginModal) closeModal(loginModal);
-    });
+      // ====== LOGIN MODAL ======
+      const loginModal = document.getElementById("loginModal");
+      const openLogin = document.getElementById("open-login");
+      const closeLogin = document.getElementById("close-login");
 
-    // ====== SIGN UP MODAL ======
-    const signUpModal = document.getElementById("signUpModal");
-    const openSignUp = document.getElementById("open-signup");
-    const closeSignUp = document.getElementById("close-signup");
+      if (openLogin && loginModal && closeLogin) {
+        openLogin.addEventListener("click", (e) => {
+          e.preventDefault();
+          openModal(loginModal);
 
-    openSignUp.addEventListener("click", (e) => {
-      e.preventDefault();
-      openModal(signUpModal);
-    });
-    closeSignUp.addEventListener("click", (e) => {
-      e.preventDefault();
-      closeModal(signUpModal);
-    });
-    signUpModal.addEventListener("click", (e) => {
-      if (e.target === signUpModal) closeModal(signUpModal);
-    });
+          // After opening modal, try to attach Google login button event
+          setTimeout(() => {
+            const googleLoginBtn = document.getElementById("googleLoginBtn");
+            if (googleLoginBtn && !googleLoginBtn.hasAttribute('data-main-login-listener')) {
+              googleLoginBtn.setAttribute('data-main-login-listener', 'true');
+              googleLoginBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Google login button clicked from main script!');
+                handleGoogleLogin();
+              });
+              console.log('Google login button listener attached from main script');
+            }
+          }, 100);
+        });
 
-    // ESC untuk menutup
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        if (signUpModal.style.display === "flex") closeModal(signUpModal);
-        if (loginModal.style.display === "flex") closeModal(loginModal);
+        closeLogin.addEventListener("click", (e) => {
+          e.preventDefault();
+          closeModal(loginModal);
+        });
+
+        loginModal.addEventListener("click", (e) => {
+          if (e.target === loginModal) closeModal(loginModal);
+        });
       }
+
+      // ====== SIGN UP MODAL ======
+      const signUpModal = document.getElementById("signUpModal");
+      const openSignUp = document.getElementById("open-signup");
+      const closeSignUp = document.getElementById("close-signup");
+
+      if (openSignUp && signUpModal && closeSignUp) {
+        openSignUp.addEventListener("click", (e) => {
+          e.preventDefault();
+          openModal(signUpModal);
+
+          // After opening modal, try to attach Google signup button event
+          setTimeout(() => {
+            const googleSignupBtn = document.getElementById("googleSignUpBtn");
+            if (googleSignupBtn && !googleSignupBtn.hasAttribute('data-main-signup-listener')) {
+              googleSignupBtn.setAttribute('data-main-signup-listener', 'true');
+              googleSignupBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Google signup button clicked from main script!');
+                handleGoogleOAuth();
+              });
+              console.log('Google signup button listener attached from main script');
+            }
+          }, 100);
+        });
+
+        closeSignUp.addEventListener("click", (e) => {
+          e.preventDefault();
+          closeModal(signUpModal);
+        });
+
+        signUpModal.addEventListener("click", (e) => {
+          if (e.target === signUpModal) closeModal(signUpModal);
+        });
+      }
+
+      // ESC untuk menutup
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          if (signUpModal && signUpModal.style.display === "flex") closeModal(signUpModal);
+          if (loginModal && loginModal.style.display === "flex") closeModal(loginModal);
+        }
+      });
     });
   </script>
 
-  <!-- Tempelkan sebelum penutup </body> atau di <head> -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+  <!-- Load external JavaScript files -->
+  <script src="frontend/registrasi.js"></script>
+  <script src="frontend/login.js"></script>
+  <script src="frontend/trip-user.js"></script>
 
 </body>
 
