@@ -73,7 +73,7 @@ require_once 'auth_check.php';
     left: 0;
     width: 280px;
     height: 100vh;
-    background: #be8859ff; /* Warna yang diminta */
+    background: #a97c50; /* Warna yang diminta */
     z-index: 1055;
     transition: width 0.3s ease;
     overflow: visible;

@@ -23,20 +23,38 @@ require_once 'auth_check.php';
     letter-spacing: 0.3px;
     margin: 0;
   }
-  .sidebar {
-    background: #a97c50;
-    min-height: 100vh;
-    width: 240px;
-    position: fixed;
-    left: 0; top: 0; bottom: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 34px;
-    box-shadow: 2px 0 18px rgba(79,56,34,0.06);
-    z-index: 100;
-    transition: width 0.25s ease;
+  .search-container {
+    position: relative;
+    margin: 0;
+    width: 100%;
+    max-width: 450px;
   }
+  .search-input {
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 45px;
+    border-radius: 50px;
+    border: 1.5px solid #a97c50;
+    height: 38px;
+    font-size: 14px;
+    color: #432f17;
+    transition: border-color 0.3s ease;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: #432f17;
+    box-shadow: 0 0 8px rgba(67, 47, 23, 0.3);
+  }
+  .search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a97c50;
+    pointer-events: none;
+    font-size: 18px;
+  }
+
   .sidebar img {
     width: 43px;
     height: 43px;
@@ -267,6 +285,11 @@ require_once 'auth_check.php';
   <h3 class="chart-title">Distribusi Pembayaran per Bulan</h3>
   <canvas id="paymentsChart" width="400" height="100"></canvas>
  </section>
+ <div class="search-container" style="max-width: 450px; margin-bottom: 15px;">
+  <input type="text" id="paymentSearchInput" class="search-input" placeholder="Cari pembayaran..." />
+  <i class="bi bi-search search-icon"></i>
+</div>
+
  <table>
   <thead>
    <tr>
@@ -302,6 +325,16 @@ require_once 'auth_check.php';
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+const paymentSearchInput = document.getElementById('paymentSearchInput');
+paymentSearchInput.addEventListener('input', function() {
+  const filter = this.value.toLowerCase();
+  const rows = document.querySelectorAll('#paymentList tr');
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(filter) ? '' : 'none';
+  });
+});
+
 async function loadPayments() {
  const res = await fetch('payments.json');
  const payments = await res.json();

@@ -25,7 +25,7 @@
     "jumlahbayar": 1200000,
     "tanggal": "2025-09-13",
     "jenispembayaran": "Lunas",
-    "metode": "Transfer Bank",
+    "metode": "Transfer",
     "sisabayar": 0,
     "statuspembayaran": "Selesai"
   }
