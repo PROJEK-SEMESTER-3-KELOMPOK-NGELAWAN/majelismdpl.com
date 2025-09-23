@@ -10,50 +10,176 @@
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
   <style>
-    .google-signup-section {
-      margin-bottom: 20px;
-      text-align: center;
+    /* === LOGIN / SIGNUP MODAL === */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      transition: opacity .28s ease, background-color .28s ease;
     }
 
-    .btn-google {
-      display: flex !important;
+    .modal.open {
+      display: flex;
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .modal.open .modal-container {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .modal.closing {
+      opacity: 0;
+      background: rgba(0, 0, 0, 0.0);
+    }
+
+    .modal.closing .modal-container {
+      transform: translateY(8px) scale(.98);
+      opacity: 0;
+    }
+
+    /* Modal Container - menggunakan flexbox untuk layout kiri-kanan */
+    .modal-container {
+      background: #E3EAC4;
+      /* Background cream seperti pada gambar */
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 800px;
+      min-height: 500px;
+      position: relative;
+      display: flex;
+      overflow: hidden;
+      transform: translateY(12px) scale(.98);
+      opacity: 0;
+      transition: transform .28s ease, opacity .28s ease;
+    }
+
+    /* Close Button */
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      text-decoration: none;
+      color: #666;
+      z-index: 10;
+      width: 40px;
+      height: 40px;
+      display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .close-btn:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    /* Modal Container - menggunakan flexbox untuk layout kiri-kanan */
+    .modal-container {
+      background: linear-gradient(to right, #E3EAC4 0%, #E3EAC4 45%, #f8f8f8 55%, #ffffff 100%);
+      /* Gradasi dari cream ke putih */
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      background-color: #fff;
-      color: #3c4043;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer !important;
-      transition: background-color 0.2s;
-      margin-bottom: 15px;
+      max-width: 800px;
+      min-height: 500px;
       position: relative;
-      z-index: 1000;
-      pointer-events: auto !important;
-      box-sizing: border-box;
+      display: flex;
+      overflow: hidden;
+      transform: translateY(12px) scale(.98);
+      opacity: 0;
+      transition: transform .28s ease, opacity .28s ease;
     }
 
-    .btn-google:hover {
-      background-color: #f8f9fa;
-      border-color: #c6c6c6;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    /* Left Section - Logo */
+    .modal-left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: transparent;
+      /* Hapus background solid agar gradasi terlihat */
     }
 
-    .btn-google:active {
-      background-color: #e8f0fe;
-      transform: translateY(1px);
+    .logo-container {
+      text-align: center;
+      width: 100%;
     }
 
+    .modal-logo {
+      max-width: 320px;
+      /* Diperbesar dari 250px menjadi 320px */
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* Right Section - Form */
+    .modal-right {
+      flex: 1;
+      background: transparent;
+      /* Hapus background solid agar gradasi terlihat */
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .modal-right h2 {
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 30px;
+      color: #333;
+      text-align: center;
+    }
+
+
+    /* Input Groups */
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 15px 18px;
+      border: 2px solid #e1e1e1;
+      border-radius: 12px;
+      outline: none;
+      font-size: 16px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      background: #fafafa;
+    }
+
+    .input-group input:focus {
+      border-color: #AE8340;
+      box-shadow: 0 0 0 3px rgba(174, 131, 64, 0.1);
+      background: #fff;
+    }
+
+    /* Divider */
     .divider {
       position: relative;
-      margin: 15px 0;
+      margin: 20px 0;
       text-align: center;
-      color: #666;
-      font-size: 12px;
+      color: #888;
+      font-size: 14px;
     }
 
     .divider::before {
@@ -63,54 +189,316 @@
       left: 0;
       right: 0;
       height: 1px;
-      background-color: #dadce0;
+      background-color: #e1e1e1;
       z-index: 1;
     }
 
     .divider span {
       background-color: white;
-      padding: 0 15px;
+      padding: 0 20px;
       position: relative;
       z-index: 2;
     }
 
-    /* UNTUK CSS POP UP LOGIN */
+    /* Google Login Button */
     .google-login-section {
       margin-bottom: 20px;
       text-align: center;
     }
 
-    /* CSS untuk tombol Google sudah ada dari sebelumnya */
     .btn-google {
       display: flex !important;
       align-items: center;
       justify-content: center;
       width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
+      padding: 15px 16px;
+      border: 2px solid #e1e1e1;
+      border-radius: 12px;
       background-color: #fff;
-      color: #3c4043;
-      font-size: 14px;
+      color: #333;
+      font-size: 16px;
       font-weight: 500;
       cursor: pointer !important;
-      transition: background-color 0.2s;
-      margin-bottom: 15px;
-      position: relative;
-      z-index: 1000;
-      pointer-events: auto !important;
-      box-sizing: border-box;
+      transition: all 0.3s;
+      margin-bottom: 20px;
     }
 
     .btn-google:hover {
       background-color: #f8f9fa;
-      border-color: #c6c6c6;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      border-color: #AE8340;
+      box-shadow: 0 2px 8px rgba(174, 131, 64, 0.15);
     }
 
-    .btn-google:active {
-      background-color: #e8f0fe;
-      transform: translateY(1px);
+    /* Login Button */
+    .btn-login {
+      width: 100%;
+      background: #AE8340;
+      border: none;
+      padding: 15px;
+      font-weight: 600;
+      color: #ffffff;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn-login:hover {
+      background: #8b5e3c;
+      transform: translateY(-1px);
+    }
+
+    /* Signup Modal Specific Styles */
+    .signup-modal {
+      max-width: 900px;
+      /* Lebih lebar untuk menampung form grid */
+      min-height: 550px;
+    }
+
+    .signup-modal .modal-right {
+      padding: 40px 40px;
+      /* Sedikit lebih kompak */
+    }
+
+    .signup-modal .modal-right h2 {
+      font-size: 28px;
+      /* Sedikit lebih kecil */
+      margin-bottom: 25px;
+    }
+
+    /* Form Grid Layout untuk 2 kolom */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px 20px;
+      /* vertical gap, horizontal gap */
+      margin-bottom: 25px;
+    }
+
+    /* Full width field */
+    .field-full {
+      grid-column: 1 / -1;
+      /* Span across all columns */
+    }
+
+    /* Input Groups di dalam grid */
+    .form-grid .input-group {
+      margin-bottom: 0;
+      /* Reset margin karena sudah ada gap di grid */
+    }
+
+    .form-grid .input-group input {
+      width: 100%;
+      padding: 12px 15px;
+      /* Sedikit lebih kompak */
+      border: 2px solid #e1e1e1;
+      border-radius: 10px;
+      outline: none;
+      font-size: 15px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      background: #fafafa;
+    }
+
+    .form-grid .input-group input:focus {
+      border-color: #AE8340;
+      box-shadow: 0 0 0 3px rgba(174, 131, 64, 0.1);
+      background: #fff;
+    }
+
+    /* Google Signup Section */
+    .google-signup-section {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    /* Responsive Design untuk Signup Modal */
+    @media (max-width: 1000px) {
+      .signup-modal {
+        max-width: 500px;
+        flex-direction: column;
+        min-height: auto;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .signup-modal .modal-left {
+        padding: 25px 20px 15px;
+      }
+
+      .signup-modal .modal-logo {
+        max-width: 160px;
+      }
+
+      .signup-modal .modal-right {
+        padding: 25px 30px 35px;
+      }
+    }
+
+    @media (max-width: 750px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+        /* Single column pada mobile */
+        gap: 15px;
+      }
+
+      .signup-modal {
+        max-width: calc(100% - 40px);
+        margin: 20px;
+      }
+
+      .signup-modal .modal-right {
+        padding: 20px 25px 30px;
+      }
+
+      .form-grid .input-group input,
+      .signup-modal .btn-google,
+      .signup-modal .btn-login {
+        padding: 12px 15px;
+        font-size: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .signup-modal .modal-right {
+        padding: 20px 20px 25px;
+      }
+
+      .signup-modal .modal-right h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      .form-grid {
+        gap: 12px;
+      }
+
+      .form-grid .input-group input {
+        padding: 11px 14px;
+        font-size: 14px;
+        border-radius: 8px;
+      }
+    }
+
+    /* Divider dan button styles tetap sama seperti login modal */
+    .signup-modal .divider {
+      position: relative;
+      margin: 20px 0 15px 0;
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+    }
+
+    .signup-modal .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: #e1e1e1;
+      z-index: 1;
+    }
+
+    .signup-modal .divider span {
+      background-color: white;
+      padding: 0 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .signup-modal .btn-google {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e1e1e1;
+      border-radius: 10px;
+      background-color: #fff;
+      color: #333;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer !important;
+      transition: all 0.3s;
+      margin-top: 5px;
+    }
+
+    .signup-modal .btn-google:hover {
+      background-color: #f8f9fa;
+      border-color: #AE8340;
+      box-shadow: 0 2px 8px rgba(174, 131, 64, 0.15);
+    }
+
+    .signup-modal .btn-login {
+      width: 100%;
+      background: #AE8340;
+      border: none;
+      padding: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s, transform 0.2s;
+      margin-bottom: 15px;
+    }
+
+    .signup-modal .btn-login:hover {
+      background: #8b5e3c;
+      transform: translateY(-1px);
+    }
+
+
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .modal-container {
+        flex-direction: column;
+        max-width: 450px;
+        min-height: auto;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-left {
+        padding: 30px 20px 20px;
+      }
+
+      .modal-logo {
+        max-width: 220px;
+        /* Diperbesar dari 180px menjadi 220px untuk mobile */
+      }
+
+      .modal-right {
+        padding: 30px 30px 40px;
+      }
+
+      .modal-right h2 {
+        font-size: 28px;
+        margin-bottom: 25px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .modal-container {
+        margin: 20px;
+        max-width: calc(100% - 40px);
+      }
+
+      .modal-right {
+        padding: 25px 20px 35px;
+      }
+
+      .modal-logo {
+        max-width: 200px;
+        /* Disesuaikan untuk layar yang sangat kecil */
+      }
+
+      .input-group input,
+      .btn-google,
+      .btn-login {
+        padding: 12px 15px;
+        font-size: 15px;
+      }
     }
   </style>
 </head>
@@ -308,87 +696,111 @@
 
   <!-- POPUP LOGIN -->
   <div id="loginModal" class="modal">
-    <div class="login-box">
+    <div class="modal-container">
       <a href="#" class="close-btn" id="close-login">&times;</a>
-      <h2>Login</h2>
 
-      <form action="login.php" method="POST">
-        <div class="input-group">
-          <input type="text" name="username" placeholder="Username" required />
+      <!-- Left section dengan logo -->
+      <div class="modal-left">
+        <div class="logo-container">
+          <img src="assets/logo-majelis.png" alt="Majelis MDPL Logo" class="modal-logo">
         </div>
-        <div class="input-group">
-          <input type="password" name="password" placeholder="Password" required />
-        </div>
+      </div>
 
-        <!-- Tombol Login dengan Google -->
-        <div class="divider">
-          <span>atau</span>
-        </div>
-        <div class="google-login-section">
-          <button type="button" id="googleLoginBtn" class="btn-google">
-            <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
-            Login with Google
-          </button>
-        </div>
+      <!-- Right section dengan form -->
+      <div class="modal-right">
+        <h2>Login</h2>
 
-        <button type="submit" class="btn-login">Masuk</button>
-        <div style="text-align:center;margin-top:13px;">
-          <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
-            Lupa password?
-          </a>
-        </div>
-      </form>
+        <form action="login.php" method="POST">
+          <div class="input-group">
+            <input type="text" name="username" placeholder="Username" required />
+          </div>
+          <div class="input-group">
+            <input type="password" name="password" placeholder="Password" required />
+          </div>
+
+          <!-- Tombol Login dengan Google -->
+          <div class="divider">
+            <span>atau</span>
+          </div>
+
+          <div class="google-login-section">
+            <button type="button" id="googleLoginBtn" class="btn-google">
+              <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+              Login with Google
+            </button>
+          </div>
+
+          <button type="submit" class="btn-login">Masuk</button>
+
+          <div style="text-align:center;margin-top:13px;">
+            <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
+              Lupa password?
+            </a>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
 
-  <!-- POPUP SIGN UP (layout 2 kolom + alamat full width) -->
+
+  <!-- POPUP SIGN UP -->
   <div id="signUpModal" class="modal">
-    <div class="login-box">
+    <div class="modal-container signup-modal">
       <a href="#" class="close-btn" id="close-signup">&times;</a>
-      <h2>Sign Up</h2>
 
-      <form method="POST" novalidate>
-        <div class="form-grid">
-          <!-- Row 1 -->
-          <div class="input-group">
-            <input type="text" name="username" placeholder="Username" autocomplete="username" required />
-          </div>
-          <div class="input-group">
-            <input type="password" name="password" placeholder="Password" autocomplete="new-password" required />
-          </div>
-
-          <!-- Row 2 -->
-          <div class="input-group">
-            <input type="email" name="email" placeholder="Email" autocomplete="email" required />
-          </div>
-          <div class="input-group">
-            <input type="tel" name="no_wa" placeholder="No HP" inputmode="tel" autocomplete="tel" required />
-          </div>
-
-          <!-- Row 3: full width -->
-          <div class="input-group field-full">
-            <input type="text" name="alamat" placeholder="Alamat" autocomplete="street-address" required />
-          </div>
+      <!-- Left section dengan logo -->
+      <div class="modal-left">
+        <div class="logo-container">
+          <img src="assets/logo-majelis.png" alt="Majelis MDPL Logo" class="modal-logo">
         </div>
-
-        <button type="submit" class="btn-login">Daftar</button>
-      </form>
-
-      <!-- Tombol Sign Up dengan Google -->
-      <div class="divider">
-        <span>atau</span>
-      </div>
-      <div class="google-signup-section">
-        <button type="button" id="googleSignUpBtn" class="btn-google">
-          <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
-          Sign up with Google
-        </button>
       </div>
 
+      <!-- Right section dengan form -->
+      <div class="modal-right">
+        <h2>Sign Up</h2>
 
+        <form method="POST" novalidate>
+          <div class="form-grid">
+            <!-- Row 1 -->
+            <div class="input-group">
+              <input type="text" name="username" placeholder="Username" autocomplete="username" required />
+            </div>
+            <div class="input-group">
+              <input type="password" name="password" placeholder="Password" autocomplete="new-password" required />
+            </div>
+
+            <!-- Row 2 -->
+            <div class="input-group">
+              <input type="email" name="email" placeholder="Email" autocomplete="email" required />
+            </div>
+            <div class="input-group">
+              <input type="tel" name="no_wa" placeholder="No HP" inputmode="tel" autocomplete="tel" required />
+            </div>
+
+            <!-- Row 3: full width -->
+            <div class="input-group field-full">
+              <input type="text" name="alamat" placeholder="Alamat" autocomplete="street-address" required />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login">Daftar</button>
+
+          <!-- Tombol Sign Up dengan Google -->
+          <div class="divider">
+            <span>atau</span>
+          </div>
+          <div class="google-signup-section">
+            <button type="button" id="googleSignUpBtn" class="btn-google">
+              <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+              Sign up with Google
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
+
 
   <footer class="footer">
     <div class="container">
