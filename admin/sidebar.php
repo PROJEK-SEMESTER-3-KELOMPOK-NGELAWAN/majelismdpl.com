@@ -242,12 +242,6 @@ require_once 'auth_check.php';
     z-index: 1000;
 }
 
-.sidebar-link.logout-link {
-    margin-top: 20px;
-    background: rgba(220, 53, 69, 0.3);
-    border: 1px solid rgba(220, 53, 69, 0.4);
-}
-
 .sidebar-link.logout-link:hover {
     background: rgba(220, 53, 69, 0.4);
     color: white;

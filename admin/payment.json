@@ -28,5 +28,15 @@
     "metode": "Transfer",
     "sisabayar": 0,
     "statuspembayaran": "Selesai"
+  },
+  {
+    "idpayment": 2,
+    "idbooking": 102,
+    "jumlahbayar": 750000,
+    "tanggal": "2025-09-14",
+    "jenispembayaran": "DP",
+    "metode": "Cash",
+    "sisabayar": 750000,
+    "statuspembayaran": "Menunggu"
   }
 ]
