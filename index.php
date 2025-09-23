@@ -326,7 +326,7 @@
         </div>
         <div class="google-login-section">
           <button type="button" id="googleLoginBtn" class="btn-google">
-            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+            <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
             Login with Google
           </button>
         </div>
@@ -381,7 +381,7 @@
       </div>
       <div class="google-signup-section">
         <button type="button" id="googleSignUpBtn" class="btn-google">
-          <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+          <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
           Sign up with Google
         </button>
       </div>
