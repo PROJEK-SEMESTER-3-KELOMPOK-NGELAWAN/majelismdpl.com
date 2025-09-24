@@ -197,24 +197,209 @@ require_once 'auth_check.php';
             gap: 15px;
         }
 
+        /* Updated Gallery Item Styling */
         .gallery-item {
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             cursor: pointer;
             transition: transform 0.3s ease;
+            background: white;
         }
 
         .gallery-item img {
             width: 100%;
-            height: 160px;
+            height: 200px;
             object-fit: cover;
             display: block;
-            border-radius: 16px;
         }
 
         .gallery-item:hover {
-            transform: scale(1.05);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-item .position-relative {
+            position: relative;
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        .gallery-overlay .btn {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        .gallery-info {
+            padding: 12px;
+            text-align: center;
+        }
+
+        .btn-delete {
+            background-color: #dc3545 !important;
+            border-color: #dc3545 !important;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333 !important;
+            border-color: #bd2130 !important;
+        }
+
+        .btn-view {
+            background-color: #007bff !important;
+            border-color: #007bff !important;
+        }
+
+        .btn-view:hover {
+            background-color: #0056b3 !important;
+            border-color: #004085 !important;
+        }
+
+        /* Toast Container */
+        .toast-container {
+            z-index: 9999;
+        }
+
+        /* Loading State */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /* Responsive untuk mobile */
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+
+            .gallery-item img {
+                height: 150px;
+            }
+
+            .gallery-overlay .btn {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+        }
+
+        /* Alert Styling */
+        .alert-custom {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+        }
+
+        .alert-success-custom {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-danger-custom {
+            background: linear-gradient(135deg, #f8d7da 0%, #f1b0b7 100%);
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        /* Custom Modal Delete Styles */
+        .modal-delete {
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-delete .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-delete .modal-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 20px 30px;
+        }
+
+        .modal-delete .modal-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-delete .image-preview {
+            width: 150px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin: 20px auto;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-delete .btn-confirm-delete {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal-delete .btn-confirm-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(220, 53, 69, 0.4);
+        }
+
+        .modal-delete .btn-cancel {
+            background: #6c757d;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal-delete .btn-cancel:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.7) translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-delete.show .modal-content {
+            animation: modalSlideIn 0.3s ease-out;
         }
     </style>
 </head>
@@ -225,6 +410,9 @@ require_once 'auth_check.php';
 
     <main class="main">
         <h1 class="daftar-heading">Galeri</h1>
+
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
 
         <section class="upload-section">
             <form id="formUpload" enctype="multipart/form-data">
@@ -243,6 +431,7 @@ require_once 'auth_check.php';
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../frontend/galeri.js"></script>
 </body>
 
