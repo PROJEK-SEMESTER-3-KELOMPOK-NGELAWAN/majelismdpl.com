@@ -727,664 +727,646 @@
         <img src="img/majelis.png" alt="Majelis MDPL" />
         <span>Majelis MDPL</span>
       </div>
-      <nav>
-        <ul class="nav-links">
-          <li><a href="index.php">Home</a></li>
-          <li><a href="profile.php" class="active">Profile</a></li>
-          <li><a href="jadwalpendakian.php">Jadwal Pendakian</a></li>
-          <li><a href="testimoni.php">Testimoni</a></li>
-          <li><a href="galeri.php">Galeri</a></li>
-        </ul>
+      <nav class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Profile</a>
+        <a href="#">Jadwal Pendakian</a>
+        <a href="#">Testimoni</a>
+        <a href="#">Galeri</a>
       </nav>
       <div class="nav-btns">
-        <a href="#" class="btn">Sign Up</a>
-        <a href="#" class="btn">Login</a>
+        <a href="#" id="open-signup" class="btn">Sign Up</a>
+        <a href="#" id="open-login" class="btn">Login</a>
       </div>
     </div>
   </header>
 
-    <!-- Hero -->
-    <div class="hero-section">
-      <!-- Background layer -->
-      <div class="hero-bg-custom"></div>
+  <!-- Hero -->
+  <div class="hero-section">
+    <!-- Background layer -->
+    <div class="hero-bg-custom"></div>
 
-      <img class="hero-bg" src="img/Herooo.jpg" alt="Healing" />
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <h1>Kamu Pusing?<br>Yuk Healing</h1>
-        <p>Mau Explore berbagai pilihan trip buat nikmatin weekendmu? <br>
-          Temukan semuanya di sini.</p>
-        <button class="hero-btn">Lihat Semua <i class="fas fa-arrow-right"></i></button>
-        <div class="destination-carousel">
-          <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
-          <div class="carousel-track">
-            <!-- Card Destinasi -->
-            <!-- trip ini diambil dari file frontend/trip-user.js -->
-            <!-- Tambahkan lagi card di sini jika perlu -->
+    <img class="hero-bg" src="img/Herooo.jpg" alt="Healing" />
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Kamu Pusing?<br>Yuk Healing</h1>
+      <p>Mau Explore berbagai pilihan trip buat nikmatin weekendmu? <br>
+        Temukan semuanya di sini.</p>
+      <button class="hero-btn">Lihat Semua <i class="fas fa-arrow-right"></i></button>
+      <div class="destination-carousel">
+        <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+        <div class="carousel-track">
+          <!-- Card Destinasi -->
+          <!-- trip ini diambil dari file frontend/trip-user.js -->
+          <!-- Tambahkan lagi card di sini jika perlu -->
 
-          </div>
-          <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+  <script src="carousel.js"></script>
+
+  <!-- profile -->
+  <section class="why-explorer">
+    <div class="gallery-collage">
+      <img src="img/gambar1.jpg" alt="Trip Foto 1" class="item item1">
+      <img src="img/gambar2.jpg" alt="Trip Foto 2" class="item item2">
+      <img src="img/gambar3.jpg" alt="Trip Foto 3" class="item item3">
+      <img src="img/gambar1.jpg" alt="Trip Foto 4" class="item item4">
+      <img src="img/gambar2.jpg" alt="Trip Foto 5" class="item item5">
+    </div>
+    <div class="content">
+      <h1>Kenapa Pilih Majelis Mdpl?</h1>
+      <div class="feature">
+        <i class="fas fa-map-marked-alt icon"></i>
+        <div>
+          <h3>Banyak Pilihan Destinasi</h3>
+          <p>Mau liburan ke Bandung, Lembang, Yogyakarta, Semarang, Surabaya, Gunung ataupun Laut semuanya ada di Explorer.ID.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <i class="fas fa-credit-card icon"></i>
+        <div>
+          <h3>Banyak Metode Pembayaran</h3>
+          <p>Gak usah pusing, Majelis Mdpl banyak metode pembayaran kekinian yang bakal bikin kamu lebih nyaman.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <i class="fas fa-lock icon"></i>
+        <div>
+          <h3>Transaksi Aman</h3>
+          <p>Keamanan dan privasi transaksi online Anda menjadi prioritas kami.</p>
         </div>
       </div>
     </div>
-    <script src="carousel.js"></script>
+  </section>
 
-    <!-- profile -->
-    <section class="why-explorer">
-      <div class="gallery-collage">
-        <img src="img/gambar1.jpg" alt="Trip Foto 1" class="item item1">
-        <img src="img/gambar2.jpg" alt="Trip Foto 2" class="item item2">
-        <img src="img/gambar3.jpg" alt="Trip Foto 3" class="item item3">
-        <img src="img/gambar1.jpg" alt="Trip Foto 4" class="item item4">
-        <img src="img/gambar2.jpg" alt="Trip Foto 5" class="item item5">
+  <!-- CARD -->
+  <div class="row g-4">
+    <?php if (empty($trips)): ?>
+      <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
+        <p class="text-muted fs-4 fade-text">🚫 Belum ada jadwal trip.</p>
       </div>
-      <div class="content">
-        <h1>Kenapa Pilih Majelis Mdpl?</h1>
-        <div class="feature">
-          <i class="fas fa-map-marked-alt icon"></i>
-          <div>
-            <h3>Banyak Pilihan Destinasi</h3>
-            <p>Mau liburan ke Bandung, Lembang, Yogyakarta, Semarang, Surabaya, Gunung ataupun Laut semuanya ada di
-              Explorer.ID.</p>
-          </div>
-        </div>
-        <div class="feature">
-          <i class="fas fa-credit-card icon"></i>
-          <div>
-            <h3>Banyak Metode Pembayaran</h3>
-            <p>Gak usah pusing, Majelis Mdpl banyak metode pembayaran kekinian yang bakal bikin kamu lebih nyaman.</p>
-          </div>
-        </div>
-        <div class="feature">
-          <i class="fas fa-lock icon"></i>
-          <div>
-            <h3>Transaksi Aman</h3>
-            <p>Keamanan dan privasi transaksi online Anda menjadi prioritas kami.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CARD -->
-    <div class="row g-4">
-      <?php if (empty($trips)): ?>
-        <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
-          <p class="text-muted fs-4 fade-text">🚫 Belum ada jadwal trip.</p>
-        </div>
-      <?php else: ?>
-        <?php foreach ($trips as $trip): ?>
-          <div class="col-md-4 fade-text">
-            <div class="card shadow-sm border-0 rounded-4 h-100 text-center">
-              <div class="position-relative">
-                <!-- Badge Status Trip -->
-                <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2 
+    <?php else: ?>
+      <?php foreach ($trips as $trip) : ?>
+        <div class="col-md-4 fade-text">
+          <div class="card shadow-sm border-0 rounded-4 h-100 text-center">
+            <div class="position-relative">
+              <!-- Badge Status Trip -->
+              <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2 
                 <?= $trip['status'] == "sold" ? "bg-danger" : "bg-success" ?>">
-                  <i class="bi <?= $trip['status'] == "sold" ? "bi-x-circle-fill" : "bi-check-circle-fill" ?>"></i>
-                  <?= $trip['status'] == "sold" ? "Sold" : "Available" ?>
+                <i class="bi <?= $trip['status'] == "sold" ? "bi-x-circle-fill" : "bi-check-circle-fill" ?>"></i>
+                <?= $trip['status'] == "sold" ? "Sold" : "Available" ?>
+              </span>
+              <!-- Gambar -->
+              <img src="../img/<?= $trip['gambar'] ?>"
+                class="card-img-top rounded-top-4"
+                alt="<?= $trip['nama_gunung'] ?>"
+                style="height:200px; object-fit:cover;">
+            </div>
+            <div class="card-body text-center">
+              <!-- Tanggal & Durasi -->
+              <div class="d-flex justify-content-between small text-muted mb-2">
+                <span><i class="bi bi-calendar-event"></i> <?= date("d M Y", strtotime($trip['tanggal'])) ?></span>
+                <span><i class="bi bi-clock"></i> <?= $trip['jenis_trip'] == "Camp" ? $trip['durasi'] : "1 hari" ?></span>
+              </div>
+              <!-- Judul -->
+              <h5 class="card-title fw-bold"><?= $trip['nama_gunung'] ?></h5>
+              <div class="mb-2">
+                <span class="badge bg-secondary">
+                  <i class="bi bi-flag-fill"></i> <?= $trip['jenis_trip'] ?>
                 </span>
-                <!-- Gambar -->
-                <img src="../img/<?= $trip['gambar'] ?>" class="card-img-top rounded-top-4"
-                  alt="<?= $trip['nama_gunung'] ?>" style="height:200px; object-fit:cover;">
               </div>
-              <div class="card-body text-center">
-                <!-- Tanggal & Durasi -->
-                <div class="d-flex justify-content-between small text-muted mb-2">
-                  <span><i class="bi bi-calendar-event"></i> <?= date("d M Y", strtotime($trip['tanggal'])) ?></span>
-                  <span><i class="bi bi-clock"></i> <?= $trip['jenis_trip'] == "Camp" ? $trip['durasi'] : "1 hari" ?></span>
-                </div>
-                <!-- Judul -->
-                <h5 class="card-title fw-bold"><?= $trip['nama_gunung'] ?></h5>
-                <div class="mb-2">
-                  <span class="badge bg-secondary">
-                    <i class="bi bi-flag-fill"></i> <?= $trip['jenis_trip'] ?>
-                  </span>
-                </div>
-                <!-- Rating & Ulasan -->
-                <div class="small text-muted mb-2">
-                  <i class="bi bi-star-fill text-warning"></i> 5 (<?= rand(101, 300) ?>+ ulasan)
-                </div>
-                <!-- Via Gunung -->
-                <div class="small text-muted mb-2">
-                  <i class="bi bi-signpost-2"></i> Via <?= $trip['via_gunung'] ?? '-' ?>
-                </div>
-                <!-- Harga -->
-                <h5 class="fw-bold text-success mb-3">
-                  Rp <?= number_format((int) str_replace(['.', ','], '', $trip['harga']), 0, ',', '.') ?>
-                </h5>
-                <!-- Tombol Aksi -->
-                <div class="d-flex justify-content-between">
-                  <a href="trip_detail.php?id=<?= $trip['id'] ?>" class="btn btn-info btn-sm">
-                    <i class="bi bi-eye"></i> Detail
-                  </a>
-                  <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                    data-bs-target="#editModal<?= $trip['id'] ?>">
-                    <i class="bi bi-pencil-square"></i> Edit
-                  </button>
-                  <a href="trip.php?hapus=<?= $trip['id'] ?>" onclick="return confirm('Hapus trip ini?');"
-                    class="btn btn-danger btn-sm">
-                    <i class="bi bi-trash"></i> Hapus
-                  </a>
-                </div>
+              <!-- Rating & Ulasan -->
+              <div class="small text-muted mb-2">
+                <i class="bi bi-star-fill text-warning"></i> 5 (<?= rand(101, 300) ?>+ ulasan)
+              </div>
+              <!-- Via Gunung -->
+              <div class="small text-muted mb-2">
+                <i class="bi bi-signpost-2"></i> Via <?= $trip['via_gunung'] ?? '-' ?>
+              </div>
+              <!-- Harga -->
+              <h5 class="fw-bold text-success mb-3">
+                Rp <?= number_format((int)str_replace(['.', ','], '', $trip['harga']), 0, ',', '.') ?>
+              </h5>
+              <!-- Tombol Aksi -->
+              <div class="d-flex justify-content-between">
+                <a href="trip_detail.php?id=<?= $trip['id'] ?>" class="btn btn-info btn-sm">
+                  <i class="bi bi-eye"></i> Detail
+                </a>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $trip['id'] ?>">
+                  <i class="bi bi-pencil-square"></i> Edit
+                </button>
+                <a href="trip.php?hapus=<?= $trip['id'] ?>"
+                  onclick="return confirm('Hapus trip ini?');"
+                  class="btn btn-danger btn-sm">
+                  <i class="bi bi-trash"></i> Hapus
+                </a>
               </div>
             </div>
           </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
-    </div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </div>
 
-    <!-- Testimonials -->
-    <section id="testimonials" class="testimonials">
-      <div class="container">
-        <h2><span class="title-large">Apa Kata Mereka?</span></h2>
-        <div class="testimonial-grid">
-          <div class="testimonial-card elevation-1">
-            <p class="testimonial-text">Trip ke Rinjani sangat terorganisir. Guide-nya asik dan perhatian. Saya yang
-              pemula merasa aman banget!</p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Rudi"></div>
-              <div class="author-details">
-                <h4>Rudi Saputra</h4>
-                <p>Jakarta</p>
-              </div>
+  <!-- Testimonials -->
+  <section id="testimonials" class="testimonials">
+    <div class="container">
+      <h2><span class="title-large">Apa Kata Mereka?</span></h2>
+      <div class="testimonial-grid">
+        <div class="testimonial-card elevation-1">
+          <p class="testimonial-text">Trip ke Rinjani sangat terorganisir. Guide-nya asik dan perhatian. Saya yang pemula merasa aman banget!</p>
+          <div class="testimonial-author">
+            <div class="author-image"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Rudi"></div>
+            <div class="author-details">
+              <h4>Rudi Saputra</h4>
+              <p>Jakarta</p>
             </div>
           </div>
-          <div class="testimonial-card elevation-1">
-            <p class="testimonial-text">Baru pertama kali ikut open trip, tapi langsung jatuh cinta. Banyak teman baru
-              dan pengalaman tak terlupakan.</p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dewi"></div>
-              <div class="author-details">
-                <h4>Dewi Lestari</h4>
-                <p>Bandung</p>
-              </div>
+        </div>
+        <div class="testimonial-card elevation-1">
+          <p class="testimonial-text">Baru pertama kali ikut open trip, tapi langsung jatuh cinta. Banyak teman baru dan pengalaman tak terlupakan.</p>
+          <div class="testimonial-author">
+            <div class="author-image"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dewi"></div>
+            <div class="author-details">
+              <h4>Dewi Lestari</h4>
+              <p>Bandung</p>
             </div>
           </div>
-          <div class="testimonial-card elevation-1">
-            <p class="testimonial-text">Sunrise di Bromo, camping di savana, semua sempurna. Majelis MDPL benar-benar
-              profesional!</p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Andi"></div>
-              <div class="author-details">
-                <h4>Andi Pratama</h4>
-                <p>Surabaya</p>
-              </div>
+        </div>
+        <div class="testimonial-card elevation-1">
+          <p class="testimonial-text">Sunrise di Bromo, camping di savana, semua sempurna. Majelis MDPL benar-benar profesional!</p>
+          <div class="testimonial-author">
+            <div class="author-image"><img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Andi"></div>
+            <div class="author-details">
+              <h4>Andi Pratama</h4>
+              <p>Surabaya</p>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- POPUP LOGIN -->
-    <div id="loginModal" class="modal">
-      <div class="modal-container">
-        <a href="#" class="close-btn" id="close-login">&times;</a>
+  <!-- POPUP LOGIN -->
+  <div id="loginModal" class="modal">
+    <div class="modal-container">
+      <a href="#" class="close-btn" id="close-login">&times;</a>
 
-        <!-- Left section dengan logo -->
-        <div class="modal-left">
-          <div class="logo-container">
-            <img src="assets/logo-majelis.png" alt="Majelis MDPL Logo" class="modal-logo">
-          </div>
+      <!-- Left section dengan logo -->
+      <div class="modal-left">
+        <div class="logo-container">
+          <img src="assets/logo-majelis.png" alt="Majelis MDPL Logo" class="modal-logo">
         </div>
+      </div>
 
-        <!-- Right section dengan form -->
-        <div class="modal-right">
-          <h2>Login</h2>
+      <!-- Right section dengan form -->
+      <div class="modal-right">
+        <h2>Login</h2>
 
-          <form action="login.php" method="POST">
+        <form action="login.php" method="POST">
+          <div class="input-group">
+            <input type="text" name="username" placeholder="Username" required />
+          </div>
+
+          <!-- Input Password dengan toggle show/hide -->
+          <div class="input-group password-group">
+            <input type="password" name="password" id="loginPassword" placeholder="Password" required />
+            <button type="button" class="password-toggle" id="toggleLoginPassword">
+              <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20" style="display: none;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Tombol Login dengan Google -->
+          <div class="divider">
+            <span>atau</span>
+          </div>
+
+          <div class="google-login-section">
+            <button type="button" id="googleLoginBtn" class="btn-google">
+              <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+              Login with Google
+            </button>
+          </div>
+
+          <button type="submit" class="btn-login">Masuk</button>
+
+          <div style="text-align:center;margin-top:13px;">
+            <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
+              Lupa password?
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- POPUP SIGN UP -->
+  <div id="signUpModal" class="modal">
+    <div class="modal-container signup-modal">
+      <a href="#" class="close-btn" id="close-signup">&times;</a>
+
+      <!-- Left section dengan logo -->
+      <div class="modal-left">
+        <div class="logo-container">
+          <img src="assets/logo-majelis.png" alt="Majelis MDPL Logo" class="modal-logo">
+        </div>
+      </div>
+
+      <!-- Right section dengan form -->
+      <div class="modal-right">
+        <h2>Sign Up</h2>
+
+        <form method="POST" novalidate id="signupForm">
+          <div class="form-grid">
+            <!-- Row 1 -->
             <div class="input-group">
-              <input type="text" name="username" placeholder="Username" required />
+              <input type="text" name="username" placeholder="Username" autocomplete="username" required />
             </div>
-
-            <!-- Input Password dengan toggle show/hide -->
             <div class="input-group password-group">
-              <input type="password" name="password" id="loginPassword" placeholder="Password" required />
-              <button type="button" class="password-toggle" id="toggleLoginPassword">
-                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                  stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+              <input type="password" name="password" id="signupPassword" placeholder="Password" autocomplete="new-password" required />
+              <button type="button" class="password-toggle" id="toggleSignupPassword">
+                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                  stroke-width="1.5" stroke="currentColor" width="20" height="20" style="display: none;">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                 </svg>
               </button>
             </div>
 
-            <!-- Tombol Login dengan Google -->
-            <div class="divider">
-              <span>atau</span>
+            <!-- Row 2 -->
+            <div class="input-group">
+              <input type="email" name="email" placeholder="Email" autocomplete="email" required />
             </div>
-
-            <div class="google-login-section">
-              <button type="button" id="googleLoginBtn" class="btn-google">
-                <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
-                Login with Google
+            <div class="input-group password-group">
+              <input type="password" name="confirm_password" id="confirmPassword" placeholder="Konfirmasi Password" autocomplete="new-password" required />
+              <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                </svg>
               </button>
             </div>
 
-            <button type="submit" class="btn-login">Masuk</button>
-
-            <div style="text-align:center;margin-top:13px;">
-              <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
-                Lupa password?
-              </a>
+            <!-- Row 3 -->
+            <div class="input-group">
+              <input type="tel" name="no_wa" placeholder="No HP" inputmode="tel" autocomplete="tel" required />
             </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-
-
-
-    <!-- POPUP SIGN UP -->
-    <div id="signUpModal" class="modal">
-      <div class="modal-container signup-modal">
-        <a href="#" class="close-btn" id="close-signup">&times;</a>
-
-        <!-- Left section dengan logo -->
-        <div class="modal-left">
-          <div class="logo-container">
-            <img src="assets/logo-majelis.png" alt="Majelis MDPL Logo" class="modal-logo">
+            <div class="input-group">
+              <input type="text" name="alamat" placeholder="Alamat" autocomplete="street-address" required />
+            </div>
           </div>
-        </div>
 
-        <!-- Right section dengan form -->
-        <div class="modal-right">
-          <h2>Sign Up</h2>
+          <button type="submit" class="btn-login">Daftar</button>
 
-          <form method="POST" novalidate id="signupForm">
-            <div class="form-grid">
-              <!-- Row 1 -->
-              <div class="input-group">
-                <input type="text" name="username" placeholder="Username" autocomplete="username" required />
-              </div>
-              <div class="input-group password-group">
-                <input type="password" name="password" id="signupPassword" placeholder="Password"
-                  autocomplete="new-password" required />
-                <button type="button" class="password-toggle" id="toggleSignupPassword">
-                  <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="1.5" stroke="currentColor" width="18" height="18">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                  </svg>
-                </button>
-              </div>
-
-              <!-- Row 2 -->
-              <div class="input-group">
-                <input type="email" name="email" placeholder="Email" autocomplete="email" required />
-              </div>
-              <div class="input-group password-group">
-                <input type="password" name="confirm_password" id="confirmPassword" placeholder="Konfirmasi Password"
-                  autocomplete="new-password" required />
-                <button type="button" class="password-toggle" id="toggleConfirmPassword">
-                  <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="1.5" stroke="currentColor" width="18" height="18">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                  </svg>
-                </button>
-              </div>
-
-              <!-- Row 3 -->
-              <div class="input-group">
-                <input type="tel" name="no_wa" placeholder="No HP" inputmode="tel" autocomplete="tel" required />
-              </div>
-              <div class="input-group">
-                <input type="text" name="alamat" placeholder="Alamat" autocomplete="street-address" required />
-              </div>
-            </div>
-
-            <button type="submit" class="btn-login">Daftar</button>
-
-            <!-- Tombol Sign Up dengan Google -->
-            <div class="divider">
-              <span>atau</span>
-            </div>
-            <div class="google-signup-section">
-              <button type="button" id="googleSignUpBtn" class="btn-google">
-                <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
-                Sign up with Google
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-
-
-    <footer class="footer">
-      <div class="container">
-        <!-- Kolom Kiri -->
-        <div class="footer-col">
-          <h3 class="brand">Pendakian Majelis MDPL</h3>
-          <p>
-            ✨ Nikmati pengalaman tak terlupakan bersama Majelis MDPL Open Trip. <br>
-            Ikuti serunya pendakian tektok maupun camping, rasakan panorama puncak
-            yang menakjubkan, dan ciptakan kenangan berharga di setiap perjalanan. 🌲🏔️
-          </p>
-          <div class="social-links">
-            <a href="#"><i class="fa-brands fa-facebook"></i></a>
-            <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+          <!-- Tombol Sign Up dengan Google -->
+          <div class="divider">
+            <span>atau</span>
           </div>
-        </div>
-        <!-- Kolom Tengah -->
-        <div class="footer-col">
-          <h3>Kontak <span>Kami</span></h3>
-          <p><strong>Alamat Kami</strong><br>Jl. aseleole, Kaliwates, Jember 55582</p>
-          <p><strong>Whatsapp</strong><br>08562898933</p>
-          <p><strong>Email</strong><br>majelismdpl@gmail.com</p>
-        </div>
-        <!-- Kolom Kanan -->
-        <div class="footer-col">
-          <h3>Quick <span>Link</span></h3>
-          <ul>
-            <li><a href="#">Profile</a></li>
-            <li><a href="#">Paket Open Trip</a></li>
-            <li><a href="#">Kontak</a></li>
-          </ul>
-        </div>
+          <div class="google-signup-section">
+            <button type="button" id="googleSignUpBtn" class="btn-google">
+              <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+              Sign up with Google
+            </button>
+          </div>
+        </form>
       </div>
-      <div class="copyright">
-        <p>Copyright © 2025 Majelis Mdpl. All rights reserved. Developed with ❤️ by Dimasdw15</p>
-      </div>
-    </footer>
-
-    <!-- Tombol WhatsApp -->
-    <div class="whatsapp-container">
-      <button class="whatsapp-button" onclick="bukaWhatsapp()">
-        <i class="fab fa-whatsapp"></i> Hubungi via WhatsApp
-      </button>
     </div>
+  </div>
 
-    <!-- Load SweetAlert first -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Global functions that might be needed -->
-    <script>
-      function bukaWhatsapp() {
-        const nomor = "6283853493130";
-        const url = "https://wa.me/" + nomor;
-        window.open(url, "_blank");
-      }
 
-      // Global function untuk Google OAuth (fallback)
-      function handleGoogleOAuth() {
-        console.log("Global handleGoogleOAuth called");
-        window.location.href = window.location.origin + "/majelismdpl.com/backend/google-oauth.php";
-      }
+  <footer class="footer">
+    <div class="container">
+      <!-- Kolom Kiri -->
+      <div class="footer-col">
+        <h3 class="brand">Pendakian Majelis MDPL</h3>
+        <p>
+          ✨ Nikmati pengalaman tak terlupakan bersama Majelis MDPL Open Trip. <br>
+          Ikuti serunya pendakian tektok maupun camping, rasakan panorama puncak
+          yang menakjubkan, dan ciptakan kenangan berharga di setiap perjalanan. 🌲🏔️
+        </p>
+        <div class="social-links">
+          <a href="#"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+      <!-- Kolom Tengah -->
+      <div class="footer-col">
+        <h3>Kontak <span>Kami</span></h3>
+        <p><strong>Alamat Kami</strong><br>Jl. aseleole, Kaliwates, Jember 55582</p>
+        <p><strong>Whatsapp</strong><br>08562898933</p>
+        <p><strong>Email</strong><br>majelismdpl@gmail.com</p>
+      </div>
+      <!-- Kolom Kanan -->
+      <div class="footer-col">
+        <h3>Quick <span>Link</span></h3>
+        <ul>
+          <li><a href="#">Profile</a></li>
+          <li><a href="#">Paket Open Trip</a></li>
+          <li><a href="#">Kontak</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>Copyright © 2025 Majelis Mdpl. All rights reserved. Developed with ❤️ by Dimasdw15</p>
+    </div>
+  </footer>
 
-      // Global function untuk Google Login (fallback)
-      function handleGoogleLogin() {
-        console.log("Global handleGoogleLogin called");
-        window.location.href = window.location.origin + "/majelismdpl.com/backend/google-oauth.php?type=login";
-      }
+  <!-- Tombol WhatsApp -->
+  <div class="whatsapp-container">
+    <button class="whatsapp-button" onclick="bukaWhatsapp()">
+      <i class="fab fa-whatsapp"></i> Hubungi via WhatsApp
+    </button>
+  </div>
 
-      // ====== util animasi modal (sesuai CSS .open/.closing) ======
-      const OPEN = "open";
-      const CLOSING = "closing";
-      const DURATION = 300;
+  <!-- Load SweetAlert first -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-      function openModal(el) {
+  <!-- Global functions that might be needed -->
+  <script>
+    function bukaWhatsapp() {
+      const nomor = "6283853493130";
+      const url = "https://wa.me/" + nomor;
+      window.open(url, "_blank");
+    }
+
+    // Global function untuk Google OAuth (fallback)
+    function handleGoogleOAuth() {
+      console.log("Global handleGoogleOAuth called");
+      window.location.href = window.location.origin + "/majelismdpl.com/backend/google-oauth.php";
+    }
+
+    // Global function untuk Google Login (fallback)
+    function handleGoogleLogin() {
+      console.log("Global handleGoogleLogin called");
+      window.location.href = window.location.origin + "/majelismdpl.com/backend/google-oauth.php?type=login";
+    }
+
+    // ====== util animasi modal (sesuai CSS .open/.closing) ======
+    const OPEN = "open";
+    const CLOSING = "closing";
+    const DURATION = 300;
+
+    function openModal(el) {
+      el.classList.remove(CLOSING);
+      el.style.display = "flex";
+      void el.offsetWidth; // force reflow
+      el.classList.add(OPEN);
+    }
+
+    function closeModal(el) {
+      el.classList.remove(OPEN);
+      el.classList.add(CLOSING);
+      setTimeout(() => {
         el.classList.remove(CLOSING);
-        el.style.display = "flex";
-        void el.offsetWidth; // force reflow
-        el.classList.add(OPEN);
+        el.style.display = "none";
+      }, DURATION);
+    }
+
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Main script DOMContentLoaded executed');
+
+      // ====== LOGIN MODAL ======
+      const loginModal = document.getElementById("loginModal");
+      const openLogin = document.getElementById("open-login");
+      const closeLogin = document.getElementById("close-login");
+
+      if (openLogin && loginModal && closeLogin) {
+        openLogin.addEventListener("click", (e) => {
+          e.preventDefault();
+          openModal(loginModal);
+
+          // After opening modal, try to attach Google login button event
+          setTimeout(() => {
+            const googleLoginBtn = document.getElementById("googleLoginBtn");
+            if (googleLoginBtn && !googleLoginBtn.hasAttribute('data-main-login-listener')) {
+              googleLoginBtn.setAttribute('data-main-login-listener', 'true');
+              googleLoginBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Google login button clicked from main script!');
+                handleGoogleLogin();
+              });
+              console.log('Google login button listener attached from main script');
+            }
+          }, 100);
+        });
+
+        closeLogin.addEventListener("click", (e) => {
+          e.preventDefault();
+          closeModal(loginModal);
+        });
+
+        loginModal.addEventListener("click", (e) => {
+          if (e.target === loginModal) closeModal(loginModal);
+        });
       }
 
-      function closeModal(el) {
-        el.classList.remove(OPEN);
-        el.classList.add(CLOSING);
-        setTimeout(() => {
-          el.classList.remove(CLOSING);
-          el.style.display = "none";
-        }, DURATION);
+      // ====== SIGN UP MODAL ======
+      const signUpModal = document.getElementById("signUpModal");
+      const openSignUp = document.getElementById("open-signup");
+      const closeSignUp = document.getElementById("close-signup");
+
+      if (openSignUp && signUpModal && closeSignUp) {
+        openSignUp.addEventListener("click", (e) => {
+          e.preventDefault();
+          openModal(signUpModal);
+
+          // After opening modal, try to attach Google signup button event
+          setTimeout(() => {
+            const googleSignupBtn = document.getElementById("googleSignUpBtn");
+            if (googleSignupBtn && !googleSignupBtn.hasAttribute('data-main-signup-listener')) {
+              googleSignupBtn.setAttribute('data-main-signup-listener', 'true');
+              googleSignupBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Google signup button clicked from main script!');
+                handleGoogleOAuth();
+              });
+              console.log('Google signup button listener attached from main script');
+            }
+          }, 100);
+        });
+
+        closeSignUp.addEventListener("click", (e) => {
+          e.preventDefault();
+          closeModal(signUpModal);
+        });
+
+        signUpModal.addEventListener("click", (e) => {
+          if (e.target === signUpModal) closeModal(signUpModal);
+        });
       }
 
-      // Wait for DOM to be fully loaded
-      document.addEventListener('DOMContentLoaded', function () {
-        console.log('Main script DOMContentLoaded executed');
-
-        // ====== LOGIN MODAL ======
-        const loginModal = document.getElementById("loginModal");
-        const openLogin = document.getElementById("open-login");
-        const closeLogin = document.getElementById("close-login");
-
-        if (openLogin && loginModal && closeLogin) {
-          openLogin.addEventListener("click", (e) => {
-            e.preventDefault();
-            openModal(loginModal);
-
-            // After opening modal, try to attach Google login button event
-            setTimeout(() => {
-              const googleLoginBtn = document.getElementById("googleLoginBtn");
-              if (googleLoginBtn && !googleLoginBtn.hasAttribute('data-main-login-listener')) {
-                googleLoginBtn.setAttribute('data-main-login-listener', 'true');
-                googleLoginBtn.addEventListener('click', function (e) {
-                  e.preventDefault();
-                  console.log('Google login button clicked from main script!');
-                  handleGoogleLogin();
-                });
-                console.log('Google login button listener attached from main script');
-              }
-            }, 100);
-          });
-
-          closeLogin.addEventListener("click", (e) => {
-            e.preventDefault();
-            closeModal(loginModal);
-          });
-
-          loginModal.addEventListener("click", (e) => {
-            if (e.target === loginModal) closeModal(loginModal);
-          });
+      // ESC untuk menutup
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          if (signUpModal && signUpModal.style.display === "flex") closeModal(signUpModal);
+          if (loginModal && loginModal.style.display === "flex") closeModal(loginModal);
         }
+      });
+    });
 
-        // ====== SIGN UP MODAL ======
-        const signUpModal = document.getElementById("signUpModal");
-        const openSignUp = document.getElementById("open-signup");
-        const closeSignUp = document.getElementById("close-signup");
+    // Toggle Password Visibility untuk Login Modal
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggleButton = document.getElementById('toggleLoginPassword');
+      const passwordInput = document.getElementById('loginPassword');
 
-        if (openSignUp && signUpModal && closeSignUp) {
-          openSignUp.addEventListener("click", (e) => {
-            e.preventDefault();
-            openModal(signUpModal);
+      if (toggleButton && passwordInput) {
+        toggleButton.addEventListener('click', function() {
+          const showIcon = toggleButton.querySelector('.eye-icon.show');
+          const hideIcon = toggleButton.querySelector('.eye-icon.hide');
 
-            // After opening modal, try to attach Google signup button event
-            setTimeout(() => {
-              const googleSignupBtn = document.getElementById("googleSignUpBtn");
-              if (googleSignupBtn && !googleSignupBtn.hasAttribute('data-main-signup-listener')) {
-                googleSignupBtn.setAttribute('data-main-signup-listener', 'true');
-                googleSignupBtn.addEventListener('click', function (e) {
-                  e.preventDefault();
-                  console.log('Google signup button clicked from main script!');
-                  handleGoogleOAuth();
-                });
-                console.log('Google signup button listener attached from main script');
-              }
-            }, 100);
-          });
-
-          closeSignUp.addEventListener("click", (e) => {
-            e.preventDefault();
-            closeModal(signUpModal);
-          });
-
-          signUpModal.addEventListener("click", (e) => {
-            if (e.target === signUpModal) closeModal(signUpModal);
-          });
-        }
-
-        // ESC untuk menutup
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") {
-            if (signUpModal && signUpModal.style.display === "flex") closeModal(signUpModal);
-            if (loginModal && loginModal.style.display === "flex") closeModal(loginModal);
+          if (passwordInput.type === 'password') {
+            // Show password
+            passwordInput.type = 'text';
+            showIcon.style.display = 'none';
+            hideIcon.style.display = 'block';
+          } else {
+            // Hide password
+            passwordInput.type = 'password';
+            showIcon.style.display = 'block';
+            hideIcon.style.display = 'none';
           }
         });
-      });
-
-      // Toggle Password Visibility untuk Login Modal
-      document.addEventListener('DOMContentLoaded', function () {
-        const toggleButton = document.getElementById('toggleLoginPassword');
-        const passwordInput = document.getElementById('loginPassword');
-
-        if (toggleButton && passwordInput) {
-          toggleButton.addEventListener('click', function () {
-            const showIcon = toggleButton.querySelector('.eye-icon.show');
-            const hideIcon = toggleButton.querySelector('.eye-icon.hide');
-
-            if (passwordInput.type === 'password') {
-              // Show password
-              passwordInput.type = 'text';
-              showIcon.style.display = 'none';
-              hideIcon.style.display = 'block';
-            } else {
-              // Hide password
-              passwordInput.type = 'password';
-              showIcon.style.display = 'block';
-              hideIcon.style.display = 'none';
-            }
-          });
-        }
-      });
+      }
+    });
 
 
-      // Password Toggle dan Validasi untuk Signup Modal
-      document.addEventListener('DOMContentLoaded', function () {
-        // Toggle untuk password utama
-        const toggleSignupPassword = document.getElementById('toggleSignupPassword');
-        const signupPasswordInput = document.getElementById('signupPassword');
+    // Password Toggle dan Validasi untuk Signup Modal
+    document.addEventListener('DOMContentLoaded', function() {
+      // Toggle untuk password utama
+      const toggleSignupPassword = document.getElementById('toggleSignupPassword');
+      const signupPasswordInput = document.getElementById('signupPassword');
 
-        if (toggleSignupPassword && signupPasswordInput) {
-          toggleSignupPassword.addEventListener('click', function () {
-            togglePasswordVisibility(signupPasswordInput, toggleSignupPassword);
-          });
-        }
-
-        // Toggle untuk konfirmasi password
-        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
-
-        if (toggleConfirmPassword && confirmPasswordInput) {
-          toggleConfirmPassword.addEventListener('click', function () {
-            togglePasswordVisibility(confirmPasswordInput, toggleConfirmPassword);
-          });
-        }
-
-        // Real-time password match validation
-        if (signupPasswordInput && confirmPasswordInput) {
-          confirmPasswordInput.addEventListener('input', function () {
-            validatePasswordMatch();
-          });
-
-          signupPasswordInput.addEventListener('input', function () {
-            if (confirmPasswordInput.value) {
-              validatePasswordMatch();
-            }
-          });
-        }
-
-        // Form submission validation
-        const signupForm = document.getElementById('signupForm');
-        if (signupForm) {
-          signupForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const password = signupPasswordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
-
-            if (password !== confirmPassword) {
-              showCustomAlert(
-                'Password Tidak Sama!',
-                'Password dan Konfirmasi Password harus sama. Silakan periksa kembali input Anda.',
-                'error'
-              );
-              return false;
-            }
-
-            // Jika password sama, lanjutkan submit form
-            // Anda bisa menambahkan logic submit form di sini
-            showCustomAlert(
-              'Berhasil!',
-              'Password telah tervalidasi. Form siap untuk disubmit.',
-              'success'
-            );
-          });
-        }
-      });
-
-      // Function untuk toggle password visibility
-      function togglePasswordVisibility(passwordInput, toggleButton) {
-        const showIcon = toggleButton.querySelector('.eye-icon.show');
-        const hideIcon = toggleButton.querySelector('.eye-icon.hide');
-
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text';
-          showIcon.style.display = 'none';
-          hideIcon.style.display = 'block';
-        } else {
-          passwordInput.type = 'password';
-          showIcon.style.display = 'block';
-          hideIcon.style.display = 'none';
-        }
+      if (toggleSignupPassword && signupPasswordInput) {
+        toggleSignupPassword.addEventListener('click', function() {
+          togglePasswordVisibility(signupPasswordInput, toggleSignupPassword);
+        });
       }
 
-      // Function untuk validasi password match secara real-time
-      function validatePasswordMatch() {
-        const password = document.getElementById('signupPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        const confirmPasswordInput = document.getElementById('confirmPassword');
+      // Toggle untuk konfirmasi password
+      const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
 
-        // Remove existing indicator
-        const existingIndicator = confirmPasswordInput.parentNode.querySelector('.password-match-indicator');
-        if (existingIndicator) {
-          existingIndicator.remove();
-        }
+      if (toggleConfirmPassword && confirmPasswordInput) {
+        toggleConfirmPassword.addEventListener('click', function() {
+          togglePasswordVisibility(confirmPasswordInput, toggleConfirmPassword);
+        });
+      }
 
-        if (confirmPassword) {
-          const indicator = document.createElement('span');
-          indicator.classList.add('password-match-indicator');
+      // Real-time password match validation
+      if (signupPasswordInput && confirmPasswordInput) {
+        confirmPasswordInput.addEventListener('input', function() {
+          validatePasswordMatch();
+        });
 
-          if (password === confirmPassword) {
-            indicator.innerHTML = '✓';
-            indicator.classList.add('success');
-            confirmPasswordInput.style.borderColor = '#22c55e';
-          } else {
-            indicator.innerHTML = '✗';
-            indicator.classList.add('error');
-            confirmPasswordInput.style.borderColor = '#ef4444';
+        signupPasswordInput.addEventListener('input', function() {
+          if (confirmPasswordInput.value) {
+            validatePasswordMatch();
+          }
+        });
+      }
+
+      // Form submission validation
+      const signupForm = document.getElementById('signupForm');
+      if (signupForm) {
+        signupForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+
+          const password = signupPasswordInput.value;
+          const confirmPassword = confirmPasswordInput.value;
+
+          if (password !== confirmPassword) {
+            showCustomAlert(
+              'Password Tidak Sama!',
+              'Password dan Konfirmasi Password harus sama. Silakan periksa kembali input Anda.',
+              'error'
+            );
+            return false;
           }
 
-          confirmPasswordInput.parentNode.appendChild(indicator);
-        } else {
-          confirmPasswordInput.style.borderColor = '#e1e1e1';
-        }
+          // Jika password sama, lanjutkan submit form
+          // Anda bisa menambahkan logic submit form di sini
+          showCustomAlert(
+            'Berhasil!',
+            'Password telah tervalidasi. Form siap untuk disubmit.',
+            'success'
+          );
+        });
+      }
+    });
+
+    // Function untuk toggle password visibility
+    function togglePasswordVisibility(passwordInput, toggleButton) {
+      const showIcon = toggleButton.querySelector('.eye-icon.show');
+      const hideIcon = toggleButton.querySelector('.eye-icon.hide');
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        showIcon.style.display = 'none';
+        hideIcon.style.display = 'block';
+      } else {
+        passwordInput.type = 'password';
+        showIcon.style.display = 'block';
+        hideIcon.style.display = 'none';
+      }
+    }
+
+    // Function untuk validasi password match secara real-time
+    function validatePasswordMatch() {
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const confirmPasswordInput = document.getElementById('confirmPassword');
+
+      // Remove existing indicator
+      const existingIndicator = confirmPasswordInput.parentNode.querySelector('.password-match-indicator');
+      if (existingIndicator) {
+        existingIndicator.remove();
       }
 
-      // Function untuk menampilkan custom alert
-      function showCustomAlert(title, message, type) {
-        // Create alert HTML
-        const alertHTML = `
+      if (confirmPassword) {
+        const indicator = document.createElement('span');
+        indicator.classList.add('password-match-indicator');
+
+        if (password === confirmPassword) {
+          indicator.innerHTML = '✓';
+          indicator.classList.add('success');
+          confirmPasswordInput.style.borderColor = '#22c55e';
+        } else {
+          indicator.innerHTML = '✗';
+          indicator.classList.add('error');
+          confirmPasswordInput.style.borderColor = '#ef4444';
+        }
+
+        confirmPasswordInput.parentNode.appendChild(indicator);
+      } else {
+        confirmPasswordInput.style.borderColor = '#e1e1e1';
+      }
+    }
+
+    // Function untuk menampilkan custom alert
+    function showCustomAlert(title, message, type) {
+      // Create alert HTML
+      const alertHTML = `
     <div class="custom-alert show" id="customAlert">
       <div class="alert-content">
         <div class="alert-icon ${type}">
@@ -1397,32 +1379,32 @@
     </div>
   `;
 
-        // Remove existing alert if any
-        const existingAlert = document.getElementById('customAlert');
-        if (existingAlert) {
-          existingAlert.remove();
-        }
-
-        // Add new alert
-        document.body.insertAdjacentHTML('beforeend', alertHTML);
+      // Remove existing alert if any
+      const existingAlert = document.getElementById('customAlert');
+      if (existingAlert) {
+        existingAlert.remove();
       }
 
-      // Function untuk menutup custom alert
-      function closeCustomAlert() {
-        const alert = document.getElementById('customAlert');
-        if (alert) {
-          alert.classList.remove('show');
-          setTimeout(() => {
-            alert.remove();
-          }, 300);
-        }
-      }
-    </script>
+      // Add new alert
+      document.body.insertAdjacentHTML('beforeend', alertHTML);
+    }
 
-    <!-- Load external JavaScript files -->
-    <script src="frontend/registrasi.js"></script>
-    <script src="frontend/login.js"></script>
-    <script src="frontend/trip-user.js"></script>
+    // Function untuk menutup custom alert
+    function closeCustomAlert() {
+      const alert = document.getElementById('customAlert');
+      if (alert) {
+        alert.classList.remove('show');
+        setTimeout(() => {
+          alert.remove();
+        }, 300);
+      }
+    }
+  </script>
+
+  <!-- Load external JavaScript files -->
+  <script src="frontend/registrasi.js"></script>
+  <script src="frontend/login.js"></script>
+  <script src="frontend/trip-user.js"></script>
 
 </body>
 
