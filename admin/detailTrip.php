@@ -1,34 +1,51 @@
 <?php
-require_once 'auth_check.php';
+require_once '../backend/koneksi.php';
 
 $id = $_GET['id'] ?? null;
 
-// Contoh ambil data trip dan detail dari database menggunakan $id
-// Contoh data statis sebagai ilustrasi (ganti dengan query dari DB)
-$trip = [
-  'nama_gunung' => 'Gunung Merapi',
-  'tanggal' => '2025-10-01',
-  'slot' => 10,
-  'durasi' => '2 Hari 1 Malam',
-  'jenis_trip' => 'Camp',
-  'harga' => 1500000,
-  'via_gunung' => 'Selo',
-  'status' => 'available',
-  'gambar' => 'images/merapi.jpg'
-];
+// Ambil data tabel
+$trip = [];
+if ($id) {
+  $stmtTrip = $conn->prepare("SELECT * FROM paket_trips WHERE id_trip = ?");
+  $stmtTrip->bind_param("i", $id);
+  $stmtTrip->execute();
+  $resultTrip = $stmtTrip->get_result();
+  $trip = $resultTrip->fetch_assoc();
+}
+if (!$trip) {
+  $trip = [
+    'nama_gunung' => '',
+    'tanggal' => '',
+    'slot' => '',
+    'durasi' => '',
+    'jenis_trip' => '',
+    'harga' => '',
+    'via_gunung' => '',
+    'status' => '',
+    'gambar' => ''
+  ];
+}
 
-// Data detail trip meeting point (ganti dengan query dari DB sesuai $id)
-$detail = [
-  'nama_lokasi_meeting_point' => 'Basecamp Selo',
-  'alamat_meeting_point' => 'Jl. Raya Selo, Boyolali',
-  'waktu_kumpul' => '07.00 WIB di Basecamp',
-  'include' => "- Transportasi\n- Makan 3x\n- Guide Profesional",
-  'exclude' => "- Perlengkapan pribadi\n- Asuransi\n- Biaya pribadi",
-  'syarat_ketentuan' => "Tidak menerima peserta dengan penyakit kronis\nPatuhi instruksi guide",
-  'link_gmap_meeting_point' => 'https://www.google.com/maps/place/Basecamp+Selo/@-7.541,110.591'
-];
+$detail = [];
+if ($id) {
+  $stmtDetail = $conn->prepare("SELECT * FROM detail_trips WHERE id_trip = ?");
+  $stmtDetail->bind_param("i", $id);
+  $stmtDetail->execute();
+  $resultDetail = $stmtDetail->get_result();
+  $detail = $resultDetail->fetch_assoc();
+}
+if (!$detail) {
+  $detail = [
+    'nama_lokasi' => '',
+    'alamat' => '',
+    'waktu_kumpul' => '',
+    'link_map' => '',
+    'include' => '',
+    'exclude' => '',
+    'syaratKetentuan' => ''
+  ];
+}
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 
@@ -126,7 +143,6 @@ $detail = [
       margin-bottom: 40px;
     }
 
-    /* Kotak lembut tanpa garis untuk setiap section */
     .info-box {
       background: white;
       border-radius: 18px;
@@ -184,69 +200,85 @@ $detail = [
 </head>
 
 <body>
-
   <div class="container-detail">
-    <!-- mengambil data dari paket -->
+
     <div class="trip-header">
-      <img id="tripGambar" src="" alt="" class="trip-image" />
+      <img id="tripGambar" src="<?= $trip['gambar'] ? '../' . htmlspecialchars($trip['gambar']) : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80' ?>" alt="" class="trip-image" />
       <div class="trip-info">
-        <h1 id="tripJudul"></h1>
-        <div id="tripStatus" class="badge-status">
+        <h1 id="tripJudul"><?= htmlspecialchars($trip['nama_gunung']) ?></h1>
+        <div id="tripStatus" class="badge-status <?= $trip['status'] !== 'available' ? 'sold' : '' ?>">
+          <?= htmlspecialchars($trip['status']) ?>
         </div>
         <div class="trip-meta">
-          <span><i class="bi bi-calendar-event"></i> <span id="tripTanggal"></span></span>
-          <span><i class="bi bi-clock"></i> <span id="tripDurasi"></span></span>
-          <span><i class="bi bi-people-fill"></i> Slot: <span id="tripSlot"></span></span>
-          <span><i class="bi bi-flag"></i> <span id="tripJenis"></span></span>
-          <span><i class="bi bi-signpost-2"></i> Via <span id="tripVia"></span></span>
+          <span><i class="bi bi-calendar-event"></i> <span id="tripTanggal"><?= htmlspecialchars($trip['tanggal']) ?></span></span>
+          <span><i class="bi bi-clock"></i> <span id="tripDurasi"><?= htmlspecialchars($trip['durasi']) ?></span></span>
+          <span><i class="bi bi-people-fill"></i> Slot: <span id="tripSlot"><?= htmlspecialchars($trip['slot']) ?></span></span>
+          <span><i class="bi bi-flag"></i> <span id="tripJenis"><?= htmlspecialchars($trip['jenis_trip']) ?></span></span>
+          <span><i class="bi bi-signpost-2"></i> Via <span id="tripVia"><?= htmlspecialchars($trip['via_gunung']) ?></span></span>
         </div>
-        <div class="trip-price" id="tripHarga"></div>
+        <div class="trip-price" id="tripHarga">Rp <?= number_format($trip['harga']) ?></div>
       </div>
     </div>
+
     <button class="btn-add-detail" id="btnTambahDetailTrip"><i class="bi bi-plus-circle"></i> Tambah/Edit Detail Trip</button>
 
-
-    <!-- Meeting Point -->
     <section class="info-box">
       <h2 class="section-title">Meeting Point</h2>
       <div class="section-content">
-        <p><strong>Lokasi :</strong> <?= htmlspecialchars($detail['nama_lokasi_meeting_point']) ?></p>
-        <p><strong>Alamat :</strong> <?= nl2br(htmlspecialchars($detail['alamat_meeting_point'])) ?></p>
+        <p><strong>Lokasi :</strong> <?= htmlspecialchars($detail['nama_lokasi']) ?></p>
+        <p><strong>Alamat :</strong> <?= nl2br(htmlspecialchars($detail['alamat'])) ?></p>
         <p><strong>Waktu Kumpul :</strong> <?= htmlspecialchars($detail['waktu_kumpul']) ?></p>
       </div>
     </section>
-
     <section class="info-box">
       <h2 class="section-title">Include</h2>
       <div class="section-content"><?= nl2br(htmlspecialchars($detail['include'])) ?></div>
     </section>
-
     <section class="info-box">
       <h2 class="section-title">Exclude</h2>
       <div class="section-content"><?= nl2br(htmlspecialchars($detail['exclude'])) ?></div>
     </section>
-
     <section class="info-box">
       <h2 class="section-title">Syarat & Ketentuan</h2>
-      <div class="section-content"><?= nl2br(htmlspecialchars($detail['syarat_ketentuan'])) ?></div>
+      <div class="section-content"><?= nl2br(htmlspecialchars($detail['syaratKetentuan'])) ?></div>
     </section>
 
     <section class="info-box">
       <h2 class="section-title">Lokasi Meeting Point di Google Map</h2>
-      <?php if (!empty($detail['link_gmap_meeting_point'])): ?>
-        <iframe src="<?= str_replace('/maps/', '/maps/embed/', htmlspecialchars($detail['link_gmap_meeting_point'])) ?>" allowfullscreen loading="lazy"></iframe>
-      <?php else: ?>
-        <p><em>Belum ada link Google Map Meeting Point</em></p>
-      <?php endif; ?>
-    </section>
+      <?php
+      $linkMap = trim($detail['link_map']);
 
+      if (!$linkMap) {
+        echo '<p><em>Belum ada link Google Map Meeting Point</em></p>';
+      }
+      // Embed langsung jika sudah embed link
+      elseif (strpos($linkMap, '/maps/embed?') !== false) {
+        echo '<iframe src="' . htmlspecialchars($linkMap) . '" allowfullscreen loading="lazy"></iframe>';
+      }
+      // Auto-convert share url ke embed
+      elseif (preg_match('#^https:\/\/(www\.)?google\.(com|co\.id)\/maps/#', $linkMap)) {
+        $embedUrl = str_replace('/maps/', '/maps/embed/', $linkMap);
+        echo '<iframe src="' . htmlspecialchars($embedUrl) . '" allowfullscreen loading="lazy"></iframe>';
+      }
+      // Jika shortlink Google Maps
+      elseif (preg_match('#^https:\/\/maps\.app\.goo\.gl\/[A-Za-z0-9]+#', $linkMap)) {
+        echo '<p><a href="' . htmlspecialchars($linkMap) . '" target="_blank" rel="noopener" style="color:#3779e1;font-weight:600;">Buka peta di Google Maps</a></p>';
+        echo '<small style="color:#888;">Preview otomatis hanya untuk link <b>maps.google.com</b> atau <b>maps.google.co.id</b>.</small>';
+      }
+      // Format lain (fallback: hanya tampil link)
+      else {
+        echo '<p><a href="' . htmlspecialchars($linkMap) . '" target="_blank" rel="noopener" style="color:#3779e1;font-weight:600;">Buka peta di Google Maps</a></p>';
+        echo '<small style="color:#888;">Preview embed otomatis hanya untuk link <b>maps.google.com</b> atau <b>maps.google.co.id</b>.</small>';
+      }
+      ?>
+    </section>
 
   </div>
 
   <!-- Modal Form Tambah/Edit Detail Trip -->
   <div class="modal fade" id="detailTripFormModal" tabindex="-1" aria-labelledby="detailTripFormModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <form class="modal-content" id="formDetailTrip" method="POST" action="save_detailtrip.php">
+      <form class="modal-content" id="formDetailTrip" method="POST" action="#">
         <div class="modal-header">
           <h5 class="modal-title" id="detailTripFormModalLabel">Tambah/Edit Detail Trip</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
@@ -254,17 +286,29 @@ $detail = [
         <div class="modal-body">
           <input type="hidden" name="id_trip" value="<?= htmlspecialchars($id) ?>" />
           <div class="mb-3">
-            <label for="nama_lokasi_meeting_point" class="form-label">Nama Meeting Point</label>
-            <input type="text" class="form-control" id="nama_lokasi_meeting_point" name="nama_lokasi_meeting_point" required value="<?= htmlspecialchars($detail['nama_lokasi_meeting_point']) ?>" />
+            <label for="nama_lokasi" class="form-label">Nama Meeting Point</label>
+            <input type="text" class="form-control" id="nama_lokasi" name="nama_lokasi" required value="<?= htmlspecialchars($detail['nama_lokasi']) ?>" />
           </div>
           <div class="mb-3">
-            <label for="alamat_meeting_point" class="form-label">Alamat Meeting Point</label>
-            <textarea class="form-control" id="alamat_meeting_point" name="alamat_meeting_point" rows="3" required><?= htmlspecialchars($detail['alamat_meeting_point']) ?></textarea>
+            <label for="alamat" class="form-label">Alamat Meeting Point</label>
+            <textarea class="form-control" id="alamat" name="alamat" rows="3" required><?= htmlspecialchars($detail['alamat']) ?></textarea>
           </div>
           <div class="mb-3">
             <label for="waktu_kumpul" class="form-label">Waktu Kumpul</label>
-            <input type="text" class="form-control" id="waktu_kumpul" name="waktu_kumpul" required value="<?= htmlspecialchars($detail['waktu_kumpul']) ?>" />
+            <input
+              type="time"
+              class="form-control"
+              id="waktu_kumpul"
+              name="waktu_kumpul"
+              required
+              value="<?= htmlspecialchars($detail['waktu_kumpul']) ?>" />
           </div>
+
+          <div class="mb-3">
+            <label for="link_map" class="form-label">Link Google Map Meeting Point</label>
+            <input type="text" class="form-control" id="link_map" name="link_map" value="<?= htmlspecialchars($detail['link_map']) ?>" placeholder="https://maps.google.com/..." />
+          </div>
+
           <div class="mb-3">
             <label for="include" class="form-label">Include</label>
             <textarea class="form-control" id="include" name="include" rows="3" required><?= htmlspecialchars($detail['include']) ?></textarea>
@@ -274,12 +318,8 @@ $detail = [
             <textarea class="form-control" id="exclude" name="exclude" rows="3" required><?= htmlspecialchars($detail['exclude']) ?></textarea>
           </div>
           <div class="mb-3">
-            <label for="syarat_ketentuan" class="form-label">Syarat & Ketentuan</label>
-            <textarea class="form-control" id="syarat_ketentuan" name="syarat_ketentuan" rows="4" required><?= htmlspecialchars($detail['syarat_ketentuan']) ?></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="link_gmap_meeting_point" class="form-label">Link Google Map Meeting Point</label>
-            <input type="url" class="form-control" id="link_gmap_meeting_point" name="link_gmap_meeting_point" value="<?= htmlspecialchars($detail['link_gmap_meeting_point']) ?>" placeholder="https://maps.google.com/..." />
+            <label for="syaratKetentuan" class="form-label">Syarat & Ketentuan</label>
+            <textarea class="form-control" id="syaratKetentuan" name="syaratKetentuan" rows="4" required><?= htmlspecialchars($detail['syaratKetentuan']) ?></textarea>
           </div>
         </div>
         <div class="modal-footer">
@@ -289,7 +329,6 @@ $detail = [
       </form>
     </div>
   </div>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.getElementById('btnTambahDetailTrip').addEventListener('click', function() {
@@ -297,15 +336,14 @@ $detail = [
       modal.show();
     });
   </script>
-
   <script src="../frontend/trip-detail.js"></script>
   <script>
-    // Pastikan id trip diambil dari URL
     const idTrip = '<?= htmlspecialchars($id) ?>';
     window.onload = function() {
       loadTripDetail(idTrip);
     };
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>
 

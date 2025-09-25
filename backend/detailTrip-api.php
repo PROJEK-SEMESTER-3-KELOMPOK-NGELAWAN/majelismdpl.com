@@ -1,66 +1,75 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once 'koneksi.php';
 
-// Ambil method dan parameter
-$method = $_SERVER['REQUEST_METHOD'];
-$action = $_GET['action'] ?? null;
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
 
-// GET: Detail trip
-if ($method === 'GET' && $action === 'getDetail') {
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $id_trip = $_GET['id_trip'] ?? null;
-    if (!$id_trip) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Parameter id_trip wajib diisi'
-        ]);
-        exit;
-    }
-
-    $stmt = $conn->prepare("SELECT * FROM detail_trip WHERE id_trip = ?");
+    $stmt = $conn->prepare("SELECT * FROM detail_trips WHERE id_trip = ?");
     $stmt->bind_param("i", $id_trip);
     $stmt->execute();
     $result = $stmt->get_result();
     $data = $result->fetch_assoc();
-    echo json_encode([
-        'success' => ($data ? true : false),
-        'data' => $data
-    ]);
+    $stmt->close();
+
+    if (!$data) {
+        $data = [
+            'nama_lokasi' => '',
+            'alamat' => '',
+            'waktu_kumpul' => '',
+            'link_map' => '',
+            'include' => '',
+            'exclude' => '',
+            'syaratKetentuan' => ''
+        ];
+    }
+
+    echo json_encode(['success' => true, 'data' => $data]);
     exit;
 }
 
-// POST: Simpan/ubah detail trip
-if ($method === 'POST') {
-    $id_trip = $_POST['id_trip'];
-    $nama_lokasi = $_POST['nama_lokasi_meeting_point'];
-    $alamat = $_POST['alamat_meeting_point'];
-    $waktu_kumpul = $_POST['waktu_kumpul'];
-    $include = $_POST['include'];
-    $exclude = $_POST['exclude'];
-    $syaratKetentuan = $_POST['syarat_ketentuan'];
-    $link_map = $_POST['link_gmap_meeting_point'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id_trip = $_POST['id_trip'] ?? null;
+    $nama_lokasi = $_POST['nama_lokasi'] ?? '';
+    $alamat = $_POST['alamat'] ?? '';
+    $waktu_kumpul = $_POST['waktu_kumpul'] ?? '';
+    $link_map = $_POST['link_map'] ?? '';
+    $include = $_POST['include'] ?? '';
+    $exclude = $_POST['exclude'] ?? '';
+    $syaratKetentuan = $_POST['syaratKetentuan'] ?? '';
 
-    // Cek, kalau detail sudah ada update, kalau belum insert
-    $cek = $conn->prepare("SELECT id_trip FROM detail_trip WHERE id_trip = ?");
+    if (!$id_trip) {
+        echo json_encode(['success' => false, 'message' => 'Trip ID kosong!']);
+        exit;
+    }
+
+    $cek = $conn->prepare("SELECT id_trip FROM detail_trips WHERE id_trip = ?");
     $cek->bind_param("i", $id_trip);
     $cek->execute();
     $cek->store_result();
 
     if ($cek->num_rows > 0) {
-        // Update
-        $stmt = $conn->prepare("UPDATE detail_trip SET nama_lokasi=?, alamat=?, waktu_kumpul=?, include=?, exclude=?, syaratKetentuan=?, link_map=? WHERE id_trip=?");
-        $stmt->bind_param("sssssssi", $nama_lokasi, $alamat, $waktu_kumpul, $include, $exclude, $syaratKetentuan, $link_map, $id_trip);
+        $stmt = $conn->prepare(
+            "UPDATE detail_trips SET nama_lokasi=?, alamat=?, waktu_kumpul=?, link_map=?, `include`=?, `exclude`=?, syaratKetentuan=? WHERE id_trip=?"
+        );
+        $stmt->bind_param("sssssssi", $nama_lokasi, $alamat, $waktu_kumpul, $link_map, $include, $exclude, $syaratKetentuan, $id_trip);
     } else {
-        // Insert
-        $stmt = $conn->prepare("INSERT INTO detail_trip (id_trip, nama_lokasi, alamat, waktu_kumpul, include, exclude, syaratKetentuan, link_map) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isssssss", $id_trip, $nama_lokasi, $alamat, $waktu_kumpul, $include, $exclude, $syaratKetentuan, $link_map);
+        $stmt = $conn->prepare(
+            "INSERT INTO detail_trips (id_trip, nama_lokasi, alamat, waktu_kumpul, link_map, `include`, `exclude`, syaratKetentuan)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        );
+        $stmt->bind_param("isssssss", $id_trip, $nama_lokasi, $alamat, $waktu_kumpul, $link_map, $include, $exclude, $syaratKetentuan);
     }
-    $result = $stmt->execute();
+    $cek->close();
 
-    echo json_encode([
-        'success' => $result,
-        'message' => $result ? 'Detail trip berhasil disimpan!' : 'Gagal menyimpan detail trip.'
-    ]);
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Detail trip berhasil disimpan']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Gagal menyimpan: ' . $stmt->error]);
+    }
+    $stmt->close();
     exit;
 }
-
-echo json_encode(['success' => false, 'message' => 'Invalid Request']);
