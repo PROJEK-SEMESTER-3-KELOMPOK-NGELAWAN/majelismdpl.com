@@ -138,6 +138,15 @@ function displayTrips(trips) {
       }
     };
   });
+
+  // Event handler tombol detail - BARU DITAMBAHKAN
+  document.querySelectorAll('.btn-detail').forEach(btn => {
+    btn.onclick = function() {
+      const id_trip = this.dataset.id;
+      // Navigasi ke halaman detail dengan parameter id
+      window.location.href = `detailTrip.php?id=${id_trip}`;
+    };
+  });
 }
 
 // Form tambah trip submit
