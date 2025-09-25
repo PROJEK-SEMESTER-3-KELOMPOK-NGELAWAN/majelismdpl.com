@@ -109,6 +109,13 @@ body {
 .navbar .navbar-nav a:hover::after {
   transform: scale(1);
 }
+
+.nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 /* === RESPONSIVE NAVBAR === */
 
 /* Hide Desktop Nav, Show Hamburger on Mobile */
