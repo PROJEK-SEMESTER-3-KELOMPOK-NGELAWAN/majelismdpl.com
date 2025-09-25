@@ -716,8 +716,6 @@
         font-size: 15px;
       }
     }
-
-    
   </style>
 </head>
 
@@ -729,44 +727,36 @@
       <img src="img/majelismdpl.png" alt="Logo Majelis MDPL" class="logo-img" />
     </div>
     <ul class="navbar-menu">
-    <li><a href="#" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
-    <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
-    <li><a href="#"><i class="fa-solid fa-calendar-days"></i> Jadwal Pendakian</a></li>
-    <li><a href="#"><i class="fa-solid fa-image"></i> Galeri</a></li>
-    <li><a href="#"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
-  </ul>
+      <li><a href="#" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
+      <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
+      <li><a href="#"><i class="fa-solid fa-calendar-days"></i> Jadwal Pendakian</a></li>
+      <li><a href="#"><i class="fa-solid fa-image"></i> Galeri</a></li>
+      <li><a href="#"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
+    </ul>
     </div>
     <div class="nav-btns">
-        <a href="#" id="open-signup" class="btn">Sign Up</a>
-        <a href="#" id="open-login" class="btn">Login</a>
+      <a href="#" id="open-signup" class="btn">Sign Up</a>
+      <a href="#" id="open-login" class="btn">Login</a>
     </div>
   </nav>
 
   <!-- Hero -->
-  <div class="hero-section">
-    <!-- Background layer -->
-    <div class="hero-bg-custom"></div>
-
-    <img class="hero-bg" src="img/Herooo.jpg" alt="Healing" />
+  <section class="hero-home">
+    <img src="img/Herooo.jpg" alt="Gunung Bromo" class="hero-bg">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1>Kamu Pusing?<br>Yuk Healing</h1>
-      <p>Mau Explore berbagai pilihan trip buat nikmatin weekendmu? <br>
-        Temukan semuanya di sini.</p>
-      <button class="hero-btn">Lihat Semua <i class="fas fa-arrow-right"></i></button>
-      <div class="destination-carousel">
-        <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
-        <div class="carousel-track">
-          <!-- Card Destinasi -->
-          <!-- trip ini diambil dari file frontend/trip-user.js -->
-          <!-- Tambahkan lagi card di sini jika perlu -->
-
-        </div>
-        <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
+      <span class="hero-offer">BEST OFFERS</span>
+      <h1 class="hero-title">GUNUNG BROMO</h1>
+      <div class="hero-days"><span class="highlight">1 HARI</span></div>
+      <p class="hero-desc">Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan</p>
+      <button class="hero-btn">DETAIL</button>
+      <div class="hero-carousel">
+        <img src="img/gambar1.jpg" alt="Jellyfish" class="carousel-item">
+        <img src="img/gambar2.jpg" alt="Sunrise" class="carousel-item">
+        <img src="img/gambar3.jpg" alt="Forest" class="carousel-item">
       </div>
     </div>
-  </div>
-  <script src="carousel.js"></script>
+  </section>
 
   <!-- profile -->
   <section class="why-explorer">
@@ -805,68 +795,70 @@
   </section>
 
   <div class="destination-carousel">
-  <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
-  <div class="carousel-track">
-    <!-- CARD trip di-generate di sini -->
-    <div class="row g-4 flex-nowrap" style="flex-wrap:nowrap;">
-      <?php if (empty($trips)): ?>
-        <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
-          <p class="text-muted fs-4 fade-text">🚫 Belum ada jadwal trip.</p>
-        </div>
-      <?php else: ?>
-        <?php foreach ($trips as $trip): ?>
-          <div class="col-md-4 fade-text" style="min-width:320px; max-width:320px;">
-            <div class="card shadow-sm border-0 rounded-4 h-100 text-center">
-              <div class="position-relative">
-                <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2 
+    <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+    <div class="carousel-track">
+      <!-- CARD trip di-generate di sini -->
+      <div class="row g-4 flex-nowrap" style="flex-wrap:nowrap;">
+        <?php if (empty($trips)): ?>
+          <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
+            <p class="text-muted fs-4 fade-text">🚫 Belum ada jadwal trip.</p>
+          </div>
+        <?php else: ?>
+          <?php foreach ($trips as $trip): ?>
+            <div class="col-md-4 fade-text" style="min-width:320px; max-width:320px;">
+              <div class="card shadow-sm border-0 rounded-4 h-100 text-center">
+                <div class="position-relative">
+                  <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2 
                   <?= $trip['status'] == "sold" ? "bg-danger" : "bg-success" ?>">
-                  <i class="bi <?= $trip['status'] == "sold" ? "bi-x-circle-fill" : "bi-check-circle-fill" ?>"></i>
-                  <?= $trip['status'] == "sold" ? "Sold" : "Available" ?>
-                </span>
-                <img src="../img/<?= $trip['gambar'] ?>" class="card-img-top rounded-top-4" alt="<?= $trip['nama_gunung'] ?>"
-                  style="height:200px; object-fit:cover;">
-              </div>
-              <div class="card-body text-center">
-                <div class="d-flex justify-content-between small text-muted mb-2">
-                  <span><i class="bi bi-calendar-event"></i> <?= date("d M Y", strtotime($trip['tanggal'])) ?></span>
-                  <span><i class="bi bi-clock"></i> <?= $trip['jenis_trip'] == "Camp" ? $trip['durasi'] : "1 hari" ?></span>
-                </div>
-                <h5 class="card-title fw-bold"><?= $trip['nama_gunung'] ?></h5>
-                <div class="mb-2">
-                  <span class="badge bg-secondary">
-                    <i class="bi bi-flag-fill"></i> <?= $trip['jenis_trip'] ?>
+                    <i class="bi <?= $trip['status'] == "sold" ? "bi-x-circle-fill" : "bi-check-circle-fill" ?>"></i>
+                    <?= $trip['status'] == "sold" ? "Sold" : "Available" ?>
                   </span>
+                  <img src="../img/<?= $trip['gambar'] ?>" class="card-img-top rounded-top-4"
+                    alt="<?= $trip['nama_gunung'] ?>" style="height:200px; object-fit:cover;">
                 </div>
-                <div class="small text-muted mb-2">
-                  <i class="bi bi-star-fill text-warning"></i> 5 (<?= rand(101, 300) ?>+ ulasan)
-                </div>
-                <div class="small text-muted mb-2">
-                  <i class="bi bi-signpost-2"></i> Via <?= $trip['via_gunung'] ?? '-' ?>
-                </div>
-                <h5 class="fw-bold text-success mb-3">
-                  Rp <?= number_format((int) str_replace(['.', ','], '', $trip['harga']), 0, ',', '.') ?>
-                </h5>
-                <div class="d-flex justify-content-between">
-                  <a href="trip_detail.php?id=<?= $trip['id'] ?>" class="btn btn-info btn-sm">
-                    <i class="bi bi-eye"></i> Detail
-                  </a>
-                  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $trip['id'] ?>">
-                    <i class="bi bi-pencil-square"></i> Edit
-                  </button>
-                  <a href="trip.php?hapus=<?= $trip['id'] ?>" onclick="return confirm('Hapus trip ini?');"
-                    class="btn btn-danger btn-sm">
-                    <i class="bi bi-trash"></i> Hapus
-                  </a>
+                <div class="card-body text-center">
+                  <div class="d-flex justify-content-between small text-muted mb-2">
+                    <span><i class="bi bi-calendar-event"></i> <?= date("d M Y", strtotime($trip['tanggal'])) ?></span>
+                    <span><i class="bi bi-clock"></i>
+                      <?= $trip['jenis_trip'] == "Camp" ? $trip['durasi'] : "1 hari" ?></span>
+                  </div>
+                  <h5 class="card-title fw-bold"><?= $trip['nama_gunung'] ?></h5>
+                  <div class="mb-2">
+                    <span class="badge bg-secondary">
+                      <i class="bi bi-flag-fill"></i> <?= $trip['jenis_trip'] ?>
+                    </span>
+                  </div>
+                  <div class="small text-muted mb-2">
+                    <i class="bi bi-star-fill text-warning"></i> 5 (<?= rand(101, 300) ?>+ ulasan)
+                  </div>
+                  <div class="small text-muted mb-2">
+                    <i class="bi bi-signpost-2"></i> Via <?= $trip['via_gunung'] ?? '-' ?>
+                  </div>
+                  <h5 class="fw-bold text-success mb-3">
+                    Rp <?= number_format((int) str_replace(['.', ','], '', $trip['harga']), 0, ',', '.') ?>
+                  </h5>
+                  <div class="d-flex justify-content-between">
+                    <a href="trip_detail.php?id=<?= $trip['id'] ?>" class="btn btn-info btn-sm">
+                      <i class="bi bi-eye"></i> Detail
+                    </a>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                      data-bs-target="#editModal<?= $trip['id'] ?>">
+                      <i class="bi bi-pencil-square"></i> Edit
+                    </button>
+                    <a href="trip.php?hapus=<?= $trip['id'] ?>" onclick="return confirm('Hapus trip ini?');"
+                      class="btn btn-danger btn-sm">
+                      <i class="bi bi-trash"></i> Hapus
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </div>
     </div>
+    <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
   </div>
-  <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
-</div>
 
 
   <!-- Testimonials -->
@@ -1075,7 +1067,7 @@
         <p>
           ✨ Nikmati pengalaman tak terlupakan bersama Majelis MDPL Open Trip. <br>
           Ikuti serunya pendakian tektok maupun camping, rasakan panorama puncak
-          yang menakjubkan, dan ciptakan kenangan berharga di setiap perjalanan. 🌲🏔️
+          yang menakjubkan, dan ciptakan kenangan berharga di setiap perjalanan. 🌲🏔
         </p>
         <div class="social-links">
           <a href="#"><i class="fa-brands fa-facebook"></i></a>
@@ -1102,7 +1094,7 @@
       </div>
     </div>
     <div class="copyright">
-      <p>Copyright © 2025 Majelis Mdpl. All rights reserved. Developed with ❤️ by Dimasdw15</p>
+      <p>Copyright © 2025 Majelis Mdpl. All rights reserved. Developed with ❤ by Dimasdw15</p>
     </div>
   </footer>
 
@@ -1385,7 +1377,7 @@
     <div class="custom-alert show" id="customAlert">
       <div class="alert-content">
         <div class="alert-icon ${type}">
-          ${type === 'error' ? '⚠️' : '✅'}
+          ${type === 'error' ? '⚠' : '✅'}
         </div>
         <div class="alert-title">${title}</div>
         <div class="alert-message">${message}</div>
