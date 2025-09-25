@@ -716,56 +716,49 @@
         font-size: 15px;
       }
     }
+
+    
   </style>
 </head>
 
 <body>
   <!-- Navbar -->
-  <header class="navbar">
-    <div class="container nav-content">
-      <div class="logo">
-        <img src="img/majelis.png" alt="Majelis MDPL" />
-        <span>Majelis MDPL</span>
-      </div>
-      <nav class="nav-links">
-        <a href="#">Home</a>
-        <a href="#">Profile</a>
-        <a href="#">Jadwal Pendakian</a>
-        <a href="#">Testimoni</a>
-        <a href="#">Galeri</a>
-      </nav>
-      <div class="nav-btns">
+  <nav class="navbar">
+    <div class="navbar-logo">
+      <!-- Ganti src logo sesuai file logo kamu, contoh PNG transparan: -->
+      <img src="img/majelismdpl.png" alt="Logo Majelis MDPL" class="logo-img" />
+    </div>
+    <ul class="navbar-menu">
+    <li><a href="#" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
+    <li><a href="#"><i class="fa-solid fa-calendar-days"></i> Jadwal Pendakian</a></li>
+    <li><a href="#"><i class="fa-solid fa-image"></i> Galeri</a></li>
+    <li><a href="#"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
+  </ul>
+    </div>
+    <div class="nav-btns">
         <a href="#" id="open-signup" class="btn">Sign Up</a>
         <a href="#" id="open-login" class="btn">Login</a>
-      </div>
     </div>
-  </header>
+  </nav>
 
   <!-- Hero -->
-  <div class="hero-section">
-    <!-- Background layer -->
-    <div class="hero-bg-custom"></div>
-
-    <img class="hero-bg" src="img/Herooo.jpg" alt="Healing" />
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <h1>Kamu Pusing?<br>Yuk Healing</h1>
-      <p>Mau Explore berbagai pilihan trip buat nikmatin weekendmu? <br>
-        Temukan semuanya di sini.</p>
-      <button class="hero-btn">Lihat Semua <i class="fas fa-arrow-right"></i></button>
-      <div class="destination-carousel">
-        <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
-        <div class="carousel-track">
-          <!-- Card Destinasi -->
-          <!-- trip ini diambil dari file frontend/trip-user.js -->
-          <!-- Tambahkan lagi card di sini jika perlu -->
-
-        </div>
-        <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
-      </div>
+  <section class="hero-home">
+  <img src="img/Herooo.jpg" alt="Gunung Bromo" class="hero-bg">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="hero-offer">BEST OFFERS</span>
+    <h1 class="hero-title">GUNUNG BROMO</h1>
+    <div class="hero-days"><span class="highlight">1 HARI</span></div>
+    <p class="hero-desc">Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan</p>
+    <button class="hero-btn">DETAIL</button>
+    <div class="hero-carousel">
+      <img src="img/gambar1.jpg" alt="Jellyfish" class="carousel-item">
+      <img src="img/gambar2.jpg" alt="Sunrise" class="carousel-item">
+      <img src="img/gambar3.jpg" alt="Forest" class="carousel-item">
     </div>
   </div>
-  <script src="carousel.js"></script>
+</section>
 
   <!-- profile -->
   <section class="why-explorer">
@@ -782,7 +775,8 @@
         <i class="fas fa-map-marked-alt icon"></i>
         <div>
           <h3>Banyak Pilihan Destinasi</h3>
-          <p>Mau liburan ke Bandung, Lembang, Yogyakarta, Semarang, Surabaya, Gunung ataupun Laut semuanya ada di Explorer.ID.</p>
+          <p>Mau liburan ke Bandung, Lembang, Yogyakarta, Semarang, Surabaya, Gunung ataupun Laut semuanya ada di
+            Explorer.ID.</p>
         </div>
       </div>
       <div class="feature">
@@ -802,74 +796,70 @@
     </div>
   </section>
 
-  <!-- CARD -->
-  <div class="row g-4">
-    <?php if (empty($trips)): ?>
-      <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
-        <p class="text-muted fs-4 fade-text">🚫 Belum ada jadwal trip.</p>
-      </div>
-    <?php else: ?>
-      <?php foreach ($trips as $trip) : ?>
-        <div class="col-md-4 fade-text">
-          <div class="card shadow-sm border-0 rounded-4 h-100 text-center">
-            <div class="position-relative">
-              <!-- Badge Status Trip -->
-              <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2 
-                <?= $trip['status'] == "sold" ? "bg-danger" : "bg-success" ?>">
-                <i class="bi <?= $trip['status'] == "sold" ? "bi-x-circle-fill" : "bi-check-circle-fill" ?>"></i>
-                <?= $trip['status'] == "sold" ? "Sold" : "Available" ?>
-              </span>
-              <!-- Gambar -->
-              <img src="../img/<?= $trip['gambar'] ?>"
-                class="card-img-top rounded-top-4"
-                alt="<?= $trip['nama_gunung'] ?>"
-                style="height:200px; object-fit:cover;">
-            </div>
-            <div class="card-body text-center">
-              <!-- Tanggal & Durasi -->
-              <div class="d-flex justify-content-between small text-muted mb-2">
-                <span><i class="bi bi-calendar-event"></i> <?= date("d M Y", strtotime($trip['tanggal'])) ?></span>
-                <span><i class="bi bi-clock"></i> <?= $trip['jenis_trip'] == "Camp" ? $trip['durasi'] : "1 hari" ?></span>
-              </div>
-              <!-- Judul -->
-              <h5 class="card-title fw-bold"><?= $trip['nama_gunung'] ?></h5>
-              <div class="mb-2">
-                <span class="badge bg-secondary">
-                  <i class="bi bi-flag-fill"></i> <?= $trip['jenis_trip'] ?>
+  <div class="destination-carousel">
+  <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+  <div class="carousel-track">
+    <!-- CARD trip di-generate di sini -->
+    <div class="row g-4 flex-nowrap" style="flex-wrap:nowrap;">
+      <?php if (empty($trips)): ?>
+        <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
+          <p class="text-muted fs-4 fade-text">🚫 Belum ada jadwal trip.</p>
+        </div>
+      <?php else: ?>
+        <?php foreach ($trips as $trip): ?>
+          <div class="col-md-4 fade-text" style="min-width:320px; max-width:320px;">
+            <div class="card shadow-sm border-0 rounded-4 h-100 text-center">
+              <div class="position-relative">
+                <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2 
+                  <?= $trip['status'] == "sold" ? "bg-danger" : "bg-success" ?>">
+                  <i class="bi <?= $trip['status'] == "sold" ? "bi-x-circle-fill" : "bi-check-circle-fill" ?>"></i>
+                  <?= $trip['status'] == "sold" ? "Sold" : "Available" ?>
                 </span>
+                <img src="../img/<?= $trip['gambar'] ?>" class="card-img-top rounded-top-4" alt="<?= $trip['nama_gunung'] ?>"
+                  style="height:200px; object-fit:cover;">
               </div>
-              <!-- Rating & Ulasan -->
-              <div class="small text-muted mb-2">
-                <i class="bi bi-star-fill text-warning"></i> 5 (<?= rand(101, 300) ?>+ ulasan)
-              </div>
-              <!-- Via Gunung -->
-              <div class="small text-muted mb-2">
-                <i class="bi bi-signpost-2"></i> Via <?= $trip['via_gunung'] ?? '-' ?>
-              </div>
-              <!-- Harga -->
-              <h5 class="fw-bold text-success mb-3">
-                Rp <?= number_format((int)str_replace(['.', ','], '', $trip['harga']), 0, ',', '.') ?>
-              </h5>
-              <!-- Tombol Aksi -->
-              <div class="d-flex justify-content-between">
-                <a href="trip_detail.php?id=<?= $trip['id'] ?>" class="btn btn-info btn-sm">
-                  <i class="bi bi-eye"></i> Detail
-                </a>
-                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $trip['id'] ?>">
-                  <i class="bi bi-pencil-square"></i> Edit
-                </button>
-                <a href="trip.php?hapus=<?= $trip['id'] ?>"
-                  onclick="return confirm('Hapus trip ini?');"
-                  class="btn btn-danger btn-sm">
-                  <i class="bi bi-trash"></i> Hapus
-                </a>
+              <div class="card-body text-center">
+                <div class="d-flex justify-content-between small text-muted mb-2">
+                  <span><i class="bi bi-calendar-event"></i> <?= date("d M Y", strtotime($trip['tanggal'])) ?></span>
+                  <span><i class="bi bi-clock"></i> <?= $trip['jenis_trip'] == "Camp" ? $trip['durasi'] : "1 hari" ?></span>
+                </div>
+                <h5 class="card-title fw-bold"><?= $trip['nama_gunung'] ?></h5>
+                <div class="mb-2">
+                  <span class="badge bg-secondary">
+                    <i class="bi bi-flag-fill"></i> <?= $trip['jenis_trip'] ?>
+                  </span>
+                </div>
+                <div class="small text-muted mb-2">
+                  <i class="bi bi-star-fill text-warning"></i> 5 (<?= rand(101, 300) ?>+ ulasan)
+                </div>
+                <div class="small text-muted mb-2">
+                  <i class="bi bi-signpost-2"></i> Via <?= $trip['via_gunung'] ?? '-' ?>
+                </div>
+                <h5 class="fw-bold text-success mb-3">
+                  Rp <?= number_format((int) str_replace(['.', ','], '', $trip['harga']), 0, ',', '.') ?>
+                </h5>
+                <div class="d-flex justify-content-between">
+                  <a href="trip_detail.php?id=<?= $trip['id'] ?>" class="btn btn-info btn-sm">
+                    <i class="bi bi-eye"></i> Detail
+                  </a>
+                  <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $trip['id'] ?>">
+                    <i class="bi bi-pencil-square"></i> Edit
+                  </button>
+                  <a href="trip.php?hapus=<?= $trip['id'] ?>" onclick="return confirm('Hapus trip ini?');"
+                    class="btn btn-danger btn-sm">
+                    <i class="bi bi-trash"></i> Hapus
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      <?php endforeach; ?>
-    <?php endif; ?>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
   </div>
+  <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
+</div>
+
 
   <!-- Testimonials -->
   <section id="testimonials" class="testimonials">
@@ -877,7 +867,8 @@
       <h2><span class="title-large">Apa Kata Mereka?</span></h2>
       <div class="testimonial-grid">
         <div class="testimonial-card elevation-1">
-          <p class="testimonial-text">Trip ke Rinjani sangat terorganisir. Guide-nya asik dan perhatian. Saya yang pemula merasa aman banget!</p>
+          <p class="testimonial-text">Trip ke Rinjani sangat terorganisir. Guide-nya asik dan perhatian. Saya yang
+            pemula merasa aman banget!</p>
           <div class="testimonial-author">
             <div class="author-image"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Rudi"></div>
             <div class="author-details">
@@ -887,7 +878,8 @@
           </div>
         </div>
         <div class="testimonial-card elevation-1">
-          <p class="testimonial-text">Baru pertama kali ikut open trip, tapi langsung jatuh cinta. Banyak teman baru dan pengalaman tak terlupakan.</p>
+          <p class="testimonial-text">Baru pertama kali ikut open trip, tapi langsung jatuh cinta. Banyak teman baru dan
+            pengalaman tak terlupakan.</p>
           <div class="testimonial-author">
             <div class="author-image"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dewi"></div>
             <div class="author-details">
@@ -897,7 +889,8 @@
           </div>
         </div>
         <div class="testimonial-card elevation-1">
-          <p class="testimonial-text">Sunrise di Bromo, camping di savana, semua sempurna. Majelis MDPL benar-benar profesional!</p>
+          <p class="testimonial-text">Sunrise di Bromo, camping di savana, semua sempurna. Majelis MDPL benar-benar
+            profesional!</p>
           <div class="testimonial-author">
             <div class="author-image"><img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Andi"></div>
             <div class="author-details">
@@ -935,12 +928,16 @@
           <div class="input-group password-group">
             <input type="password" name="password" id="loginPassword" placeholder="Password" required />
             <button type="button" class="password-toggle" id="toggleLoginPassword">
-              <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+              <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20" style="display: none;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+              <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" width="20" height="20" style="display: none;">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
               </svg>
             </button>
           </div>
@@ -995,14 +992,19 @@
               <input type="text" name="username" placeholder="Username" autocomplete="username" required />
             </div>
             <div class="input-group password-group">
-              <input type="password" name="password" id="signupPassword" placeholder="Password" autocomplete="new-password" required />
+              <input type="password" name="password" id="signupPassword" placeholder="Password"
+                autocomplete="new-password" required />
               <button type="button" class="password-toggle" id="toggleSignupPassword">
-                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor" width="18" height="18">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                 </svg>
               </button>
             </div>
@@ -1012,14 +1014,19 @@
               <input type="email" name="email" placeholder="Email" autocomplete="email" required />
             </div>
             <div class="input-group password-group">
-              <input type="password" name="confirm_password" id="confirmPassword" placeholder="Konfirmasi Password" autocomplete="new-password" required />
+              <input type="password" name="confirm_password" id="confirmPassword" placeholder="Konfirmasi Password"
+                autocomplete="new-password" required />
               <button type="button" class="password-toggle" id="toggleConfirmPassword">
-                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor" width="18" height="18">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                 </svg>
               </button>
             </div>
@@ -1143,7 +1150,7 @@
     }
 
     // Wait for DOM to be fully loaded
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       console.log('Main script DOMContentLoaded executed');
 
       // ====== LOGIN MODAL ======
@@ -1161,7 +1168,7 @@
             const googleLoginBtn = document.getElementById("googleLoginBtn");
             if (googleLoginBtn && !googleLoginBtn.hasAttribute('data-main-login-listener')) {
               googleLoginBtn.setAttribute('data-main-login-listener', 'true');
-              googleLoginBtn.addEventListener('click', function(e) {
+              googleLoginBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 console.log('Google login button clicked from main script!');
                 handleGoogleLogin();
@@ -1196,7 +1203,7 @@
             const googleSignupBtn = document.getElementById("googleSignUpBtn");
             if (googleSignupBtn && !googleSignupBtn.hasAttribute('data-main-signup-listener')) {
               googleSignupBtn.setAttribute('data-main-signup-listener', 'true');
-              googleSignupBtn.addEventListener('click', function(e) {
+              googleSignupBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 console.log('Google signup button clicked from main script!');
                 handleGoogleOAuth();
@@ -1226,12 +1233,12 @@
     });
 
     // Toggle Password Visibility untuk Login Modal
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const toggleButton = document.getElementById('toggleLoginPassword');
       const passwordInput = document.getElementById('loginPassword');
 
       if (toggleButton && passwordInput) {
-        toggleButton.addEventListener('click', function() {
+        toggleButton.addEventListener('click', function () {
           const showIcon = toggleButton.querySelector('.eye-icon.show');
           const hideIcon = toggleButton.querySelector('.eye-icon.hide');
 
@@ -1252,13 +1259,13 @@
 
 
     // Password Toggle dan Validasi untuk Signup Modal
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       // Toggle untuk password utama
       const toggleSignupPassword = document.getElementById('toggleSignupPassword');
       const signupPasswordInput = document.getElementById('signupPassword');
 
       if (toggleSignupPassword && signupPasswordInput) {
-        toggleSignupPassword.addEventListener('click', function() {
+        toggleSignupPassword.addEventListener('click', function () {
           togglePasswordVisibility(signupPasswordInput, toggleSignupPassword);
         });
       }
@@ -1268,18 +1275,18 @@
       const confirmPasswordInput = document.getElementById('confirmPassword');
 
       if (toggleConfirmPassword && confirmPasswordInput) {
-        toggleConfirmPassword.addEventListener('click', function() {
+        toggleConfirmPassword.addEventListener('click', function () {
           togglePasswordVisibility(confirmPasswordInput, toggleConfirmPassword);
         });
       }
 
       // Real-time password match validation
       if (signupPasswordInput && confirmPasswordInput) {
-        confirmPasswordInput.addEventListener('input', function() {
+        confirmPasswordInput.addEventListener('input', function () {
           validatePasswordMatch();
         });
 
-        signupPasswordInput.addEventListener('input', function() {
+        signupPasswordInput.addEventListener('input', function () {
           if (confirmPasswordInput.value) {
             validatePasswordMatch();
           }
@@ -1289,7 +1296,7 @@
       // Form submission validation
       const signupForm = document.getElementById('signupForm');
       if (signupForm) {
-        signupForm.addEventListener('submit', function(e) {
+        signupForm.addEventListener('submit', function (e) {
           e.preventDefault();
 
           const password = signupPasswordInput.value;
