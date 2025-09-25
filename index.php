@@ -743,22 +743,30 @@
   </nav>
 
   <!-- Hero -->
-  <section class="hero-home">
-  <img src="img/Herooo.jpg" alt="Gunung Bromo" class="hero-bg">
-  <div class="hero-overlay"></div>
-  <div class="hero-content">
-    <span class="hero-offer">BEST OFFERS</span>
-    <h1 class="hero-title">GUNUNG BROMO</h1>
-    <div class="hero-days"><span class="highlight">1 HARI</span></div>
-    <p class="hero-desc">Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan</p>
-    <button class="hero-btn">DETAIL</button>
-    <div class="hero-carousel">
-      <img src="img/gambar1.jpg" alt="Jellyfish" class="carousel-item">
-      <img src="img/gambar2.jpg" alt="Sunrise" class="carousel-item">
-      <img src="img/gambar3.jpg" alt="Forest" class="carousel-item">
+  <div class="hero-section">
+    <!-- Background layer -->
+    <div class="hero-bg-custom"></div>
+
+    <img class="hero-bg" src="img/Herooo.jpg" alt="Healing" />
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Kamu Pusing?<br>Yuk Healing</h1>
+      <p>Mau Explore berbagai pilihan trip buat nikmatin weekendmu? <br>
+        Temukan semuanya di sini.</p>
+      <button class="hero-btn">Lihat Semua <i class="fas fa-arrow-right"></i></button>
+      <div class="destination-carousel">
+        <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+        <div class="carousel-track">
+          <!-- Card Destinasi -->
+          <!-- trip ini diambil dari file frontend/trip-user.js -->
+          <!-- Tambahkan lagi card di sini jika perlu -->
+
+        </div>
+        <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
+      </div>
     </div>
   </div>
-</section>
+  <script src="carousel.js"></script>
 
   <!-- profile -->
   <section class="why-explorer">

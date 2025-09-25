@@ -110,7 +110,7 @@ function displayGallery(images) {
 
   if (images.length === 0) {
     galleryGrid.innerHTML =
-      '<div class="col-12 text-center text-muted">Belum ada gambar dalam galeri</div>';
+      '<div class="col-12 text-center text-muted" style = "justify-content: center">Belum ada gambar dalam galeri</div>';
     return;
   }
 

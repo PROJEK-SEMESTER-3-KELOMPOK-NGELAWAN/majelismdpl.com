@@ -123,4 +123,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'getTrips') {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'getTrip' && isset($_GET['id'])) {
+    $id = intval($_GET['id']);
+    $q = $conn->prepare("SELECT * FROM paket_trips WHERE id_trip = ?");
+    $q->bind_param("i", $id);
+    $q->execute();
+    $result = $q->get_result();
+    $trip = $result->fetch_assoc();
+    $q->close();
+
+    // Kirim data, jika tidak ditemukan akan bernilai null
+    echo json_encode(['success' => (bool)$trip, 'data' => $trip]);
+    exit;
+}
+
 ?>
