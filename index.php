@@ -1150,7 +1150,7 @@
     }
 
     // Wait for DOM to be fully loaded
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       console.log('Main script DOMContentLoaded executed');
 
       // ====== LOGIN MODAL ======
@@ -1168,7 +1168,7 @@
             const googleLoginBtn = document.getElementById("googleLoginBtn");
             if (googleLoginBtn && !googleLoginBtn.hasAttribute('data-main-login-listener')) {
               googleLoginBtn.setAttribute('data-main-login-listener', 'true');
-              googleLoginBtn.addEventListener('click', function (e) {
+              googleLoginBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 console.log('Google login button clicked from main script!');
                 handleGoogleLogin();
@@ -1203,7 +1203,7 @@
             const googleSignupBtn = document.getElementById("googleSignUpBtn");
             if (googleSignupBtn && !googleSignupBtn.hasAttribute('data-main-signup-listener')) {
               googleSignupBtn.setAttribute('data-main-signup-listener', 'true');
-              googleSignupBtn.addEventListener('click', function (e) {
+              googleSignupBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 console.log('Google signup button clicked from main script!');
                 handleGoogleOAuth();
@@ -1233,12 +1233,12 @@
     });
 
     // Toggle Password Visibility untuk Login Modal
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       const toggleButton = document.getElementById('toggleLoginPassword');
       const passwordInput = document.getElementById('loginPassword');
 
       if (toggleButton && passwordInput) {
-        toggleButton.addEventListener('click', function () {
+        toggleButton.addEventListener('click', function() {
           const showIcon = toggleButton.querySelector('.eye-icon.show');
           const hideIcon = toggleButton.querySelector('.eye-icon.hide');
 
@@ -1259,13 +1259,13 @@
 
 
     // Password Toggle dan Validasi untuk Signup Modal
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       // Toggle untuk password utama
       const toggleSignupPassword = document.getElementById('toggleSignupPassword');
       const signupPasswordInput = document.getElementById('signupPassword');
 
       if (toggleSignupPassword && signupPasswordInput) {
-        toggleSignupPassword.addEventListener('click', function () {
+        toggleSignupPassword.addEventListener('click', function() {
           togglePasswordVisibility(signupPasswordInput, toggleSignupPassword);
         });
       }
@@ -1275,18 +1275,18 @@
       const confirmPasswordInput = document.getElementById('confirmPassword');
 
       if (toggleConfirmPassword && confirmPasswordInput) {
-        toggleConfirmPassword.addEventListener('click', function () {
+        toggleConfirmPassword.addEventListener('click', function() {
           togglePasswordVisibility(confirmPasswordInput, toggleConfirmPassword);
         });
       }
 
       // Real-time password match validation
       if (signupPasswordInput && confirmPasswordInput) {
-        confirmPasswordInput.addEventListener('input', function () {
+        confirmPasswordInput.addEventListener('input', function() {
           validatePasswordMatch();
         });
 
-        signupPasswordInput.addEventListener('input', function () {
+        signupPasswordInput.addEventListener('input', function() {
           if (confirmPasswordInput.value) {
             validatePasswordMatch();
           }
@@ -1296,7 +1296,7 @@
       // Form submission validation
       const signupForm = document.getElementById('signupForm');
       if (signupForm) {
-        signupForm.addEventListener('submit', function (e) {
+        signupForm.addEventListener('submit', function(e) {
           e.preventDefault();
 
           const password = signupPasswordInput.value;
