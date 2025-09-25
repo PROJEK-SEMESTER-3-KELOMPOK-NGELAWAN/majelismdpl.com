@@ -6,31 +6,32 @@ $id = $_GET['id'] ?? null;
 // Contoh ambil data trip dan detail dari database menggunakan $id
 // Contoh data statis sebagai ilustrasi (ganti dengan query dari DB)
 $trip = [
-    'nama_gunung' => 'Gunung Merapi',
-    'tanggal' => '2025-10-01',
-    'slot' => 10,
-    'durasi' => '2 Hari 1 Malam',
-    'jenis_trip' => 'Camp',
-    'harga' => 1500000,
-    'via_gunung' => 'Selo',
-    'status' => 'available',
-    'gambar' => 'images/merapi.jpg'
+  'nama_gunung' => 'Gunung Merapi',
+  'tanggal' => '2025-10-01',
+  'slot' => 10,
+  'durasi' => '2 Hari 1 Malam',
+  'jenis_trip' => 'Camp',
+  'harga' => 1500000,
+  'via_gunung' => 'Selo',
+  'status' => 'available',
+  'gambar' => 'images/merapi.jpg'
 ];
 
 // Data detail trip meeting point (ganti dengan query dari DB sesuai $id)
 $detail = [
-    'nama_lokasi_meeting_point' => 'Basecamp Selo',
-    'alamat_meeting_point' => 'Jl. Raya Selo, Boyolali',
-    'waktu_kumpul' => '07.00 WIB di Basecamp',
-    'include' => "- Transportasi\n- Makan 3x\n- Guide Profesional",
-    'exclude' => "- Perlengkapan pribadi\n- Asuransi\n- Biaya pribadi",
-    'syarat_ketentuan' => "Tidak menerima peserta dengan penyakit kronis\nPatuhi instruksi guide",
-    'link_gmap_meeting_point' => 'https://www.google.com/maps/place/Basecamp+Selo/@-7.541,110.591'
+  'nama_lokasi_meeting_point' => 'Basecamp Selo',
+  'alamat_meeting_point' => 'Jl. Raya Selo, Boyolali',
+  'waktu_kumpul' => '07.00 WIB di Basecamp',
+  'include' => "- Transportasi\n- Makan 3x\n- Guide Profesional",
+  'exclude' => "- Perlengkapan pribadi\n- Asuransi\n- Biaya pribadi",
+  'syarat_ketentuan' => "Tidak menerima peserta dengan penyakit kronis\nPatuhi instruksi guide",
+  'link_gmap_meeting_point' => 'https://www.google.com/maps/place/Basecamp+Selo/@-7.541,110.591'
 ];
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -46,6 +47,7 @@ $detail = [
       min-height: 100vh;
       padding: 20px;
     }
+
     .container-detail {
       max-width: 1000px;
       margin: auto;
@@ -54,17 +56,21 @@ $detail = [
       box-shadow: 0 8px 24px rgb(0 0 0 / 0.1);
       padding: 30px 40px;
     }
-    h1, h2 {
+
+    h1,
+    h2 {
       color: #a97c50;
       font-weight: 700;
       letter-spacing: 1.2px;
     }
+
     .trip-header {
       display: flex;
       gap: 25px;
       margin-bottom: 30px;
       flex-wrap: wrap;
     }
+
     .trip-image {
       max-width: 320px;
       flex-shrink: 0;
@@ -74,9 +80,11 @@ $detail = [
       width: 200px;
       box-shadow: 0 4px 16px rgba(169, 124, 80, 0.3);
     }
+
     .trip-info h1 {
       margin-bottom: 12px;
     }
+
     .badge-status {
       text-transform: uppercase;
       font-weight: 700;
@@ -89,9 +97,11 @@ $detail = [
       margin-bottom: 18px;
       width: max-content;
     }
+
     .badge-status.sold {
       background-color: #d48d9a;
     }
+
     .trip-meta {
       font-size: 1em;
       color: #444;
@@ -100,6 +110,7 @@ $detail = [
       flex-wrap: wrap;
       gap: 14px 28px;
     }
+
     .trip-meta span {
       display: flex;
       align-items: center;
@@ -107,31 +118,36 @@ $detail = [
       font-weight: 600;
       color: #695a3a;
     }
+
     .trip-price {
       font-size: 1.6em;
       font-weight: 700;
       color: #2ea564;
       margin-bottom: 40px;
     }
+
     /* Kotak lembut tanpa garis untuk setiap section */
     .info-box {
       background: white;
       border-radius: 18px;
-      box-shadow: 0 2px 12px rgba(30,30,50,0.05);
+      box-shadow: 0 2px 12px rgba(30, 30, 50, 0.05);
       padding: 25px 25px 18px 25px;
       margin-bottom: 30px;
       color: #ebebeb;
       border: 2px solid #d9b680;
     }
+
     .section-title {
       color: #a97c50;
       margin-bottom: 18px;
       font-size: 1.7em;
     }
+
     .section-content p {
       padding-bottom: 5px;
       margin: 0;
     }
+
     .section-content {
       font-family: 'Poppins', Arial, sans-serif;
       white-space: pre-line;
@@ -140,6 +156,7 @@ $detail = [
       font-weight: 300;
       padding-bottom: 10px;
     }
+
     iframe {
       border-radius: 12px;
       width: 100%;
@@ -147,6 +164,7 @@ $detail = [
       border: 1.5 solid #d9b680;
       box-shadow: 0 6px 20px rgb(169 124 80 / 0.35);
     }
+
     .btn-add-detail {
       background-color: #a97c50;
       color: white;
@@ -158,34 +176,37 @@ $detail = [
       transition: background-color 0.3s ease;
       margin-bottom: 25px;
     }
+
     .btn-add-detail:hover {
       background-color: #7a5f34;
     }
   </style>
 </head>
+
 <body>
 
   <div class="container-detail">
+    <!-- mengambil data dari paket -->
     <div class="trip-header">
-      <img src="<?= htmlspecialchars($trip['gambar']) ?>" alt="<?= htmlspecialchars($trip['nama_gunung']) ?>" class="trip-image" />
+      <img id="tripGambar" src="" alt="" class="trip-image" />
       <div class="trip-info">
-        <h1><?= htmlspecialchars($trip['nama_gunung']) ?></h1>
-        <div class="badge-status <?= $trip['status'] === 'available' ? 'available' : 'sold' ?>">
-          <?= ucfirst($trip['status']) ?>
+        <h1 id="tripJudul"></h1>
+        <div id="tripStatus" class="badge-status">
         </div>
         <div class="trip-meta">
-          <span><i class="bi bi-calendar-event"></i> <?= htmlspecialchars($trip['tanggal']) ?></span>
-          <span><i class="bi bi-clock"></i> <?= htmlspecialchars($trip['durasi']) ?></span>
-          <span><i class="bi bi-people-fill"></i> Slot: <?= intval($trip['slot']) ?></span>
-          <span><i class="bi bi-flag"></i> <?= htmlspecialchars($trip['jenis_trip']) ?></span>
-          <span><i class="bi bi-signpost-2"></i> Via <?= htmlspecialchars($trip['via_gunung']) ?></span>
+          <span><i class="bi bi-calendar-event"></i> <span id="tripTanggal"></span></span>
+          <span><i class="bi bi-clock"></i> <span id="tripDurasi"></span></span>
+          <span><i class="bi bi-people-fill"></i> Slot: <span id="tripSlot"></span></span>
+          <span><i class="bi bi-flag"></i> <span id="tripJenis"></span></span>
+          <span><i class="bi bi-signpost-2"></i> Via <span id="tripVia"></span></span>
         </div>
-        <div class="trip-price">Rp <?= number_format($trip['harga'], 0, ',', '.') ?></div>
+        <div class="trip-price" id="tripHarga"></div>
       </div>
     </div>
-
     <button class="btn-add-detail" id="btnTambahDetailTrip"><i class="bi bi-plus-circle"></i> Tambah/Edit Detail Trip</button>
 
+
+    <!-- Meeting Point -->
     <section class="info-box">
       <h2 class="section-title">Meeting Point</h2>
       <div class="section-content">
@@ -218,6 +239,8 @@ $detail = [
         <p><em>Belum ada link Google Map Meeting Point</em></p>
       <?php endif; ?>
     </section>
+
+
   </div>
 
   <!-- Modal Form Tambah/Edit Detail Trip -->
@@ -274,5 +297,16 @@ $detail = [
       modal.show();
     });
   </script>
+
+  <script src="../frontend/trip-detail.js"></script>
+  <script>
+    // Pastikan id trip diambil dari URL
+    const idTrip = '<?= htmlspecialchars($id) ?>';
+    window.onload = function() {
+      loadTripDetail(idTrip);
+    };
+  </script>
+
 </body>
+
 </html>

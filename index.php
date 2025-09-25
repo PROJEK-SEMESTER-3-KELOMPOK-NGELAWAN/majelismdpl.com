@@ -755,12 +755,14 @@
       <button class="hero-btn">Lihat Semua <i class="fas fa-arrow-right"></i></button>
       <div class="destination-carousel">
         <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+        
         <div class="carousel-track">
           <!-- Card Destinasi -->
           <!-- trip ini diambil dari file frontend/trip-user.js -->
           <!-- Tambahkan lagi card di sini jika perlu -->
 
         </div>
+        
         <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
       </div>
     </div>
