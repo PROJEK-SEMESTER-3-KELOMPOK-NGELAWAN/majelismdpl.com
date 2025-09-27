@@ -12,709 +12,251 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <style>
-    /* === LOGIN / SIGNUP MODAL === */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.6);
-      opacity: 0;
-      transition: opacity .28s ease, background-color .28s ease;
-    }
-
-    .modal.open {
-      display: flex;
-      opacity: 1;
-      background: rgba(0, 0, 0, 0.6);
-    }
-
-    .modal.open .modal-container {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-
-    .modal.closing {
-      opacity: 0;
-      background: rgba(0, 0, 0, 0.0);
-    }
-
-    .modal.closing .modal-container {
-      transform: translateY(8px) scale(.98);
-      opacity: 0;
-    }
-
-    /* Modal Container - menggunakan flexbox untuk layout kiri-kanan */
-    .modal-container {
-      background: #E3EAC4;
-      /* Background cream seperti pada gambar */
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    .modal-container,
+    .signup-modal {
+      background: rgba(34, 36, 58, 0.26);
+      border-radius: 16px;
+      box-shadow: 0 8px 22px #0006;
+      max-width: 350px;
+      min-width: 220px;
       width: 100%;
-      max-width: 800px;
-      min-height: 500px;
-      position: relative;
-      display: flex;
+      padding: 0;
       overflow: hidden;
-      transform: translateY(12px) scale(.98);
-      opacity: 0;
-      transition: transform .28s ease, opacity .28s ease;
-    }
-
-    /* Close Button */
-    .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 28px;
-      text-decoration: none;
-      color: #666;
-      z-index: 10;
-      width: 40px;
-      height: 40px;
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+      border: 2px solid rgba(255, 255, 255, 0.14);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      position: relative;
+    }
+
+    .signup-modal {
+      max-width: 410px;
+    }
+
+    .modal-logo,
+    .signup-modal .modal-logo {
+      width: 44px;
+      height: 44px;
+      margin: 13px auto 6px auto;
+      background: rgba(255, 255, 255, 0.13);
       border-radius: 50%;
-      transition: background-color 0.2s, color 0.2s;
+      box-shadow: 0 1px 6px #e2c7fd33;
+      object-fit: contain;
+      display: block;
     }
 
-    .close-btn:hover {
-      background-color: rgba(0, 0, 0, 0.1);
-      color: #333;
-    }
-
-    /* Modal Container - menggunakan flexbox untuk layout kiri-kanan */
-    .modal-container {
-      background: linear-gradient(to right, #E3EAC4 0%, #E3EAC4 45%, #f8f8f8 55%, #ffffff 100%);
-      /* Gradasi dari cream ke putih */
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    .modal-left,
+    .signup-modal .modal-left {
       width: 100%;
-      max-width: 800px;
-      min-height: 500px;
-      position: relative;
-      display: flex;
-      overflow: hidden;
-      transform: translateY(12px) scale(.98);
-      opacity: 0;
-      transition: transform .28s ease, opacity .28s ease;
-    }
-
-    /* Left Section - Logo */
-    .modal-left {
-      flex: 1;
+      background: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px;
-      background: transparent;
-      /* Hapus background solid agar gradasi terlihat */
+      margin-top: 2px;
     }
 
-    .logo-container {
-      text-align: center;
+    .modal-right,
+    .signup-modal .modal-right {
       width: 100%;
-    }
-
-    .modal-logo {
-      max-width: 320px;
-      /* Diperbesar dari 250px menjadi 320px */
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-    }
-
-    /* Right Section - Form */
-    .modal-right {
-      flex: 1;
-      background: transparent;
-      /* Hapus background solid agar gradasi terlihat */
-      padding: 50px 40px;
+      background: none;
+      padding: 12px 14px 10px 14px;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      color: #fff;
     }
 
-    .modal-right h2 {
-      font-size: 32px;
-      font-weight: 600;
-      margin-bottom: 30px;
-      color: #333;
+    .modal-container h2,
+    .signup-modal h2 {
+      font-size: 1.08rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #fff;
       text-align: center;
+      letter-spacing: .45px;
     }
 
-
-    /* Input Groups */
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 15px 18px;
-      border: 2px solid #e1e1e1;
-      border-radius: 12px;
-      outline: none;
-      font-size: 16px;
-      transition: border-color 0.3s, box-shadow 0.3s;
-      background: #fafafa;
-    }
-
-    .input-group input:focus {
-      border-color: #AE8340;
-      box-shadow: 0 0 0 3px rgba(174, 131, 64, 0.1);
-      background: #fff;
-    }
-
-    /* Divider */
-    .divider {
-      position: relative;
-      margin: 20px 0;
-      text-align: center;
-      color: #888;
-      font-size: 14px;
-    }
-
-    .divider::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background-color: #e1e1e1;
-      z-index: 1;
-    }
-
-    .divider span {
-      background-color: white;
-      padding: 0 20px;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Google Login Button */
-    .google-login-section {
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .btn-google {
-      display: flex !important;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 15px 16px;
-      border: 2px solid #e1e1e1;
-      border-radius: 12px;
-      background-color: #fff;
-      color: #333;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer !important;
-      transition: all 0.3s;
-      margin-bottom: 20px;
-    }
-
-    .btn-google:hover {
-      background-color: #f8f9fa;
-      border-color: #AE8340;
-      box-shadow: 0 2px 8px rgba(174, 131, 64, 0.15);
-    }
-
-    /* Login Button */
-    .btn-login {
-      width: 100%;
-      background: #AE8340;
-      border: none;
-      padding: 15px;
-      font-weight: 600;
-      color: #ffffff;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.3s, transform 0.2s;
-    }
-
-    .btn-login:hover {
-      background: #8b5e3c;
-      transform: translateY(-1px);
-    }
-
-    /* Signup Modal Specific Styles */
-    .signup-modal {
-      max-width: 900px;
-      /* Lebih lebar untuk menampung form grid */
-      min-height: 550px;
-    }
-
-    .signup-modal .modal-right {
-      padding: 40px 40px;
-      /* Sedikit lebih kompak */
-    }
-
-    .signup-modal .modal-right h2 {
-      font-size: 28px;
-      /* Sedikit lebih kecil */
-      margin-bottom: 25px;
-    }
-
-    /* Form Grid Layout untuk 2 kolom */
-    .form-grid {
+    .signup-modal .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px 20px;
-      /* vertical gap, horizontal gap */
-      margin-bottom: 25px;
+      gap: 8px 12px;
+      margin-bottom: 10px;
     }
 
-    /* Full width field */
-    .field-full {
+    .signup-modal .form-grid .field-full {
       grid-column: 1 / -1;
-      /* Span across all columns */
     }
 
-    /* Input Groups di dalam grid */
-    .form-grid .input-group {
-      margin-bottom: 0;
-      /* Reset margin karena sudah ada gap di grid */
-    }
+    @media (max-width: 540px) {
 
-    .form-grid .input-group input {
-      width: 100%;
-      padding: 12px 15px;
-      /* Sedikit lebih kompak */
-      border: 2px solid #e1e1e1;
-      border-radius: 10px;
-      outline: none;
-      font-size: 15px;
-      transition: border-color 0.3s, box-shadow 0.3s;
-      background: #fafafa;
-    }
-
-    .form-grid .input-group input:focus {
-      border-color: #AE8340;
-      box-shadow: 0 0 0 3px rgba(174, 131, 64, 0.1);
-      background: #fff;
-    }
-
-    /* Google Signup Section */
-    .google-signup-section {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    /* Responsive Design untuk Signup Modal */
-    @media (max-width: 1000px) {
-      .signup-modal {
-        max-width: 500px;
-        flex-direction: column;
-        min-height: auto;
-        max-height: 90vh;
-        overflow-y: auto;
+      .signup-modal,
+      .modal-container {
+        max-width: 99vw;
       }
 
-      .signup-modal .modal-left {
-        padding: 25px 20px 15px;
-      }
-
-      .signup-modal .modal-logo {
-        max-width: 160px;
-      }
-
-      .signup-modal .modal-right {
-        padding: 25px 30px 35px;
-      }
-    }
-
-    @media (max-width: 750px) {
-      .form-grid {
+      .signup-modal .form-grid {
         grid-template-columns: 1fr;
-        /* Single column pada mobile */
-        gap: 15px;
+        gap: 8px 0;
       }
 
-      .signup-modal {
-        max-width: calc(100% - 40px);
-        margin: 20px;
-      }
-
-      .signup-modal .modal-right {
-        padding: 20px 25px 30px;
-      }
-
-      .form-grid .input-group input,
-      .signup-modal .btn-google,
-      .signup-modal .btn-login {
-        padding: 12px 15px;
-        font-size: 15px;
+      .signup-modal .form-grid .field-full {
+        grid-column: auto;
       }
     }
 
-    @media (max-width: 480px) {
-      .signup-modal .modal-right {
-        padding: 20px 20px 25px;
-      }
-
-      .signup-modal .modal-right h2 {
-        font-size: 24px;
-        margin-bottom: 20px;
-      }
-
-      .form-grid {
-        gap: 12px;
-      }
-
-      .form-grid .input-group input {
-        padding: 11px 14px;
-        font-size: 14px;
-        border-radius: 8px;
-      }
-    }
-
-    /* Divider dan button styles tetap sama seperti login modal */
-    .signup-modal .divider {
-      position: relative;
-      margin: 20px 0 15px 0;
-      text-align: center;
-      color: #888;
-      font-size: 14px;
-    }
-
-    .signup-modal .divider::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background-color: #e1e1e1;
-      z-index: 1;
-    }
-
-    .signup-modal .divider span {
-      background-color: white;
-      padding: 0 20px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .signup-modal .btn-google {
-      display: flex !important;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid #e1e1e1;
-      border-radius: 10px;
-      background-color: #fff;
-      color: #333;
-      font-size: 15px;
+    .modal-container .input-group input,
+    .signup-modal .input-group input {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border: 1.2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 7px;
       font-weight: 500;
-      cursor: pointer !important;
-      transition: all 0.3s;
-      margin-top: 5px;
+      font-size: 13px;
+      color: #fff !important;
+      padding: 8px 10px;
+      margin-bottom: 3px;
+      min-width: 0;
     }
 
-    .signup-modal .btn-google:hover {
-      background-color: #f8f9fa;
-      border-color: #AE8340;
-      box-shadow: 0 2px 8px rgba(174, 131, 64, 0.15);
+    .modal-container .input-group input:focus,
+    .signup-modal .input-group input:focus {
+      background: rgba(255, 255, 255, 0.19) !important;
+      border-color: #b089f4;
+      color: #fff !important;
     }
 
-    .signup-modal .btn-login {
-      width: 100%;
-      background: #AE8340;
-      border: none;
-      padding: 13px;
-      font-weight: 600;
-      color: #ffffff;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.3s, transform 0.2s;
-      margin-bottom: 15px;
+    ::placeholder {
+      color: #d0d0d0;
+      opacity: 0.93;
     }
 
-    .signup-modal .btn-login:hover {
-      background: #8b5e3c;
-      transform: translateY(-1px);
-    }
-
-    /* Password Toggle Button */
-    /* Password Group dengan Toggle Button */
-    .password-group {
-      position: relative;
-    }
-
-    .password-group input {
-      padding-right: 50px !important;
-      /* Beri ruang untuk button toggle */
-    }
-
-    .password-toggle {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 5px;
+    .modal-container .divider,
+    .signup-modal .divider {
+      margin: 9px 0 6px 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #666;
-      transition: color 0.3s ease;
-      z-index: 10;
+      width: 100%;
+      gap: 0.35em;
+      text-align: center;
     }
 
-    .password-toggle:hover {
-      color: #AE8340;
+    .modal-container .divider::before,
+    .signup-modal .divider::before,
+    .modal-container .divider::after,
+    .signup-modal .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.22) 100%);
+      border-radius: 1.3px;
     }
 
-    .password-toggle:focus {
-      outline: none;
+    .modal-container .divider span,
+    .signup-modal .divider span {
+      display: inline-block;
+      background: rgba(34, 36, 58, 0.78);
+      font-weight: 800;
+      font-size: .98rem;
+      color: #fff;
+      text-align: center;
+      padding: 3px 10px;
+      border-radius: 7px;
+      letter-spacing: .5px;
+      box-shadow: 0 1px 3px #0001;
     }
 
-    .eye-icon {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      transition: opacity 0.2s ease;
+    .modal-container .btn-google,
+    .signup-modal .btn-google {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff !important;
+      border-radius: 7px;
+      border: 1.8px solid #e1e1e1;
+      font-size: 13px;
+      padding: 8px 10px;
+      margin-bottom: 5px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Responsive untuk password toggle */
-    @media (max-width: 600px) {
-      .password-group input {
-        padding-right: 45px !important;
-      }
-
-      .password-toggle {
-        right: 12px;
-      }
-
-      .eye-icon {
-        width: 18px;
-        height: 18px;
-      }
+    .modal-container .btn-google:hover,
+    .signup-modal .btn-google:hover {
+      background: #44337060;
+      border-color: #b089f4;
     }
 
-    /* Password Group untuk signup modal */
+    .modal-container .btn-login,
+    .signup-modal .btn-login {
+      background: linear-gradient(90deg, #a97c50 65%, #b089f4 100%);
+      color: #fff !important;
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 0;
+      font-weight: 700;
+      font-size: 13.5px;
+      letter-spacing: .4px;
+      margin-top: 8px;
+      margin-bottom: 3px;
+      transition: background .3s;
+      box-shadow: 0 2px 9px #b089f433;
+    }
+
+    .modal-container .btn-login:hover,
+    .signup-modal .btn-login:hover {
+      background: linear-gradient(90deg, #b089f4 32%, #a97c50 100%);
+    }
+
+    /* Password toggle small */
+    .modal-container .password-group,
     .signup-modal .password-group {
       position: relative;
     }
 
+    .modal-container .password-group input,
     .signup-modal .password-group input {
-      padding-right: 45px !important;
-      /* Beri ruang untuk button toggle */
+      padding-right: 42px !important;
+      box-sizing: border-box;
     }
 
+    .modal-container .password-toggle,
     .signup-modal .password-toggle {
       position: absolute;
+      top: 0;
+      bottom: 0;
       right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
+      /* JANGAN 8px, ini agar benar-benar dalam */
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #666;
-      transition: color 0.3s ease;
-      z-index: 10;
+      height: 100%;
+      width: 28px;
+      background: none;
+      border: none;
+      color: #eee;
+      cursor: pointer;
+      z-index: 11;
+      margin: 0;
+      padding: 0;
+      transition: color .18s;
     }
 
+    .modal-container .password-toggle:hover,
     .signup-modal .password-toggle:hover {
-      color: #AE8340;
+      color: #b089f4;
     }
 
-    .signup-modal .password-toggle:focus {
-      outline: none;
-    }
-
+    .modal-container .eye-icon,
     .signup-modal .eye-icon {
       width: 18px;
       height: 18px;
+      display: block;
       stroke: currentColor;
-      transition: opacity 0.2s ease;
-    }
-
-    /* Password Match Indicator */
-    .password-match-indicator {
-      position: absolute;
-      right: 45px;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 5;
-    }
-
-    .password-match-indicator.success {
-      color: #22c55e;
-    }
-
-    .password-match-indicator.error {
-      color: #ef4444;
-    }
-
-    /* Custom Alert Popup */
-    .custom-alert {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .custom-alert.show {
-      display: flex;
-    }
-
-    .alert-content {
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      animation: alertSlideIn 0.3s ease;
-    }
-
-    @keyframes alertSlideIn {
-      from {
-        opacity: 0;
-        transform: scale(0.9) translateY(-20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    .alert-icon {
-      font-size: 48px;
-      margin-bottom: 15px;
-    }
-
-    .alert-icon.error {
-      color: #ef4444;
-    }
-
-    .alert-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: #333;
-    }
-
-    .alert-message {
-      font-size: 16px;
-      color: #666;
-      margin-bottom: 25px;
-      line-height: 1.5;
-    }
-
-    .alert-button {
-      background: #AE8340;
-      color: white;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .alert-button:hover {
-      background: #8b5e3c;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 750px) {
-      .signup-modal .password-group input {
-        padding-right: 42px !important;
-      }
-
-      .signup-modal .password-toggle {
-        right: 10px;
-      }
-
-      .signup-modal .eye-icon {
-        width: 16px;
-        height: 16px;
-      }
-    }
-
-
-
-
-    /* Responsive Design */
-    @media (max-width: 900px) {
-      .modal-container {
-        flex-direction: column;
-        max-width: 450px;
-        min-height: auto;
-        max-height: 90vh;
-        overflow-y: auto;
-      }
-
-      .modal-left {
-        padding: 30px 20px 20px;
-      }
-
-      .modal-logo {
-        max-width: 220px;
-        /* Diperbesar dari 180px menjadi 220px untuk mobile */
-      }
-
-      .modal-right {
-        padding: 30px 30px 40px;
-      }
-
-      .modal-right h2 {
-        font-size: 28px;
-        margin-bottom: 25px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .modal-container {
-        margin: 20px;
-        max-width: calc(100% - 40px);
-      }
-
-      .modal-right {
-        padding: 25px 20px 35px;
-      }
-
-      .modal-logo {
-        max-width: 200px;
-        /* Disesuaikan untuk layar yang sangat kecil */
-      }
-
-      .input-group input,
-      .btn-google,
-      .btn-login {
-        padding: 12px 15px;
-        font-size: 15px;
-      }
+      pointer-events: none;
     }
   </style>
 </head>
@@ -911,7 +453,7 @@
       <!-- Left section dengan logo -->
       <div class="modal-left">
         <div class="logo-container">
-          <img src="assets/logo-majelis.png" alt="Majelis MDPL Logo" class="modal-logo">
+          <img src="assets/logo_majelis_noBg.png" alt="Majelis MDPL Logo" class="modal-logo">
         </div>
       </div>
 
@@ -941,7 +483,14 @@
               </svg>
             </button>
           </div>
-
+          
+          <button type="submit" class="btn-login">Masuk</button>
+          <div style="text-align:center;margin-top:13px;">
+            <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
+              Lupa password?
+            </a>
+          </div>
+          
           <!-- Tombol Login dengan Google -->
           <div class="divider">
             <span>atau</span>
@@ -949,18 +498,12 @@
 
           <div class="google-login-section">
             <button type="button" id="googleLoginBtn" class="btn-google">
-              <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+              <img src="assets/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
               Login with Google
             </button>
           </div>
 
-          <button type="submit" class="btn-login">Masuk</button>
 
-          <div style="text-align:center;margin-top:13px;">
-            <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
-              Lupa password?
-            </a>
-          </div>
         </form>
       </div>
     </div>
@@ -977,7 +520,7 @@
       <!-- Left section dengan logo -->
       <div class="modal-left">
         <div class="logo-container">
-          <img src="assets/logo-majelis.png" alt="Majelis MDPL Logo" class="modal-logo">
+          <img src="assets/logo_majelis_noBg.png" alt="Majelis MDPL Logo" class="modal-logo">
         </div>
       </div>
 
@@ -1010,9 +553,6 @@
             </div>
 
             <!-- Row 2 -->
-            <div class="input-group">
-              <input type="email" name="email" placeholder="Email" autocomplete="email" required />
-            </div>
             <div class="input-group password-group">
               <input type="password" name="confirm_password" id="confirmPassword" placeholder="Konfirmasi Password"
                 autocomplete="new-password" required />
@@ -1029,6 +569,9 @@
                     d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                 </svg>
               </button>
+            </div>
+            <div class="input-group">
+              <input type="email" name="email" placeholder="Email" autocomplete="email" required />
             </div>
 
             <!-- Row 3 -->
@@ -1048,7 +591,7 @@
           </div>
           <div class="google-signup-section">
             <button type="button" id="googleSignUpBtn" class="btn-google">
-              <img src="img/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+              <img src="assets/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
               Sign up with Google
             </button>
           </div>
@@ -1110,25 +653,23 @@
 
   <!-- Global functions that might be needed -->
   <script>
+    // Buka WhatsApp helper
     function bukaWhatsapp() {
       const nomor = "6283853493130";
       const url = "https://wa.me/" + nomor;
       window.open(url, "_blank");
     }
 
-    // Global function untuk Google OAuth (fallback)
+    // Global function untuk Google OAuth dan Google Login
     function handleGoogleOAuth() {
-      console.log("Global handleGoogleOAuth called");
       window.location.href = window.location.origin + "/majelismdpl.com/backend/google-oauth.php";
     }
 
-    // Global function untuk Google Login (fallback)
     function handleGoogleLogin() {
-      console.log("Global handleGoogleLogin called");
       window.location.href = window.location.origin + "/majelismdpl.com/backend/google-oauth.php?type=login";
     }
 
-    // ====== util animasi modal (sesuai CSS .open/.closing) ======
+    // Modal animation helpers
     const OPEN = "open";
     const CLOSING = "closing";
     const DURATION = 300;
@@ -1136,7 +677,7 @@
     function openModal(el) {
       el.classList.remove(CLOSING);
       el.style.display = "flex";
-      void el.offsetWidth; // force reflow
+      void el.offsetWidth;
       el.classList.add(OPEN);
     }
 
@@ -1149,31 +690,25 @@
       }, DURATION);
     }
 
-    // Wait for DOM to be fully loaded
+    // --------- When DOM loaded ----------
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('Main script DOMContentLoaded executed');
-
-      // ====== LOGIN MODAL ======
+      // ======= LOGIN MODAL
       const loginModal = document.getElementById("loginModal");
       const openLogin = document.getElementById("open-login");
       const closeLogin = document.getElementById("close-login");
-
       if (openLogin && loginModal && closeLogin) {
         openLogin.addEventListener("click", (e) => {
           e.preventDefault();
           openModal(loginModal);
 
-          // After opening modal, try to attach Google login button event
           setTimeout(() => {
             const googleLoginBtn = document.getElementById("googleLoginBtn");
             if (googleLoginBtn && !googleLoginBtn.hasAttribute('data-main-login-listener')) {
               googleLoginBtn.setAttribute('data-main-login-listener', 'true');
               googleLoginBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                console.log('Google login button clicked from main script!');
                 handleGoogleLogin();
               });
-              console.log('Google login button listener attached from main script');
             }
           }, 100);
         });
@@ -1188,27 +723,23 @@
         });
       }
 
-      // ====== SIGN UP MODAL ======
+      // ======= SIGNUP MODAL
       const signUpModal = document.getElementById("signUpModal");
       const openSignUp = document.getElementById("open-signup");
       const closeSignUp = document.getElementById("close-signup");
-
       if (openSignUp && signUpModal && closeSignUp) {
         openSignUp.addEventListener("click", (e) => {
           e.preventDefault();
           openModal(signUpModal);
 
-          // After opening modal, try to attach Google signup button event
           setTimeout(() => {
             const googleSignupBtn = document.getElementById("googleSignUpBtn");
             if (googleSignupBtn && !googleSignupBtn.hasAttribute('data-main-signup-listener')) {
               googleSignupBtn.setAttribute('data-main-signup-listener', 'true');
               googleSignupBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                console.log('Google signup button clicked from main script!');
                 handleGoogleOAuth();
               });
-              console.log('Google signup button listener attached from main script');
             }
           }, 100);
         });
@@ -1230,79 +761,51 @@
           if (loginModal && loginModal.style.display === "flex") closeModal(loginModal);
         }
       });
-    });
 
-    // Toggle Password Visibility untuk Login Modal
-    document.addEventListener('DOMContentLoaded', function() {
+      // --- TOGGLE PASSWORD LOGIN ---
       const toggleButton = document.getElementById('toggleLoginPassword');
       const passwordInput = document.getElementById('loginPassword');
-
       if (toggleButton && passwordInput) {
         toggleButton.addEventListener('click', function() {
           const showIcon = toggleButton.querySelector('.eye-icon.show');
           const hideIcon = toggleButton.querySelector('.eye-icon.hide');
-
           if (passwordInput.type === 'password') {
-            // Show password
             passwordInput.type = 'text';
             showIcon.style.display = 'none';
             hideIcon.style.display = 'block';
           } else {
-            // Hide password
             passwordInput.type = 'password';
             showIcon.style.display = 'block';
             hideIcon.style.display = 'none';
           }
         });
       }
-    });
 
-
-    // Password Toggle dan Validasi untuk Signup Modal
-    document.addEventListener('DOMContentLoaded', function() {
-      // Toggle untuk password utama
+      // --- TOGGLE PASSWORD SIGNUP ---
       const toggleSignupPassword = document.getElementById('toggleSignupPassword');
       const signupPasswordInput = document.getElementById('signupPassword');
-
       if (toggleSignupPassword && signupPasswordInput) {
         toggleSignupPassword.addEventListener('click', function() {
           togglePasswordVisibility(signupPasswordInput, toggleSignupPassword);
         });
       }
 
-      // Toggle untuk konfirmasi password
       const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
       const confirmPasswordInput = document.getElementById('confirmPassword');
-
       if (toggleConfirmPassword && confirmPasswordInput) {
         toggleConfirmPassword.addEventListener('click', function() {
           togglePasswordVisibility(confirmPasswordInput, toggleConfirmPassword);
         });
       }
 
-      // Real-time password match validation
-      if (signupPasswordInput && confirmPasswordInput) {
-        confirmPasswordInput.addEventListener('input', function() {
-          validatePasswordMatch();
-        });
-
-        signupPasswordInput.addEventListener('input', function() {
-          if (confirmPasswordInput.value) {
-            validatePasswordMatch();
-          }
-        });
-      }
-
-      // Form submission validation
+      // SUBMIT handler for signup form: only alert, no inline indicator
       const signupForm = document.getElementById('signupForm');
-      if (signupForm) {
+      if (signupForm && signupPasswordInput && confirmPasswordInput) {
         signupForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-
           const password = signupPasswordInput.value;
-          const confirmPassword = confirmPasswordInput.value;
-
-          if (password !== confirmPassword) {
+          const confirm = confirmPasswordInput.value;
+          if (password !== confirm) {
+            e.preventDefault();
             showCustomAlert(
               'Password Tidak Sama!',
               'Password dan Konfirmasi Password harus sama. Silakan periksa kembali input Anda.',
@@ -1310,23 +813,20 @@
             );
             return false;
           }
-
-          // Jika password sama, lanjutkan submit form
-          // Anda bisa menambahkan logic submit form di sini
           showCustomAlert(
             'Berhasil!',
-            'Password telah tervalidasi. Form siap untuk disubmit.',
+            'Password sudah sama. Form siap untuk disubmit.',
             'success'
           );
+          // Lanjutkan dengan logic submit form atau AJAX di sini jika ingin.
         });
       }
     });
 
-    // Function untuk toggle password visibility
+    // Utility for password show/hide
     function togglePasswordVisibility(passwordInput, toggleButton) {
       const showIcon = toggleButton.querySelector('.eye-icon.show');
       const hideIcon = toggleButton.querySelector('.eye-icon.hide');
-
       if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
         showIcon.style.display = 'none';
@@ -1338,65 +838,23 @@
       }
     }
 
-    // Function untuk validasi password match secara real-time
-    function validatePasswordMatch() {
-      const password = document.getElementById('signupPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const confirmPasswordInput = document.getElementById('confirmPassword');
-
-      // Remove existing indicator
-      const existingIndicator = confirmPasswordInput.parentNode.querySelector('.password-match-indicator');
-      if (existingIndicator) {
-        existingIndicator.remove();
-      }
-
-      if (confirmPassword) {
-        const indicator = document.createElement('span');
-        indicator.classList.add('password-match-indicator');
-
-        if (password === confirmPassword) {
-          indicator.innerHTML = '✓';
-          indicator.classList.add('success');
-          confirmPasswordInput.style.borderColor = '#22c55e';
-        } else {
-          indicator.innerHTML = '✗';
-          indicator.classList.add('error');
-          confirmPasswordInput.style.borderColor = '#ef4444';
-        }
-
-        confirmPasswordInput.parentNode.appendChild(indicator);
-      } else {
-        confirmPasswordInput.style.borderColor = '#e1e1e1';
-      }
-    }
-
-    // Function untuk menampilkan custom alert
+    // Custom alert popup
     function showCustomAlert(title, message, type) {
-      // Create alert HTML
       const alertHTML = `
     <div class="custom-alert show" id="customAlert">
       <div class="alert-content">
-        <div class="alert-icon ${type}">
-          ${type === 'error' ? '⚠' : '✅'}
-        </div>
+        <div class="alert-icon ${type}">${type === 'error' ? '⚠' : '✅'}</div>
         <div class="alert-title">${title}</div>
         <div class="alert-message">${message}</div>
         <button class="alert-button" onclick="closeCustomAlert()">OK</button>
       </div>
     </div>
   `;
-
-      // Remove existing alert if any
       const existingAlert = document.getElementById('customAlert');
-      if (existingAlert) {
-        existingAlert.remove();
-      }
-
-      // Add new alert
+      if (existingAlert) existingAlert.remove();
       document.body.insertAdjacentHTML('beforeend', alertHTML);
     }
 
-    // Function untuk menutup custom alert
     function closeCustomAlert() {
       const alert = document.getElementById('customAlert');
       if (alert) {
