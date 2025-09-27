@@ -113,27 +113,38 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                 if ($user['role'] === 'admin') {
                     $redirect_url = '/majelismdpl.com/admin/index.php';
                 }
-
                 echo "<!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Login Berhasil</title>
-                    <meta charset='UTF-8'>
-                </head>
-                <body>
-                    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-                    <script>
-                        Swal.fire({
-                            title: 'Login Berhasil!',
-                            text: 'Selamat datang kembali " . addslashes($user['username']) . "',
-                            icon: 'success',
-                            confirmButtonText: 'Lanjutkan'
-                        }).then(() => {
-                            window.location.href = '" . $redirect_url . "';
-                        });
-                    </script>
-                </body>
-                </html>";
+                    <html>
+                    <head>
+                        <title>Login Berhasil</title>
+                        <meta charset='UTF-8'>
+                        <style>
+                            body {
+                                background-image: url('../assets/login-bg.jpg');
+                                background-size: cover;
+                                background-repeat: no-repeat;
+                                background-position: bottom center;
+                                margin: 0;
+                                padding: 0;
+                                height: 100vh;
+                                min-height: 100vh;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+                        <script>
+                            Swal.fire({
+                                title: 'Login Berhasil!',
+                                text: 'Selamat datang kembali " . addslashes($user['username']) . "',
+                                icon: 'success',
+                                confirmButtonText: 'Lanjutkan'
+                            }).then(() => {
+                                window.location.href = '" . $redirect_url . "';
+                            });
+                        </script>
+                    </body>
+                    </html>";
             } else {
                 // User doesn't exist
                 if ($auth_type === 'login') {
