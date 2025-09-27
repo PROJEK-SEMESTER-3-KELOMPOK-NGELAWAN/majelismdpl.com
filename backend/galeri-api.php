@@ -6,6 +6,19 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 require_once 'koneksi.php';
 
+// Ambil id_user dari sesi login
+session_start();
+$id_user = $_SESSION['id_user'] ?? null;
+
+// Helper function untuk activity_logs
+function logActivity($conn, $id_user, $aktivitas, $statusLog) {
+    if (!$id_user) return;
+    $stmt = $conn->prepare("INSERT INTO activity_logs (aktivitas, waktu, status, id_user) VALUES (?, NOW(), ?, ?)");
+    $stmt->bind_param("ssi", $aktivitas, $statusLog, $id_user);
+    $stmt->execute();
+    $stmt->close();
+}
+
 // Function untuk generate unique filename
 function generateUniqueFilename($originalName)
 {
@@ -72,6 +85,10 @@ try {
             $stmt->bind_param("i", $id);
 
             if ($stmt->execute()) {
+                if ($id_user) {
+                    $aktivitas = "Menghapus gambar gallery (ID: $id, Nama File: $imageName)";
+                    logActivity($conn, $id_user, $aktivitas, "delete");
+                }
                 echo json_encode([
                     'success' => true,
                     'message' => 'Gambar berhasil dihapus'
@@ -79,7 +96,6 @@ try {
             } else {
                 throw new Exception("Error menghapus data: " . $stmt->error);
             }
-
             $stmt->close();
         } else {
             // POST - Upload gambar baru
@@ -109,12 +125,15 @@ try {
 
             // Upload file ke server
             if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
-                // Simpan informasi ke database
                 $sql = "INSERT INTO tb_galleries (gallery) VALUES (?)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("s", $uniqueFilename);
 
                 if ($stmt->execute()) {
+                    if ($id_user) {
+                        $aktivitas = "Menambahkan gambar gallery baru (ID: " . $conn->insert_id . ", Nama File: $uniqueFilename)";
+                        logActivity($conn, $id_user, $aktivitas, "publish");
+                    }
                     echo json_encode([
                         'success' => true,
                         'message' => 'Gambar berhasil diupload',
@@ -124,11 +143,9 @@ try {
                         ]
                     ]);
                 } else {
-                    // Hapus file jika gagal simpan ke database
                     unlink($uploadPath);
                     throw new Exception("Error menyimpan ke database: " . $stmt->error);
                 }
-
                 $stmt->close();
             } else {
                 throw new Exception("Gagal mengupload file ke server.");

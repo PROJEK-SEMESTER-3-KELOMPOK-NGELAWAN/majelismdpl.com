@@ -1,5 +1,6 @@
 <?php
 require_once 'auth_check.php';
+
 ?>
 
 
@@ -318,6 +319,8 @@ require_once 'auth_check.php';
       padding: 5px 11px;
       border-radius: 10px;
       letter-spacing: 0.6px;
+      color: #000000ff;
+      font-size: 15px;
     }
 
     .badge-success {
@@ -391,51 +394,33 @@ require_once 'auth_check.php';
       <canvas id="pesertaChart" height="90"></canvas>
     </section>
 
-<section class="data-table-section">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 style="margin: 0; color: #a97c50; font-weight: 700; font-size: 1.2rem; letter-spacing:1px;">Riwayat Aktivitas Terbaru</h3>
-    <div class="search-container" style="max-width: 280px; width: 100%;">
-      <input type="text" id="activitySearchInput" class="search-input" placeholder="Cari aktivitas..." />
-      <i class="bi bi-search search-icon"></i>
-    </div>
-  </div>
+    <section class="data-table-section">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 style="margin: 0; color: #a97c50; font-weight: 700; font-size: 1.2rem; letter-spacing:1px;">Riwayat Aktivitas Terbaru</h3>
+        <div class="search-container" style="max-width: 280px; width: 100%;">
+          <input type="text" id="activitySearchInput" class="search-input" placeholder="Cari aktivitas..." />
+          <i class="bi bi-search search-icon"></i>
+        </div>
+      </div>
 
       <table>
         <thead>
           <tr>
             <th>No</th>
             <th>Aktivitas</th>
+            <th>Pelaku</th>
             <th>Waktu</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>Trip “Rinjani” ditambahkan</td>
-            <td>11/09/2025 13:30</td>
-            <td><span class="badge badge-success">Publish</span></td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Pembayaran peserta #067 diverifikasi</td>
-            <td>09/09/2025 19:42</td>
-            <td><span class="badge badge-warning">Proses</span></td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Peserta baru daftar – Bromo</td>
-            <td>09/09/2025 08:10</td>
-            <td><span class="badge badge-info">Baru</span></td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>Pembatalan peserta #024 trip Lawu</td>
-            <td>08/09/2025 20:14</td>
-            <td><span class="badge badge-danger">Batal</span></td>
-          </tr>
+          <?php
+          include '../backend/activity-logs.php';
+          echo $rows;
+          ?>
         </tbody>
       </table>
+
     </section>
 
   </main>

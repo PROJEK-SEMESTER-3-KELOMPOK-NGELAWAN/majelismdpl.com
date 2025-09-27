@@ -3,6 +3,9 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 require_once 'koneksi.php';
 
+session_start(); // Pastikan session dimulai untuk ambil id_user
+$id_user = $_SESSION['id_user'] ?? null;
+
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 
@@ -51,7 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cek->execute();
     $cek->store_result();
 
-    if ($cek->num_rows > 0) {
+    $isUpdate = ($cek->num_rows > 0);
+
+    // UPDATE DETAIL TRIP JIKA SUDAH ADA, INSERT JIKA BELUM ADA
+    if ($isUpdate) {
         $stmt = $conn->prepare(
             "UPDATE detail_trips SET nama_lokasi=?, alamat=?, waktu_kumpul=?, link_map=?, `include`=?, `exclude`=?, syaratKetentuan=? WHERE id_trip=?"
         );
@@ -66,6 +72,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cek->close();
 
     if ($stmt->execute()) {
+        // Logging activity jika ada id_user
+        if ($id_user) {
+            if ($isUpdate) {
+                $aktivitas = "Mengubah detail trip pada Trip ID #$id_trip ($nama_lokasi)";
+                $statusLog = "update";
+            } else {
+                $aktivitas = "Menambahkan detail trip baru pada Trip ID #$id_trip ($nama_lokasi)";
+                $statusLog = "publish";
+            }
+            $logStmt = $conn->prepare(
+                "INSERT INTO activity_logs (aktivitas, waktu, status, id_user) VALUES (?, NOW(), ?, ?)"
+            );
+            $logStmt->bind_param("ssi", $aktivitas, $statusLog, $id_user);
+            $logStmt->execute();
+            $logStmt->close();
+        }
+
         echo json_encode(['success' => true, 'message' => 'Detail trip berhasil disimpan']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Gagal menyimpan: ' . $stmt->error]);

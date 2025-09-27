@@ -1,5 +1,8 @@
 <?php
+require_once 'auth_check.php';
 require_once '../backend/koneksi.php';
+
+
 
 $id = $_GET['id'] ?? null;
 
@@ -216,7 +219,9 @@ if (!$detail) {
           <span><i class="bi bi-flag"></i> <span id="tripJenis"><?= htmlspecialchars($trip['jenis_trip']) ?></span></span>
           <span><i class="bi bi-signpost-2"></i> Via <span id="tripVia"><?= htmlspecialchars($trip['via_gunung']) ?></span></span>
         </div>
-        <div class="trip-price" id="tripHarga">Rp <?= number_format($trip['harga']) ?></div>
+        <div class="trip-price" id="tripHarga">
+          Rp <?= isset($trip['harga']) && is_numeric($trip['harga']) ? number_format($trip['harga']) : '0' ?>
+        </div>
       </div>
     </div>
 

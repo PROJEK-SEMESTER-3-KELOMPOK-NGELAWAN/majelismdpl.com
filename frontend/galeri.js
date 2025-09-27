@@ -213,12 +213,6 @@ async function confirmDelete(id, imageName) {
   const bootstrapModal = bootstrap.Modal.getInstance(modal);
   bootstrapModal.hide();
 
-  // Show loading alert
-  showAlert(
-    '<i class="spinner-border spinner-border-sm me-2"></i>Menghapus gambar...',
-    "info"
-  );
-
   try {
     const formData = new FormData();
     formData.append("action", "delete");
