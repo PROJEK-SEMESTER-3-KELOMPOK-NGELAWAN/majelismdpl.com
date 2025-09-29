@@ -63,7 +63,7 @@ formUpload.addEventListener("submit", async (e) => {
     const result = await response.json();
 
     if (result.success) {
-      showAlert("Gambar berhasil diupload!", "success");
+      showToast("success", "Gambar berhasil diupload!");
       // Reset form
       fileInput.value = "";
       imagePreview.style.display = "none";
@@ -71,7 +71,7 @@ formUpload.addEventListener("submit", async (e) => {
       // Refresh gallery
       loadGallery();
     } else {
-      showAlert(result.message || "Gagal upload gambar!", "danger");
+      showToast("error", result.message || "Gagal upload gambar!");
     }
   } catch (error) {
     console.error("Error:", error);
@@ -165,35 +165,50 @@ function viewImage(imageName) {
 }
 
 // Function untuk menghapus gambar dengan modal custom
+// Function untuk menghapus gambar dengan modal custom
 async function deleteImage(id, imageName) {
   const modal = document.createElement("div");
   modal.className = "modal fade modal-delete";
+  modal.setAttribute("data-bs-backdrop", "static");
   modal.innerHTML = `
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            Konfirmasi Hapus
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <img src="../img/${imageName}" alt="${imageName}" class="image-preview d-block">
-          <h6 class="mt-3 mb-2 fw-bold">Apakah Anda yakin?</h6>
-          <p class="text-muted mb-4">
-            Gambar "<span class="fw-bold text-dark">${imageName}</span>" akan dihapus secara permanen dan tidak dapat dikembalikan!
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; background: white;">
+        <div class="modal-body text-center" style="padding: 2.5rem 2rem;">
+          <!-- Icon peringatan dengan lingkaran orange -->
+          <div class="mb-3">
+            <div class="d-inline-flex align-items-center justify-content-center" 
+                 style="width: 75px; height: 75px; background: #FFF3E0; border-radius: 50%;">
+              <i class="bi bi-exclamation" style="font-size: 2.8rem; color: #FF9800; font-weight: bold; line-height: 1;"></i>
+            </div>
+          </div>
+          
+          <!-- Judul -->
+          <h4 class="fw-bold mb-2" style="color: #2D3748; font-size: 1.4rem; margin-bottom: 0.8rem !important;">
+            Hapus Trip?
+          </h4>
+          
+          <!-- Pesan -->
+          <p class="mb-4" style="color: #718096; font-size: 0.95rem; line-height: 1.4; margin-bottom: 2.2rem !important;">
+            Data akan dihapus permanen.
           </p>
+          
+          <!-- Tombol dengan styling yang tepat -->
           <div class="d-flex gap-3 justify-content-center">
-            <button type="button" class="btn btn-cancel text-white" data-bs-dismiss="modal">
-              <i class="bi bi-x-circle me-2"></i>Batal
+            <button type="button" 
+                    class="btn flex-fill" 
+                    style="background: #E2E8F0; color: #4A5568; border: none; border-radius: 10px; font-weight: 500; padding: 12px 20px; font-size: 0.9rem;"
+                    data-bs-dismiss="modal">
+              Batal
             </button>
-            <button type="button" class="btn btn-confirm-delete text-white" onclick="confirmDelete(${id}, '${imageName}')">
-              <i class="bi bi-trash me-2"></i>Ya, Hapus!
+            <button type="button" 
+                    class="btn flex-fill" 
+                    style="background: #673AB7; color: white; border: none; border-radius: 10px; font-weight: 500; padding: 12px 20px; font-size: 0.9rem;"
+                    onclick="confirmDelete(${id}, '${imageName}')">
+              Ya, Hapus
             </button>
           </div>
         </div>
-      </div> 
+      </div>
     </div>
   `;
 
@@ -227,10 +242,10 @@ async function confirmDelete(id, imageName) {
     const result = await response.json();
 
     if (result.success) {
-      showAlert("Gambar berhasil dihapus!", "success");
+      showToast("success", "Gambar berhasil dihapus");
       loadGallery();
     } else {
-      showAlert(result.message || "Gagal menghapus gambar!", "danger");
+      showToast("error", result.message || "Gagal menghapus gambar!");
     }
   } catch (error) {
     console.error("Error:", error);
@@ -258,4 +273,20 @@ function showAlert(message, type) {
       alertDiv.remove();
     }
   }, 5000);
+}
+
+// Function untuk menampilkan toast notification
+function showToast(type, message) {
+  Swal.fire({
+    toast: true,
+    position: "top-end",
+    icon: type,
+    title: message,
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+    customClass: {
+      popup: "colored-toast",
+    },
+  });
 }
