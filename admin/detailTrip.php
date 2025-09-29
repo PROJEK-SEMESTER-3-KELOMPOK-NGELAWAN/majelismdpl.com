@@ -2,11 +2,9 @@
 require_once 'auth_check.php';
 require_once '../backend/koneksi.php';
 
-
-
 $id = $_GET['id'] ?? null;
 
-// Ambil data tabel
+// Ambil data tabel paket_trips
 $trip = [];
 if ($id) {
   $stmtTrip = $conn->prepare("SELECT * FROM paket_trips WHERE id_trip = ?");
@@ -29,6 +27,7 @@ if (!$trip) {
   ];
 }
 
+// Ambil data detail_trips
 $detail = [];
 if ($id) {
   $stmtDetail = $conn->prepare("SELECT * FROM detail_trips WHERE id_trip = ?");
@@ -69,7 +68,7 @@ if (!$detail) {
     }
 
     .container-detail {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: auto;
       background: #fff;
       border-radius: 16px;
@@ -84,38 +83,57 @@ if (!$detail) {
       letter-spacing: 1.2px;
     }
 
+    /* Header opsi pertama */
+
     .trip-header {
       display: flex;
+      align-items: center;
       gap: 25px;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 15px 20px;
+      border-radius: 14px;
       margin-bottom: 30px;
-      flex-wrap: wrap;
+      box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
     }
 
     .trip-image {
-      max-width: 320px;
-      flex-shrink: 0;
-      border-radius: 14px;
+      width: 140px;
+      height: 140px;
+      border-radius: 12px;
       object-fit: cover;
-      height: 220px;
-      width: 200px;
-      box-shadow: 0 4px 16px rgba(169, 124, 80, 0.3);
+      box-shadow: 0 4px 14px rgba(169, 124, 80, 0.4);
+    }
+
+    .trip-info {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .trip-info h1 {
-      margin-bottom: 12px;
+      font-weight: 800;
+      font-size: 1.9rem;
+      margin-bottom: 6px;
+      color: #a97c50;
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
 
     .badge-status {
-      text-transform: uppercase;
-      font-weight: 700;
-      padding: 6px 14px;
+      font-size: 0.9rem;
+      padding: 6px 16px;
       border-radius: 14px;
       background-color: #63c494;
       color: white;
-      font-size: 0.85em;
+      font-weight: 700;
+      width: auto;
+      max-width: max-content;
+      white-space: nowrap;
       display: inline-block;
-      margin-bottom: 18px;
-      width: max-content;
+      margin-bottom: 12px;
+      text-transform: uppercase;
     }
 
     .badge-status.sold {
@@ -123,43 +141,71 @@ if (!$detail) {
     }
 
     .trip-meta {
-      font-size: 1em;
-      color: #444;
-      margin-bottom: 30px;
+      font-size: 0.95rem;
+      color: #695a3a;
       display: flex;
+      gap: 24px;
       flex-wrap: wrap;
-      gap: 14px 28px;
+      font-weight: 600;
     }
 
     .trip-meta span {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-weight: 600;
-      color: #695a3a;
+      white-space: nowrap;
     }
 
-    .trip-price {
-      font-size: 1.6em;
+    /* Harga dan rating */
+    .trip-extra {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      margin-top: 12px;
       font-weight: 700;
+      color: #a97c50;
+    }
+
+    .trip-extra .price {
+      font-size: 1.4rem;
+      font-weight: 900;
       color: #2ea564;
-      margin-bottom: 40px;
+    }
+
+    .trip-extra .rating {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #a97c50;
+      font-size: 1rem;
+    }
+
+    .trip-extra .rating i {
+      color: #ffd700;
+      font-size: 1.2rem;
     }
 
     .info-box {
       background: white;
       border-radius: 18px;
-      box-shadow: 0 2px 12px rgba(30, 30, 50, 0.05);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
       padding: 25px 25px 18px 25px;
       margin-bottom: 30px;
-      color: #ebebeb;
-      border: 2px solid #d9b680;
+      color: black;
+      border: none;
     }
 
     .section-title {
       color: #a97c50;
       margin-bottom: 18px;
       font-size: 1.7em;
+    }
+
+    /* Icon di judul section */
+    .section-title i {
+      margin-right: 8px;
+      font-size: 1em;
+      vertical-align: middle;
     }
 
     .section-content p {
@@ -199,6 +245,27 @@ if (!$detail) {
     .btn-add-detail:hover {
       background-color: #7a5f34;
     }
+
+    /* Tombol kembali */
+    .btn-back {
+      background-color: #d9d9d9;
+      color: #444;
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 10px 24px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-back:hover {
+      background-color: #a97c50;
+      color: white;
+      text-decoration: none;
+    }
   </style>
 </head>
 
@@ -206,7 +273,7 @@ if (!$detail) {
   <div class="container-detail">
 
     <div class="trip-header">
-      <img id="tripGambar" src="<?= $trip['gambar'] ? '../' . htmlspecialchars($trip['gambar']) : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80' ?>" alt="" class="trip-image" />
+      <img id="tripGambar" src="<?= $trip['gambar'] ? '../' . htmlspecialchars($trip['gambar']) : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80' ?>" alt="Foto Gunung" class="trip-image" />
       <div class="trip-info">
         <h1 id="tripJudul"><?= htmlspecialchars($trip['nama_gunung']) ?></h1>
         <div id="tripStatus" class="badge-status <?= $trip['status'] !== 'available' ? 'sold' : '' ?>">
@@ -219,8 +286,16 @@ if (!$detail) {
           <span><i class="bi bi-flag"></i> <span id="tripJenis"><?= htmlspecialchars($trip['jenis_trip']) ?></span></span>
           <span><i class="bi bi-signpost-2"></i> Via <span id="tripVia"><?= htmlspecialchars($trip['via_gunung']) ?></span></span>
         </div>
-        <div class="trip-price" id="tripHarga">
-          Rp <?= isset($trip['harga']) && is_numeric($trip['harga']) ? number_format($trip['harga']) : '0' ?>
+        <div class="trip-extra">
+          <div class="price">Rp <?= isset($trip['harga']) && is_numeric($trip['harga']) ? number_format($trip['harga'], 0, ',', '.') : '0' ?></div>
+          <div class="rating" title="Rating Trip">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-half"></i>
+            <i class="bi bi-star"></i>
+            <span>(4.5)</span>
+          </div>
         </div>
       </div>
     </div>
@@ -228,28 +303,31 @@ if (!$detail) {
     <button class="btn-add-detail" id="btnTambahDetailTrip"><i class="bi bi-plus-circle"></i> Tambah/Edit Detail Trip</button>
 
     <section class="info-box">
-      <h2 class="section-title">Meeting Point</h2>
+      <h2 class="section-title"><i class="bi bi-geo-alt-fill"></i> Meeting Point</h2>
       <div class="section-content">
         <p><strong>Lokasi :</strong> <?= htmlspecialchars($detail['nama_lokasi']) ?></p>
         <p><strong>Alamat :</strong> <?= nl2br(htmlspecialchars($detail['alamat'])) ?></p>
         <p><strong>Waktu Kumpul :</strong> <?= htmlspecialchars($detail['waktu_kumpul']) ?></p>
       </div>
     </section>
+
     <section class="info-box">
-      <h2 class="section-title">Include</h2>
+      <h2 class="section-title"><i class="bi bi-check2-square"></i> Include</h2>
       <div class="section-content"><?= nl2br(htmlspecialchars($detail['include'])) ?></div>
     </section>
+
     <section class="info-box">
-      <h2 class="section-title">Exclude</h2>
+      <h2 class="section-title"><i class="bi bi-x-square"></i> Exclude</h2>
       <div class="section-content"><?= nl2br(htmlspecialchars($detail['exclude'])) ?></div>
     </section>
+
     <section class="info-box">
-      <h2 class="section-title">Syarat & Ketentuan</h2>
+      <h2 class="section-title"><i class="bi bi-file-text"></i> Syarat & Ketentuan</h2>
       <div class="section-content"><?= nl2br(htmlspecialchars($detail['syaratKetentuan'])) ?></div>
     </section>
 
     <section class="info-box">
-      <h2 class="section-title">Lokasi Meeting Point di Google Map</h2>
+      <h2 class="section-title"><i class="bi bi-map"></i> Lokasi Meeting Point di Google Map</h2>
       <?php
       $linkMap = trim($detail['link_map']);
 
@@ -277,6 +355,12 @@ if (!$detail) {
       }
       ?>
     </section>
+
+    <div class="d-flex justify-content-start mb-4">
+      <a href="trip.php" class="btn-back">
+        <i class="bi bi-arrow-left-circle"></i> Kembali ke Menu Trip
+      </a>
+    </div>
 
   </div>
 
@@ -334,6 +418,7 @@ if (!$detail) {
       </form>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.getElementById('btnTambahDetailTrip').addEventListener('click', function() {

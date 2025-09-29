@@ -315,32 +315,37 @@ require_once 'auth_check.php';
 
     .badge {
       font-weight: 600;
-      font-size: 11px;
-      padding: 5px 11px;
-      border-radius: 10px;
-      letter-spacing: 0.6px;
-      color: #000000ff;
-      font-size: 15px;
+      font-size: 13px;
+      padding: 5px 12px;
+      border-radius: 14px;
+      display: inline-block;
+      min-width: 70px;
+      text-align: center;
     }
 
-    .badge-success {
-      background: #13a362;
-      color: #fff;
+    .badge-delete {
+      background-color: #c94f44;
+      color: white;
     }
 
-    .badge-warning {
-      background: #ffd49c;
+    .badge-pending {
+      background-color: #ffd49c;
       color: #432f17;
     }
 
-    .badge-danger {
-      background: #c94f44;
-      color: #fff;
+    .badge-success {
+      background-color: #13a362;
+      color: white;
     }
 
     .badge-info {
-      background: #67caff;
-      color: #fff;
+      background-color: #13a362;
+      color: white;
+    }
+
+    .badge-update {
+      background-color: #67caff;
+      color: white;
     }
   </style>
 </head>

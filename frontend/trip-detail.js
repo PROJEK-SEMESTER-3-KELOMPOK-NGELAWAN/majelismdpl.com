@@ -51,4 +51,3 @@ document.getElementById("formDetailTrip")?.addEventListener("submit", function (
       }
     });
 });
-
