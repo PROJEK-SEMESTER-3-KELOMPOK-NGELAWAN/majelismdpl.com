@@ -472,6 +472,256 @@ body {
   }
 }
 
+/* === DESTINATION CAROUSEL === */
+.destination-carousel {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  margin: 60px auto;
+  padding: 0 60px;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.carousel-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.carousel-btn.prev {
+  left: 10px;
+}
+
+.carousel-btn.next {
+  right: 10px;
+}
+
+.carousel-btn i {
+  font-size: 18px;
+  color: #333;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 10px 0 20px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* === DESTINATION CARD === */
+.destination-card {
+  min-width: 320px;
+  max-width: 320px;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.destination-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.card-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.destination-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+.availability-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: lowercase;
+  color: white;
+  z-index: 5;
+}
+
+.availability-badge.available {
+  background: #28a745;
+}
+
+.availability-badge.sold {
+  background: #dc3545;
+}
+
+.availability-badge::before {
+  content: "✓ ";
+  margin-right: 4px;
+}
+
+.card-content {
+  padding: 24px;
+}
+
+.card-date-duration {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #666;
+}
+
+.card-date::before {
+  content: "📅 ";
+  margin-right: 4px;
+}
+
+.card-duration::before {
+  content: "🕐 ";
+  margin-right: 4px;
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.card-type {
+  margin-bottom: 16px;
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: #f8f9fa;
+  color: #333;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.type-badge::before {
+  content: "🏕️ ";
+  margin-right: 6px;
+}
+
+.card-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.rating-star {
+  margin-right: 4px;
+}
+
+.rating-number {
+  font-weight: 600;
+  margin-right: 8px;
+  color: #333;
+}
+
+.rating-reviews {
+  color: #666;
+}
+
+.card-location {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.location-icon {
+  margin-right: 8px;
+}
+
+.card-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #28a745;
+}
+
+/* === ERROR & LOADING STATES === */
+.no-trips,
+.error-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+}
+
+.no-trips p,
+.error-message p {
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+}
+
+/* Loading spinner */
+.spinner-border {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  vertical-align: text-bottom;
+  border: 0.25em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.text-primary {
+  color: #007bff;
+}
+
 /* === LOGIN / SIGNUP MODAL === */
 .modal {
   display: none;
@@ -553,7 +803,6 @@ body {
 }
 .close-btn {
   color: #fff !important;
-  /* ...aturan lain tetap... */
   position: absolute;
   top: 15px;
   right: 20px;
@@ -638,62 +887,6 @@ section {
   font-weight: bold;
 }
 
-.destination-carousel {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  margin: 0 auto 50px auto;
-  padding: 8px 0 28px 0;
-}
-
-.carousel-track {
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  display: flex;
-}
-
-.row.flex-nowrap {
-  display: flex;
-  flex-wrap: nowrap !important;
-  gap: 24px;
-}
-
-.carousel-btn {
-  position: absolute;
-  top: 40%;
-  z-index: 10;
-  background: #fff;
-  border: none;
-  border-radius: 50%;
-  box-shadow: 0 2px 12px #0002;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3em;
-  cursor: pointer;
-  transition: background 0.14s, color 0.15s;
-}
-.carousel-btn.prev {
-  left: -18px;
-}
-.carousel-btn.next {
-  right: -18px;
-}
-.carousel-btn:hover {
-  background: #b49666;
-  color: #fff;
-}
-
-.col-md-4 {
-  min-width: 320px;
-  max-width: 320px;
-}
-
-.fade-text {
-  animation: fadeinUp 0.7s;
-}
 @keyframes fadeinUp {
   from {
     opacity: 0;
@@ -705,31 +898,32 @@ section {
   }
 }
 
-.card {
-  transition: transform 0.18s cubic-bezier(0.58, 0.24, 0.62, 1.11),
-    box-shadow 0.17s;
-}
-.card:hover {
-  transform: scale(1.045) translateY(-6px);
-  box-shadow: 0 8px 32px -2px #8b5e3c33, 0 4px 18px #b4966612;
-}
-
-/* Dukungan responsive mobile */
-@media (max-width: 768px) {
-  .col-md-4 {
-    min-width: 89vw;
-    max-width: 99vw;
-  }
-  .carousel-btn.prev,
-  .carousel-btn.next {
-    display: none;
-  }
-  .row.flex-nowrap {
-    gap: 12px;
-  }
+.fade-text {
+  animation: fadeinUp 0.7s;
 }
 
 /* === TESTIMONIAL CARD === */
+.testimonials {
+  padding: 60px 20px;
+  background: #f8f9fa;
+}
+
+.testimonials .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.testimonials h2 {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.title-large {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+}
+
 .testimonial-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -745,6 +939,12 @@ section {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .testimonial-text {
@@ -791,7 +991,8 @@ section {
   }
 }
 
-footer {
+/* === FOOTER === */
+.footer {
   background: #8b5e2e;
   color: #fff;
   padding: 40px 20px 20px;
@@ -920,6 +1121,8 @@ footer {
   gap: 10px;
   transition: background-color 0.3s;
   font-family: Arial, sans-serif;
+  border: none;
+  cursor: pointer;
 }
 
 .whatsapp-button:hover {
@@ -928,6 +1131,45 @@ footer {
 
 .whatsapp-button i {
   font-size: 20px;
+}
+
+/* === RESPONSIVE CAROUSEL === */
+@media (max-width: 768px) {
+  .destination-carousel {
+    padding: 0 20px;
+  }
+
+  .carousel-btn {
+    display: none;
+  }
+
+  .destination-card {
+    min-width: 280px;
+    max-width: 280px;
+  }
+
+  .card-content {
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .destination-card {
+    min-width: 260px;
+    max-width: 260px;
+  }
+
+  .card-content {
+    padding: 16px;
+  }
+
+  .destination-carousel {
+    padding: 0 10px;
+  }
 }
 
 /* === ANIMATIONS === */

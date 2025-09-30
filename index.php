@@ -338,69 +338,19 @@
 
   <div class="destination-carousel">
     <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+
     <div class="carousel-track">
-      <!-- CARD trip di-generate di sini -->
-      <div class="row g-4 flex-nowrap" style="flex-wrap:nowrap;">
-        <?php if (empty($trips)): ?>
-          <div class="d-flex justify-content-center align-items-center" style="height:60vh;">
-            <p class="text-muted fs-4 fade-text">🚫 Belum ada jadwal trip.</p>
-          </div>
-        <?php else: ?>
-          <?php foreach ($trips as $trip): ?>
-            <div class="col-md-4 fade-text" style="min-width:320px; max-width:320px;">
-              <div class="card shadow-sm border-0 rounded-4 h-100 text-center">
-                <div class="position-relative">
-                  <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2 
-                  <?= $trip['status'] == "sold" ? "bg-danger" : "bg-success" ?>">
-                    <i class="bi <?= $trip['status'] == "sold" ? "bi-x-circle-fill" : "bi-check-circle-fill" ?>"></i>
-                    <?= $trip['status'] == "sold" ? "Sold" : "Available" ?>
-                  </span>
-                  <img src="../img/<?= $trip['gambar'] ?>" class="card-img-top rounded-top-4"
-                    alt="<?= $trip['nama_gunung'] ?>" style="height:200px; object-fit:cover;">
-                </div>
-                <div class="card-body text-center">
-                  <div class="d-flex justify-content-between small text-muted mb-2">
-                    <span><i class="bi bi-calendar-event"></i> <?= date("d M Y", strtotime($trip['tanggal'])) ?></span>
-                    <span><i class="bi bi-clock"></i>
-                      <?= $trip['jenis_trip'] == "Camp" ? $trip['durasi'] : "1 hari" ?></span>
-                  </div>
-                  <h5 class="card-title fw-bold"><?= $trip['nama_gunung'] ?></h5>
-                  <div class="mb-2">
-                    <span class="badge bg-secondary">
-                      <i class="bi bi-flag-fill"></i> <?= $trip['jenis_trip'] ?>
-                    </span>
-                  </div>
-                  <div class="small text-muted mb-2">
-                    <i class="bi bi-star-fill text-warning"></i> 5 (<?= rand(101, 300) ?>+ ulasan)
-                  </div>
-                  <div class="small text-muted mb-2">
-                    <i class="bi bi-signpost-2"></i> Via <?= $trip['via_gunung'] ?? '-' ?>
-                  </div>
-                  <h5 class="fw-bold text-success mb-3">
-                    Rp <?= number_format((int) str_replace(['.', ','], '', $trip['harga']), 0, ',', '.') ?>
-                  </h5>
-                  <div class="d-flex justify-content-between">
-                    <a href="trip_detail.php?id=<?= $trip['id'] ?>" class="btn btn-info btn-sm">
-                      <i class="bi bi-eye"></i> Detail
-                    </a>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                      data-bs-target="#editModal<?= $trip['id'] ?>">
-                      <i class="bi bi-pencil-square"></i> Edit
-                    </button>
-                    <a href="trip.php?hapus=<?= $trip['id'] ?>" onclick="return confirm('Hapus trip ini?');"
-                      class="btn btn-danger btn-sm">
-                      <i class="bi bi-trash"></i> Hapus
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php endif; ?>
+      <!-- Loading spinner sementara -->
+      <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 200px;">
+        <div class="spinner-border text-primary" role="status">
+          <span style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">Loading...</span>
+        </div>
       </div>
     </div>
+
     <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
   </div>
+
 
 
   <!-- Testimonials -->
@@ -483,14 +433,14 @@
               </svg>
             </button>
           </div>
-          
+
           <button type="submit" class="btn-login">Masuk</button>
           <div style="text-align:center;margin-top:13px;">
             <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
               Lupa password?
             </a>
           </div>
-          
+
           <!-- Tombol Login dengan Google -->
           <div class="divider">
             <span>atau</span>

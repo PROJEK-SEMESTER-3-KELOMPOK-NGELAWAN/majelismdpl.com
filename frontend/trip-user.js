@@ -1,29 +1,155 @@
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('backend/trip-api.php?action=getTrips')
-        .then(response => response.json())
-        .then(trips => {
-            const track = document.querySelector('.carousel-track');
-            track.innerHTML = ''; // Hapus card statis (jika ada)
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("Trip-user.js loaded");
 
-            trips.forEach(trip => {
-                const card = document.createElement('div');
-                card.className = 'destination-card';
-                card.innerHTML = `
-                    <img src="${trip.gambar}" alt="${trip.nama_gunung}" />
-                    <div class="card-info">
-                        <div class="card-title">${trip.nama_gunung}</div>
-                        <div class="card-meta">
-                            <i class="fas fa-map-marker-alt"></i> ${trip.via_gunung} &nbsp; 
-                            <i class="fas fa-star"></i> 5
-                        </div>
-                        <div class="card-price">Rp. ${Number(trip.harga).toLocaleString('id-ID')}</div>
-                    </div>
-                `;
-                track.appendChild(card);
-            });
-        })
-        .catch(err => {
-            alert('Gagal mengambil daftar trip!');
-            console.error(err);
+  fetch("backend/trip-api.php?action=getTrips")
+    .then((response) => {
+      console.log("API Response status:", response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((trips) => {
+      console.log("Trips loaded:", trips);
+
+      const carousel = document.querySelector(
+        ".destination-carousel .carousel-track"
+      );
+      if (!carousel) {
+        console.error("Carousel track tidak ditemukan");
+        return;
+      }
+
+      carousel.innerHTML = "";
+
+      if (trips.length === 0) {
+        carousel.innerHTML = `
+          <div class="no-trips">
+            <p>🚫 Belum ada jadwal trip.</p>
+          </div>
+        `;
+        return;
+      }
+
+      trips.forEach((trip) => {
+        console.log("Processing trip:", trip.nama_gunung);
+        console.log("Image from database:", trip.gambar);
+
+        // Format tanggal
+        const date = new Date(trip.tanggal);
+        const formattedDate = date.toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
         });
+
+        // Format harga
+        const price = Number(trip.harga);
+        const formattedPrice = price.toLocaleString("id-ID");
+
+        const card = document.createElement("div");
+        card.className = "destination-card";
+
+        // Path gambar - karena database hanya simpan nama file
+        let imagePath;
+        if (trip.gambar && trip.gambar.trim() !== "") {
+          // Jika gambar sudah berisi path lengkap (data lama)
+          if (trip.gambar.startsWith("img/")) {
+            imagePath = trip.gambar;
+          } else {
+            // Jika hanya nama file (data baru)
+            imagePath = `img/${trip.gambar}`;
+          }
+        } else {
+          imagePath = "img/default-mountain.jpg";
+        }
+
+        console.log("Final image path:", imagePath);
+
+        card.innerHTML = `
+          <div class="card-image-container">
+            <span class="availability-badge ${
+              trip.status === "sold" ? "sold" : "available"
+            }">
+              ${trip.status === "sold" ? "sold" : "available"}
+            </span>
+            <img src="${imagePath}" 
+                 alt="${trip.nama_gunung}" 
+                 class="card-image" 
+                 onload="console.log('✅ Image loaded:', '${imagePath}')"
+                 onerror="console.error('❌ Image failed:', '${imagePath}'); this.style.backgroundColor='#f0f0f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.innerHTML='🏔️'; this.style.fontSize='48px'; this.style.color='#ccc';">
+          </div>
+          <div class="card-content">
+            <div class="card-date-duration">
+              <span class="card-date">${formattedDate}</span>
+              <span class="card-duration">${
+                trip.jenis_trip === "camp"
+                  ? trip.durasi || "2 Hari 1 Malam"
+                  : "2 Hari 1 Malam"
+              }</span>
+            </div>
+            <h3 class="card-title">${trip.nama_gunung}</h3>
+            <div class="card-type">
+              <span class="type-badge">${trip.jenis_trip}</span>
+            </div>
+            <div class="card-rating">
+              <span class="rating-star">⭐</span>
+              <span class="rating-number">5</span>
+              <span class="rating-reviews">(${
+                Math.floor(Math.random() * 200) + 228
+              }+ ulasan)</span>
+            </div>
+            <div class="card-location">
+              <span class="location-icon">🚩</span>
+              <span>Via ${trip.via_gunung || "paltuding"}</span>
+            </div>
+            <div class="card-price">
+              Rp ${formattedPrice}
+            </div>
+          </div>
+        `;
+
+        carousel.appendChild(card);
+      });
+
+      setupCarouselNavigation();
+      console.log("✅ Total cards created:", carousel.children.length);
+    })
+    .catch((err) => {
+      console.error("❌ Error fetching trips:", err);
+      const carousel = document.querySelector(
+        ".destination-carousel .carousel-track"
+      );
+      if (carousel) {
+        carousel.innerHTML = `
+          <div class="error-message">
+            <p>❌ Gagal memuat data trip: ${err.message}</p>
+          </div>
+        `;
+      }
+    });
 });
+
+function setupCarouselNavigation() {
+  const prevBtn = document.querySelector(".destination-carousel .prev");
+  const nextBtn = document.querySelector(".destination-carousel .next");
+  const track = document.querySelector(".destination-carousel .carousel-track");
+
+  if (prevBtn && nextBtn && track) {
+    console.log("✅ Carousel navigation setup successful");
+
+    prevBtn.addEventListener("click", () => {
+      track.scrollBy({
+        left: -340,
+        behavior: "smooth",
+      });
+    });
+
+    nextBtn.addEventListener("click", () => {
+      track.scrollBy({
+        left: 340,
+        behavior: "smooth",
+      });
+    });
+  }
+}
