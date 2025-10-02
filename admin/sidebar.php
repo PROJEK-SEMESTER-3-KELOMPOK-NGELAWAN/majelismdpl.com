@@ -21,6 +21,10 @@ require_once 'auth_check.php';
             <i class="bi bi-bar-chart"></i>
             <span class="link-text">Dashboard</span>
         </a>
+        <a href="master-admin.php" class="sidebar-link <?= basename($_SERVER['PHP_SELF']) == 'user.php' ? 'active' : '' ?>" data-tooltip="User">
+            <i class="bi bi-person-gear"></i>
+            <span class="link-text">Master Admin</span>
+        </a>
         <a href="trip.php" class="sidebar-link <?= basename($_SERVER['PHP_SELF']) == 'trip.php' ? 'active' : '' ?>" data-tooltip="Trip">
             <i class="bi bi-signpost-split"></i>
             <span class="link-text">Trip</span>
@@ -66,29 +70,32 @@ require_once 'auth_check.php';
     font-size: 16px;
 }
 
-/* Custom Sidebar - Default terbuka */
+/* Custom Sidebar - Default terbuka dengan scroll */
 .custom-sidebar {
     position: fixed;
     top: 0;
     left: 0;
     width: 280px;
     height: 100vh;
-    background: #a97c50; /* Warna yang diminta */
+    background: #a97c50;
     z-index: 1055;
     transition: width 0.3s ease;
-    overflow: visible;
+    overflow: hidden; /* Mencegah overflow di sidebar utama */
     box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column; /* Untuk layout yang lebih baik */
 }
 
 /* Ketika sidebar collapsed - jadi mini sidebar */
 .custom-sidebar.collapsed {
-    width: 70px; /* Mini sidebar dengan icon saja */
+    width: 70px;
 }
 
-/* Hamburger Button Container */
+/* Hamburger Button Container - Fixed position */
 .sidebar-toggle-container {
     padding: 15px;
     border-bottom: 1px solid rgba(255,255,255,0.2);
+    flex-shrink: 0; /* Tidak akan menyusut */
 }
 
 /* Sidebar Toggle Button di dalam sidebar */
@@ -113,12 +120,13 @@ require_once 'auth_check.php';
     transform: scale(1.1);
 }
 
-/* Sidebar Header */
+/* Sidebar Header - Fixed position */
 .sidebar-header {
     padding: 20px;
     text-align: center;
     border-bottom: 1px solid rgba(255,255,255,0.2);
     transition: all 0.3s ease;
+    flex-shrink: 0; /* Tidak akan menyusut */
 }
 
 /* Ketika collapsed, sembunyikan logo dan title */
@@ -152,11 +160,39 @@ require_once 'auth_check.php';
     transition: all 0.3s ease;
 }
 
-/* Sidebar Navigation */
+/* Sidebar Navigation - Scrollable area */
 .custom-sidebar-nav {
+    flex: 1; /* Mengisi sisa ruang yang tersedia */
     padding: 15px 10px;
-    overflow-y: auto;
-    height: calc(100vh - 160px);
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Hide horizontal scrolling */
+    /* Custom scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
+
+/* Custom scrollbar untuk webkit browsers (Chrome, Safari, Edge) */
+.custom-sidebar-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-sidebar-nav::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255,0.3);
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+
+.custom-sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255,255,255,0.5);
+}
+
+/* Collapsed sidebar scrollbar */
+.custom-sidebar.collapsed .custom-sidebar-nav::-webkit-scrollbar {
+    width: 4px;
 }
 
 .sidebar-link {
@@ -170,6 +206,7 @@ require_once 'auth_check.php';
     transition: all 0.3s ease;
     font-size: 15px;
     position: relative;
+    flex-shrink: 0; /* Mencegah menu menyusut */
 }
 
 .sidebar-link:hover {
@@ -191,11 +228,14 @@ require_once 'auth_check.php';
     text-align: center;
     margin-right: 15px;
     transition: all 0.3s ease;
+    flex-shrink: 0; /* Icon tidak akan menyusut */
 }
 
 .sidebar-link .link-text {
     transition: all 0.3s ease;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Ketika sidebar collapsed */
@@ -229,6 +269,7 @@ require_once 'auth_check.php';
     white-space: nowrap;
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    pointer-events: none; /* Mencegah interferensi dengan tooltip */
 }
 
 .custom-sidebar.collapsed .sidebar-link:hover::before {
@@ -240,6 +281,7 @@ require_once 'auth_check.php';
     border: 5px solid transparent;
     border-right-color: #333;
     z-index: 1000;
+    pointer-events: none;
 }
 
 .sidebar-link.logout-link:hover {
@@ -252,9 +294,10 @@ require_once 'auth_check.php';
 .main,
 .container-fluid,
 .content {
-    margin-left: 280px; /* Default dengan sidebar terbuka */
+    margin-left: 280px;
     transition: margin-left 0.3s ease;
     padding: 20px;
+    min-height: 100vh; /* Pastikan konten utama bisa di-scroll */
 }
 
 /* Ketika sidebar collapsed */
@@ -262,13 +305,13 @@ body.sidebar-collapsed .main-content,
 body.sidebar-collapsed .main,
 body.sidebar-collapsed .container-fluid,
 body.sidebar-collapsed .content {
-    margin-left: 70px; /* Adjust untuk mini sidebar */
+    margin-left: 70px;
 }
 
 /* Responsive untuk mobile */
 @media (max-width: 768px) {
     .custom-sidebar {
-        left: -280px; /* Default tertutup di mobile */
+        left: -280px;
         width: 280px;
     }
     
@@ -281,7 +324,7 @@ body.sidebar-collapsed .content {
     .main,
     .container-fluid,
     .content {
-        margin-left: 0 !important; /* Selalu full width di mobile */
+        margin-left: 0 !important;
     }
     
     /* Mobile overlay */
@@ -302,6 +345,16 @@ body.sidebar-collapsed .content {
         opacity: 1;
         visibility: visible;
     }
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Prevent horizontal scroll on body */
+body {
+    overflow-x: hidden;
 }
 </style>
 
@@ -391,6 +444,13 @@ document.addEventListener('DOMContentLoaded', function() {
             location.reload(); // Reload untuk reset state
         }
     });
+    
+    // Smooth scroll untuk sidebar navigation
+    const sidebarNav = document.querySelector('.custom-sidebar-nav');
+    if (sidebarNav) {
+        // Prevent scroll momentum on iOS
+        sidebarNav.style.webkitOverflowScrolling = 'touch';
+    }
 });
 
 // Toast function
