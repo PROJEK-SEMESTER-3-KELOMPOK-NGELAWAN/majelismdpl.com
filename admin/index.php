@@ -1,8 +1,36 @@
 <?php
 require_once 'auth_check.php';
 
-?>
+// Debug dan perbaiki session username
+if (!isset($_SESSION['username']) || empty($_SESSION['username']) || $_SESSION['username'] === 'root') {
+    // Jika session bermasalah, ambil dari database
+    if (isset($_SESSION['id_user']) && !empty($_SESSION['id_user'])) {
+        require_once '../backend/koneksi.php';
+        $stmt = $conn->prepare("SELECT username, role FROM users WHERE id_user = ?");
+        $stmt->bind_param("i", $_SESSION['id_user']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+        }
+        $stmt->close();
+    }
+}
 
+// Ambil username dari session dengan fallback yang lebih baik
+$username = $_SESSION['username'] ?? 'Guest';
+$role = $_SESSION['role'] ?? 'user';
+
+// Jika masih "root" atau kosong, redirect ke login
+if ($username === 'root' || $username === 'Guest' || empty($username)) {
+    session_destroy();
+    header('Location: ../login.php?error=session_invalid');
+    exit;
+}
+?>
 
 <!DOCTYPE html>
 <html lang="id">
@@ -203,10 +231,84 @@ require_once 'auth_check.php';
       background: #432f17;
       color: #ffe8c8;
       border-radius: 19px;
-      padding: 6px 18px;
+      padding: 8px 20px;
       font-weight: 600;
       font-size: 14px;
       box-shadow: 0 2px 8px rgba(169, 124, 80, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .admin-info:hover {
+      background: #a97c50;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(169, 124, 80, 0.2);
+    }
+
+    .admin-info .user-icon {
+      font-size: 16px;
+      color: #ffd49c;
+    }
+
+    .admin-info .user-details {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .admin-info .username {
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .admin-info .role-badge {
+      font-size: 11px;
+      font-weight: 500;
+      color: #ffd49c;
+      opacity: 0.9;
+      text-transform: capitalize;
+      letter-spacing: 0.3px;
+    }
+
+    /* Responsive admin info */
+    @media (max-width: 800px) {
+      .admin-info {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      
+      .admin-info .user-details {
+        display: none;
+      }
+      
+      .admin-info .username {
+        font-size: 12px;
+      }
+      
+      .main-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      
+      .main-header h2 {
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .admin-info {
+        padding: 5px 10px;
+      }
+      
+      .admin-info .username {
+        display: none;
+      }
     }
 
     .cards {
@@ -347,6 +449,29 @@ require_once 'auth_check.php';
       background-color: #67caff;
       color: white;
     }
+
+    /* Welcome message enhancement */
+    .welcome-section {
+      background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
+      color: white;
+      padding: 20px 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 15px rgba(169, 124, 80, 0.2);
+    }
+
+    .welcome-section h3 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .welcome-section p {
+      margin: 5px 0 0 0;
+      opacity: 0.9;
+      font-size: 14px;
+    }
   </style>
 </head>
 
@@ -358,8 +483,27 @@ require_once 'auth_check.php';
   <main class="main">
     <div class="main-header">
       <h2>Dashboard Admin</h2>
-      <div class="admin-info"><i class="bi bi-person-circle"></i> Admin</div>
+      <div class="admin-info" title="Pengguna yang sedang login">
+        <i class="bi bi-person-circle user-icon"></i>
+        <div class="user-details">
+          <span class="username"><?php echo htmlspecialchars($username); ?></span>
+          <span class="role-badge"><?php echo htmlspecialchars(ucfirst($role)); ?></span>
+        </div>
+        <span class="username d-lg-none"><?php echo htmlspecialchars($username); ?></span>
+      </div>
     </div>
+
+    <!-- Welcome Section - Fixed untuk tidak menampilkan "root" -->
+    <section class="welcome-section">
+      <h3 id="welcomeMessage">
+        <?php 
+        // Pastikan tidak menampilkan "root"
+        $displayName = ($username && $username !== 'root' && $username !== 'Guest') ? $username : 'Pengguna';
+        echo "Selamat Datang, " . htmlspecialchars($displayName) . "!"; 
+        ?>
+      </h3>
+      <p>Selamat beraktivitas di sistem Majelis MDPL</p>
+    </section>
 
     <!-- SECTION HEADERS INFORMATION -->
     <section class="cards">
@@ -425,14 +569,14 @@ require_once 'auth_check.php';
           ?>
         </tbody>
       </table>
-
     </section>
 
   </main>
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../frontend/dashboard.js"></script>
   <script>
-    // Fitur pencarian realtime pada tabel riwayat aktivitas
+    // JavaScript untuk dynamic greeting
     document.addEventListener('DOMContentLoaded', () => {
       const searchInput = document.getElementById('activitySearchInput');
       const tableBody = document.querySelector('.data-table-section tbody');
@@ -445,6 +589,30 @@ require_once 'auth_check.php';
           row.style.display = text.includes(filter) ? '' : 'none';
         });
       });
+
+      // Dynamic greeting berdasarkan waktu
+      const currentHour = new Date().getHours();
+      let greeting = '';
+      
+      if (currentHour < 10) {
+        greeting = 'Selamat Pagi';
+      } else if (currentHour < 15) {
+        greeting = 'Selamat Siang';
+      } else if (currentHour < 18) {
+        greeting = 'Selamat Sore';
+      } else {
+        greeting = 'Selamat Malam';
+      }
+
+      // Update welcome message dengan greeting yang sesuai waktu
+      const welcomeTitle = document.getElementById('welcomeMessage');
+      const currentUsername = "<?php echo addslashes($displayName); ?>";
+      
+      if (welcomeTitle && currentUsername && currentUsername !== 'root' && currentUsername !== 'Pengguna') {
+        welcomeTitle.innerHTML = `${greeting}, ${currentUsername}!`;
+      } else if (welcomeTitle) {
+        welcomeTitle.innerHTML = `${greeting}!`;
+      }
     });
   </script>
 
