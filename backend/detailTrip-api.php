@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 require_once 'koneksi.php';
 
-session_start(); // Pastikan session dimulai untuk ambil id_user
+session_start();
 $id_user = $_SESSION['id_user'] ?? null;
 
 header('Access-Control-Allow-Origin: *');
@@ -11,6 +11,12 @@ header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $id_trip = $_GET['id_trip'] ?? null;
+    
+    if (!$id_trip) {
+        echo json_encode(['success' => false, 'message' => 'ID trip tidak ditemukan']);
+        exit;
+    }
+    
     $stmt = $conn->prepare("SELECT * FROM detail_trips WHERE id_trip = ?");
     $stmt->bind_param("i", $id_trip);
     $stmt->execute();
@@ -56,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $isUpdate = ($cek->num_rows > 0);
 
-    // UPDATE DETAIL TRIP JIKA SUDAH ADA, INSERT JIKA BELUM ADA
     if ($isUpdate) {
         $stmt = $conn->prepare(
             "UPDATE detail_trips SET nama_lokasi=?, alamat=?, waktu_kumpul=?, link_map=?, `include`=?, `exclude`=?, syaratKetentuan=? WHERE id_trip=?"
@@ -72,7 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cek->close();
 
     if ($stmt->execute()) {
-        // Logging activity jika ada id_user
         if ($id_user) {
             if ($isUpdate) {
                 $aktivitas = "Mengubah detail trip pada Trip ID #$id_trip ($nama_lokasi)";
@@ -96,3 +100,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
     exit;
 }
+?>
