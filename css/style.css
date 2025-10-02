@@ -532,8 +532,8 @@ body {
   display: none;
 }
 
-/* === DESTINATION CARD === */
 .destination-card {
+  position: relative;
   min-width: 320px;
   max-width: 320px;
   background: #fff;
@@ -551,81 +551,85 @@ body {
 }
 
 .card-image-container {
-  position: relative;
-  height: 200px;
+  width: 100%;
+  text-align: center;
+  border-radius: 20px 20px 0 0;
   overflow: hidden;
 }
-
 .card-image {
   width: 100%;
-  height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  height: 180px;
+  border-radius: 20px 20px 0 0;
+}
+
+.status-badge {
+  position: absolute;
+  top: 15px;
+  left: 18px;
+  border-radius: 32px;
+  font-size: 0.90em;
+  font-weight: 650;
+  padding: 3px 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 3;
+}
+.status-badge.available {
+  background: rgba(25, 158, 82, 0.88);
+  color: #fff;
+}
+.status-badge.sold {
+  background: rgba(220, 53, 69, 0.88);
+  color: #fff;
 }
 
 .destination-card:hover .card-image {
   transform: scale(1.05);
 }
 
-.availability-badge {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: lowercase;
-  color: white;
-  z-index: 5;
-}
-
-.availability-badge.available {
-  background: #28a745;
-}
-
-.availability-badge.sold {
-  background: #dc3545;
-}
-
-.availability-badge::before {
-  content: "✓ ";
-  margin-right: 4px;
-}
-
 .card-content {
-  padding: 24px;
+  padding: 1.2rem 1.2rem 1.2rem 1.2rem;
+  text-align: center;
 }
 
-.card-date-duration {
+.card-row-date-duration {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  font-size: 14px;
-  color: #666;
+  margin-bottom: 5px;
+  font-size: 1rem;
+  color: #888;
 }
-
-.card-date::before {
-  content: "📅 ";
-  margin-right: 4px;
-}
-
-.card-duration::before {
-  content: "🕐 ";
-  margin-right: 4px;
+.card-date,
+.card-duration {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .card-title {
-  font-size: 24px;
   font-weight: 700;
-  color: #333;
-  margin-bottom: 16px;
-  line-height: 1.2;
+  color: #222;
+  font-size: 1.35rem;
+  margin: 0.5rem 0;
 }
-
 .card-type {
   margin-bottom: 16px;
+}
+
+.trip-type-badge {
+  background-color: #f3f3f3 !important;
+  color: #444 !important;
+  font-weight: 600;
+  border-radius: 20px;
+  padding: 6px 18px;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto;
 }
 
 .type-badge {
@@ -640,15 +644,30 @@ body {
 }
 
 .type-badge::before {
-  content: "🏕️ ";
   margin-right: 6px;
 }
 
 .card-rating {
+  font-size: 1rem;
+  color: #444;
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
-  font-size: 14px;
+  justify-content: center;
+  gap: 4px;
+}
+
+.card-rating .text-warning {
+  color: #f6a609;
+  font-size: 1.2rem;
+}
+
+.card-location {
+  font-size: 1rem;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
 }
 
 .rating-star {
@@ -665,22 +684,15 @@ body {
   color: #666;
 }
 
-.card-location {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  font-size: 14px;
-  color: #666;
-}
-
 .location-icon {
   margin-right: 8px;
 }
 
 .card-price {
-  font-size: 20px;
+  color: #199e52;
   font-weight: 700;
-  color: #28a745;
+  font-size: 1.5rem;
+  margin-top: 0.2rem;
 }
 
 /* === ERROR & LOADING STATES === */

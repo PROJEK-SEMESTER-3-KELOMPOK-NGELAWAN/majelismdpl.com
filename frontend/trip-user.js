@@ -66,49 +66,51 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("Final image path:", imagePath);
 
-        card.innerHTML = `
-          <div class="card-image-container">
-            <span class="availability-badge ${
-              trip.status === "sold" ? "sold" : "available"
-            }">
-              ${trip.status === "sold" ? "sold" : "available"}
-            </span>
-            <img src="${imagePath}" 
-                 alt="${trip.nama_gunung}" 
-                 class="card-image" 
-                 onload="console.log('✅ Image loaded:', '${imagePath}')"
-                 onerror="console.error('❌ Image failed:', '${imagePath}'); this.style.backgroundColor='#f0f0f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.innerHTML='🏔️'; this.style.fontSize='48px'; this.style.color='#ccc';">
-          </div>
-          <div class="card-content">
-            <div class="card-date-duration">
-              <span class="card-date">${formattedDate}</span>
-              <span class="card-duration">${
-                trip.jenis_trip === "camp"
-                  ? trip.durasi || "2 Hari 1 Malam"
-                  : "2 Hari 1 Malam"
-              }</span>
-            </div>
-            <h3 class="card-title">${trip.nama_gunung}</h3>
-            <div class="card-type">
-              <span class="type-badge">${trip.jenis_trip}</span>
-            </div>
-            <div class="card-rating">
-              <span class="rating-star">⭐</span>
-              <span class="rating-number">5</span>
-              <span class="rating-reviews">(${
-                Math.floor(Math.random() * 200) + 228
-              }+ ulasan)</span>
-            </div>
-            <div class="card-location">
-              <span class="location-icon">🚩</span>
-              <span>Via ${trip.via_gunung || "paltuding"}</span>
-            </div>
-            <div class="card-price">
-              Rp ${formattedPrice}
-            </div>
-          </div>
-        `;
-
+card.innerHTML = `
+  <div class="card-custom">
+    <span class="status-badge ${trip.status === "sold" ? "sold" : "available"}">
+      ${
+        trip.status === "sold"
+          ? '<i class="bi bi-x-circle"></i> Sold'
+          : '<i class="bi bi-check-circle"></i> available'
+      }
+    </span>
+    <div class="card-image-container">
+      <img src="${imagePath}" alt="${trip.nama_gunung}" class="card-image">
+    </div>
+    <div class="card-content">
+      <div class="card-row-date-duration">
+        <span class="card-date">
+          <i class="bi bi-calendar"></i> ${formattedDate}
+        </span>
+        <span class="card-duration">
+          <i class="bi bi-clock"></i> ${
+            trip.jenis_trip === "camp" ? trip.durasi || "1 hari" : "1 hari"
+          }
+        </span>
+      </div>
+      <h3 class="card-title">${trip.nama_gunung}</h3>
+      <div class="card-type mb-2">
+        <span class="badge trip-type-badge bg-light text-dark">
+          <i class="bi bi-flag-fill"></i>
+          ${trip.jenis_trip.charAt(0).toUpperCase() + trip.jenis_trip.slice(1)}
+        </span>
+      </div>
+      <div class="card-rating mb-2">
+        <i class="bi bi-star-fill text-warning"></i>
+        <span class="rating-number">5</span>
+        <span class="rating-reviews">(${Math.floor(Math.random() * 200) + 549}+ ulasan)</span>
+      </div>
+      <div class="card-location mb-2">
+        <i class="bi bi-signpost-2"></i>
+        <span>Via ${trip.via_gunung || "paltuding"}</span>
+      </div>
+      <div class="card-price text-success fw-bold fs-4">
+        Rp ${formattedPrice}
+      </div>
+    </div>
+  </div>
+`;
         carousel.appendChild(card);
       });
 
