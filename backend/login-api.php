@@ -30,20 +30,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['role'] = $user['role'];
             $_SESSION['email'] = $user['email'] ?? '';
             $_SESSION['last_activity'] = time();
-            
+
             // Set flag khusus untuk admin dan super admin
             if (in_array($user['role'], ['admin', 'super_admin'])) {
                 $_SESSION['admin_logged_in'] = true;
-                
+
                 // Extra flag untuk super admin
                 if ($user['role'] === 'super_admin') {
                     $_SESSION['super_admin_logged_in'] = true;
                 }
             }
-            
+
             // Pastikan session tersimpan sebelum redirect
             session_write_close();
-            
+
             // Response dengan role dan redirect info
             $redirect_url = '';
             switch ($user['role']) {
@@ -56,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $redirect_url = 'index.php';
                     break;
             }
-            
+
             echo json_encode([
-                'success' => true, 
+                'success' => true,
                 'role' => $user['role'],
                 'username' => $user['username'],
                 'redirect_url' => $redirect_url,
@@ -72,6 +72,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $stmt->close();
 } else {
-    echo json_encode(['success'=>false,'message'=>'Metode tidak diizinkan']);
+    echo json_encode(['success' => false, 'message' => 'Metode tidak diizinkan']);
 }
-?>

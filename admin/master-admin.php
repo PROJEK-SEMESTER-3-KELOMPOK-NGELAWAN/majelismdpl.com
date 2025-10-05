@@ -26,21 +26,15 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
 
     <style>
         .main {
-            margin-left: 280px; /* Disesuaikan dengan sidebar baru */
+            margin-left: 280px;
             min-height: 100vh;
             padding: 20px 25px;
             background: #f6f0e8;
             transition: margin-left 0.3s ease;
         }
 
-        /* Responsive untuk sidebar collapsed */
         body.sidebar-collapsed .main {
             margin-left: 70px;
-        }
-
-        .main-content {
-            background-color: #f8f9fa;
-            min-height: 100vh;
         }
 
         .content-wrapper {
@@ -81,20 +75,253 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             background: linear-gradient(135deg, #8b6332 0%, #a97c50 100%);
         }
 
-        .btn-warning {
-            background-color: #ffc107;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 12px;
+        /* Compact Modal Styling */
+        .modal-dialog {
+            max-width: 650px;
+            margin: 1.5rem auto;
         }
 
-        .btn-danger {
-            background-color: #dc3545;
+        .modal-content {
+            border-radius: 15px;
             border: none;
-            border-radius: 6px;
-            padding: 6px 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
         }
 
+        .modal-header {
+            background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
+            color: white;
+            border: none;
+            padding: 20px 25px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .btn-close {
+            filter: invert(1);
+            opacity: 0.8;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 25px;
+            background: #ffffff;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            background: #f8f9fa;
+            border: none;
+            gap: 10px;
+        }
+
+        /* Compact Form Styling */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            height: 42px;
+        }
+
+        .form-control:focus {
+            border-color: #a97c50;
+            box-shadow: 0 0 0 0.2rem rgba(169, 124, 80, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .form-control.is-valid {
+            border-color: #28a745;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.94-.94 1.44 1.44L7.86 4.05l-.94-.94L4.86 5.17zM2.3 6.73z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 2.4 2.4M8.2 4.6l-2.4 2.4'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        /* Custom Select Dropdown Styling */
+        .custom-select-wrapper {
+            position: relative;
+        }
+
+        .custom-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px 45px 10px 40px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 42px;
+            width: 100%;
+            background-image: none;
+        }
+
+        .custom-select:focus {
+            border-color: #a97c50;
+            box-shadow: 0 0 0 0.2rem rgba(169, 124, 80, 0.15);
+            outline: none;
+            transform: translateY(-1px);
+        }
+
+        .custom-select:hover {
+            border-color: #a97c50;
+        }
+
+        .custom-select.is-valid {
+            border-color: #28a745;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.94-.94 1.44 1.44L7.86 4.05l-.94-.94L4.86 5.17zM2.3 6.73z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(2.25rem + 0.375rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .custom-select.is-invalid {
+            border-color: #dc3545;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 2.4 2.4M8.2 4.6l-2.4 2.4'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(2.25rem + 0.375rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .select-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a97c50;
+            font-size: 1.1rem;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 0.9rem;
+            pointer-events: none;
+            transition: transform 0.3s ease;
+        }
+
+        .custom-select:focus + .select-arrow {
+            transform: translateY(-50%) rotate(180deg);
+            color: #a97c50;
+        }
+
+        .custom-select option {
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            background: #ffffff;
+            color: #495057;
+        }
+
+        .custom-select option:hover {
+            background: #f8f9fa;
+        }
+
+        .custom-select option[value="admin"] {
+            background: linear-gradient(90deg, rgba(169, 124, 80, 0.1) 0%, transparent 100%);
+            color: #a97c50;
+            font-weight: 500;
+        }
+
+        .custom-select option[value="super_admin"] {
+            background: linear-gradient(90deg, rgba(220, 53, 69, 0.1) 0%, transparent 100%);
+            color: #dc3545;
+            font-weight: 500;
+        }
+
+        /* Input Icons */
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .input-with-icon .form-control {
+            padding-left: 40px;
+        }
+
+        .input-with-icon .form-control:focus + .input-icon {
+            color: #a97c50;
+        }
+
+        /* Role Info Card - Compact */
+        .role-info-card {
+            background: #f8f9fa;
+            border: none;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .role-info-card.role-admin-info {
+            background: linear-gradient(135deg, rgba(169, 124, 80, 0.08) 0%, rgba(169, 124, 80, 0.05) 100%);
+            border-left: 3px solid #a97c50;
+        }
+
+        .role-info-card.role-super-admin-info {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.08) 0%, rgba(220, 53, 69, 0.05) 100%);
+            border-left: 3px solid #dc3545;
+        }
+
+        .form-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        .invalid-feedback {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Table and other existing styles remain the same */
         .table {
             border-radius: 10px;
             overflow: hidden;
@@ -117,33 +344,29 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             background-color: #f8f9fa;
         }
 
-        .modal-header {
-            background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
+        .main-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 32px;
+            padding-bottom: 28px;
+        }
+
+        .main-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #a97c50;
+            margin-bottom: 0;
+            letter-spacing: 1px;
+        }
+
+        .permission-badge {
+            background-color: #28a745;
             color: white;
-            border-radius: 15px 15px 0 0;
-        }
-
-        .modal-content {
-            border-radius: 15px;
-            border: none;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .form-control, .form-select {
-            border-radius: 8px;
-            border: 2px solid #e9ecef;
-            padding: 12px 15px;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: #a97c50;
-            box-shadow: 0 0 0 0.2rem rgba(169, 124, 80, 0.25);
-            outline: none;
-        }
-
-        .form-select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a97c50' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
         }
 
         .badge {
@@ -191,28 +414,42 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             color: white;
         }
 
-        .border-brown {
-            border-color: #a97c50 !important;
+        .btn-warning {
+            background-color: #ffc107;
+            border: none;
+            border-radius: 6px;
         }
 
-        .dataTables_wrapper .dataTables_filter input {
-            border: 2px solid #e9ecef;
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
             border-radius: 6px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
             transition: all 0.3s ease;
         }
 
-        .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #a97c50;
-            box-shadow: 0 0 0 0.2rem rgba(169, 124, 80, 0.25);
-            outline: none;
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
         }
 
+        /* DataTables styling */
+        .dataTables_wrapper .dataTables_filter input,
         .dataTables_wrapper .dataTables_length select {
             border: 2px solid #e9ecef;
             border-radius: 6px;
             transition: all 0.3s ease;
         }
 
+        .dataTables_wrapper .dataTables_filter input:focus,
         .dataTables_wrapper .dataTables_length select:focus {
             border-color: #a97c50;
             box-shadow: 0 0 0 0.2rem rgba(169, 124, 80, 0.25);
@@ -234,56 +471,7 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             border-color: #a97c50;
         }
 
-        .main-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-top: 32px;
-            padding-bottom: 28px;
-        }
-
-        .main-header h2 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #a97c50;
-            margin-bottom: 0;
-            letter-spacing: 1px;
-        }
-
-        .permission-badge {
-            background-color: #28a745;
-            color: white;
-            font-size: 0.7em;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 8px;
-        }
-
-        /* Role Selection Styling */
-        .role-selection-container {
-            position: relative;
-        }
-
-        #roleInfo {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 8px;
-            font-size: 13px;
-            line-height: 1.4;
-        }
-
-        .role-admin-info {
-            border-left: 4px solid #a97c50 !important;
-            background: rgba(169, 124, 80, 0.05) !important;
-        }
-
-        .role-super-admin-info {
-            border-left: 4px solid #dc3545 !important;
-            background: rgba(220, 53, 69, 0.05) !important;
-        }
-
+        /* Responsive Design */
         @media (max-width: 768px) {
             .main {
                 margin-left: 0 !important;
@@ -293,12 +481,13 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
                 padding: 15px;
             }
 
-            .main-header {
-                padding: 20px;
+            .modal-dialog {
+                margin: 1rem;
+                max-width: calc(100vw - 2rem);
             }
 
-            .table-responsive {
-                border-radius: 10px;
+            .modal-body {
+                padding: 20px 15px;
             }
         }
     </style>
@@ -370,15 +559,15 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
         </div>
     </div>
 
-    <!-- User Modal -->
+    <!-- Compact User Modal -->
     <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="userModalLabel">
                         <i class="bi bi-shield-plus"></i> <span id="modalTitle">Tambah Administrator Baru</span>
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
@@ -387,74 +576,105 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
                         <input type="hidden" id="actionType" name="action" value="create">
 
                         <div class="row">
+                            <!-- Username -->
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="username" class="form-label text-brown">
-                                        <i class="bi bi-person-badge"></i> Username Administrator *
+                                <div class="form-group">
+                                    <label for="username" class="form-label">
+                                        <i class="bi bi-person-circle me-1"></i> Username
                                     </label>
-                                    <input type="text" class="form-control" id="username" name="username" required>
-                                    <div class="invalid-feedback">Username administrator harus diisi dan unik</div>
+                                    <div class="input-with-icon">
+                                        <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username" required>
+                                        <i class="bi bi-person-badge input-icon"></i>
+                                    </div>
+                                    <div class="invalid-feedback">Username harus diisi (minimal 3 karakter)</div>
                                 </div>
                             </div>
 
+                            <!-- Email -->
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="email" class="form-label text-brown">
-                                        <i class="bi bi-envelope-at"></i> Email Administrator *
+                                <div class="form-group">
+                                    <label for="email" class="form-label">
+                                        <i class="bi bi-envelope-at me-1"></i> Email
                                     </label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
-                                    <div class="invalid-feedback">Email administrator harus diisi dengan format yang benar</div>
+                                    <div class="input-with-icon">
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="admin@example.com" required>
+                                        <i class="bi bi-envelope input-icon"></i>
+                                    </div>
+                                    <div class="invalid-feedback">Email harus berformat yang benar</div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row">
+                            <!-- Password -->
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="password" class="form-label text-brown">
-                                        <i class="bi bi-shield-lock"></i> Password Administrator *
+                                <div class="form-group">
+                                    <label for="password" class="form-label">
+                                        <i class="bi bi-shield-lock me-1"></i> Password
                                     </label>
-                                    <input type="password" class="form-control" id="password" name="password" required>
+                                    <div class="input-with-icon">
+                                        <input type="password" class="form-control" id="password" name="password" placeholder="Minimal 6 karakter" required>
+                                        <i class="bi bi-key input-icon"></i>
+                                    </div>
+                                    <div class="form-text">Kosongkan jika tidak ingin mengubah (saat edit)</div>
                                     <div class="invalid-feedback">Password minimal 6 karakter</div>
-                                    <div class="form-text">Kosongkan jika tidak ingin mengubah password (saat edit)</div>
                                 </div>
                             </div>
 
+                            <!-- Role -->
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="no_wa" class="form-label text-brown">
-                                        <i class="bi bi-whatsapp"></i> No. WhatsApp
+                                <div class="form-group">
+                                    <label for="role" class="form-label">
+                                        <i class="bi bi-shield-check me-1"></i> Role Administrator
                                     </label>
-                                    <input type="text" class="form-control" id="no_wa" name="no_wa" placeholder="628xxxxxxxxxx">
+                                    <div class="custom-select-wrapper">
+                                        <i class="bi bi-shield-check select-icon"></i>
+                                        <select class="custom-select" id="role" name="role" required onchange="updateRoleInfo()">
+                                            <option value="">Pilih Role Administrator</option>
+                                            <?php foreach (RoleHelper::getAdminRoles() as $roleKey => $roleName): ?>
+                                                <option value="<?= htmlspecialchars($roleKey) ?>">
+                                                    <?= $roleKey === 'admin' ? '👤 ' : '⚡ ' ?><?= htmlspecialchars($roleName) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <i class="bi bi-chevron-down select-arrow"></i>
+                                    </div>
+                                    <div class="invalid-feedback">Role administrator harus dipilih</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Role Information -->
+                        <div id="roleInfo" class="role-info-card" style="display: none;">
+                            <div id="roleInfoContent"></div>
+                        </div>
+
+                        <div class="row">
+                            <!-- WhatsApp -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="no_wa" class="form-label">
+                                        <i class="bi bi-whatsapp me-1"></i> No. WhatsApp <small class="text-muted">(opsional)</small>
+                                    </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" class="form-control" id="no_wa" name="no_wa" placeholder="628xxxxxxxxxx">
+                                        <i class="bi bi-phone input-icon"></i>
+                                    </div>
                                     <div class="form-text">Format: 628xxxxxxxxxx</div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <label for="alamat" class="form-label text-brown">
-                                <i class="bi bi-geo-alt-fill"></i> Alamat
-                            </label>
-                            <textarea class="form-control" id="alamat" name="alamat" rows="3" placeholder="Alamat lengkap administrator"></textarea>
-                        </div>
-
-                        <div class="mb-3 role-selection-container">
-                            <label for="role" class="form-label text-brown">
-                                <i class="bi bi-shield-check"></i> Role Administrator *
-                            </label>
-                            <select class="form-select" id="role" name="role" required onchange="updateRoleInfo()">
-                                <option value="">Pilih Role Administrator</option>
-                                <?php foreach (RoleHelper::getAdminRoles() as $roleKey => $roleName): ?>
-                                    <option value="<?= htmlspecialchars($roleKey) ?>">
-                                        <?= htmlspecialchars($roleName) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="invalid-feedback">Role administrator harus dipilih</div>
-                            
-                            <!-- Role Information -->
-                            <div id="roleInfo" style="display: none;">
-                                <div id="roleInfoContent"></div>
+                            <!-- Alamat -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="alamat" class="form-label">
+                                        <i class="bi bi-geo-alt me-1"></i> Alamat <small class="text-muted">(opsional)</small>
+                                    </label>
+                                    <div class="input-with-icon">
+                                        <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Alamat lengkap">
+                                        <i class="bi bi-house input-icon"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -462,10 +682,10 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle"></i> Batal
+                        <i class="bi bi-x-circle me-1"></i> Batal
                     </button>
                     <button type="button" class="btn btn-primary" onclick="saveUser()">
-                        <i class="bi bi-save"></i> <span id="saveButtonText">Simpan</span>
+                        <i class="bi bi-save me-1"></i> <span id="saveButtonText">Simpan</span>
                     </button>
                 </div>
             </div>
@@ -488,20 +708,30 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             const roleInfoContent = document.getElementById('roleInfoContent');
             
             if (roleSelect.value === 'admin') {
-                roleInfo.className = 'role-admin-info';
+                roleInfo.className = 'role-info-card role-admin-info';
                 roleInfo.style.display = 'block';
                 roleInfoContent.innerHTML = `
-                    <strong><i class="bi bi-shield-check"></i> Admin:</strong> 
-                    Dapat mengelola trip, peserta, pembayaran, dan galeri. 
-                    <em class="text-muted">Tidak dapat mengakses Master Admin.</em>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-shield-check fs-5 text-brown me-2"></i>
+                        <div>
+                            <strong class="text-brown">Admin:</strong> 
+                            Dapat mengelola trip, peserta, pembayaran, dan galeri.
+                            <br><small class="text-muted">Tidak dapat mengakses Master Admin.</small>
+                        </div>
+                    </div>
                 `;
             } else if (roleSelect.value === 'super_admin') {
-                roleInfo.className = 'role-super-admin-info';
+                roleInfo.className = 'role-info-card role-super-admin-info';
                 roleInfo.style.display = 'block';
                 roleInfoContent.innerHTML = `
-                    <strong><i class="bi bi-shield-exclamation"></i> Super Admin:</strong> 
-                    Memiliki akses penuh ke semua fitur termasuk Master Admin. 
-                    <em class="text-danger">Dapat mengelola semua administrator.</em>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-shield-exclamation fs-5 text-danger me-2"></i>
+                        <div>
+                            <strong class="text-danger">Super Admin:</strong> 
+                            Memiliki akses penuh ke semua fitur termasuk Master Admin.
+                            <br><small class="text-danger">Dapat mengelola semua administrator.</small>
+                        </div>
+                    </div>
                 `;
             } else {
                 roleInfo.style.display = 'none';
@@ -510,7 +740,6 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
 
         // Initialize role info on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Set up role change listener
             document.getElementById('role').addEventListener('change', updateRoleInfo);
         });
     </script>

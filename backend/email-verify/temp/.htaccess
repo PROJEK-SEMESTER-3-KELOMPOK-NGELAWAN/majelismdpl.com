@@ -1,0 +1,10 @@
+# Deny access to temporary files
+<Files "*.json">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Alternative untuk Apache 2.4+
+<Files "*.json">
+    Require all denied
+</Files>
