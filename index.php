@@ -549,6 +549,7 @@
 
 
 
+
   <footer class="footer">
     <div class="container">
       <!-- Kolom Kiri -->
@@ -587,6 +588,10 @@
       <p>Copyright © 2025 Majelis Mdpl. All rights reserved. Developed with ❤ by Dimasdw15</p>
     </div>
   </footer>
+
+
+
+
 
   <!-- Tombol WhatsApp -->
   <div class="whatsapp-container">
