@@ -12,11 +12,15 @@ if ($delRow['cnt'] > 0) {
     $wasReset = true;
 }
 
-// Query log terbaru
-$sql = "SELECT activity_logs.aktivitas, activity_logs.waktu, activity_logs.status, users.username
-        FROM activity_logs
-        JOIN users ON activity_logs.id_user = users.id_user
-        ORDER BY activity_logs.waktu DESC
+// Query log terbaru: LEFT JOIN supaya log user yang sudah dihapus/id_user NULL tetap muncul
+$sql = "SELECT 
+            activity_logs.aktivitas, 
+            activity_logs.waktu, 
+            activity_logs.status, 
+            users.username 
+        FROM activity_logs 
+        LEFT JOIN users ON activity_logs.id_user = users.id_user 
+        ORDER BY activity_logs.waktu DESC 
         LIMIT 10";
 $res = $conn->query($sql);
 
@@ -30,6 +34,9 @@ function simplifyActivity($text) {
     }
     if (preg_match('/Trip "(.+)" diupdate/i', $text, $matches)) {
         return "Trip \"{$matches[1]}\" diupdate";
+    }
+    if (preg_match('/dihapus/i', $text, $matches)) {
+        return $text; // biarkan log hapus tampil apa adanya
     }
     // Jika tidak cocok dengan pola, tampilkan teks asli dengan pembatasan panjang
     $maxLen = 80;
@@ -61,10 +68,13 @@ while ($row = $res->fetch_assoc()) {
 
     $aktivitasSingkat = simplifyActivity($row['aktivitas']);
 
+    // Jika username NULL (karena user dihapus), tampilkan tanda "- (dihapus)"
+    $kolomPelaku = $row['username'] !== null ? htmlspecialchars($row['username']) : "<span style='color:#c00;font-style:italic'>(dihapus)</span>";
+
     $rows .= "<tr>
         <td>" . htmlspecialchars($no) . "</td>
         <td>" . htmlspecialchars($aktivitasSingkat) . "</td>
-        <td>" . htmlspecialchars($row['username']) . "</td>
+        <td>" . $kolomPelaku . "</td>
         <td>" . date('d/m/Y H:i', strtotime($row['waktu'])) . "</td>
         <td><span class='badge {$badgeClass}'>" . htmlspecialchars(ucfirst($status)) . "</span></td>
     </tr>";
@@ -83,3 +93,6 @@ if ($wasReset) {
     }, 400);
     </script>";
 }
+
+// Tampilkan rows log jika script ini dipanggil via include atau ajax
+echo $rows;
