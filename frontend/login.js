@@ -58,7 +58,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const result = await response.json();
         closeLoginModal();
-
         if (result.success) {
           Swal.fire({
             title: "Login berhasil!",
@@ -66,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
             icon: "success",
             confirmButtonText: "Lanjutkan",
           }).then(() => {
-            if (result.role === "admin") {
+            if (["admin", "super_admin"].includes(result.role)) {
               setTimeout(() => {
                 window.location.href = "/majelismdpl.com/admin/index.php";
               }, 100);

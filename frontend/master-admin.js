@@ -1,13 +1,10 @@
-/**
- * Master Admin JavaScript
- * Handles CRUD operations for administrator management - Filter hanya role 'admin'
- * Theme Color: #a97c50 (Brown)
- */
+
 
 $(document).ready(function () {
   // Initialize DataTable
   const usersTable = $("#usersTable").DataTable({
     processing: true,
+    responsive: true,
     language: {
       processing: "Memuat data administrator...",
       lengthMenu: "Tampilkan _MENU_ administrator per halaman",
@@ -24,21 +21,21 @@ $(document).ready(function () {
       },
     },
     columnDefs: [
-      { orderable: false, targets: [6] }, // Disable ordering on action column
+      { orderable: false, targets: [6] },
       { className: "text-center", targets: [0, 5, 6] },
     ],
-    order: [[0, "desc"]], // Sort by ID descending
+    order: [[0, "desc"]],
   });
 
-  // Load administrators data on page load
+  // Load administrators data
   loadAdministrators();
 
-  // Form validation
+  // Setup form validation
   setupFormValidation();
 });
 
 /**
- * Load all administrators from API - Filter hanya role 'admin'
+ * Load all administrators from API
  */
 function loadAdministrators() {
   showLoading(true);
@@ -47,80 +44,96 @@ function loadAdministrators() {
     url: "../backend/master-admin-api.php",
     method: "GET",
     dataType: "json",
+    timeout: 10000,
     success: function (response) {
       showLoading(false);
 
       if (response.success) {
-        // Filter hanya user dengan role 'admin'
         const administrators = response.data.filter(function(user) {
-          return user.role === 'admin';
+          return user.role === 'admin' || user.role === 'super_admin';
         });
         
         populateAdministratorsTable(administrators);
         
-        // Show info message if no administrators found
         if (administrators.length === 0) {
-          showAlert("info", "Informasi", "Belum ada administrator yang terdaftar");
+          showAlert("info", "Informasi", "Belum ada administrator yang terdaftar dalam sistem");
         }
       } else {
-        showAlert(
-          "error",
-          "Error",
-          response.message || "Gagal memuat data administrator"
-        );
+        showAlert("error", "Error", response.message || "Gagal memuat data administrator");
       }
     },
     error: function (xhr, status, error) {
       showLoading(false);
       console.error("Error loading administrators:", error);
-      showAlert(
-        "error",
-        "Error",
-        "Terjadi kesalahan saat memuat data administrator"
-      );
+      
+      let errorMessage = "Terjadi kesalahan saat memuat data administrator";
+      if (status === "timeout") {
+        errorMessage = "Koneksi timeout. Silakan coba lagi.";
+      }
+      
+      showAlert("error", "Error Koneksi", errorMessage);
     },
   });
 }
 
 /**
- * Populate administrators table with data - Hanya admin role
+ * Populate administrators table
  */
 function populateAdministratorsTable(administrators) {
   const table = $("#usersTable").DataTable();
   table.clear();
 
-  // Validasi tambahan untuk memastikan hanya role 'admin' yang ditampilkan
-  const adminRoleOnly = administrators.filter(user => user.role === 'admin');
+  const adminRoles = administrators.filter(user => 
+    user.role === 'admin' || user.role === 'super_admin'
+  );
 
-  adminRoleOnly.forEach(function (admin, index) {
+  adminRoles.forEach(function (admin) {
+    let badgeClass = 'bg-brown';
+    let badgeIcon = 'bi-shield-check';
+    let roleText = 'Admin';
+    
+    if (admin.role === 'super_admin') {
+      badgeClass = 'bg-danger';
+      badgeIcon = 'bi-shield-exclamation';
+      roleText = 'Super Admin';
+    }
+
     const row = [
       admin.id_user,
-      admin.username || "-",
+      `<span class="fw-semibold">${admin.username || "-"}</span>`,
       admin.email || "-",
-      admin.no_wa || "-",
-      admin.alamat || "-",
-      `<span class="badge bg-brown"><i class="bi bi-shield-check"></i> ${admin.role}</span>`, // Brown badge for admin
-      `<div class="action-buttons">
-                <button type="button" class="btn btn-warning btn-sm" onclick="editAdministrator(${admin.id_user})" title="Edit Administrator">
-                    <i class="bi bi-pencil-square"></i>
-                </button>
-                <button type="button" class="btn btn-danger btn-sm" onclick="deleteAdministrator(${admin.id_user})" title="Hapus Administrator">
-                    <i class="bi bi-trash3"></i>
-                </button>
-            </div>`,
+      admin.no_wa ? `<a href="https://wa.me/${admin.no_wa}" target="_blank" class="text-success text-decoration-none">
+        <i class="bi bi-whatsapp me-1"></i>${admin.no_wa}
+      </a>` : "-",
+      admin.alamat ? `<span class="text-truncate d-inline-block" style="max-width: 200px;" title="${admin.alamat}">
+        ${admin.alamat}
+      </span>` : "-",
+      `<span class="badge ${badgeClass} fw-semibold">
+        <i class="bi ${badgeIcon} me-1"></i>${roleText}
+      </span>`,
+      `<div class="action-buttons d-flex gap-1 justify-content-center">
+        <button type="button" class="btn btn-warning btn-sm" onclick="editAdministrator(${admin.id_user})" title="Edit ${admin.username}">
+          <i class="bi bi-pencil-square"></i>
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAdministrator(${admin.id_user})" title="Hapus ${admin.username}">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>`,
     ];
 
     table.row.add(row);
   });
 
   table.draw();
-  
-  // Tampilkan info jumlah administrator
-  console.log(`Menampilkan ${adminRoleOnly.length} administrator dengan role 'admin'`);
-  
-  // Update page info
-  if (adminRoleOnly.length > 0) {
-    $('.dataTables_info').html(`Menampilkan ${adminRoleOnly.length} administrator`);
+    
+  if (adminRoles.length > 0) {
+    const adminCount = adminRoles.filter(u => u.role === 'admin').length;
+    const superAdminCount = adminRoles.filter(u => u.role === 'super_admin').length;
+    $('.dataTables_info').html(
+      `<strong>Total: ${adminRoles.length}</strong> administrator 
+       <span class="badge bg-brown ms-2">${adminCount} Admin</span> 
+       <span class="badge bg-danger ms-1">${superAdminCount} Super Admin</span>`
+    );
   }
 }
 
@@ -129,17 +142,20 @@ function populateAdministratorsTable(administrators) {
  */
 function openAddModal() {
   resetForm();
-  $("#userModalLabel").html(
-    '<i class="bi bi-shield-plus"></i> Tambah Administrator Baru'
-  );
+  $("#userModalLabel").html('<i class="bi bi-shield-plus me-2"></i> Tambah Administrator Baru');
+  $("#modalTitle").text("Tambah Administrator Baru");
+  $("#saveButtonText").text("Simpan");
   $("#actionType").val("create");
   $("#password").prop("required", true);
-  $("#role").val("admin"); // Set default role ke 'admin'
+  $("#role").val("");
   $(".form-text").show();
+  
+  $("#roleInfo").hide();
+  $(".form-control, .custom-select").removeClass("is-invalid is-valid");
 }
 
 /**
- * Edit administrator - load administrator data and open modal
+ * Edit administrator
  */
 function editAdministrator(userId) {
   $.ajax({
@@ -151,13 +167,8 @@ function editAdministrator(userId) {
       if (response.success) {
         const admin = response.data;
         
-        // Validasi bahwa user yang diedit adalah role 'admin'
-        if (admin.role !== 'admin') {
-          showAlert(
-            "error",
-            "Error",
-            "Anda hanya dapat mengedit pengguna dengan role 'admin'"
-          );
+        if (admin.role !== 'admin' && admin.role !== 'super_admin') {
+          showAlert("error", "Akses Ditolak", "Anda hanya dapat mengedit pengguna dengan role Administrator");
           return;
         }
 
@@ -165,34 +176,30 @@ function editAdministrator(userId) {
         $("#userId").val(admin.id_user);
         $("#username").val(admin.username);
         $("#email").val(admin.email);
-        $("#no_wa").val(admin.no_wa);
-        $("#alamat").val(admin.alamat);
-        $("#role").val("admin"); // Force role ke 'admin'
+        $("#no_wa").val(admin.no_wa || '');
+        $("#alamat").val(admin.alamat || '');
+        $("#role").val(admin.role);
         $("#password").val("");
 
         // Update modal
-        $("#userModalLabel").html('<i class="bi bi-shield-exclamation"></i> Edit Administrator');
+        $("#userModalLabel").html('<i class="bi bi-shield-exclamation me-2"></i> Edit Administrator');
+        $("#modalTitle").text("Edit Administrator");
+        $("#saveButtonText").text("Update");
         $("#actionType").val("update");
         $("#password").prop("required", false);
         $(".form-text").show();
 
-        // Show modal
+        updateRoleInfo();
+        $(".form-control, .custom-select").removeClass("is-invalid is-valid");
+
         $("#userModal").modal("show");
       } else {
-        showAlert(
-          "error",
-          "Error",
-          response.message || "Gagal memuat data administrator"
-        );
+        showAlert("error", "Error", response.message || "Gagal memuat data administrator");
       }
     },
     error: function (xhr, status, error) {
       console.error("Error loading administrator:", error);
-      showAlert(
-        "error",
-        "Error",
-        "Terjadi kesalahan saat memuat data administrator"
-      );
+      showAlert("error", "Error", "Terjadi kesalahan saat memuat data administrator");
     },
   });
 }
@@ -201,38 +208,56 @@ function editAdministrator(userId) {
  * Delete administrator with confirmation
  */
 function deleteAdministrator(userId) {
-  // Validasi sebelum menghapus - pastikan hanya menghapus user dengan role 'admin'
   $.ajax({
     url: "../backend/master-admin-api.php",
     method: "GET",
     data: { id: userId },
     dataType: "json",
     success: function (response) {
-      if (response.success && response.data.role === 'admin') {
+      if (response.success && (response.data.role === 'admin' || response.data.role === 'super_admin')) {
+        const roleDisplay = response.data.role === 'admin' ? 'Admin' : 'Super Admin';
+        const admin = response.data;
+        
         Swal.fire({
-          title: "Konfirmasi Hapus Administrator",
-          text: `Apakah Anda yakin ingin menghapus administrator "${response.data.username}"?`,
+          title: `Konfirmasi Hapus ${roleDisplay}`,
+          html: `
+            <div class="text-start">
+              <div class="alert alert-info mb-3">
+                <h6 class="mb-2"><i class="bi bi-info-circle me-2"></i>Data Administrator:</h6>
+                <p class="mb-1"><strong>Username:</strong> ${admin.username}</p>
+                <p class="mb-1"><strong>Email:</strong> ${admin.email}</p>
+                <p class="mb-0"><strong>Role:</strong> <span class="badge ${admin.role === 'admin' ? 'bg-brown' : 'bg-danger'}">${roleDisplay}</span></p>
+              </div>
+              <div class="alert alert-warning mb-0">
+                <i class="bi bi-exclamation-triangle me-2"></i> 
+                ${admin.role === 'super_admin' ? 
+                  '<strong>Peringatan:</strong> Menghapus Super Admin akan menghilangkan akses penuh!' : 
+                  '<strong>Perhatian:</strong> Tindakan ini tidak dapat dibatalkan!'
+                }
+              </div>
+            </div>
+          `,
           icon: "warning",
           showCancelButton: true,
           confirmButtonColor: "#dc3545",
           cancelButtonColor: "#6c757d",
-          confirmButtonText: "Ya, Hapus Administrator",
-          cancelButtonText: "Batal",
+          confirmButtonText: `<i class="bi bi-trash3 me-2"></i>Ya, Hapus`,
+          cancelButtonText: '<i class="bi bi-x-circle me-2"></i>Batal',
           reverseButtons: true,
+          customClass: {
+            popup: 'rounded-3'
+          }
         }).then((result) => {
           if (result.isConfirmed) {
-            performDelete(userId);
+            performDelete(userId, admin.username, roleDisplay);
           }
         });
       } else {
-        showAlert(
-          "error",
-          "Error",
-          "Anda hanya dapat menghapus pengguna dengan role 'admin'"
-        );
+        showAlert("error", "Akses Ditolak", "Anda hanya dapat menghapus pengguna dengan role Administrator");
       }
     },
     error: function (xhr, status, error) {
+      console.error("Error validating administrator:", error);
       showAlert("error", "Error", "Terjadi kesalahan saat validasi administrator");
     }
   });
@@ -241,7 +266,17 @@ function deleteAdministrator(userId) {
 /**
  * Perform delete operation
  */
-function performDelete(userId) {
+function performDelete(userId, username, roleDisplay) {
+  Swal.fire({
+    title: `Menghapus ${roleDisplay}`,
+    html: `Sedang menghapus administrator <strong>${username}</strong>...`,
+    allowOutsideClick: false,
+    showConfirmButton: false,
+    willOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
   $.ajax({
     url: "../backend/master-admin-api.php",
     method: "POST",
@@ -253,14 +288,11 @@ function performDelete(userId) {
     dataType: "json",
     success: function (response) {
       if (response.success) {
-        showAlert("success", "Berhasil", "Administrator berhasil dihapus");
-        loadAdministrators(); // Reload table
+        showAlert("success", "Berhasil Dihapus", 
+          `${roleDisplay} <strong>${username}</strong> berhasil dihapus dari sistem`);
+        loadAdministrators();
       } else {
-        showAlert(
-          "error",
-          "Error",
-          response.message || "Gagal menghapus administrator"
-        );
+        showAlert("error", "Error", response.message || "Gagal menghapus administrator");
       }
     },
     error: function (xhr, status, error) {
@@ -271,7 +303,7 @@ function performDelete(userId) {
 }
 
 /**
- * Save administrator (create or update)
+ * Save administrator
  */
 function saveUser() {
   if (!validateForm()) {
@@ -279,6 +311,16 @@ function saveUser() {
   }
 
   const formData = getFormData();
+  const isUpdate = $("#actionType").val() === "update";
+  
+  console.log("Form Data:", formData);
+
+  const saveButton = $('[onclick="saveUser()"]');
+  const originalHtml = saveButton.html();
+  
+  saveButton
+    .prop("disabled", true)
+    .html('<i class="bi bi-hourglass-split me-2"></i>Menyimpan...');
 
   $.ajax({
     url: "../backend/master-admin-api.php",
@@ -286,67 +328,82 @@ function saveUser() {
     contentType: "application/json",
     data: JSON.stringify(formData),
     dataType: "json",
-    beforeSend: function () {
-      // Disable save button
-      $('[onclick="saveUser()"]')
-        .prop("disabled", true)
-        .html('<i class="bi bi-hourglass-split"></i> Menyimpan...');
-    },
+    timeout: 15000,
     success: function (response) {
+      console.log("Save Response:", response);
       if (response.success) {
-        const actionText = formData.action === 'create' ? 'ditambahkan' : 'diupdate';
-        showAlert("success", "Berhasil", `Administrator berhasil ${actionText}`);
+        const successMessage = isUpdate ? 
+          `Administrator <strong>${formData.username}</strong> berhasil diperbarui` :
+          `Administrator <strong>${formData.username}</strong> berhasil ditambahkan`;
+          
+        showAlert("success", "Berhasil", successMessage);
         $("#userModal").modal("hide");
-        loadAdministrators(); // Reload table
+        loadAdministrators();
       } else {
-        showAlert(
-          "error",
-          "Error",
-          response.message || "Gagal menyimpan data administrator"
-        );
+        showAlert("error", "Error", response.message || "Gagal menyimpan data administrator");
       }
     },
     error: function (xhr, status, error) {
       console.error("Error saving administrator:", error);
-      showAlert(
-        "error",
-        "Error",
-        "Terjadi kesalahan saat menyimpan data administrator"
-      );
+      
+      let errorMessage = "Terjadi kesalahan saat menyimpan data administrator";
+      
+      if (status === "timeout") {
+        errorMessage = "Koneksi timeout. Silakan coba lagi.";
+      } else if (xhr.responseText) {
+        try {
+          const errorResponse = JSON.parse(xhr.responseText);
+          errorMessage = errorResponse.message || errorMessage;
+        } catch (e) {
+          if (xhr.responseText.length < 200) {
+            errorMessage = xhr.responseText;
+          }
+        }
+      }
+      
+      showAlert("error", "Error", errorMessage);
     },
     complete: function () {
-      // Re-enable save button
-      $('[onclick="saveUser()"]')
+      saveButton
         .prop("disabled", false)
-        .html('<i class="bi bi-save"></i> Simpan');
+        .html(originalHtml);
     },
   });
 }
 
 /**
- * Get form data - Force role ke 'admin'
+ * Get form data
  */
 function getFormData() {
-  return {
+  const data = {
     action: $("#actionType").val(),
-    id_user: $("#userId").val() || null,
     username: $("#username").val().trim(),
-    email: $("#email").val().trim(),
-    password: $("#password").val(),
-    no_wa: $("#no_wa").val().trim(),
-    alamat: $("#alamat").val().trim(),
-    role: "admin", // Always set to 'admin'
+    email: $("#email").val().trim().toLowerCase(),
+    role: $("#role").val(),
+    no_wa: $("#no_wa").val().trim() || null,
+    alamat: $("#alamat").val().trim() || null,
   };
+
+  const password = $("#password").val();
+  if (password) {
+    data.password = password;
+  }
+
+  const userId = $("#userId").val();
+  if (userId) {
+    data.id_user = parseInt(userId);
+  }
+
+  return data;
 }
 
 /**
- * Validate form for administrator data
+ * Validate form
  */
 function validateForm() {
   let isValid = true;
 
-  // Clear previous validation
-  $(".form-control").removeClass("is-invalid");
+  $(".form-control, .custom-select").removeClass("is-invalid is-valid");
 
   // Username validation
   const username = $("#username").val().trim();
@@ -355,38 +412,67 @@ function validateForm() {
     isValid = false;
   } else if (username.length < 3) {
     $("#username").addClass("is-invalid");
-    showAlert("warning", "Peringatan", "Username administrator minimal 3 karakter");
+    showAlert("warning", "Format Username", "Username minimal 3 karakter");
     isValid = false;
+  } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    $("#username").addClass("is-invalid");
+    showAlert("warning", "Format Username", "Username hanya boleh mengandung huruf, angka, dan underscore");
+    isValid = false;
+  } else {
+    $("#username").addClass("is-valid");
   }
 
   // Email validation
-  const email = $("#email").val().trim();
+  const email = $("#email").val().trim().toLowerCase();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email || !emailRegex.test(email)) {
     $("#email").addClass("is-invalid");
     isValid = false;
+  } else {
+    $("#email").addClass("is-valid");
   }
 
-  // Password validation (required for create, optional for update)
-  if ($("#actionType").val() === "create" && !$("#password").val()) {
-    $("#password").addClass("is-invalid");
+  // Role validation
+  const role = $("#role").val();
+  if (!role) {
+    $("#role").addClass("is-invalid");
+    showAlert("warning", "Role Diperlukan", "Role administrator harus dipilih");
     isValid = false;
-  } else if ($("#password").val() && $("#password").val().length < 6) {
-    $("#password").addClass("is-invalid");
-    showAlert("warning", "Peringatan", "Password administrator minimal 6 karakter");
-    isValid = false;
+  } else {
+    $("#role").addClass("is-valid");
   }
 
-  // WhatsApp number validation (optional but must be valid format if provided)
+  // Password validation
+  const password = $("#password").val();
+  const isCreate = $("#actionType").val() === "create";
+  
+  if (isCreate && !password) {
+    $("#password").addClass("is-invalid");
+    isValid = false;
+  } else if (password && password.length < 6) {
+    $("#password").addClass("is-invalid");
+    showAlert("warning", "Password Terlalu Pendek", "Password minimal 6 karakter");
+    isValid = false;
+  } else if (password) {
+    $("#password").addClass("is-valid");
+  }
+
+  // WhatsApp validation
   const noWa = $("#no_wa").val().trim();
-  if (noWa && !/^628\d{8,12}$/.test(noWa)) {
-    $("#no_wa").addClass("is-invalid");
-    showAlert(
-      "warning",
-      "Format Nomor WhatsApp",
-      "Format nomor WhatsApp harus 628xxxxxxxxxx (8-12 digit setelah 628)"
-    );
-    isValid = false;
+  if (noWa) {
+    if (!/^628\d{8,12}$/.test(noWa)) {
+      $("#no_wa").addClass("is-invalid");
+      showAlert("warning", "Format WhatsApp", "Format: 628xxxxxxxxxx (8-12 digit setelah 628)");
+      isValid = false;
+    } else {
+      $("#no_wa").addClass("is-valid");
+    }
+  }
+
+  // Address validation
+  const alamat = $("#alamat").val().trim();
+  if (alamat && alamat.length > 0) {
+    $("#alamat").addClass("is-valid");
   }
 
   return isValid;
@@ -397,72 +483,164 @@ function validateForm() {
  */
 function setupFormValidation() {
   // Real-time validation
-  $("#username, #email, #password, #no_wa").on("blur", function () {
-    $(this).removeClass("is-invalid");
-
-    if ($(this).attr("id") === "username") {
-      const username = $(this).val().trim();
-      if (username && username.length < 3) {
-        $(this).addClass("is-invalid");
+  $("#username").on("blur input", function () {
+    const $this = $(this);
+    const value = $this.val().trim();
+    
+    $this.removeClass("is-invalid is-valid");
+    
+    if (value) {
+      if (value.length < 3 || !/^[a-zA-Z0-9_]+$/.test(value)) {
+        $this.addClass("is-invalid");
+      } else {
+        $this.addClass("is-valid");
       }
     }
+  });
 
-    if ($(this).attr("id") === "email") {
-      const email = $(this).val().trim();
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (email && !emailRegex.test(email)) {
-        $(this).addClass("is-invalid");
+  $("#email").on("blur input", function () {
+    const $this = $(this);
+    const value = $this.val().trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    $this.removeClass("is-invalid is-valid");
+    
+    if (value) {
+      if (emailRegex.test(value)) {
+        $this.addClass("is-valid");
+      } else {
+        $this.addClass("is-invalid");
       }
     }
+  });
 
-    if ($(this).attr("id") === "password") {
-      const password = $(this).val();
-      if (password && password.length < 6) {
-        $(this).addClass("is-invalid");
+  $("#password").on("input", function () {
+    const $this = $(this);
+    const value = $this.val();
+    
+    $this.removeClass("is-invalid is-valid");
+    
+    if (value) {
+      if (value.length < 6) {
+        $this.addClass("is-invalid");
+      } else {
+        $this.addClass("is-valid");
       }
     }
+  });
 
-    if ($(this).attr("id") === "no_wa") {
-      const noWa = $(this).val().trim();
-      if (noWa && !/^628\d{8,12}$/.test(noWa)) {
-        $(this).addClass("is-invalid");
+  $("#no_wa").on("blur input", function () {
+    const $this = $(this);
+    const value = $this.val().trim();
+    
+    $this.removeClass("is-invalid is-valid");
+    
+    if (value) {
+      if (/^628\d{8,12}$/.test(value)) {
+        $this.addClass("is-valid");
+      } else {
+        $this.addClass("is-invalid");
       }
+    }
+  });
+
+  $("#role").on("change", function () {
+    const $this = $(this);
+    $this.removeClass("is-invalid is-valid");
+    
+    if ($this.val()) {
+      $this.addClass("is-valid");
+    }
+    
+    updateRoleInfo();
+  });
+
+  $("#alamat").on("input", function () {
+    const $this = $(this);
+    const value = $this.val().trim();
+    
+    $this.removeClass("is-invalid is-valid");
+    
+    if (value && value.length > 0) {
+      $this.addClass("is-valid");
     }
   });
 }
 
 /**
- * Reset form - Set default role ke 'admin'
+ * Update role information with compact styling
  */
-function resetForm() {
-  $("#userForm")[0].reset();
-  $("#userId").val("");
-  $("#role").val("admin"); // Set default role ke 'admin'
-  $(".form-control").removeClass("is-invalid");
-}
-
-/**
- * Show loading spinner
- */
-function showLoading(show) {
-  if (show) {
-    $("#loadingSpinner").show();
-    $("#usersTable").hide();
+function updateRoleInfo() {
+  const roleSelect = $("#role");
+  const roleInfo = $("#roleInfo");
+  const roleInfoContent = $("#roleInfoContent");
+  
+  if (roleSelect.val() === 'admin') {
+    roleInfo.removeClass('role-super-admin-info').addClass('role-admin-info');
+    roleInfo.show();
+    roleInfoContent.html(`
+      <div class="d-flex align-items-center">
+        <i class="bi bi-shield-check fs-5 text-brown me-2"></i>
+        <div>
+          <strong class="text-brown">Admin:</strong> 
+          Dapat mengelola trip, peserta, pembayaran, dan galeri.
+          <br><small class="text-muted">Tidak dapat mengakses Master Admin.</small>
+        </div>
+      </div>
+    `);
+  } else if (roleSelect.val() === 'super_admin') {
+    roleInfo.removeClass('role-admin-info').addClass('role-super-admin-info');
+    roleInfo.show();
+    roleInfoContent.html(`
+      <div class="d-flex align-items-center">
+        <i class="bi bi-shield-exclamation fs-5 text-danger me-2"></i>
+        <div>
+          <strong class="text-danger">Super Admin:</strong> 
+          Memiliki akses penuh ke semua fitur termasuk Master Admin.
+          <br><small class="text-danger">Dapat mengelola semua administrator.</small>
+        </div>
+      </div>
+    `);
   } else {
-    $("#loadingSpinner").hide();
-    $("#usersTable").show();
+    roleInfo.hide();
   }
 }
 
 /**
- * Show alert using SweetAlert2 with brown theme colors
+ * Reset form
  */
-function showAlert(type, title, message) {
+function resetForm() {
+  $("#userForm")[0].reset();
+  $("#userId").val("");
+  $("#role").val("");
+  
+  $(".form-control, .custom-select").removeClass("is-invalid is-valid");
+  $("#roleInfo").hide();
+}
+
+/**
+ * Show loading
+ */
+function showLoading(show) {
+  if (show) {
+    $("#loadingSpinner").fadeIn(300);
+    $("#usersTable").fadeOut(300);
+  } else {
+    $("#loadingSpinner").fadeOut(300);
+    $("#usersTable").fadeIn(300);
+  }
+}
+
+/**
+ * Show alert
+ */
+function showAlert(type, title, message, showConfirmButton = true, timer = null) {
   let confirmButtonColor;
   
   switch(type) {
     case 'success':
       confirmButtonColor = '#28a745';
+      timer = timer || 3000;
       break;
     case 'error':
       confirmButtonColor = '#dc3545';
@@ -471,37 +649,61 @@ function showAlert(type, title, message) {
       confirmButtonColor = '#ffc107';
       break;
     case 'info':
-      confirmButtonColor = '#a97c50'; // Brown color for info
+      confirmButtonColor = '#a97c50';
+      timer = timer || 2000;
       break;
     default:
-      confirmButtonColor = '#a97c50'; // Default brown color
+      confirmButtonColor = '#a97c50';
   }
   
-  Swal.fire({
+  const config = {
     icon: type,
     title: title,
-    text: message,
+    html: message,
     confirmButtonColor: confirmButtonColor,
-    timer: type === "success" ? 3000 : null,
-    timerProgressBar: true,
-  });
+    showConfirmButton: showConfirmButton,
+    customClass: {
+      popup: 'rounded-3',
+      title: 'fs-6 fw-bold',
+      confirmButton: 'btn-sm'
+    },
+    buttonsStyling: false,
+    allowOutsideClick: true,
+    allowEscapeKey: true,
+  };
+
+  if (timer) {
+    config.timer = timer;
+    config.timerProgressBar = true;
+  }
+
+  Swal.fire(config);
 }
 
-// Handle modal events
+// Modal event handlers
 $("#userModal").on("hidden.bs.modal", function () {
   resetForm();
 });
 
-// Handle Enter key in form
+$("#userModal").on("shown.bs.modal", function () {
+  $("#username").focus();
+});
+
+// Form submission
 $("#userForm").on("keypress", function (e) {
-  if (e.which === 13) {
-    // Enter key
+  if (e.which === 13 && !$(e.target).is('textarea')) {
     e.preventDefault();
     saveUser();
   }
 });
 
-// Auto refresh data every 30 seconds (optional)
-setInterval(function() {
-  loadAdministrators();
+// Auto refresh
+let refreshInterval = setInterval(function() {
+  if (!$("#userModal").hasClass('show')) {
+    loadAdministrators();
+  }
 }, 30000);
+
+$(window).on('beforeunload', function() {
+  clearInterval(refreshInterval);
+});

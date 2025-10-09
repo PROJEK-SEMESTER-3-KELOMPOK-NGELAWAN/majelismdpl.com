@@ -15,20 +15,50 @@ if (!isset($_SESSION['username']) || empty($_SESSION['username']) || $_SESSION['
             $user = $result->fetch_assoc();
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
+            
+            // Update global variables dari auth_check.php
+            $username = $user['username'];
+            $user_role = $user['role'];
+            $is_super_admin = RoleHelper::isSuperAdmin($user_role);
+            $is_admin = RoleHelper::isAdmin($user_role);
         }
         $stmt->close();
     }
 }
 
 // Ambil username dari session dengan fallback yang lebih baik
-$username = $_SESSION['username'] ?? 'Guest';
-$role = $_SESSION['role'] ?? 'user';
+$display_username = $username ?? 'Guest';
+$display_role = $user_role ?? 'user';
 
 // Jika masih "root" atau kosong, redirect ke login
-if ($username === 'root' || $username === 'Guest' || empty($username)) {
+if ($display_username === 'root' || $display_username === 'Guest' || empty($display_username)) {
     session_destroy();
     header('Location: ../login.php?error=session_invalid');
     exit;
+}
+
+// Handle error messages dari parameter URL
+$error_message = '';
+$error_type = '';
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'access_denied':
+            $error_message = $_GET['message'] ?? 'Akses ditolak. Anda tidak memiliki permission yang diperlukan untuk mengakses halaman tersebut.';
+            $error_type = 'warning';
+            break;
+        case 'unauthorized':
+            $error_message = 'Anda tidak memiliki akses ke halaman tersebut. Silakan hubungi administrator.';
+            $error_type = 'error';
+            break;
+        case 'session_expired':
+            $error_message = 'Session Anda telah berakhir. Silakan login kembali.';
+            $error_type = 'info';
+            break;
+        case 'session_invalid':
+            $error_message = 'Session tidak valid. Silakan login kembali.';
+            $error_type = 'error';
+            break;
+    }
 }
 ?>
 
@@ -38,11 +68,13 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Majelis MDPL | Admin Dashboard</title>
+  <title>Admin Dashboard | Majelis MDPL</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- SweetAlert2 untuk error handling -->
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.0/dist/sweetalert2.min.css" rel="stylesheet">
 
   <style>
     body {
@@ -88,124 +120,23 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
       font-size: 18px;
     }
 
-    .sidebar img {
-      width: 43px;
-      height: 43px;
-      border-radius: 11px;
-      background: #fff7eb;
-      border: 2px solid #d9b680;
-      margin-bottom: 13px;
-    }
-
-    .logo-text {
-      font-size: 1.13em;
-      font-weight: 700;
-      color: #fffbe4;
-      margin-bottom: 30px;
-      letter-spacing: 1.5px;
-    }
-
-    .sidebar-nav {
-      flex: 1 1 auto;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .nav-link {
-      width: 90%;
-      color: #fff;
-      font-weight: 500;
-      border-radius: 0.7rem;
-      margin-bottom: 5px;
-      padding: 13px 22px;
-      display: flex;
-      align-items: center;
-      font-size: 16px;
-      gap: 11px;
-      letter-spacing: 0.7px;
-      text-decoration: none;
-      transition: background 0.22s, color 0.22s;
-    }
-
-    .nav-link.active,
-    .nav-link:hover {
-      background: #432f17;
-      color: #ffd49c;
-    }
-
-    .logout {
-      color: #fff;
-      background: #c19c72;
-      font-weight: 600;
-      margin-bottom: 15px;
-    }
-
-    .logout:hover {
-      background: #432f17;
-      color: #fffbe4;
-    }
-
-    @media (max-width: 800px) {
-      .sidebar {
-        width: 100vw;
-        height: 70px;
-        flex-direction: row;
-        padding-top: 0;
-        padding-bottom: 0;
-        bottom: unset;
-        top: 0;
-        justify-content: center;
-        align-items: center;
-        position: fixed;
-        z-index: 100;
-      }
-
-      .sidebar img,
-      .logo-text {
-        display: none;
-      }
-
-      .sidebar-nav {
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        width: 100vw;
-        height: 70px;
-        margin: 0;
-        padding: 0;
-      }
-
-      .nav-link,
-      .logout {
-        width: auto;
-        min-width: 70px;
-        font-size: 15px;
-        margin: 0 3px;
-        border-radius: 14px;
-        padding: 8px 10px;
-        justify-content: center;
-      }
-
-      .logout {
-        order: 99;
-        margin-left: 8px;
-        margin-bottom: 0;
-      }
-    }
-
     .main {
-      margin-left: 240px;
+      margin-left: 280px; /* Disesuaikan dengan sidebar baru */
       min-height: 100vh;
       padding: 20px 25px;
       background: #f6f0e8;
+      transition: margin-left 0.3s ease;
     }
 
-    @media (max-width: 800px) {
+    /* Responsive untuk sidebar collapsed */
+    body.sidebar-collapsed .main {
+      margin-left: 70px;
+    }
+
+    @media (max-width: 768px) {
       .main {
-        margin-left: 0;
-        padding-top: 90px;
+        margin-left: 0 !important;
+        padding-top: 20px;
         padding-left: 15px;
         padding-right: 15px;
       }
@@ -217,6 +148,8 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
       justify-content: space-between;
       padding-top: 32px;
       padding-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 15px;
     }
 
     .main-header h2 {
@@ -228,71 +161,98 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
     }
 
     .admin-info {
-      background: #432f17;
+      background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
       color: #ffe8c8;
-      border-radius: 19px;
-      padding: 8px 20px;
+      border-radius: 15px;
+      padding: 12px 20px;
       font-weight: 600;
       font-size: 14px;
-      box-shadow: 0 2px 8px rgba(169, 124, 80, 0.1);
+      box-shadow: 0 4px 15px rgba(169, 124, 80, 0.2);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       position: relative;
       transition: all 0.3s ease;
+      min-width: 200px;
     }
 
     .admin-info:hover {
-      background: #a97c50;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(169, 124, 80, 0.2);
+      background: linear-gradient(135deg, #8b6332 0%, #a97c50 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(169, 124, 80, 0.3);
     }
 
     .admin-info .user-icon {
-      font-size: 16px;
-      color: #ffd49c;
+      font-size: 24px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .admin-info .user-details {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+      flex: 1;
     }
 
     .admin-info .username {
       font-weight: 700;
-      font-size: 14px;
+      font-size: 15px;
       letter-spacing: 0.5px;
       color: #fff;
+      margin-bottom: 2px;
     }
 
     .admin-info .role-badge {
       font-size: 11px;
-      font-weight: 500;
-      color: #ffd49c;
-      opacity: 0.9;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
       text-transform: capitalize;
       letter-spacing: 0.3px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* Role-specific badge colors */
+    .role-admin {
+      background: rgba(255, 193, 7, 0.2) !important;
+      border-color: rgba(255, 193, 7, 0.4) !important;
+    }
+
+    .role-super_admin {
+      background: rgba(220, 53, 69, 0.2) !important;
+      border-color: rgba(220, 53, 69, 0.4) !important;
     }
 
     /* Responsive admin info */
     @media (max-width: 800px) {
       .admin-info {
-        padding: 6px 12px;
+        padding: 8px 15px;
         font-size: 12px;
+        min-width: 150px;
       }
       
-      .admin-info .user-details {
-        display: none;
+      .admin-info .user-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
       }
       
       .admin-info .username {
-        font-size: 12px;
+        font-size: 13px;
       }
       
       .main-header {
         flex-direction: column;
-        gap: 15px;
         align-items: flex-start;
       }
       
@@ -303,11 +263,19 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
 
     @media (max-width: 600px) {
       .admin-info {
-        padding: 5px 10px;
+        padding: 6px 12px;
+        min-width: 120px;
       }
       
-      .admin-info .username {
+      .admin-info .user-details {
         display: none;
+      }
+      
+      .admin-info::after {
+        content: attr(data-username);
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
       }
     }
 
@@ -321,62 +289,85 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
     .card-stat {
       background: #fff;
       border-radius: 1rem;
-      padding: 16px 18px;
-      box-shadow: 0 1px 7px rgba(120, 77, 37, 0.09);
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(120, 77, 37, 0.08);
       min-width: 130px;
       flex: 1 1 130px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .card-stat:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(120, 77, 37, 0.15);
     }
 
     .card-stat i {
-      font-size: 1.65rem;
+      font-size: 2rem;
       color: #a97c50;
+      background: rgba(169, 124, 80, 0.1);
+      padding: 12px;
+      border-radius: 12px;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-info {
+      flex: 1;
     }
 
     .stat-label {
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 600;
       color: #a97c50;
-      opacity: 0.94;
+      opacity: 0.9;
+      margin-bottom: 4px;
     }
 
     .stat-value {
-      font-size: 19px;
+      font-size: 24px;
       font-weight: 700;
       color: #432f17;
+      line-height: 1;
     }
 
     .chart-section {
       max-width: 900px;
       margin: 0 auto 30px auto;
       background: #fff;
-      padding: 22px 20px 16px 20px;
+      padding: 25px;
       border-radius: 1rem;
-      box-shadow: 0 1px 7px rgba(120, 77, 37, 0.1);
+      box-shadow: 0 4px 15px rgba(120, 77, 37, 0.08);
     }
 
     .chart-section h3 {
-      font-size: 1.1em;
+      font-size: 1.2em;
       font-weight: 700;
       color: #a97c50;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
       text-align: center;
+      letter-spacing: 0.5px;
     }
 
     .data-table-section {
       background: #fff;
       border-radius: 1rem;
-      box-shadow: 0 1px 7px rgba(120, 77, 37, 0.08);
-      padding: 12px;
+      box-shadow: 0 4px 15px rgba(120, 77, 37, 0.08);
+      padding: 25px;
       margin-bottom: 18px;
     }
 
     .data-table-section h3 {
-      font-size: 1.06em;
+      font-size: 1.2em;
       font-weight: 700;
       color: #a97c50;
+      margin: 0;
+      letter-spacing: 0.5px;
     }
 
     table {
@@ -384,13 +375,13 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
       border-radius: 1rem;
       overflow: hidden;
       border-collapse: collapse;
-      margin-top: 7px;
+      margin-top: 15px;
       font-size: 13px;
     }
 
     th,
     td {
-      padding: 10px 10px;
+      padding: 12px 15px;
       text-align: left;
       font-weight: 500;
       color: #432f17;
@@ -399,11 +390,11 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
     }
 
     th {
-      background: #a97c50;
+      background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
       color: #fff;
       font-weight: 700;
       letter-spacing: 0.7px;
-      font-size: 13.5px;
+      font-size: 14px;
     }
 
     tr:last-child td {
@@ -417,36 +408,37 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
 
     .badge {
       font-weight: 600;
-      font-size: 13px;
-      padding: 5px 12px;
-      border-radius: 14px;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 20px;
       display: inline-block;
       min-width: 70px;
       text-align: center;
+      letter-spacing: 0.3px;
     }
 
     .badge-delete {
-      background-color: #c94f44;
+      background-color: #dc3545;
       color: white;
     }
 
     .badge-pending {
-      background-color: #ffd49c;
+      background-color: #ffc107;
       color: #432f17;
     }
 
     .badge-success {
-      background-color: #13a362;
+      background-color: #28a745;
       color: white;
     }
 
     .badge-info {
-      background-color: #13a362;
+      background-color: #17a2b8;
       color: white;
     }
 
     .badge-update {
-      background-color: #67caff;
+      background-color: #007bff;
       color: white;
     }
 
@@ -454,23 +446,60 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
     .welcome-section {
       background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
       color: white;
-      padding: 20px 25px;
-      border-radius: 12px;
-      margin-bottom: 25px;
-      box-shadow: 0 4px 15px rgba(169, 124, 80, 0.2);
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      box-shadow: 0 6px 20px rgba(169, 124, 80, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      transform: translate(30px, -30px);
     }
 
     .welcome-section h3 {
       margin: 0;
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       font-weight: 600;
       letter-spacing: 0.5px;
+      position: relative;
+      z-index: 1;
     }
 
     .welcome-section p {
-      margin: 5px 0 0 0;
+      margin: 8px 0 0 0;
       opacity: 0.9;
-      font-size: 14px;
+      font-size: 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* SweetAlert2 custom styling */
+    .swal2-popup {
+      border-radius: 15px !important;
+    }
+
+    .swal2-title {
+      color: #a97c50 !important;
+      font-family: "Poppins", Arial, sans-serif !important;
+    }
+
+    .swal2-confirm {
+      background-color: #a97c50 !important;
+      border-radius: 8px !important;
+    }
+
+    .swal2-confirm:hover {
+      background-color: #8b6332 !important;
     }
   </style>
 </head>
@@ -483,54 +512,57 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
   <main class="main">
     <div class="main-header">
       <h2>Dashboard Admin</h2>
-      <div class="admin-info" title="Pengguna yang sedang login">
+      <div class="admin-info" 
+           title="Pengguna yang sedang login: <?= htmlspecialchars($display_username) ?>"
+           data-username="<?= htmlspecialchars($display_username) ?>">
         <i class="bi bi-person-circle user-icon"></i>
         <div class="user-details">
-          <span class="username"><?php echo htmlspecialchars($username); ?></span>
-          <span class="role-badge"><?php echo htmlspecialchars(ucfirst($role)); ?></span>
+          <span class="username"><?= htmlspecialchars($display_username) ?></span>
+          <span class="role-badge role-<?= $display_role ?>">
+            <?= RoleHelper::getRoleDisplayName($display_role) ?>
+          </span>
         </div>
-        <span class="username d-lg-none"><?php echo htmlspecialchars($username); ?></span>
       </div>
     </div>
 
-    <!-- Welcome Section - Fixed untuk tidak menampilkan "root" -->
+    <!-- Welcome Section -->
     <section class="welcome-section">
       <h3 id="welcomeMessage">
         <?php 
         // Pastikan tidak menampilkan "root"
-        $displayName = ($username && $username !== 'root' && $username !== 'Guest') ? $username : 'Pengguna';
+        $displayName = ($display_username && $display_username !== 'root' && $display_username !== 'Guest') ? $display_username : 'Pengguna';
         echo "Selamat Datang, " . htmlspecialchars($displayName) . "!"; 
         ?>
       </h3>
-      <p>Selamat beraktivitas di sistem Majelis MDPL</p>
+      <p>Selamat beraktivitas di sistem Majelis MDPL - <?= RoleHelper::getRoleDisplayName($display_role) ?></p>
     </section>
 
     <!-- SECTION HEADERS INFORMATION -->
     <section class="cards">
       <div class="card-stat">
         <i class="bi bi-signpost-split"></i>
-        <div>
+        <div class="stat-info">
           <div class="stat-label">Trip Aktif</div>
           <div class="stat-value" data-stat="trip-aktif">0</div>
         </div>
       </div>
       <div class="card-stat">
         <i class="bi bi-people"></i>
-        <div>
+        <div class="stat-info">
           <div class="stat-label">Peserta</div>
           <div class="stat-value" data-stat="total-peserta">0</div>
         </div>
       </div>
       <div class="card-stat">
         <i class="bi bi-credit-card"></i>
-        <div>
+        <div class="stat-info">
           <div class="stat-label">Pembayaran Pending</div>
           <div class="stat-value" data-stat="pembayaran-pending">0</div>
         </div>
       </div>
       <div class="card-stat">
         <i class="bi bi-check2-circle"></i>
-        <div>
+        <div class="stat-info">
           <div class="stat-label">Trip Selesai</div>
           <div class="stat-value" data-stat="trip-selesai">0</div>
         </div>
@@ -545,7 +577,7 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
 
     <section class="data-table-section">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 style="margin: 0; color: #a97c50; font-weight: 700; font-size: 1.2rem; letter-spacing:1px;">Riwayat Aktivitas Terbaru</h3>
+        <h3>Riwayat Aktivitas Terbaru</h3>
         <div class="search-container" style="max-width: 280px; width: 100%;">
           <input type="text" id="activitySearchInput" class="search-input" placeholder="Cari aktivitas..." />
           <i class="bi bi-search search-icon"></i>
@@ -573,22 +605,42 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
 
   </main>
   
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="../frontend/dashboard.js"></script>
+  
+  <!-- Error handling dan dynamic greeting script -->
   <script>
-    // JavaScript untuk dynamic greeting
     document.addEventListener('DOMContentLoaded', () => {
+      // Error handling dengan SweetAlert2
+      <?php if (!empty($error_message)): ?>
+      Swal.fire({
+        title: '<?= $error_type === "warning" ? "Peringatan!" : ($error_type === "error" ? "Error!" : "Informasi") ?>',
+        text: '<?= addslashes($error_message) ?>',
+        icon: '<?= $error_type === "warning" ? "warning" : ($error_type === "error" ? "error" : "info") ?>',
+        confirmButtonText: 'Mengerti',
+        confirmButtonColor: '#a97c50',
+        timer: <?= $error_type === "info" ? 5000 : 0 ?>,
+        timerProgressBar: <?= $error_type === "info" ? "true" : "false" ?>,
+        showCloseButton: true
+      });
+      <?php endif; ?>
+
+      // Search functionality
       const searchInput = document.getElementById('activitySearchInput');
       const tableBody = document.querySelector('.data-table-section tbody');
 
-      searchInput.addEventListener('input', () => {
-        const filter = searchInput.value.toLowerCase();
-        const rows = tableBody.querySelectorAll('tr');
-        rows.forEach(row => {
-          const text = row.textContent.toLowerCase();
-          row.style.display = text.includes(filter) ? '' : 'none';
+      if (searchInput && tableBody) {
+        searchInput.addEventListener('input', () => {
+          const filter = searchInput.value.toLowerCase();
+          const rows = tableBody.querySelectorAll('tr');
+          rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+          });
         });
-      });
+      }
 
       // Dynamic greeting berdasarkan waktu
       const currentHour = new Date().getHours();
@@ -606,14 +658,46 @@ if ($username === 'root' || $username === 'Guest' || empty($username)) {
 
       // Update welcome message dengan greeting yang sesuai waktu
       const welcomeTitle = document.getElementById('welcomeMessage');
-      const currentUsername = "<?php echo addslashes($displayName); ?>";
+      const currentUsername = "<?= addslashes($displayName) ?>";
       
       if (welcomeTitle && currentUsername && currentUsername !== 'root' && currentUsername !== 'Pengguna') {
         welcomeTitle.innerHTML = `${greeting}, ${currentUsername}!`;
       } else if (welcomeTitle) {
-        welcomeTitle.innerHTML = `${greeting}!`;
+        welcomeTitle.innerHTML = `${greeting}, <?= RoleHelper::getRoleDisplayName($display_role) ?>!`;
       }
+
+      // Animation untuk cards
+      const cards = document.querySelectorAll('.card-stat');
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          card.style.transition = 'all 0.5s ease';
+          
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, 100);
+        }, index * 100);
+      });
     });
+
+    // Function untuk menampilkan toast notification
+    function showToast(type, message) {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+    }
   </script>
 
 </body>
