@@ -109,15 +109,10 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                 }
 
                 // Determine redirect based on role
-                // Redirect berdasarkan role - admin dan super_admin ke admin panel
                 $redirect_url = '/majelismdpl.com';
-
-                if (in_array($user['role'], ['admin', 'super_admin'])) {
+                if ($user['role'] === 'admin') {
                     $redirect_url = '/majelismdpl.com/admin/index.php';
-                } else {
-                    $redirect_url = '/majelismdpl.com';
                 }
-
                 echo "<!DOCTYPE html>
                     <html>
                     <head>

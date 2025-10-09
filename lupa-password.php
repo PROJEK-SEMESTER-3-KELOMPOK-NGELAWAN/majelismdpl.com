@@ -30,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_otp'])) {
       $stmt2->execute();
       // Kirim ke email
       $mail = new PHPMailer(true);
-
       try {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
@@ -41,39 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_otp'])) {
         $mail->Port = 587;
         $mail->setFrom('dimasdwinugroho15@gmail.com', 'Majelis MDPL');
         $mail->addAddress($email);
-
         $mail->Subject = 'Kode OTP Reset Password Majelis MDPL';
-
-        // Email HTML body lebih menarik
-        $mail->isHTML(true);
-        $mail->Body = '
-        <div style="background:#f3f3f3;padding:30px;font-family:Arial,sans-serif;">
-          <center>
-            <div style="background:#fff;border-radius:12px;padding:24px 28px;max-width:420px;margin:auto;box-shadow:0 8px 32px rgba(80,80,80,0.13);">
-              <h2 style="color:#4752be;margin-bottom:10px">Permintaan Reset Password</h2>
-              <p style="font-size:15px;color:#222;margin-bottom:16px">
-                Halo, <b>' . htmlentities($email) . '</b>!<br>
-                Berikut adalah kode OTP untuk reset password akun Anda di Majelis MDPL.
-              </p>
-              <div style="background:#f6f8ff;border-radius:8px;padding:14px 0;margin-bottom:18px;border:1px solid #e2e6f8">
-                <span style="font-size:26px;letter-spacing:7px;font-weight:bold;color:#4752be;">' . htmlentities($otp) . '</span>
-              </div>
-              <div style="font-size:14px;color:#888;margin-bottom:12px">
-                Kode OTP hanya berlaku selama <b>10 menit</b>.
-              </div>
-              <hr style="border:none;border-top:1px solid #eee;margin:24px 0 16px">
-              <div style="font-size:12px;color:#999;line-height:1.6">
-                Jika Anda tidak meminta reset password, abaikan email ini.<br>
-                Salam,<br>
-                <b>Majelis MDPL</b>
-              </div>
-            </div>
-          </center>
-        </div>
-    ';
-
-        $mail->AltBody = "Kode OTP untuk reset password Anda: $otp\nKode berlaku 10 menit.";
-
+        $mail->Body = "Kode OTP untuk reset password Anda: $otp\nKode berlaku 10 menit.";
         $mail->send();
         $message = 'Kode OTP sudah dikirim ke email Anda. Silakan cek inbox email Anda lalu masukkan kode di bawah!';
         $step = 2; // Tampilkan form OTP

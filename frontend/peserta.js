@@ -14,13 +14,16 @@ class PesertaAPI {
   // Load all participants from API
   async loadParticipants() {
     try {
+      console.log("Fetching participants from:", this.baseURL + "?action=all");
       const response = await fetch(`${this.baseURL}?action=all`);
       const result = await response.json();
 
-        
+      console.log("API Response:", result);
+
       if (result.status === 200) {
         this.participants = result.data || [];
         this.renderParticipants();
+        console.log("Loaded participants:", this.participants.length);
       } else {
         this.showError("Gagal memuat data peserta: " + result.message);
       }

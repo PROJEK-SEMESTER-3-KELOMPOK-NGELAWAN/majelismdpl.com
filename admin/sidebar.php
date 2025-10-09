@@ -21,42 +21,26 @@ require_once 'auth_check.php';
             <i class="bi bi-bar-chart"></i>
             <span class="link-text">Dashboard</span>
         </a>
-        
-        <?php if (RoleHelper::canAccessMasterAdmin($user_role)): ?>
-        <a href="master-admin.php" class="sidebar-link <?= basename($_SERVER['PHP_SELF']) == 'master-admin.php' ? 'active' : '' ?>" data-tooltip="Master Admin">
+        <a href="master-admin.php" class="sidebar-link <?= basename($_SERVER['PHP_SELF']) == 'user.php' ? 'active' : '' ?>" data-tooltip="User">
             <i class="bi bi-person-gear"></i>
             <span class="link-text">Master Admin</span>
         </a>
-        <?php endif; ?>
-        
-        <?php if (RoleHelper::canManageTrips($user_role)): ?>
         <a href="trip.php" class="sidebar-link <?= basename($_SERVER['PHP_SELF']) == 'trip.php' ? 'active' : '' ?>" data-tooltip="Trip">
             <i class="bi bi-signpost-split"></i>
             <span class="link-text">Trip</span>
         </a>
-        <?php endif; ?>
-        
-        <?php if (RoleHelper::canManageParticipants($user_role)): ?>
         <a href="peserta.php" class="sidebar-link <?= basename($_SERVER['PHP_SELF']) == 'peserta.php' ? 'active' : '' ?>" data-tooltip="Peserta">
             <i class="bi bi-people"></i>
             <span class="link-text">Peserta</span>
         </a>
-        <?php endif; ?>
-        
-        <?php if (RoleHelper::canManagePayments($user_role)): ?>
         <a href="pembayaran.php" class="sidebar-link <?= basename($_SERVER['PHP_SELF']) == 'pembayaran.php' ? 'active' : '' ?>" data-tooltip="Pembayaran">
             <i class="bi bi-credit-card"></i>
             <span class="link-text">Pembayaran</span>
         </a>
-        <?php endif; ?>
-        
-        <?php if (RoleHelper::canManageGallery($user_role)): ?>
         <a href="galeri.php" class="sidebar-link <?= basename($_SERVER['PHP_SELF']) == 'galeri.php' ? 'active' : '' ?>" data-tooltip="Galeri">
             <i class="bi bi-images"></i>
             <span class="link-text">Galeri</span>
         </a>
-        <?php endif; ?>
-        
         <a href="#" class="sidebar-link logout-link" onclick="confirmLogout()" data-tooltip="Logout">
             <i class="bi bi-box-arrow-right"></i>
             <span class="link-text">Logout</span>
@@ -96,10 +80,10 @@ require_once 'auth_check.php';
     background: #a97c50;
     z-index: 1055;
     transition: width 0.3s ease;
-    overflow: hidden;
+    overflow: hidden; /* Mencegah overflow di sidebar utama */
     box-shadow: 2px 0 15px rgba(0,0,0,0.1);
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Untuk layout yang lebih baik */
 }
 
 /* Ketika sidebar collapsed - jadi mini sidebar */
@@ -111,7 +95,7 @@ require_once 'auth_check.php';
 .sidebar-toggle-container {
     padding: 15px;
     border-bottom: 1px solid rgba(255,255,255,0.2);
-    flex-shrink: 0;
+    flex-shrink: 0; /* Tidak akan menyusut */
 }
 
 /* Sidebar Toggle Button di dalam sidebar */
@@ -142,23 +126,7 @@ require_once 'auth_check.php';
     text-align: center;
     border-bottom: 1px solid rgba(255,255,255,0.2);
     transition: all 0.3s ease;
-    flex-shrink: 0;
-}
-
-/* User Info Styling */
-.user-info {
-    margin-top: 10px;
-}
-
-.user-info .badge {
-    font-size: 0.75em;
-    padding: 4px 8px;
-}
-
-/* Custom brown badge */
-.bg-brown {
-    background-color: #a97c50 !important;
-    color: white;
+    flex-shrink: 0; /* Tidak akan menyusut */
 }
 
 /* Ketika collapsed, sembunyikan logo dan title */
@@ -172,8 +140,7 @@ require_once 'auth_check.php';
     margin-bottom: 0;
 }
 
-.custom-sidebar.collapsed .sidebar-title,
-.custom-sidebar.collapsed .user-info {
+.custom-sidebar.collapsed .sidebar-title {
     display: none;
 }
 
@@ -195,15 +162,16 @@ require_once 'auth_check.php';
 
 /* Sidebar Navigation - Scrollable area */
 .custom-sidebar-nav {
-    flex: 1;
+    flex: 1; /* Mengisi sisa ruang yang tersedia */
     padding: 15px 10px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Hide horizontal scrolling */
+    /* Custom scrollbar styling */
     scrollbar-width: thin;
     scrollbar-color: rgba(255,255,255,0.3) transparent;
 }
 
-/* Custom scrollbar untuk webkit browsers */
+/* Custom scrollbar untuk webkit browsers (Chrome, Safari, Edge) */
 .custom-sidebar-nav::-webkit-scrollbar {
     width: 6px;
 }
@@ -222,6 +190,7 @@ require_once 'auth_check.php';
     background-color: rgba(255,255,255,0.5);
 }
 
+/* Collapsed sidebar scrollbar */
 .custom-sidebar.collapsed .custom-sidebar-nav::-webkit-scrollbar {
     width: 4px;
 }
@@ -237,7 +206,7 @@ require_once 'auth_check.php';
     transition: all 0.3s ease;
     font-size: 15px;
     position: relative;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Mencegah menu menyusut */
 }
 
 .sidebar-link:hover {
@@ -259,7 +228,7 @@ require_once 'auth_check.php';
     text-align: center;
     margin-right: 15px;
     transition: all 0.3s ease;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Icon tidak akan menyusut */
 }
 
 .sidebar-link .link-text {
@@ -300,7 +269,7 @@ require_once 'auth_check.php';
     white-space: nowrap;
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    pointer-events: none;
+    pointer-events: none; /* Mencegah interferensi dengan tooltip */
 }
 
 .custom-sidebar.collapsed .sidebar-link:hover::before {
@@ -328,7 +297,7 @@ require_once 'auth_check.php';
     margin-left: 280px;
     transition: margin-left 0.3s ease;
     padding: 20px;
-    min-height: 100vh;
+    min-height: 100vh; /* Pastikan konten utama bisa di-scroll */
 }
 
 /* Ketika sidebar collapsed */
@@ -358,6 +327,7 @@ body.sidebar-collapsed .content {
         margin-left: 0 !important;
     }
     
+    /* Mobile overlay */
     .mobile-overlay {
         position: fixed;
         top: 0;
@@ -377,10 +347,12 @@ body.sidebar-collapsed .content {
     }
 }
 
+/* Smooth scroll behavior */
 html {
     scroll-behavior: smooth;
 }
 
+/* Prevent horizontal scroll on body */
 body {
     overflow-x: hidden;
 }
@@ -392,27 +364,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('customSidebar');
     
+    // Check if mobile
     const isMobile = window.innerWidth <= 768;
     
+    // Set initial state
     if (isMobile) {
+        // Mobile: default tertutup
         sidebar.style.left = '-280px';
         document.body.classList.add('sidebar-collapsed');
         
+        // Create mobile overlay
         const mobileOverlay = document.createElement('div');
         mobileOverlay.className = 'mobile-overlay';
         mobileOverlay.id = 'mobileOverlay';
         document.body.appendChild(mobileOverlay);
         
+        // Mobile overlay click handler
         mobileOverlay.addEventListener('click', function() {
             closeSidebar();
         });
     } else {
+        // Desktop: default terbuka
         sidebar.classList.remove('collapsed');
         document.body.classList.remove('sidebar-collapsed');
     }
     
+    // Toggle sidebar function
     function toggleSidebar() {
         if (isMobile) {
+            // Mobile behavior - full show/hide
             const isOpen = sidebar.classList.contains('mobile-open');
             if (isOpen) {
                 sidebar.classList.remove('mobile-open');
@@ -426,11 +406,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (overlay) overlay.classList.add('show');
             }
         } else {
+            // Desktop behavior - expand/collapse
             sidebar.classList.toggle('collapsed');
             document.body.classList.toggle('sidebar-collapsed');
         }
     }
     
+    // Close sidebar function
     function closeSidebar() {
         if (isMobile) {
             sidebar.classList.remove('mobile-open');
@@ -440,10 +422,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Toggle button click handler
     if (sidebarToggle) {
         sidebarToggle.addEventListener('click', toggleSidebar);
     }
     
+    // Auto close on navigation (mobile only)
     const sidebarLinks = document.querySelectorAll('.sidebar-link:not(.logout-link)');
     sidebarLinks.forEach(function(link) {
         link.addEventListener('click', function() {
@@ -453,19 +437,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Handle window resize
     window.addEventListener('resize', function() {
         const newIsMobile = window.innerWidth <= 768;
         if (newIsMobile !== isMobile) {
-            location.reload();
+            location.reload(); // Reload untuk reset state
         }
     });
     
+    // Smooth scroll untuk sidebar navigation
     const sidebarNav = document.querySelector('.custom-sidebar-nav');
     if (sidebarNav) {
+        // Prevent scroll momentum on iOS
         sidebarNav.style.webkitOverflowScrolling = 'touch';
     }
 });
 
+// Toast function
 function showToast(type, message) {
     Swal.fire({
         toast: true,
@@ -481,6 +469,7 @@ function showToast(type, message) {
     });
 }
 
+// Logout confirmation
 function confirmLogout() {
     Swal.fire({
         title: 'Konfirmasi Logout',

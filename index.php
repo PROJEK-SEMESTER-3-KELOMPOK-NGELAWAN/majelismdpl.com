@@ -259,6 +259,58 @@
       stroke: currentColor;
       pointer-events: none;
     }
+
+    .gallery-cardstyle {
+      max-width: 1100px;
+      margin: 60px auto;
+      padding: 0 20px;
+      color: #222;
+      text-align: center;
+    }
+
+    .gallery-cardstyle h2 {
+      font-weight: 700;
+      font-size: 2.4rem;
+      margin-bottom: 24px;
+      color: #8b5e2e;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 28px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(180, 140, 65, 0.15);
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 0.35s ease, transform 0.3s ease;
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .caption {
+      padding: 8px 12px;
+      font-weight: 600;
+      color: #6e5a2b;
+      font-size: 1.1rem;
+      text-align: center;
+      background-color: #fff8ec;
+    }
+
+    .card:hover {
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+      transform: translateY(-8px);
+    }
   </style>
 </head>
 
@@ -267,7 +319,7 @@
   <nav class="navbar">
     <div class="navbar-logo">
       <!-- Ganti src logo sesuai file logo kamu, contoh PNG transparan: -->
-      <img src="img/majelismdpl.png" alt="Logo Majelis MDPL" class="logo-img" />
+      <img src="img/majelis.png" alt="Logo Majelis MDPL" class="logo-img" />
     </div>
     <ul class="navbar-menu">
       <li><a href="#" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
@@ -352,7 +404,24 @@
     <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
   </div>
 
-
+  <section class="gallery-cardstyle">
+    <h2>Galeri Foto</h2>
+    <div class="card-grid">
+      <div class="card">
+        <img src="img/foto1.png" alt="Foto 1" />
+        <div class="caption">Gunung Bromo Sunrise</div>
+      </div>
+      <div class="card">
+        <img src="img/foto3.png" alt="Foto 2" />
+        <div class="caption">Camping Savana</div>
+      </div>
+      <div class="card">
+        <img src="img/foto2.png" alt="Foto 3" />
+        <div class="caption">Trip Seru Bersama</div>
+      </div>
+      <!-- Tambah kartu lainnya serupa -->
+    </div>
+  </section>
 
   <!-- Testimonials -->
   <section id="testimonials" class="testimonials">
@@ -483,46 +552,51 @@
           <div class="form-grid">
             <!-- Row 1 -->
             <div class="input-group">
-              <input type="text" name="username" placeholder="Username" autocomplete="username" required minlength="3" />
-              <small class="error-message" style="color: #e74c3c; font-size: 12px; display: none;">Username minimal 3 karakter</small>
+              <input type="text" name="username" placeholder="Username" autocomplete="username" required />
             </div>
             <div class="input-group password-group">
-              <input type="password" name="password" id="signupPassword" placeholder="Password" autocomplete="new-password" required minlength="6" />
+              <input type="password" name="password" id="signupPassword" placeholder="Password"
+                autocomplete="new-password" required />
               <button type="button" class="password-toggle" id="toggleSignupPassword">
-                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor" width="18" height="18">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                 </svg>
               </button>
-              <small class="error-message" style="color: #e74c3c; font-size: 12px; display: none;">Password minimal 6 karakter</small>
             </div>
 
             <!-- Row 2 -->
             <div class="input-group password-group">
-              <input type="password" name="confirm_password" id="confirmPassword" placeholder="Konfirmasi Password" autocomplete="new-password" required />
+              <input type="password" name="confirm_password" id="confirmPassword" placeholder="Konfirmasi Password"
+                autocomplete="new-password" required />
               <button type="button" class="password-toggle" id="toggleConfirmPassword">
-                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <svg class="eye-icon show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor" width="18" height="18">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                <svg class="eye-icon hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke-width="1.5" stroke="currentColor" width="18" height="18" style="display: none;">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                 </svg>
               </button>
-              <small class="error-message" style="color: #e74c3c; font-size: 12px; display: none;">Password tidak cocok</small>
             </div>
             <div class="input-group">
               <input type="email" name="email" placeholder="Email" autocomplete="email" required />
-              <small class="error-message" style="color: #e74c3c; font-size: 12px; display: none;">Format email tidak valid</small>
             </div>
 
             <!-- Row 3 -->
             <div class="input-group">
-              <input type="tel" name="no_wa" placeholder="No HP (contoh: 081234567890)" inputmode="tel" autocomplete="tel" required />
-              <small class="error-message" style="color: #e74c3c; font-size: 12px; display: none;">Format nomor HP tidak valid</small>
+              <input type="tel" name="no_wa" placeholder="No HP" inputmode="tel" autocomplete="tel" required />
             </div>
             <div class="input-group">
               <input type="text" name="alamat" placeholder="Alamat" autocomplete="street-address" required />
@@ -546,10 +620,7 @@
     </div>
   </div>
 
-
-
-
-
+  <!-- footer -->
   <footer class="footer">
     <div class="container">
       <!-- Kolom Kiri -->
@@ -589,10 +660,6 @@
     </div>
   </footer>
 
-
-
-
-
   <!-- Tombol WhatsApp -->
   <div class="whatsapp-container">
     <button class="whatsapp-button" onclick="bukaWhatsapp()">
@@ -604,7 +671,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Global functions that might be needed -->
-  <script>
+  <script> 
     // Buka WhatsApp helper
     function bukaWhatsapp() {
       const nomor = "6283853493130";

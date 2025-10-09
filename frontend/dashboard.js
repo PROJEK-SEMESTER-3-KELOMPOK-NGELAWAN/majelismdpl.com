@@ -6,6 +6,7 @@ class DashboardStats {
     }
 
     async init() {
+        console.log('Initializing Dashboard Stats...');
         await this.loadDashboardStats();
         
         // Auto-refresh setiap 30 detik
@@ -17,15 +18,19 @@ class DashboardStats {
     // Load semua statistik dashboard
     async loadDashboardStats() {
         try {
+            console.log('Loading dashboard statistics from:', this.baseURL);
             const response = await fetch(`${this.baseURL}?action=getDashboardStats`);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            const result = await response.json();            
+            const result = await response.json();
+            console.log('Dashboard stats response:', result);
+            
             if (result.success) {
                 this.updateAllStats(result.data);
+                console.log('Last updated:', result.data.last_updated);
             } else {
                 console.error('Failed to load dashboard stats:', result.error);
                 this.showError('Gagal memuat statistik dashboard: ' + result.error);
@@ -38,6 +43,7 @@ class DashboardStats {
 
     // Update semua statistik di dashboard
     updateAllStats(stats) {
+        console.log('Updating dashboard stats:', stats);
         
         // Update Trip Aktif (status = available)
         this.updateStat('trip-aktif', stats.trip_aktif);
@@ -50,6 +56,14 @@ class DashboardStats {
         
         // Update Pembayaran Pending
         this.updateStat('pembayaran-pending', stats.pembayaran_pending);
+        
+        // Log untuk debugging
+        console.log('Stats updated:', {
+            'Trip Aktif': stats.trip_aktif,
+            'Trip Selesai': stats.trip_selesai,
+            'Total Peserta': stats.total_peserta,
+            'Pembayaran Pending': stats.pembayaran_pending
+        });
     }
 
     // Update statistik individual dengan animasi
@@ -64,6 +78,7 @@ class DashboardStats {
         const currentValue = parseInt(element.textContent) || 0;
         
         if (currentValue !== newValue) {
+            console.log(`Updating ${statType}: ${currentValue} → ${newValue}`);
             this.animateNumber(element, currentValue, newValue);
         }
     }
@@ -100,11 +115,14 @@ class DashboardStats {
             const result = await response.json();
             
             if (result.success) {
+                console.log(`${status} trips count:`, result.count);
                 return result.count;
             } else {
+                console.error(`Failed to get ${status} trips count:`, result.error);
                 return 0;
             }
         } catch (error) {
+            console.error(`Error getting ${status} trips count:`, error);
             return 0;
         }
     }
@@ -116,8 +134,10 @@ class DashboardStats {
             const result = await response.json();
             
             if (result.success) {
+                console.log('Trips overview:', result.data);
                 return result.data;
             } else {
+                console.error('Failed to get trips overview:', result.error);
                 return null;
             }
         } catch (error) {
@@ -128,6 +148,7 @@ class DashboardStats {
 
     // Manual refresh
     async refresh() {
+        console.log('Manual refresh triggered');
         await this.loadDashboardStats();
     }
 
