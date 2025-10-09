@@ -389,6 +389,28 @@
     </div>
   </section>
 
+  <!-- Profil -->
+  <section class="profil-section" id="profil">
+    <div class="profil-header" aria-label="Judul Bagian">
+      <h1>MAJELIS MDPL</h1>
+    </div>
+
+    <div class="profil-container">
+      <div class="profil-text">
+        <h2>Tentang Kami</h2>
+        <p>Kami adalah komunitas petualang yang menyediakan pengalaman open trip seru dan aman ke berbagai destinasi alam terbaik. Bergabunglah dan rasakan petualangan yang sesungguhnya bersama kami!</p>
+        <p class="logo-description">Logo <strong>Majelis MDPL</strong> merepresentasikan semangat petualangan dan kecintaan terhadap alam. Visual utama berupa pegunungan, matahari, deretan pohon, dan tenda di tengahnya menggambarkan kegiatan eksplorasi, pendakian, dan camping yang menjadi identitas komunitas ini.</p>
+        <p class="logo-description">Warna maroon yang dominan melambangkan keberanian dan kekompakan, sementara warna kuning emas pada tulisan “MAJELIS” memberi kesan hangat dan bersahabat. Elemen “MDPL” menguatkan identitas komunitas pecinta alam dengan merujuk pada satuan ketinggian yang umum digunakan dalam dunia pendakian.</p>
+        <p class="logo-description">Tulisan “Since 2025” menunjukkan bahwa Majelis MDPL telah berdiri sejak tahun 2025, menandakan komitmen dan eksistensi dalam mengajak masyarakat untuk lebih dekat dengan alam.</p>
+        <p class="logo-description">Secara keseluruhan, logo ini mencerminkan semangat menjelajah, kebersamaan, dan kepedulian terhadap alam dalam satu simbol yang kuat dan bermakna.</p>
+      </div>
+
+      <div class="profil-logo">
+        <img src="img/majelismdpl.png" alt="Logo Profil">
+      </div>
+    </div>
+  </section>
+
   <div class="destination-carousel">
     <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
 
