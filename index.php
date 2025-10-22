@@ -311,7 +311,76 @@
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
       transform: translateY(-8px);
     }
-    
+
+    .hero-carousel {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .carousel-item {
+      width: 120px;
+      /* diperbesar dari 80px */
+      height: 75px;
+      /* sesuai rasio */
+      object-fit: cover;
+      opacity: 0.6;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: opacity 0.3s ease, border-color 0.3s ease;
+    }
+
+    .carousel-item.active {
+      opacity: 1;
+      border-color: #b089f4;
+      box-shadow: 0 4px 12px rgba(176, 137, 244, 0.6);
+      transform: scale(1.1);
+    }
+
+    .hero-home {
+      position: relative;
+      height: 400px;
+      /* area tinggi hero penuh sesuai desain */
+      overflow: hidden;
+    }
+
+    .hero-bg-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .hero-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 1s ease-in-out;
+      opacity: 1;
+      display: block;
+    }
+
+    .hero-bg.fade-out {
+      opacity: 0;
+    }
+
+    .hero-bg.fade-in {
+      opacity: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      /* beri styling sesuai desain  */
+      color: #fff;
+      padding: 60px 30px;
+    }
+
+    /* Carousel & konten lainnya tetap seperti CSS milikmu */
   </style>
 </head>
 
@@ -337,22 +406,25 @@
   </nav>
 
   <!-- Hero -->
-  <section class="hero-home">
-    <img src="img/Herooo.jpg" alt="Gunung Bromo" class="hero-bg">
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <span class="hero-offer">BEST OFFERS</span>
-      <h1 class="hero-title">GUNUNG BROMO</h1>
-      <div class="hero-days"><span class="highlight">1 HARI</span></div>
-      <p class="hero-desc">Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan</p>
+  <section class="hero-home" style="position: relative; height: 400px;">
+    <div class="hero-bg-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
+      <img src="img/gambar1.jpg" alt="Gunung Bromo" class="hero-bg" id="hero-bg">
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content" style="position: relative; z-index: 2;">
+      <span class="hero-offer" id="hero-offer">BEST OFFERS</span>
+      <h1 class="hero-title" id="hero-title">GUNUNG BROMO</h1>
+      <div class="hero-days"><span class="highlight" id="hero-days">1 HARI</span></div>
+      <p class="hero-desc" id="hero-desc">Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan</p>
       <button class="hero-btn">DETAIL</button>
-      <div class="hero-carousel">
-        <img src="img/gambar1.jpg" alt="Jellyfish" class="carousel-item">
-        <img src="img/gambar2.jpg" alt="Sunrise" class="carousel-item">
-        <img src="img/gambar3.jpg" alt="Forest" class="carousel-item">
+      <div class="hero-carousel" id="hero-carousel">
+        <img src="img/herooo.jpg" alt="Gunung Bromo" class="carousel-item active" data-index="0">
+        <img src="img/ijen.jpg" alt="Sunrise" class="carousel-item" data-index="1">
+        <img src="img/rinjani.jpg" alt="Forest" class="carousel-item" data-index="2">
       </div>
     </div>
   </section>
+
 
   <!-- profile -->
   <section class="why-explorer">
@@ -405,19 +477,19 @@
     <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
   </div>
 
-   <section class="gallery-cardstyle">
+  <section class="gallery-cardstyle">
     <h2>Galeri Foto</h2>
     <div class="card-grid">
       <div class="card">
-        <img src="img/foto1.png" alt="Foto 1" />
+        <img src="img/gambar3.jpg" alt="Foto 1" />
         <div class="caption">Gunung Bromo Sunrise</div>
       </div>
       <div class="card">
-        <img src="img/foto3.png" alt="Foto 2" />
+        <img src="img/gambar2.jpg" alt="Foto 2" />
         <div class="caption">Camping Savana</div>
       </div>
       <div class="card">
-        <img src="img/foto2.png" alt="Foto 3" />
+        <img src="img/gambar1.jpg" alt="Foto 3" />
         <div class="caption">Trip Seru Bersama</div>
       </div>
       <!-- Tambah kartu lainnya serupa -->
@@ -888,6 +960,108 @@
         }, 300);
       }
     }
+
+
+    fetch('backend/galeri-api.php?action=get')
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          const galleryContainer = document.querySelector('.card-grid');
+          galleryContainer.innerHTML = ''; // kosongkan dulu
+          result.data.forEach(item => {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.innerHTML = `
+          <img src="img/${item.gallery}" alt="Foto" />
+          
+        `;
+            galleryContainer.appendChild(card);
+          });
+        } else {
+          console.error(result.message);
+        }
+      })
+      .catch(err => console.error(err));
+
+
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const heroSlides = [{
+          image: "img/herooo.jpg",
+          title: "GUNUNG BROMO",
+          offer: "BEST OFFERS",
+          days: "1 HARI",
+          desc: "Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan"
+        },
+        {
+          image: "img/ijen.jpg",
+          title: "GUNUNG IJEN",
+          offer: "IJEN ADVENTURE",
+          days: "2 HARI",
+          desc: "Nikmati pengalaman mendaki gunung berapi biru yang menakjubkan di Jawa Timur."
+        },
+        {
+          image: "img/rinjani.jpg",
+          title: "GUNUNG RINJANI",
+          offer: "RINJANI EXPEDITION",
+          days: "3 HARI",
+          desc: "Rasakan petualangan mendaki puncak tertinggi di Nusa Tenggara Barat. Pemandangannya luar biasa, mulai danau Segara Anak hingga sunrise dari puncak Rinjani."
+        }
+      ];
+
+      const heroBg = document.getElementById('hero-bg');
+      const carouselItems = document.querySelectorAll('.carousel-item');
+      const titleElem = document.getElementById('hero-title');
+      const offerElem = document.getElementById('hero-offer');
+      const daysElem = document.getElementById('hero-days');
+      const descElem = document.getElementById('hero-desc');
+
+      let currentIndex = 0;
+      let slideInterval;
+      const total = heroSlides.length;
+
+      function setActiveIndex(index) {
+        carouselItems.forEach((item, i) => {
+          item.classList.toggle('active', i === index);
+        });
+        // Fade out dulu
+        heroBg.classList.remove('fade-in');
+        heroBg.classList.add('fade-out');
+
+        setTimeout(() => {
+          // Ganti gambar dan text saat sudah fade out
+          heroBg.src = heroSlides[index].image;
+          titleElem.textContent = heroSlides[index].title;
+          offerElem.textContent = heroSlides[index].offer;
+          daysElem.textContent = heroSlides[index].days;
+          descElem.textContent = heroSlides[index].desc;
+
+          heroBg.classList.remove('fade-out');
+          heroBg.classList.add('fade-in');
+          currentIndex = index;
+        }, 500); // Setengah detik waktu fade-out
+      }
+
+      function startSlideShow() {
+        slideInterval = setInterval(() => {
+          let nextIndex = (currentIndex + 1) % total;
+          setActiveIndex(nextIndex);
+        }, 4000);
+      }
+
+      carouselItems.forEach(item => {
+        item.addEventListener('click', () => {
+          clearInterval(slideInterval);
+          setActiveIndex(parseInt(item.dataset.index));
+          startSlideShow();
+        });
+      });
+
+      setActiveIndex(0);
+      startSlideShow();
+    });
   </script>
 
   <!-- Load external JavaScript files -->

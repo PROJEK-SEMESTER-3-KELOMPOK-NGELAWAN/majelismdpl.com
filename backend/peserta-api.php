@@ -76,22 +76,13 @@ try {
     sendResponse(500, 'Server error: ' . $e->getMessage());
 }
 
-// Function to get all participants with booking info
+// Function to get all participants (with booking info)
 function getAllParticipants($conn)
 {
-    $query = "
-        SELECT 
-            participants.*,
-            bookings.id_booking,
-            bookings.id_trip,
-            bookings.jumlah_orang,
-            bookings.total_harga,
-            bookings.tanggal_booking,
-            bookings.status
-        FROM participants
-        LEFT JOIN bookings ON participants.id_participant = bookings.id_participant
-        ORDER BY participants.id_participant DESC
-    ";
+    $query = "SELECT participants.*, bookings.id_booking, bookings.id_trip, bookings.jumlah_orang, bookings.total_harga, bookings.tanggal_booking, bookings.status
+              FROM participants
+              LEFT JOIN bookings ON participants.id_booking = bookings.id_booking
+              ORDER BY participants.id_participant DESC";
     $result = $conn->query($query);
     if (!$result) {
         sendResponse(500, 'Database query error: ' . $conn->error);
@@ -117,7 +108,7 @@ function getParticipantDetail($conn, $id)
             bookings.tanggal_booking,
             bookings.status
         FROM participants
-        LEFT JOIN bookings ON participants.id_participant = bookings.id_participant
+        LEFT JOIN bookings ON participants.id_booking = bookings.id_booking
         WHERE participants.id_participant = ?
     ");
     $stmt->bind_param("i", $id);
@@ -134,11 +125,9 @@ function getParticipantDetail($conn, $id)
 // Function untuk upload file
 function uploadFile($file, $uploadDir = '../uploads/ktp/')
 {
-    // Buat direktori jika belum ada
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0755, true);
     }
-    // Validasi file
     $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     $maxSize = 5 * 1024 * 1024; // 5MB
     if (!in_array($file['type'], $allowedTypes)) {
@@ -147,19 +136,17 @@ function uploadFile($file, $uploadDir = '../uploads/ktp/')
     if ($file['size'] > $maxSize) {
         throw new Exception('Ukuran file terlalu besar. Maksimal 5MB.');
     }
-    // Generate nama file unik
     $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
     $fileName = 'ktp_' . time() . '_' . rand(1000, 9999) . '.' . $extension;
     $targetPath = $uploadDir . $fileName;
-    // Upload file
     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-        return 'uploads/ktp/' . $fileName; // Return relative path untuk database
+        return 'uploads/ktp/' . $fileName;
     } else {
         throw new Exception('Gagal mengupload file');
     }
 }
 
-// Function untuk update participant dengan file upload
+// Update peserta + upload file
 function updateParticipantWithFile($conn, $id, $id_user)
 {
     $checkStmt = $conn->prepare("SELECT foto_ktp, nama FROM participants WHERE id_participant = ?");
@@ -174,7 +161,7 @@ function updateParticipantWithFile($conn, $id, $id_user)
     $oldFotoPath = $currentData['foto_ktp'];
     $participantNama = $currentData['nama'];
     $data = $_POST;
-    $fotoKtpPath = $oldFotoPath; // Default gunakan foto lama
+    $fotoKtpPath = $oldFotoPath;
 
     if (isset($_FILES['foto_ktp']) && $_FILES['foto_ktp']['error'] === UPLOAD_ERR_OK) {
         try {
@@ -191,7 +178,7 @@ function updateParticipantWithFile($conn, $id, $id_user)
     $updateFields = [];
     $values = [];
     $types = '';
-    $allowedFields = ['nama', 'email', 'no_wa', 'alamat', 'riwayat_penyakit', 'no_wa_darurat', 'tanggal_lahir', 'tempat_lahir', 'nik'];
+    $allowedFields = ['nama', 'email', 'no_wa', 'alamat', 'riwayat_penyakit', 'no_wa_darurat', 'tanggal_lahir', 'tempat_lahir', 'nik', 'id_booking'];
     foreach ($allowedFields as $field) {
         if (isset($data[$field])) {
             $updateFields[] = "$field = ?";
@@ -202,6 +189,7 @@ function updateParticipantWithFile($conn, $id, $id_user)
     $updateFields[] = "foto_ktp = ?";
     $values[] = $fotoKtpPath;
     $types .= 's';
+
     if (empty($updateFields)) {
         sendResponse(400, 'No valid fields to update');
         return;
@@ -211,6 +199,7 @@ function updateParticipantWithFile($conn, $id, $id_user)
     $query = "UPDATE participants SET " . implode(', ', $updateFields) . " WHERE id_participant = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param($types, ...$values);
+
     if ($stmt->execute()) {
         if ($id_user) {
             $aktivitas = "Mengupdate data peserta (ID: $id, Nama: $participantNama)";
@@ -222,17 +211,18 @@ function updateParticipantWithFile($conn, $id, $id_user)
     }
 }
 
-// Function to create new participant
+// Create participant
 function createParticipant($conn, $id_user)
 {
     $data = json_decode(file_get_contents('php://input'), true);
-    $required_fields = ['nama', 'email', 'no_wa', 'alamat', 'tanggal_lahir', 'tempat_lahir', 'nik'];
+    $required_fields = ['nama', 'email', 'no_wa', 'alamat', 'tanggal_lahir', 'tempat_lahir', 'nik', 'id_booking'];
     foreach ($required_fields as $field) {
         if (!isset($data[$field]) || empty(trim($data[$field]))) {
             sendResponse(400, "Field '$field' is required");
             return;
         }
     }
+
     $checkStmt = $conn->prepare("SELECT id_participant FROM participants WHERE email = ? OR nik = ?");
     $checkStmt->bind_param("ss", $data['email'], $data['nik']);
     $checkStmt->execute();
@@ -241,23 +231,10 @@ function createParticipant($conn, $id_user)
         sendResponse(409, 'Email or NIK already exists');
         return;
     }
-    $stmt = $conn->prepare("
-        INSERT INTO participants (nama, email, no_wa, alamat, riwayat_penyakit, no_wa_darurat, tanggal_lahir, tempat_lahir, nik, foto_ktp)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->bind_param(
-        "ssssssssss",
-        $data['nama'],
-        $data['email'],
-        $data['no_wa'],
-        $data['alamat'],
-        $data['riwayat_penyakit'] ?? '',
-        $data['no_wa_darurat'] ?? '',
-        $data['tanggal_lahir'],
-        $data['tempat_lahir'],
-        $data['nik'],
-        $data['foto_ktp'] ?? ''
-    );
+
+    $stmt = $conn->prepare("INSERT INTO participants (nama, email, no_wa, alamat, riwayat_penyakit, no_wa_darurat, tanggal_lahir, tempat_lahir, nik, foto_ktp, id_booking)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssssssi", $data['nama'], $data['email'], $data['no_wa'], $data['alamat'], $data['riwayat_penyakit'] ?? null, $data['no_wa_darurat'] ?? null, $data['tanggal_lahir'], $data['tempat_lahir'], $data['nik'], $data['foto_ktp'] ?? null, $data['id_booking']);
     if ($stmt->execute()) {
         $newId = $conn->insert_id;
         if ($id_user) {
@@ -270,7 +247,7 @@ function createParticipant($conn, $id_user)
     }
 }
 
-// Function to update participant (JSON only)
+// Update participant
 function updateParticipant($conn, $id, $id_user)
 {
     $data = json_decode(file_get_contents('php://input'), true);
@@ -286,7 +263,7 @@ function updateParticipant($conn, $id, $id_user)
     $updateFields = [];
     $values = [];
     $types = '';
-    $allowedFields = ['nama', 'email', 'no_wa', 'alamat', 'riwayat_penyakit', 'no_wa_darurat', 'tanggal_lahir', 'tempat_lahir', 'nik', 'foto_ktp'];
+    $allowedFields = ['nama', 'email', 'no_wa', 'alamat', 'riwayat_penyakit', 'no_wa_darurat', 'tanggal_lahir', 'tempat_lahir', 'nik', 'foto_ktp', 'id_booking'];
     foreach ($allowedFields as $field) {
         if (isset($data[$field])) {
             $updateFields[] = "$field = ?";
@@ -327,11 +304,11 @@ function deleteParticipant($conn, $id, $id_user)
     }
     $participantData = $checkResult->fetch_assoc();
     $participantNama = $participantData['nama'];
-    $deleteBookingsStmt = $conn->prepare("DELETE FROM bookings WHERE id_participant = ?");
-    $deleteBookingsStmt->bind_param("i", $id);
-    $deleteBookingsStmt->execute();
+
+    // Hapus peserta saja (tidak perlu hapus bookings berdasarkan id_participant)
     $deleteStmt = $conn->prepare("DELETE FROM participants WHERE id_participant = ?");
     $deleteStmt->bind_param("i", $id);
+
     if ($deleteStmt->execute()) {
         if ($participantData['foto_ktp'] && file_exists('../' . $participantData['foto_ktp'])) {
             unlink('../' . $participantData['foto_ktp']);
@@ -360,3 +337,4 @@ function sendResponse($status, $message, $data = null)
     echo json_encode($response, JSON_PRETTY_PRINT);
     exit();
 }
+?>

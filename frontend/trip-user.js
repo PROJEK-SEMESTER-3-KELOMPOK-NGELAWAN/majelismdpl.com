@@ -144,3 +144,15 @@ function setupCarouselNavigation() {
     });
   }
 }
+
+async function autofillForm(){
+  let res = await fetch('backend/user-session-api.php');
+  let json = await res.json();
+  if(json.logged_in && document.querySelector('[name=nama]')){
+    document.querySelector('[name=nama]').value = json.user.nama || '';
+    document.querySelector('[name=email]').value = json.user.email || '';
+    document.querySelector('[name=alamat]').value = json.user.alamat || '';
+    document.querySelector('[name=no_wa]').value = json.user.no_wa || '';
+    document.querySelector('[name=tanggal_lahir]').value = json.user.tanggal_lahir || '';
+  }
+}
