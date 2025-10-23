@@ -96,7 +96,25 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
 </div>
 
 <style>
-  /* Navbar Glassmorphism */
+  /* === RESET DASAR === */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "Poppins", Arial, sans-serif;
+    background-color: #fafbff;
+    line-height: 1.6;
+    color: #333;
+    overflow-x: hidden;
+  }
+
   * {
     box-sizing: border-box;
   }

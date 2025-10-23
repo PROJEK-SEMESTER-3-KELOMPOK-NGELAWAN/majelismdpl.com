@@ -588,9 +588,9 @@ session_start();
   <!-- profile -->
   <section class="why-explorer">
     <div class="gallery-collage">
-      <img src="img/gambar1.jpg" alt="Trip Foto 1" class="item item1">
-      <img src="img/gambar2.jpg" alt="Trip Foto 2" class="item item2">
-      <img src="img/gambar3.jpg" alt="Trip Foto 3" class="item item3">
+      <img src="img/ijen.jpg" alt="Trip Foto 1" class="item item1">
+      <img src="img/rinjani.jpg" alt="Trip Foto 2" class="item item2">
+      <img src="img/gunung_rinjani.jpg" alt="Trip Foto 3" class="item item3">
       <img src="img/gambar1.jpg" alt="Trip Foto 4" class="item item4">
       <img src="img/gambar2.jpg" alt="Trip Foto 5" class="item item5">
     </div>
@@ -763,9 +763,6 @@ session_start();
     </div>
   </div>
 
-
-
-
   <!-- POPUP SIGN UP -->
   <div id="signUpModal" class="modal">
     <div class="modal-container signup-modal">
@@ -850,9 +847,6 @@ session_start();
   </div>
 
 
-
-
-
   <footer class="footer">
     <div class="container">
       <!-- Kolom Kiri -->
@@ -891,9 +885,6 @@ session_start();
       <p>Copyright © 2025 Majelis Mdpl. All rights reserved. Developed with ❤ by Dimasdw15</p>
     </div>
   </footer>
-
-
-
 
 
   <!-- Tombol WhatsApp -->
