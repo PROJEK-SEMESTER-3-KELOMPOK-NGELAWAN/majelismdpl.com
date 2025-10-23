@@ -8,7 +8,7 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
 $navbarPath = '';
 $currentDir = dirname($_SERVER['PHP_SELF']);
 if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== false) {
-    $navbarPath = '../';
+  $navbarPath = '../';
 }
 ?>
 
@@ -33,12 +33,13 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
   </button>
 
   <ul class="navbar-menu" id="navbarMenu" role="menu">
-    <li><a href="<?php echo $navbarPath; ?>index.php" class="active" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="<?php echo $navbarPath; ?>index.php" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
     <li><a href="#" role="menuitem"><i class="fa-solid fa-user"></i> Profile</a></li>
     <li><a href="#" role="menuitem"><i class="fa-solid fa-calendar-days"></i> Jadwal Pendakian</a></li>
     <li><a href="#" role="menuitem"><i class="fa-solid fa-image"></i> Galeri</a></li>
     <li><a href="#" role="menuitem"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
   </ul>
+
 
   <?php if (!$isLoggedIn): ?>
     <!-- Tampilkan tombol Sign Up dan Login jika belum login -->
@@ -54,7 +55,7 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
         <span class="user-name"><?php echo htmlspecialchars($userName, ENT_QUOTES, 'UTF-8'); ?></span>
         <i class="fa-solid fa-chevron-down dropdown-icon"></i>
       </button>
-      
+
       <div class="user-dropdown" id="userDropdown">
         <a href="<?php echo $navbarPath; ?>user/profile.php" class="dropdown-item">
           <i class="fa-solid fa-user"></i> Profil
@@ -76,7 +77,7 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
 
 <!-- Form tersembunyi untuk logout -->
 <form id="logout-form" method="POST" action="<?php echo $navbarPath; ?>user/logout.php" style="display: none;">
-    <input type="hidden" name="confirm_logout" value="1">
+  <input type="hidden" name="confirm_logout" value="1">
 </form>
 
 <!-- Custom Logout Modal -->
@@ -162,9 +163,15 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     gap: 7px;
   }
 
-  .navbar-menu a.active,
+  /* Styling untuk hover saja */
   .navbar-menu a:hover {
     background: #a97c50;
+    color: #fff;
+  }
+
+  /* Styling untuk active dengan warna berbeda (opsional) */
+  .navbar-menu a.active {
+    background: #8b5e3c;
     color: #fff;
   }
 
@@ -175,11 +182,15 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     transition: transform 0.23s cubic-bezier(0.54, 0.14, 0.23, 1.12), color 0.15s;
   }
 
-  .navbar-menu a:hover i,
-  .navbar-menu a.active i {
+  .navbar-menu a:hover i {
     transform: scale(1.25) rotate(-13deg) translateY(-5px);
     color: #ffffff;
     animation: navbarBounce 0.44s cubic-bezier(0.39, 1.6, 0.63, 1) 1;
+  }
+
+  /* Icon untuk active tanpa animasi berlebihan */
+  .navbar-menu a.active i {
+    color: #ffffff;
   }
 
   @keyframes navbarBounce {

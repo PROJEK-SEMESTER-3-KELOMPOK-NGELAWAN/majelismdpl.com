@@ -16,532 +16,548 @@ session_start();
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <style>
-    .modal-container,
-    .signup-modal {
-      background: rgba(34, 36, 58, 0.26);
-      border-radius: 16px;
-      box-shadow: 0 8px 22px #0006;
-      max-width: 350px;
-      min-width: 220px;
-      width: 100%;
-      padding: 0;
-      overflow: hidden;
-      backdrop-filter: blur(9px);
-      -webkit-backdrop-filter: blur(9px);
-      border: 2px solid rgba(255, 255, 255, 0.14);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
+<style>
+  .modal-container,
+  .signup-modal {
+    background: rgba(34, 36, 58, 0.26);
+    border-radius: 16px;
+    box-shadow: 0 8px 22px #0006;
+    max-width: 350px;
+    min-width: 220px;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+    border: 2px solid rgba(255, 255, 255, 0.14);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
 
-    .signup-modal {
-      max-width: 410px;
-    }
+  .signup-modal {
+    max-width: 410px;
+  }
 
-    .modal-logo,
-    .signup-modal .modal-logo {
-      width: 44px;
-      height: 44px;
-      margin: 13px auto 6px auto;
-      background: rgba(255, 255, 255, 0.13);
-      border-radius: 50%;
-      box-shadow: 0 1px 6px #e2c7fd33;
-      object-fit: contain;
-      display: block;
-    }
+  .modal-logo,
+  .signup-modal .modal-logo {
+    width: 44px;
+    height: 44px;
+    margin: 13px auto 6px auto;
+    background: rgba(255, 255, 255, 0.13);
+    border-radius: 50%;
+    box-shadow: 0 1px 6px #e2c7fd33;
+    object-fit: contain;
+    display: block;
+  }
 
-    .modal-left,
-    .signup-modal .modal-left {
-      width: 100%;
-      background: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 2px;
-    }
+  .modal-left,
+  .signup-modal .modal-left {
+    width: 100%;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
 
-    .modal-right,
-    .signup-modal .modal-right {
-      width: 100%;
-      background: none;
-      padding: 12px 14px 10px 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      color: #fff;
-    }
+  .modal-right,
+  .signup-modal .modal-right {
+    width: 100%;
+    background: none;
+    padding: 12px 14px 10px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #fff;
+  }
 
-    .modal-container h2,
-    .signup-modal h2 {
-      font-size: 1.08rem;
-      font-weight: 700;
-      margin-bottom: 15px;
-      color: #fff;
-      text-align: center;
-      letter-spacing: .45px;
+  .modal-container h2,
+  .signup-modal h2 {
+    font-size: 1.08rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #fff;
+    text-align: center;
+    letter-spacing: .45px;
+  }
+
+  .signup-modal .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+    margin-bottom: 10px;
+  }
+
+  .signup-modal .form-grid .field-full {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 540px) {
+
+    .signup-modal,
+    .modal-container {
+      max-width: 99vw;
     }
 
     .signup-modal .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px 12px;
-      margin-bottom: 10px;
+      grid-template-columns: 1fr;
+      gap: 8px 0;
     }
 
     .signup-modal .form-grid .field-full {
-      grid-column: 1 / -1;
+      grid-column: auto;
     }
+  }
 
-    @media (max-width: 540px) {
+  .modal-container .input-group input,
+  .signup-modal .input-group input {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1.2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 7px;
+    font-weight: 500;
+    font-size: 13px;
+    color: #fff !important;
+    padding: 8px 10px;
+    margin-bottom: 3px;
+    min-width: 0;
+  }
 
-      .signup-modal,
-      .modal-container {
-        max-width: 99vw;
-      }
+  .modal-container .input-group input:focus,
+  .signup-modal .input-group input:focus {
+    background: rgba(255, 255, 255, 0.19) !important;
+    border-color: #b089f4;
+    color: #fff !important;
+  }
 
-      .signup-modal .form-grid {
-        grid-template-columns: 1fr;
-        gap: 8px 0;
-      }
+  ::placeholder {
+    color: #d0d0d0;
+    opacity: 0.93;
+  }
 
-      .signup-modal .form-grid .field-full {
-        grid-column: auto;
-      }
-    }
+  .modal-container .divider,
+  .signup-modal .divider {
+    margin: 9px 0 6px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0.35em;
+    text-align: center;
+  }
 
-    .modal-container .input-group input,
-    .signup-modal .input-group input {
-      background: rgba(255, 255, 255, 0.12) !important;
-      border: 1.2px solid rgba(255, 255, 255, 0.15);
-      border-radius: 7px;
-      font-weight: 500;
-      font-size: 13px;
-      color: #fff !important;
-      padding: 8px 10px;
-      margin-bottom: 3px;
-      min-width: 0;
-    }
+  .modal-container .divider::before,
+  .signup-modal .divider::before,
+  .modal-container .divider::after,
+  .signup-modal .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.22) 100%);
+    border-radius: 1.3px;
+  }
 
-    .modal-container .input-group input:focus,
-    .signup-modal .input-group input:focus {
-      background: rgba(255, 255, 255, 0.19) !important;
-      border-color: #b089f4;
-      color: #fff !important;
-    }
+  .modal-container .divider span,
+  .signup-modal .divider span {
+    display: inline-block;
+    background: rgba(34, 36, 58, 0.78);
+    font-weight: 800;
+    font-size: .98rem;
+    color: #fff;
+    text-align: center;
+    padding: 3px 10px;
+    border-radius: 7px;
+    letter-spacing: .5px;
+    box-shadow: 0 1px 3px #0001;
+  }
 
-    ::placeholder {
-      color: #d0d0d0;
-      opacity: 0.93;
-    }
+  .modal-container .btn-google,
+  .signup-modal .btn-google {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff !important;
+    border-radius: 7px;
+    border: 1.8px solid #e1e1e1;
+    font-size: 13px;
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    .modal-container .divider,
-    .signup-modal .divider {
-      margin: 9px 0 6px 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      gap: 0.35em;
-      text-align: center;
-    }
+  .modal-container .btn-google:hover,
+  .signup-modal .btn-google:hover {
+    background: #44337060;
+    border-color: #b089f4;
+  }
 
-    .modal-container .divider::before,
-    .signup-modal .divider::before,
-    .modal-container .divider::after,
-    .signup-modal .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.22) 100%);
-      border-radius: 1.3px;
-    }
+  .modal-container .btn-login,
+  .signup-modal .btn-login {
+    background: linear-gradient(90deg, #a97c50 65%, #b089f4 100%);
+    color: #fff !important;
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    padding: 9px 0;
+    font-weight: 700;
+    font-size: 13.5px;
+    letter-spacing: .4px;
+    margin-top: 8px;
+    margin-bottom: 3px;
+    transition: background .3s;
+    box-shadow: 0 2px 9px #b089f433;
+  }
 
-    .modal-container .divider span,
-    .signup-modal .divider span {
-      display: inline-block;
-      background: rgba(34, 36, 58, 0.78);
-      font-weight: 800;
-      font-size: .98rem;
-      color: #fff;
-      text-align: center;
-      padding: 3px 10px;
-      border-radius: 7px;
-      letter-spacing: .5px;
-      box-shadow: 0 1px 3px #0001;
-    }
+  .modal-container .btn-login:hover,
+  .signup-modal .btn-login:hover {
+    background: linear-gradient(90deg, #b089f4 32%, #a97c50 100%);
+  }
 
-    .modal-container .btn-google,
-    .signup-modal .btn-google {
-      background: rgba(255, 255, 255, 0.14);
-      color: #fff !important;
-      border-radius: 7px;
-      border: 1.8px solid #e1e1e1;
-      font-size: 13px;
-      padding: 8px 10px;
-      margin-bottom: 5px;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  /* Password toggle small */
+  .modal-container .password-group,
+  .signup-modal .password-group {
+    position: relative;
+  }
 
-    .modal-container .btn-google:hover,
-    .signup-modal .btn-google:hover {
-      background: #44337060;
-      border-color: #b089f4;
-    }
+  .modal-container .password-group input,
+  .signup-modal .password-group input {
+    padding-right: 42px !important;
+    box-sizing: border-box;
+  }
 
-    .modal-container .btn-login,
-    .signup-modal .btn-login {
-      background: linear-gradient(90deg, #a97c50 65%, #b089f4 100%);
-      color: #fff !important;
-      width: 100%;
-      border: 0;
-      border-radius: 8px;
-      padding: 9px 0;
-      font-weight: 700;
-      font-size: 13.5px;
-      letter-spacing: .4px;
-      margin-top: 8px;
-      margin-bottom: 3px;
-      transition: background .3s;
-      box-shadow: 0 2px 9px #b089f433;
-    }
+  .modal-container .password-toggle,
+  .signup-modal .password-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 28px;
+    background: none;
+    border: none;
+    color: #eee;
+    cursor: pointer;
+    z-index: 11;
+    margin: 0;
+    padding: 0;
+    transition: color .18s;
+  }
 
-    .modal-container .btn-login:hover,
-    .signup-modal .btn-login:hover {
-      background: linear-gradient(90deg, #b089f4 32%, #a97c50 100%);
-    }
+  .modal-container .password-toggle:hover,
+  .signup-modal .password-toggle:hover {
+    color: #b089f4;
+  }
 
-    /* Password toggle small */
-    .modal-container .password-group,
-    .signup-modal .password-group {
-      position: relative;
-    }
+  .modal-container .eye-icon,
+  .signup-modal .eye-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+    stroke: currentColor;
+    pointer-events: none;
+  }
 
-    .modal-container .password-group input,
-    .signup-modal .password-group input {
-      padding-right: 42px !important;
-      box-sizing: border-box;
-    }
+  .gallery-cardstyle {
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 0 20px;
+    color: #222;
+    text-align: center;
+  }
 
-    .modal-container .password-toggle,
-    .signup-modal .password-toggle {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 12px;
-      /* JANGAN 8px, ini agar benar-benar dalam */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      width: 28px;
-      background: none;
-      border: none;
-      color: #eee;
-      cursor: pointer;
-      z-index: 11;
-      margin: 0;
-      padding: 0;
-      transition: color .18s;
-    }
+  .gallery-cardstyle h2 {
+    font-weight: 700;
+    font-size: 2.4rem;
+    margin-bottom: 24px;
+    color: #8b5e2e;
+  }
 
-    .modal-container .password-toggle:hover,
-    .signup-modal .password-toggle:hover {
-      color: #b089f4;
-    }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 28px;
+  }
 
-    .modal-container .eye-icon,
-    .signup-modal .eye-icon {
-      width: 18px;
-      height: 18px;
-      display: block;
-      stroke: currentColor;
-      pointer-events: none;
-    }
+  .card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(180, 140, 65, 0.15);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.35s ease, transform 0.3s ease;
+  }
 
-    .gallery-cardstyle {
-      max-width: 1100px;
-      margin: 60px auto;
-      padding: 0 20px;
-      color: #222;
-      text-align: center;
-    }
+  .card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid #ddd;
+  }
 
-    .gallery-cardstyle h2 {
-      font-weight: 700;
-      font-size: 2.4rem;
-      margin-bottom: 24px;
-      color: #8b5e2e;
-    }
+  .caption {
+    padding: 8px 12px;
+    font-weight: 600;
+    color: #6e5a2b;
+    font-size: 1.1rem;
+    text-align: center;
+    background-color: #fff8ec;
+  }
 
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 28px;
-    }
+  .card:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+    transform: translateY(-8px);
+  }
 
-    .card {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 6px 18px rgba(180, 140, 65, 0.15);
-      overflow: hidden;
-      cursor: pointer;
-      transition: box-shadow 0.35s ease, transform 0.3s ease;
-    }
+  /* HERO SECTION - FULL SCREEN DI LAPTOP */
+  .hero-home {
+    position: relative;
+    min-height: 100vh;
+    max-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
 
-    .card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      display: block;
-      border-bottom: 1px solid #ddd;
-    }
+  .hero-bg-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
 
-    .caption {
-      padding: 8px 12px;
-      font-weight: 600;
-      color: #6e5a2b;
-      font-size: 1.1rem;
-      text-align: center;
-      background-color: #fff8ec;
-    }
+  .hero-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 1s ease-in-out;
+    opacity: 1;
+    display: block;
+  }
 
-    .card:hover {
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
-      transform: translateY(-8px);
-    }
+  .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+    z-index: 1;
+  }
 
+  .hero-bg.fade-out {
+    opacity: 0;
+  }
+
+  .hero-bg.fade-in {
+    opacity: 1;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    padding: 40px 50px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-offer {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    color: #fff;
+    opacity: 0.9;
+  }
+
+  .hero-title {
+    font-size: 48px;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.1;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  .hero-days {
+    margin: 10px 0;
+  }
+
+  .hero-days .highlight {
+    font-size: 24px;
+    font-weight: 700;
+    color: #FFD700;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    margin: 15px 0 20px 0;
+    max-width: 550px;
+    line-height: 1.6;
+    opacity: 0.95;
+  }
+
+  .hero-btn {
+    background-color: transparent;
+    color: #fff;
+    border: 2px solid #fff;
+    padding: 10px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+    letter-spacing: 0.5px;
+  }
+
+  .hero-btn:hover {
+    background-color: #fff;
+    color: #000;
+  }
+
+  .hero-carousel {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .carousel-item {
+    width: 100px;
+    height: 70px;
+    object-fit: cover;
+    opacity: 0.6;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .carousel-item.active {
+    opacity: 1;
+    border-color: #b089f4;
+    box-shadow: 0 4px 12px rgba(176, 137, 244, 0.6);
+    transform: scale(1.05);
+  }
+
+  .carousel-item:hover {
+    opacity: 0.9;
+  }
+
+  /* Responsive untuk layar besar */
+  @media (min-width: 1200px) {
     .hero-home {
-      position: relative;
-      min-height: 450px;
-      max-height: 60vh;
-      height: 50vh;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-    }
-
-    .hero-bg-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-
-    .hero-bg {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: opacity 1s ease-in-out;
-      opacity: 1;
-      display: block;
-    }
-
-    .hero-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
-      z-index: 1;
-    }
-
-    .hero-bg.fade-out {
-      opacity: 0;
-    }
-
-    .hero-bg.fade-in {
-      opacity: 1;
+      min-height: 100vh;
+      height: 100vh;
+      max-height: 100vh;
     }
 
     .hero-content {
-      position: relative;
-      z-index: 2;
-      color: #fff;
-      padding: 30px 50px;
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
+      padding: 50px 70px;
     }
 
-    .hero-offer {
-      display: block;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      margin-bottom: 6px;
-      color: #fff;
-      opacity: 0.9;
+    .hero-title {
+      font-size: 52px;
+    }
+
+    .hero-days .highlight {
+      font-size: 26px;
+    }
+
+    .hero-desc {
+      font-size: 16px;
+    }
+
+    .carousel-item {
+      width: 110px;
+      height: 75px;
+    }
+  }
+
+  /* Responsive untuk layar sedang */
+  @media (max-width: 768px) {
+    .hero-home {
+      min-height: 600px;
+      height: 70vh;
+      max-height: 100vh;
+    }
+
+    .hero-content {
+      padding: 30px 25px;
     }
 
     .hero-title {
       font-size: 36px;
-      font-weight: 800;
-      margin: 0;
-      line-height: 1.1;
-      color: #fff;
-      letter-spacing: 1px;
-    }
-
-    .hero-days {
-      margin: 6px 0;
     }
 
     .hero-days .highlight {
       font-size: 20px;
-      font-weight: 700;
-      color: #FFD700;
     }
 
     .hero-desc {
       font-size: 13px;
-      margin: 10px 0 15px 0;
-      max-width: 450px;
-      line-height: 1.5;
-      opacity: 0.95;
-    }
-
-    .hero-btn {
-      background-color: transparent;
-      color: #fff;
-      border: 2px solid #fff;
-      padding: 7px 22px;
-      border-radius: 25px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 12px;
-      transition: all 0.3s ease;
-      margin-bottom: 15px;
-      letter-spacing: 0.5px;
-    }
-
-    .hero-btn:hover {
-      background-color: #fff;
-      color: #000;
-    }
-
-    .hero-carousel {
-      display: flex;
-      justify-content: flex-start;
-      gap: 10px;
-      margin-top: 10px;
     }
 
     .carousel-item {
-      width: 80px;
-      height: 55px;
-      object-fit: cover;
-      opacity: 0.6;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
+      width: 75px;
+      height: 52px;
+    }
+  }
+
+  /* Responsive untuk layar kecil */
+  @media (max-width: 480px) {
+    .hero-home {
+      min-height: 500px;
+      height: 65vh;
+      max-height: 100vh;
     }
 
-    .carousel-item.active {
-      opacity: 1;
-      border-color: #b089f4;
-      box-shadow: 0 4px 12px rgba(176, 137, 244, 0.6);
-      transform: scale(1.05);
+    .hero-content {
+      padding: 25px 20px;
     }
 
-    .carousel-item:hover {
-      opacity: 0.9;
+    .hero-title {
+      font-size: 28px;
     }
 
-    /* Responsive untuk layar besar */
-    @media (min-width: 1200px) {
-      .hero-home {
-        height: 55vh;
-        max-height: 500px;
-      }
-
-      .hero-content {
-        padding: 40px 70px;
-      }
-
-      .hero-title {
-        font-size: 40px;
-      }
-
-      .hero-days .highlight {
-        font-size: 22px;
-      }
-
-      .hero-desc {
-        font-size: 14px;
-      }
+    .hero-days .highlight {
+      font-size: 18px;
     }
 
-    /* Responsive untuk layar sedang */
-    @media (max-width: 768px) {
-      .hero-home {
-        min-height: 400px;
-        height: 60vh;
-      }
-
-      .hero-content {
-        padding: 25px 20px;
-      }
-
-      .hero-title {
-        font-size: 32px;
-      }
-
-      .hero-days .highlight {
-        font-size: 18px;
-      }
-
-      .hero-desc {
-        font-size: 12px;
-      }
-
-      .carousel-item {
-        width: 70px;
-        height: 48px;
-      }
+    .hero-desc {
+      font-size: 12px;
     }
 
-    /* Responsive untuk layar kecil */
-    @media (max-width: 480px) {
-      .hero-title {
-        font-size: 26px;
-      }
-
-      .hero-days .highlight {
-        font-size: 16px;
-      }
-
-      .hero-desc {
-        font-size: 11px;
-      }
-
-      .hero-btn {
-        font-size: 11px;
-        padding: 6px 18px;
-      }
-
-      .hero-carousel {
-        gap: 8px;
-      }
-
-      .carousel-item {
-        width: 60px;
-        height: 42px;
-      }
+    .hero-btn {
+      font-size: 12px;
+      padding: 8px 22px;
     }
 
+    .hero-carousel {
+      gap: 10px;
+    }
 
-    /* Carousel & konten lainnya tetap seperti CSS milikmu */
-  </style>
+    .carousel-item {
+      width: 65px;
+      height: 45px;
+    }
+  }
+</style>
+
+
 </head>
 
 <body>
