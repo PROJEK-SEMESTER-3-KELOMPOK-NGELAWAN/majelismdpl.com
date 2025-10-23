@@ -1,5 +1,5 @@
 <?php
-require_once 'backend/koneksi.php';
+require_once '../backend/koneksi.php';
 session_start();
 
 $isLogin = isset($_SESSION['id_user']);
@@ -13,7 +13,7 @@ if ($isLogin) {
 }
 
 $id = $_GET['id'] ?? null;
-if (!$id) { header("Location: index.php"); exit(); }
+if (!$id) { header("Location: ../index.php"); exit(); }
 
 $stmtTrip = $conn->prepare("SELECT * FROM paket_trips WHERE id_trip = ?");
 $stmtTrip->bind_param("i", $id);
@@ -22,7 +22,7 @@ $resultTrip = $stmtTrip->get_result();
 $trip = $resultTrip->fetch_assoc();
 $stmtTrip->close();
 
-if (!$trip) { header("Location: index.php"); exit(); }
+if (!$trip) { header("Location: ../index.php"); exit(); }
 
 $stmtDetail = $conn->prepare("SELECT * FROM detail_trips WHERE id_trip = ?");
 $stmtDetail->bind_param("i", $id);
@@ -119,12 +119,18 @@ function createIconList($text, $iconClass) {
     </style>
 </head>
 <body>
-<?php include 'navbar.php'; ?>
+<?php include '../navbar.php'; ?>
 <?php $heroSubtitle = "Jelajahi keindahan alam abadi di puncak tertinggi."; ?>
+
 <?php
-    $imgPath = 'img/default-mountain.jpg';
+    $imgPath = '../img/default-mountain.jpg';
     if (!empty($trip['gambar'])) {
-        $imgPath = (strpos($trip['gambar'],'img/') === 0) ? $trip['gambar'] : 'img/'.$trip['gambar'];
+        // Jika sudah ada 'img/' di awal, tambahkan '../' di depannya
+        if (strpos($trip['gambar'], 'img/') === 0) {
+            $imgPath = '../' . $trip['gambar'];
+        } else {
+            $imgPath = '../img/' . $trip['gambar'];
+        }
     }
     $soldOut = ($trip['status'] !== 'available' || intval($trip['slot']) <= 0);
 ?>

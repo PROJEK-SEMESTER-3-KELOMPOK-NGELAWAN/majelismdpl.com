@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
 
         card.addEventListener("click", function() {
-          window.location.href = `trip-detail-user.php?id=${trip.id_trip}`;
+          window.location.href = `user/trip-detail-user.php?id=${trip.id_trip}`;
         });
 
         carousel.appendChild(card);

@@ -1,11 +1,11 @@
 <?php
 session_start();
-require_once 'backend/koneksi.php';
+require_once '../backend/koneksi.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 $message = '';
 $step = 1; // default: minta OTP

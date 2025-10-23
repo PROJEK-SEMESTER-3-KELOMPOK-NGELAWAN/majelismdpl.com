@@ -1,5 +1,5 @@
 <?php
-require_once 'backend/koneksi.php';
+require_once '../backend/koneksi.php';
 session_start();
 
 $id_booking = intval($_GET['id'] ?? 0);

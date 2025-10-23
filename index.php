@@ -724,7 +724,7 @@ session_start();
 
           <button type="submit" class="btn-login">Masuk</button>
           <div style="text-align:center;margin-top:13px;">
-            <a href="lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
+            <a href="user/lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
               Lupa password?
             </a>
           </div>

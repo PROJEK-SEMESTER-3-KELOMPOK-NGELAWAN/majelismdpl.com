@@ -3,6 +3,13 @@
 // Cek status login user (sesuaikan dengan sistem session dari login-api.php)
 $isLoggedIn = isset($_SESSION['id_user']) && !empty($_SESSION['id_user']);
 $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
+
+// Deteksi path relatif berdasarkan lokasi file yang meng-include navbar
+$navbarPath = '';
+$currentDir = dirname($_SERVER['PHP_SELF']);
+if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== false) {
+    $navbarPath = '../';
+}
 ?>
 
 <!-- Load Google Fonts Poppins -->
@@ -16,7 +23,7 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
 
 <nav class="navbar" role="navigation" aria-label="Main Navigation">
   <div class="navbar-logo">
-    <img src="img/majelis.png" alt="Logo Majelis MDPL" class="logo-img" />
+    <img src="<?php echo $navbarPath; ?>img/majelis.png" alt="Logo Majelis MDPL" class="logo-img" />
   </div>
 
   <button class="hamburger" id="hamburgerBtn" aria-label="Toggle Menu" aria-expanded="false" aria-controls="navbarMenu">
@@ -26,7 +33,7 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
   </button>
 
   <ul class="navbar-menu" id="navbarMenu" role="menu">
-    <li><a href="index.php" class="active" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="<?php echo $navbarPath; ?>index.php" class="active" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
     <li><a href="#" role="menuitem"><i class="fa-solid fa-user"></i> Profile</a></li>
     <li><a href="#" role="menuitem"><i class="fa-solid fa-calendar-days"></i> Jadwal Pendakian</a></li>
     <li><a href="#" role="menuitem"><i class="fa-solid fa-image"></i> Galeri</a></li>
@@ -49,13 +56,13 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
       </button>
       
       <div class="user-dropdown" id="userDropdown">
-        <a href="profile.php" class="dropdown-item">
+        <a href="<?php echo $navbarPath; ?>user/profile.php" class="dropdown-item">
           <i class="fa-solid fa-user"></i> Profil
         </a>
-        <a href="my-trips.php" class="dropdown-item">
+        <a href="<?php echo $navbarPath; ?>user/my-trips.php" class="dropdown-item">
           <i class="fa-solid fa-mountain"></i> Paket Trip Saya
         </a>
-        <a href="payment-status.php" class="dropdown-item">
+        <a href="<?php echo $navbarPath; ?>user/payment-status.php" class="dropdown-item">
           <i class="fa-solid fa-credit-card"></i> Status Pembayaran
         </a>
         <div class="dropdown-divider"></div>
@@ -68,7 +75,7 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
 </nav>
 
 <!-- Form tersembunyi untuk logout -->
-<form id="logout-form" method="POST" action="logout.php" style="display: none;">
+<form id="logout-form" method="POST" action="<?php echo $navbarPath; ?>logout.php" style="display: none;">
   <input type="hidden" name="confirm_logout" value="1">
 </form>
 
@@ -176,11 +183,25 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
   }
 
   @keyframes navbarBounce {
-    0% { transform: scale(1.07) rotate(-8deg) translateY(0); }
-    28% { transform: scale(1.28) rotate(-13deg) translateY(-10px); }
-    49% { transform: scale(1.24) rotate(-9deg) translateY(2px); }
-    70% { transform: scale(1.2) rotate(-11deg) translateY(-3px); }
-    100% { transform: scale(1.25) rotate(-13deg) translateY(-5px); }
+    0% {
+      transform: scale(1.07) rotate(-8deg) translateY(0);
+    }
+
+    28% {
+      transform: scale(1.28) rotate(-13deg) translateY(-10px);
+    }
+
+    49% {
+      transform: scale(1.24) rotate(-9deg) translateY(2px);
+    }
+
+    70% {
+      transform: scale(1.2) rotate(-11deg) translateY(-3px);
+    }
+
+    100% {
+      transform: scale(1.25) rotate(-13deg) translateY(-5px);
+    }
   }
 
   .nav-btns {
@@ -387,6 +408,7 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -408,6 +430,7 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
       transform: translateY(-50px);
       opacity: 0;
     }
+
     to {
       transform: translateY(0);
       opacity: 1;
@@ -612,11 +635,11 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
       hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
         navbarMenu.classList.toggle('show');
-        
+
         if (navBtns) {
           navBtns.classList.toggle('show');
         }
-        
+
         if (userMenuContainer) {
           userMenuContainer.classList.toggle('show');
         }
@@ -632,7 +655,7 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
         e.stopPropagation();
         userMenuToggle.classList.toggle('active');
         userDropdown.classList.toggle('show');
-        
+
         const expanded = userMenuToggle.getAttribute('aria-expanded') === 'true' || false;
         userMenuToggle.setAttribute('aria-expanded', !expanded);
       });
@@ -676,10 +699,10 @@ $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
 
     // Close mobile menu when clicking outside
     document.addEventListener('click', (e) => {
-      if (hamburger && !hamburger.contains(e.target) && 
-          !navbarMenu.contains(e.target) && 
-          (!navBtns || !navBtns.contains(e.target)) &&
-          (!userMenuContainer || !userMenuContainer.contains(e.target))) {
+      if (hamburger && !hamburger.contains(e.target) &&
+        !navbarMenu.contains(e.target) &&
+        (!navBtns || !navBtns.contains(e.target)) &&
+        (!userMenuContainer || !userMenuContainer.contains(e.target))) {
         hamburger.classList.remove('active');
         navbarMenu.classList.remove('show');
         if (navBtns) navBtns.classList.remove('show');
