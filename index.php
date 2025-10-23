@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -312,38 +316,14 @@
       transform: translateY(-8px);
     }
 
-    .hero-carousel {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 15px;
-    }
-
-    .carousel-item {
-      width: 120px;
-      /* diperbesar dari 80px */
-      height: 75px;
-      /* sesuai rasio */
-      object-fit: cover;
-      opacity: 0.6;
-      border-radius: 8px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: opacity 0.3s ease, border-color 0.3s ease;
-    }
-
-    .carousel-item.active {
-      opacity: 1;
-      border-color: #b089f4;
-      box-shadow: 0 4px 12px rgba(176, 137, 244, 0.6);
-      transform: scale(1.1);
-    }
-
     .hero-home {
       position: relative;
-      height: 400px;
-      /* area tinggi hero penuh sesuai desain */
+      min-height: 450px;
+      max-height: 60vh;
+      height: 50vh;
       overflow: hidden;
+      display: flex;
+      align-items: center;
     }
 
     .hero-bg-container {
@@ -364,6 +344,16 @@
       display: block;
     }
 
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+      z-index: 1;
+    }
+
     .hero-bg.fade-out {
       opacity: 0;
     }
@@ -375,10 +365,180 @@
     .hero-content {
       position: relative;
       z-index: 2;
-      /* beri styling sesuai desain  */
       color: #fff;
-      padding: 60px 30px;
+      padding: 30px 50px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
     }
+
+    .hero-offer {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+      color: #fff;
+      opacity: 0.9;
+    }
+
+    .hero-title {
+      font-size: 36px;
+      font-weight: 800;
+      margin: 0;
+      line-height: 1.1;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .hero-days {
+      margin: 6px 0;
+    }
+
+    .hero-days .highlight {
+      font-size: 20px;
+      font-weight: 700;
+      color: #FFD700;
+    }
+
+    .hero-desc {
+      font-size: 13px;
+      margin: 10px 0 15px 0;
+      max-width: 450px;
+      line-height: 1.5;
+      opacity: 0.95;
+    }
+
+    .hero-btn {
+      background-color: transparent;
+      color: #fff;
+      border: 2px solid #fff;
+      padding: 7px 22px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.3s ease;
+      margin-bottom: 15px;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-btn:hover {
+      background-color: #fff;
+      color: #000;
+    }
+
+    .hero-carousel {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .carousel-item {
+      width: 80px;
+      height: 55px;
+      object-fit: cover;
+      opacity: 0.6;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .carousel-item.active {
+      opacity: 1;
+      border-color: #b089f4;
+      box-shadow: 0 4px 12px rgba(176, 137, 244, 0.6);
+      transform: scale(1.05);
+    }
+
+    .carousel-item:hover {
+      opacity: 0.9;
+    }
+
+    /* Responsive untuk layar besar */
+    @media (min-width: 1200px) {
+      .hero-home {
+        height: 55vh;
+        max-height: 500px;
+      }
+
+      .hero-content {
+        padding: 40px 70px;
+      }
+
+      .hero-title {
+        font-size: 40px;
+      }
+
+      .hero-days .highlight {
+        font-size: 22px;
+      }
+
+      .hero-desc {
+        font-size: 14px;
+      }
+    }
+
+    /* Responsive untuk layar sedang */
+    @media (max-width: 768px) {
+      .hero-home {
+        min-height: 400px;
+        height: 60vh;
+      }
+
+      .hero-content {
+        padding: 25px 20px;
+      }
+
+      .hero-title {
+        font-size: 32px;
+      }
+
+      .hero-days .highlight {
+        font-size: 18px;
+      }
+
+      .hero-desc {
+        font-size: 12px;
+      }
+
+      .carousel-item {
+        width: 70px;
+        height: 48px;
+      }
+    }
+
+    /* Responsive untuk layar kecil */
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 26px;
+      }
+
+      .hero-days .highlight {
+        font-size: 16px;
+      }
+
+      .hero-desc {
+        font-size: 11px;
+      }
+
+      .hero-btn {
+        font-size: 11px;
+        padding: 6px 18px;
+      }
+
+      .hero-carousel {
+        gap: 8px;
+      }
+
+      .carousel-item {
+        width: 60px;
+        height: 42px;
+      }
+    }
+
 
     /* Carousel & konten lainnya tetap seperti CSS milikmu */
   </style>
@@ -386,32 +546,15 @@
 
 <body>
   <!-- Navbar -->
-  <nav class="navbar">
-    <div class="navbar-logo">
-      <!-- Ganti src logo sesuai file logo kamu, contoh PNG transparan: -->
-      <img src="img/majelismdpl.png" alt="Logo Majelis MDPL" class="logo-img" />
-    </div>
-    <ul class="navbar-menu">
-      <li><a href="#" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
-      <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
-      <li><a href="#"><i class="fa-solid fa-calendar-days"></i> Jadwal Pendakian</a></li>
-      <li><a href="#"><i class="fa-solid fa-image"></i> Galeri</a></li>
-      <li><a href="#"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
-    </ul>
-    </div>
-    <div class="nav-btns">
-      <a href="#" id="open-signup" class="btn">Sign Up</a>
-      <a href="#" id="open-login" class="btn">Login</a>
-    </div>
-  </nav>
+  <?php include 'navbar.php'; ?>
 
   <!-- Hero -->
-  <section class="hero-home" style="position: relative; height: 400px;">
-    <div class="hero-bg-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
+  <section class="hero-home">
+    <div class="hero-bg-container">
       <img src="img/gambar1.jpg" alt="Gunung Bromo" class="hero-bg" id="hero-bg">
       <div class="hero-overlay"></div>
     </div>
-    <div class="hero-content" style="position: relative; z-index: 2;">
+    <div class="hero-content">
       <span class="hero-offer" id="hero-offer">BEST OFFERS</span>
       <h1 class="hero-title" id="hero-title">GUNUNG BROMO</h1>
       <div class="hero-days"><span class="highlight" id="hero-days">1 HARI</span></div>
@@ -986,7 +1129,6 @@
 
 
 
-
     document.addEventListener('DOMContentLoaded', () => {
       const heroSlides = [{
           image: "img/herooo.jpg",
@@ -1000,14 +1142,14 @@
           title: "GUNUNG IJEN",
           offer: "IJEN ADVENTURE",
           days: "2 HARI",
-          desc: "Nikmati pengalaman mendaki gunung berapi biru yang menakjubkan di Jawa Timur."
+          desc: "Nikmati mendaki gunung berapi biru di Jawa Timur."
         },
         {
           image: "img/rinjani.jpg",
           title: "GUNUNG RINJANI",
           offer: "RINJANI EXPEDITION",
           days: "3 HARI",
-          desc: "Rasakan petualangan mendaki puncak tertinggi di Nusa Tenggara Barat. Pemandangannya luar biasa, mulai danau Segara Anak hingga sunrise dari puncak Rinjani."
+          desc: "Rasakan petualangan mendaki puncak tertinggi di Nusa Tenggara Barat."
         }
       ];
 

@@ -333,6 +333,7 @@ body {
   padding: 60px 5vw;
   gap: 80px;
   box-sizing: border-box;
+  background: linear-gradient(to bottom, #4e3d26, #ffffff);
 }
 
 .gallery-collage {
