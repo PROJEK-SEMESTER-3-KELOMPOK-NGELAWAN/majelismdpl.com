@@ -75,8 +75,8 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
 </nav>
 
 <!-- Form tersembunyi untuk logout -->
-<form id="logout-form" method="POST" action="<?php echo $navbarPath; ?>logout.php" style="display: none;">
-  <input type="hidden" name="confirm_logout" value="1">
+<form id="logout-form" method="POST" action="<?php echo $navbarPath; ?>user/logout.php" style="display: none;">
+    <input type="hidden" name="confirm_logout" value="1">
 </form>
 
 <!-- Custom Logout Modal -->
