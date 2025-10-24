@@ -33,12 +33,13 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
   </button>
 
   <ul class="navbar-menu" id="navbarMenu" role="menu">
-    <li><a href="<?php echo $navbarPath; ?>index.php" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
-    <li><a href="../user/profile.php" role="menuitem"><i class="fa-solid fa-user"></i> Profile</a></li>
-    <li><a href="#" role="menuitem"><i class="fa-solid fa-calendar-days"></i> Jadwal Pendakian</a></li>
-    <li><a href="#" role="menuitem"><i class="fa-solid fa-image"></i> Galeri</a></li>
-    <li><a href="#" role="menuitem"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
+    <li><a href="<?php echo $navbarPath; ?>#home" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="<?php echo $navbarPath; ?>#profile" role="menuitem"><i class="fa-solid fa-user"></i> Profile</a></li>
+    <li><a href="<?php echo $navbarPath; ?>#paketTrips" role="menuitem"><i class="fa-solid fa-calendar-days"></i> Paket Trip</a></li>
+    <li><a href="<?php echo $navbarPath; ?>#gallerys" role="menuitem"><i class="fa-solid fa-image"></i> Galeri</a></li>
+    <li><a href="<?php echo $navbarPath; ?>#testimonials" role="menuitem"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
   </ul>
+
 
   <?php if (!$isLoggedIn): ?>
     <!-- Tampilkan tombol Sign Up dan Login jika belum login -->
@@ -50,13 +51,7 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     <!-- Tampilkan User Menu jika sudah login -->
     <div class="user-menu-container">
       <button class="user-menu-toggle" id="userMenuToggle" aria-label="User Menu" aria-expanded="false">
-
-        <?php if ($isCustomPhoto): ?>
-          <img src="<?php echo $photoPathFinal . $cacheBuster; ?>" alt="Foto Profil" class="profile-img-nav">
-        <?php else: ?>
-          <i class="fa-solid fa-user-circle" style="font-size: 1.5em; color: #a97c50; margin-right: -4px;"></i>
-        <?php endif; ?>
-
+        <i class="fa-solid fa-user-circle"></i>
         <span class="user-name"><?php echo htmlspecialchars($userName, ENT_QUOTES, 'UTF-8'); ?></span>
         <i class="fa-solid fa-chevron-down dropdown-icon"></i>
       </button>
@@ -290,6 +285,11 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
   .user-menu-toggle:hover {
     background: rgba(169, 124, 80, 0.2);
     border-color: #a97c50;
+  }
+
+  .user-menu-toggle i:first-child {
+    font-size: 1.5em;
+    color: #a97c50;
   }
 
   .user-menu-toggle .dropdown-icon {
@@ -642,31 +642,6 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     .logout-btn-cancel {
       width: 100%;
     }
-  }
-
-  /* Tambahkan di dalam <style> di navbar.php */
-
-  .profile-img-nav {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1.5px solid #ddd;
-  }
-
-  .user-menu-toggle i {
-    /* Atur semua ikon (termasuk chevron) di dalam toggle */
-    transition: transform 0.3s ease;
-  }
-
-  /* Pastikan tampilan flexbox benar */
-  .user-menu-toggle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    /* Jarak antara elemen */
-    padding: 8px 16px;
-    /* ... properti lainnya ... */
   }
 </style>
 

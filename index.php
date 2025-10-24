@@ -11,10 +11,11 @@ session_start();
   <title>Majelis MDPL</title>
 
   <!-- CSS utama -->
-  <link rel="stylesheet" href="css/style.css?v=2.0" />
+  <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
   <!-- AOS Animation Library -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -706,44 +707,93 @@ session_start();
 
 
   <!-- profile -->
-  <section class="why-explorer">
-    <div class="gallery-collage">
-      <img src="img/gambar1.jpg" alt="Trip Foto 1" class="item item1">
-      <img src="img/gambar2.jpg" alt="Trip Foto 2" class="item item2">
-      <img src="img/gambar3.jpg" alt="Trip Foto 3" class="item item3">
-      <img src="img/gambar1.jpg" alt="Trip Foto 4" class="item item4">
-      <img src="img/gambar2.jpg" alt="Trip Foto 5" class="item item5">
+  <section class="why-explorer" id="profile">
+    <!-- Heading dengan animasi -->
+    <div class="profile-header">
+      <h2 class="profile-title"
+        data-aos="fade-up"
+        data-aos-duration="600">
+        <span data-aos="fade-right" data-aos-delay="100" data-aos-duration="500">Kenapa</span>
+        <span data-aos="fade-left" data-aos-delay="300" data-aos-duration="500">Pilih</span>
+        <span data-aos="fade-right" data-aos-delay="500" data-aos-duration="500">Majelis</span>
+        <span data-aos="fade-left" data-aos-delay="700" data-aos-duration="500">Mdpl?</span>
+      </h2>
+      <p class="profile-subtitle" data-aos="fade-up" data-aos-delay="900" data-aos-duration="800">
+        Temukan alasan mengapa ribuan traveler mempercayai kami untuk petualangan mereka
+      </p>
     </div>
-    <div class="content">
-      <h1>Kenapa Pilih Majelis Mdpl?</h1>
-      <div class="feature">
-        <i class="fas fa-map-marked-alt icon"></i>
-        <div>
-          <h3>Banyak Pilihan Destinasi</h3>
-          <p>Mau liburan ke Bandung, Lembang, Yogyakarta, Semarang, Surabaya, Gunung ataupun Laut semuanya ada di
-            Explorer.ID.</p>
-        </div>
+
+    <!-- WRAPPER PENTING: Bungkus gallery dan content -->
+    <div class="why-explorer-content">
+      <!-- Gallery Collage -->
+      <div class="gallery-collage" data-aos="fade-right" data-aos-duration="800" data-aos-delay="200">
+        <img src="img/gambar1.jpg" alt="Trip Foto 1" class="item item1" data-aos="zoom-in" data-aos-delay="300">
+        <img src="img/gambar2.jpg" alt="Trip Foto 2" class="item item2" data-aos="zoom-in" data-aos-delay="400">
+        <img src="img/gambar3.jpg" alt="Trip Foto 3" class="item item3" data-aos="zoom-in" data-aos-delay="500">
+        <img src="img/gambar1.jpg" alt="Trip Foto 4" class="item item4" data-aos="zoom-in" data-aos-delay="600">
+        <img src="img/gambar2.jpg" alt="Trip Foto 5" class="item item5" data-aos="zoom-in" data-aos-delay="700">
       </div>
-      <div class="feature">
-        <i class="fas fa-credit-card icon"></i>
-        <div>
-          <h3>Banyak Metode Pembayaran</h3>
-          <p>Gak usah pusing, Majelis Mdpl banyak metode pembayaran kekinian yang bakal bikin kamu lebih nyaman.</p>
+
+      <!-- Content Text -->
+      <div class="content" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
+        <div class="feature" data-aos="fade-up" data-aos-delay="400">
+          <i class="fas fa-map-marked-alt icon"></i>
+          <div>
+            <h3>Banyak Pilihan Destinasi</h3>
+            <p>Mau liburan ke Bandung, Lembang, Yogyakarta, Semarang, Surabaya, Gunung ataupun Laut semuanya ada di Explorer.ID.</p>
+          </div>
         </div>
-      </div>
-      <div class="feature">
-        <i class="fas fa-lock icon"></i>
-        <div>
-          <h3>Transaksi Aman</h3>
-          <p>Keamanan dan privasi transaksi online Anda menjadi prioritas kami.</p>
+        <div class="feature" data-aos="fade-up" data-aos-delay="600">
+          <i class="fas fa-credit-card icon"></i>
+          <div>
+            <h3>Banyak Metode Pembayaran</h3>
+            <p>Gak usah pusing, Majelis Mdpl banyak metode pembayaran kekinian yang bakal bikin kamu lebih nyaman.</p>
+          </div>
+        </div>
+        <div class="feature" data-aos="fade-up" data-aos-delay="800">
+          <i class="fas fa-lock icon"></i>
+          <div>
+            <h3>Transaksi Aman</h3>
+            <p>Keamanan dan privasi transaksi online Anda menjadi prioritas kami.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="destination-carousel">
-    <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
 
+  <!-- Paket Trip Section -->
+  <section class="paket-trip-section" id="paketTrips">
+    <!-- Section Header dengan AOS -->
+    <div class="section-header">
+      <h2 class="section-title"
+        data-aos="fade-up"
+        data-aos-duration="600">
+        <span data-aos="fade-right" data-aos-delay="100" data-aos-duration="500">Paket</span>
+        <span data-aos="fade-left" data-aos-delay="300" data-aos-duration="500">Trip</span>
+        <span data-aos="fade-right" data-aos-delay="500" data-aos-duration="500">Kami</span>
+      </h2>
+      <p class="section-subtitle"
+        data-aos="fade-up"
+        data-aos-delay="700"
+        data-aos-duration="800">
+        Pilihan destinasi petualangan terbaik untuk liburan Anda
+      </p>
+    </div>
+
+    <!-- Destination Carousel dengan AOS -->
+    <div class="destination-carousel"
+      data-aos="fade-up"
+      data-aos-duration="1000"
+      data-aos-delay="200">
+      <!-- Carousel Button Left -->
+      <button class="carousel-btn prev"
+        data-aos="fade-right"
+        data-aos-delay="400">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <!-- Carousel Track -->
       <div class="carousel-track">
         <!-- Loading spinner sementara -->
         <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 200px;">
@@ -753,27 +803,64 @@ session_start();
         </div>
       </div>
 
-    <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
-  </div>
-
-  <section class="gallery-cardstyle">
-    <h2>Galeri Foto</h2>
-    <div class="card-grid">
-      <div class="card">
-        <img src="img/gambar3.jpg" alt="Foto 1" />
-        <div class="caption">Gunung Bromo Sunrise</div>
-      </div>
-      <div class="card">
-        <img src="img/gambar2.jpg" alt="Foto 2" />
-        <div class="caption">Camping Savana</div>
-      </div>
-      <div class="card">
-        <img src="img/gambar1.jpg" alt="Foto 3" />
-        <div class="caption">Trip Seru Bersama</div>
-      </div>
-      <!-- Tambah kartu lainnya serupa -->
+      <!-- Carousel Button Right -->
+      <button class="carousel-btn next"
+        data-aos="fade-left"
+        data-aos-delay="400">
+        <i class="fas fa-chevron-right"></i>
+      </button>
     </div>
   </section>
+
+
+  <!-- Gallery Section -->
+  <section class="gallery-cardstyle" id="gallerys">
+    <!-- Particles.js Background (reduced) -->
+    <div id="particles-js"></div>
+
+    <!-- Gallery Header -->
+    <div class="gallery-header">
+      <h2 class="gallery-title">
+        <span>Galeri</span>
+        <span>Foto</span>
+        <span>Kami</span>
+      </h2>
+      <p class="gallery-subtitle">
+        Dokumentasi perjalanan petualangan yang tak terlupakan
+      </p>
+    </div>
+
+    <!-- Card Grid -->
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-overlay"></div>
+        <img src="img/gambar3.jpg" alt="Gunung Bromo" />
+        <div class="caption">
+          <i class="fas fa-mountain"></i>
+          Gunung Bromo Sunrise
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-overlay"></div>
+        <img src="img/gambar2.jpg" alt="Camping" />
+        <div class="caption">
+          <i class="fas fa-campground"></i>
+          Camping Savana
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-overlay"></div>
+        <img src="img/gambar1.jpg" alt="Trip Bersama" />
+        <div class="caption">
+          <i class="fas fa-users"></i>
+          Trip Seru Bersama
+        </div>
+      </div>
+    </div>
+  </section>
+
 
 
 
@@ -1029,6 +1116,9 @@ session_start();
   <!-- Load SweetAlert first -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <!-- Load Particles.js -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
   <!-- Global functions that might be needed -->
   <script>
     // Initialize AOS
@@ -1279,8 +1369,6 @@ session_start();
 
 
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('Hero carousel script loaded'); // Debug
-
       const heroSlides = [{
           image: "img/herooo.jpg",
           title: "GUNUNG BROMO",
@@ -1326,6 +1414,10 @@ session_start();
       const total = heroSlides.length;
 
       function setActiveIndex(index) {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        // Update active carousel item
         carouselItems.forEach((item, i) => {
           item.classList.toggle('active', i === index);
         });
@@ -1397,7 +1489,6 @@ session_start();
       carouselItems.forEach(item => {
         item.addEventListener('click', () => {
           if (isAnimating) return;
-          console.log('Carousel item clicked:', item.dataset.index); // Debug
           clearInterval(slideInterval);
           setActiveIndex(parseInt(item.dataset.index));
           setTimeout(startSlideShow, 1000);
@@ -1407,6 +1498,76 @@ session_start();
       // Initialize
       setActiveIndex(0);
       startSlideShow();
+
+    });
+
+    // Optimized Particles.js - LIGHTWEIGHT
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof particlesJS !== 'undefined') {
+        particlesJS('particles-js', {
+          particles: {
+            number: {
+              value: 30, // Reduced dari 50
+              density: {
+                enable: true,
+                value_area: 1000
+              }
+            },
+            color: {
+              value: ['#ffffff', '#ffd44a']
+            },
+            shape: {
+              type: 'circle' // Simple shape only
+            },
+            opacity: {
+              value: 0.3,
+              random: true,
+              anim: {
+                enable: true,
+                speed: 0.5,
+                opacity_min: 0.1,
+                sync: false
+              }
+            },
+            size: {
+              value: 3,
+              random: true,
+              anim: {
+                enable: false // Disable animation
+              }
+            },
+            line_linked: {
+              enable: true,
+              distance: 150,
+              color: '#ffd44a',
+              opacity: 0.15,
+              width: 1
+            },
+            move: {
+              enable: true,
+              speed: 1, // Slower
+              direction: 'none',
+              random: false,
+              straight: false,
+              out_mode: 'out',
+              bounce: false
+            }
+          },
+          interactivity: {
+            detect_on: 'canvas',
+            events: {
+              onhover: {
+                enable: false // Disable untuk performance
+              },
+              onclick: {
+                enable: false // Disable untuk performance
+              },
+              resize: true
+            }
+          },
+          retina_detect: true
+        });
+      }
     });
   </script>
 
