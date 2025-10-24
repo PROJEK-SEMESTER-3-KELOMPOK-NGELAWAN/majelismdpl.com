@@ -3,46 +3,6 @@
 // Cek status login user (sesuaikan dengan sistem session dari login-api.php)
 $isLoggedIn = isset($_SESSION['id_user']) && !empty($_SESSION['id_user']);
 $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
-$userPhoto = 'default.jpg';
-
-// Deteksi path relatif berdasarkan lokasi file yang meng-include navbar
-$navbarPath = '';
-$currentDir = dirname($_SERVER['PHP_SELF']);
-if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== false) {
-  $navbarPath = '../';
-}
-
-require_once $navbarPath . 'backend/koneksi.php'; // WAJIB: Tambahkan koneksi database
-
-if ($isLoggedIn) {
-  // AMBIL DATA FOTO DARI DATABASE
-  $id_user = $_SESSION['id_user'];
-  $stmt = $conn->prepare("SELECT username, foto_profil FROM users WHERE id_user=?");
-  $stmt->bind_param("i", $id_user);
-  $stmt->execute();
-  $result = $stmt->get_result()->fetch_assoc();
-  $stmt->close();
-
-  if ($result) {
-    $userName = $result['username'];
-    $userPhoto = $result['foto_profil'] ?? 'default.jpg';
-  }
-}
-
-$photoFileName = htmlspecialchars($userPhoto, ENT_QUOTES, 'UTF-8');
-
-$projectDirName = '/majelismdpl.com'; // <--- SESUAIKAN DENGAN NAMA FOLDER PROYEK ANDA!
-$projectRoot = $_SERVER['DOCUMENT_ROOT'] . $projectDirName; 
-
-// 2. Buat Path Absolut Server yang Benar
-$absoluteFilePath = $projectRoot . '/img/profile/' . $photoFileName;
-
-// 3. Cek keberadaan file
-$isCustomPhoto = ($userPhoto !== 'default.jpg' && file_exists($absoluteFilePath));
-
-// 4. Perbaiki Path Final URL (Untuk Browser)
-$photoPathFinal = $navbarPath . 'img/profile/' . $photoFileName; 
-$cacheBuster = '?' . time();
 
 // Deteksi path relatif berdasarkan lokasi file yang meng-include navbar
 $navbarPath = '';
