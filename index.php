@@ -11,551 +11,667 @@ session_start();
   <title>Majelis MDPL</title>
 
   <!-- CSS utama -->
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=2.0" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-<style>
-  .modal-container,
-  .signup-modal {
-    background: rgba(34, 36, 58, 0.26);
-    border-radius: 16px;
-    box-shadow: 0 8px 22px #0006;
-    max-width: 350px;
-    min-width: 220px;
-    width: 100%;
-    padding: 0;
-    overflow: hidden;
-    backdrop-filter: blur(9px);
-    -webkit-backdrop-filter: blur(9px);
-    border: 2px solid rgba(255, 255, 255, 0.14);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
+  <!-- AOS Animation Library -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-  .signup-modal {
-    max-width: 410px;
-  }
+  <style>
+    .modal-container,
+    .signup-modal {
+      background: rgba(34, 36, 58, 0.26);
+      border-radius: 16px;
+      box-shadow: 0 8px 22px #0006;
+      max-width: 350px;
+      min-width: 220px;
+      width: 100%;
+      padding: 0;
+      overflow: hidden;
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+      border: 2px solid rgba(255, 255, 255, 0.14);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
 
-  .modal-logo,
-  .signup-modal .modal-logo {
-    width: 44px;
-    height: 44px;
-    margin: 13px auto 6px auto;
-    background: rgba(255, 255, 255, 0.13);
-    border-radius: 50%;
-    box-shadow: 0 1px 6px #e2c7fd33;
-    object-fit: contain;
-    display: block;
-  }
+    .signup-modal {
+      max-width: 410px;
+    }
 
-  .modal-left,
-  .signup-modal .modal-left {
-    width: 100%;
-    background: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 2px;
-  }
+    .modal-logo,
+    .signup-modal .modal-logo {
+      width: 44px;
+      height: 44px;
+      margin: 13px auto 6px auto;
+      background: rgba(255, 255, 255, 0.13);
+      border-radius: 50%;
+      box-shadow: 0 1px 6px #e2c7fd33;
+      object-fit: contain;
+      display: block;
+    }
 
-  .modal-right,
-  .signup-modal .modal-right {
-    width: 100%;
-    background: none;
-    padding: 12px 14px 10px 14px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    color: #fff;
-  }
+    .modal-left,
+    .signup-modal .modal-left {
+      width: 100%;
+      background: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
 
-  .modal-container h2,
-  .signup-modal h2 {
-    font-size: 1.08rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-    color: #fff;
-    text-align: center;
-    letter-spacing: .45px;
-  }
+    .modal-right,
+    .signup-modal .modal-right {
+      width: 100%;
+      background: none;
+      padding: 12px 14px 10px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: #fff;
+    }
 
-  .signup-modal .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 12px;
-    margin-bottom: 10px;
-  }
-
-  .signup-modal .form-grid .field-full {
-    grid-column: 1 / -1;
-  }
-
-  @media (max-width: 540px) {
-
-    .signup-modal,
-    .modal-container {
-      max-width: 99vw;
+    .modal-container h2,
+    .signup-modal h2 {
+      font-size: 1.08rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #fff;
+      text-align: center;
+      letter-spacing: .45px;
     }
 
     .signup-modal .form-grid {
-      grid-template-columns: 1fr;
-      gap: 8px 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      margin-bottom: 10px;
     }
 
     .signup-modal .form-grid .field-full {
-      grid-column: auto;
-    }
-  }
-
-  .modal-container .input-group input,
-  .signup-modal .input-group input {
-    background: rgba(255, 255, 255, 0.12) !important;
-    border: 1.2px solid rgba(255, 255, 255, 0.15);
-    border-radius: 7px;
-    font-weight: 500;
-    font-size: 13px;
-    color: #fff !important;
-    padding: 8px 10px;
-    margin-bottom: 3px;
-    min-width: 0;
-  }
-
-  .modal-container .input-group input:focus,
-  .signup-modal .input-group input:focus {
-    background: rgba(255, 255, 255, 0.19) !important;
-    border-color: #b089f4;
-    color: #fff !important;
-  }
-
-  ::placeholder {
-    color: #d0d0d0;
-    opacity: 0.93;
-  }
-
-  .modal-container .divider,
-  .signup-modal .divider {
-    margin: 9px 0 6px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    gap: 0.35em;
-    text-align: center;
-  }
-
-  .modal-container .divider::before,
-  .signup-modal .divider::before,
-  .modal-container .divider::after,
-  .signup-modal .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.22) 100%);
-    border-radius: 1.3px;
-  }
-
-  .modal-container .divider span,
-  .signup-modal .divider span {
-    display: inline-block;
-    background: rgba(34, 36, 58, 0.78);
-    font-weight: 800;
-    font-size: .98rem;
-    color: #fff;
-    text-align: center;
-    padding: 3px 10px;
-    border-radius: 7px;
-    letter-spacing: .5px;
-    box-shadow: 0 1px 3px #0001;
-  }
-
-  .modal-container .btn-google,
-  .signup-modal .btn-google {
-    background: rgba(255, 255, 255, 0.14);
-    color: #fff !important;
-    border-radius: 7px;
-    border: 1.8px solid #e1e1e1;
-    font-size: 13px;
-    padding: 8px 10px;
-    margin-bottom: 5px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-container .btn-google:hover,
-  .signup-modal .btn-google:hover {
-    background: #44337060;
-    border-color: #b089f4;
-  }
-
-  .modal-container .btn-login,
-  .signup-modal .btn-login {
-    background: linear-gradient(90deg, #a97c50 65%, #b089f4 100%);
-    color: #fff !important;
-    width: 100%;
-    border: 0;
-    border-radius: 8px;
-    padding: 9px 0;
-    font-weight: 700;
-    font-size: 13.5px;
-    letter-spacing: .4px;
-    margin-top: 8px;
-    margin-bottom: 3px;
-    transition: background .3s;
-    box-shadow: 0 2px 9px #b089f433;
-  }
-
-  .modal-container .btn-login:hover,
-  .signup-modal .btn-login:hover {
-    background: linear-gradient(90deg, #b089f4 32%, #a97c50 100%);
-  }
-
-  /* Password toggle small */
-  .modal-container .password-group,
-  .signup-modal .password-group {
-    position: relative;
-  }
-
-  .modal-container .password-group input,
-  .signup-modal .password-group input {
-    padding-right: 42px !important;
-    box-sizing: border-box;
-  }
-
-  .modal-container .password-toggle,
-  .signup-modal .password-toggle {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 28px;
-    background: none;
-    border: none;
-    color: #eee;
-    cursor: pointer;
-    z-index: 11;
-    margin: 0;
-    padding: 0;
-    transition: color .18s;
-  }
-
-  .modal-container .password-toggle:hover,
-  .signup-modal .password-toggle:hover {
-    color: #b089f4;
-  }
-
-  .modal-container .eye-icon,
-  .signup-modal .eye-icon {
-    width: 18px;
-    height: 18px;
-    display: block;
-    stroke: currentColor;
-    pointer-events: none;
-  }
-
-  .gallery-cardstyle {
-    max-width: 1100px;
-    margin: 60px auto;
-    padding: 0 20px;
-    color: #222;
-    text-align: center;
-  }
-
-  .gallery-cardstyle h2 {
-    font-weight: 700;
-    font-size: 2.4rem;
-    margin-bottom: 24px;
-    color: #8b5e2e;
-  }
-
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 28px;
-  }
-
-  .card {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 6px 18px rgba(180, 140, 65, 0.15);
-    overflow: hidden;
-    cursor: pointer;
-    transition: box-shadow 0.35s ease, transform 0.3s ease;
-  }
-
-  .card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    display: block;
-    border-bottom: 1px solid #ddd;
-  }
-
-  .caption {
-    padding: 8px 12px;
-    font-weight: 600;
-    color: #6e5a2b;
-    font-size: 1.1rem;
-    text-align: center;
-    background-color: #fff8ec;
-  }
-
-  .card:hover {
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
-    transform: translateY(-8px);
-  }
-
-  /* HERO SECTION - FULL SCREEN DI LAPTOP */
-  .hero-home {
-    position: relative;
-    min-height: 100vh;
-    max-height: 100vh;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-  }
-
-  .hero-bg-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-  }
-
-  .hero-bg {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: opacity 1s ease-in-out;
-    opacity: 1;
-    display: block;
-  }
-
-  .hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
-    z-index: 1;
-  }
-
-  .hero-bg.fade-out {
-    opacity: 0;
-  }
-
-  .hero-bg.fade-in {
-    opacity: 1;
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    color: #fff;
-    padding: 40px 50px;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .hero-offer {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    margin-bottom: 10px;
-    color: #fff;
-    opacity: 0.9;
-  }
-
-  .hero-title {
-    font-size: 48px;
-    font-weight: 800;
-    margin: 0;
-    line-height: 1.1;
-    color: #fff;
-    letter-spacing: 1px;
-  }
-
-  .hero-days {
-    margin: 10px 0;
-  }
-
-  .hero-days .highlight {
-    font-size: 24px;
-    font-weight: 700;
-    color: #FFD700;
-  }
-
-  .hero-desc {
-    font-size: 15px;
-    margin: 15px 0 20px 0;
-    max-width: 550px;
-    line-height: 1.6;
-    opacity: 0.95;
-  }
-
-  .hero-btn {
-    background-color: transparent;
-    color: #fff;
-    border: 2px solid #fff;
-    padding: 10px 30px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    margin-bottom: 25px;
-    letter-spacing: 0.5px;
-  }
-
-  .hero-btn:hover {
-    background-color: #fff;
-    color: #000;
-  }
-
-  .hero-carousel {
-    display: flex;
-    justify-content: flex-start;
-    gap: 15px;
-    margin-top: 20px;
-  }
-
-  .carousel-item {
-    width: 100px;
-    height: 70px;
-    object-fit: cover;
-    opacity: 0.6;
-    border-radius: 8px;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
-  }
-
-  .carousel-item.active {
-    opacity: 1;
-    border-color: #b089f4;
-    box-shadow: 0 4px 12px rgba(176, 137, 244, 0.6);
-    transform: scale(1.05);
-  }
-
-  .carousel-item:hover {
-    opacity: 0.9;
-  }
-
-  /* Responsive untuk layar besar */
-  @media (min-width: 1200px) {
-    .hero-home {
-      min-height: 100vh;
-      height: 100vh;
-      max-height: 100vh;
+      grid-column: 1 / -1;
     }
 
-    .hero-content {
-      padding: 50px 70px;
+    @media (max-width: 540px) {
+
+      .signup-modal,
+      .modal-container {
+        max-width: 99vw;
+      }
+
+      .signup-modal .form-grid {
+        grid-template-columns: 1fr;
+        gap: 8px 0;
+      }
+
+      .signup-modal .form-grid .field-full {
+        grid-column: auto;
+      }
     }
 
-    .hero-title {
-      font-size: 52px;
-    }
-
-    .hero-days .highlight {
-      font-size: 26px;
-    }
-
-    .hero-desc {
-      font-size: 16px;
-    }
-
-    .carousel-item {
-      width: 110px;
-      height: 75px;
-    }
-  }
-
-  /* Responsive untuk layar sedang */
-  @media (max-width: 768px) {
-    .hero-home {
-      min-height: 600px;
-      height: 70vh;
-      max-height: 100vh;
-    }
-
-    .hero-content {
-      padding: 30px 25px;
-    }
-
-    .hero-title {
-      font-size: 36px;
-    }
-
-    .hero-days .highlight {
-      font-size: 20px;
-    }
-
-    .hero-desc {
+    .modal-container .input-group input,
+    .signup-modal .input-group input {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border: 1.2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 7px;
+      font-weight: 500;
       font-size: 13px;
+      color: #fff !important;
+      padding: 8px 10px;
+      margin-bottom: 3px;
+      min-width: 0;
     }
 
-    .carousel-item {
-      width: 75px;
-      height: 52px;
+    .modal-container .input-group input:focus,
+    .signup-modal .input-group input:focus {
+      background: rgba(255, 255, 255, 0.19) !important;
+      border-color: #b089f4;
+      color: #fff !important;
     }
-  }
 
-  /* Responsive untuk layar kecil */
-  @media (max-width: 480px) {
+    ::placeholder {
+      color: #d0d0d0;
+      opacity: 0.93;
+    }
+
+    .modal-container .divider,
+    .signup-modal .divider {
+      margin: 9px 0 6px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 0.35em;
+      text-align: center;
+    }
+
+    .modal-container .divider::before,
+    .signup-modal .divider::before,
+    .modal-container .divider::after,
+    .signup-modal .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.22) 100%);
+      border-radius: 1.3px;
+    }
+
+    .modal-container .divider span,
+    .signup-modal .divider span {
+      display: inline-block;
+      background: rgba(34, 36, 58, 0.78);
+      font-weight: 800;
+      font-size: .98rem;
+      color: #fff;
+      text-align: center;
+      padding: 3px 10px;
+      border-radius: 7px;
+      letter-spacing: .5px;
+      box-shadow: 0 1px 3px #0001;
+    }
+
+    .modal-container .btn-google,
+    .signup-modal .btn-google {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff !important;
+      border-radius: 7px;
+      border: 1.8px solid #e1e1e1;
+      font-size: 13px;
+      padding: 8px 10px;
+      margin-bottom: 5px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-container .btn-google:hover,
+    .signup-modal .btn-google:hover {
+      background: #44337060;
+      border-color: #b089f4;
+    }
+
+    .modal-container .btn-login,
+    .signup-modal .btn-login {
+      background: linear-gradient(90deg, #a97c50 65%, #b089f4 100%);
+      color: #fff !important;
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 0;
+      font-weight: 700;
+      font-size: 13.5px;
+      letter-spacing: .4px;
+      margin-top: 8px;
+      margin-bottom: 3px;
+      transition: background .3s;
+      box-shadow: 0 2px 9px #b089f433;
+    }
+
+    .modal-container .btn-login:hover,
+    .signup-modal .btn-login:hover {
+      background: linear-gradient(90deg, #b089f4 32%, #a97c50 100%);
+    }
+
+    .modal-container .password-group,
+    .signup-modal .password-group {
+      position: relative;
+    }
+
+    .modal-container .password-group input,
+    .signup-modal .password-group input {
+      padding-right: 42px !important;
+      box-sizing: border-box;
+    }
+
+    .modal-container .password-toggle,
+    .signup-modal .password-toggle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 28px;
+      background: none;
+      border: none;
+      color: #eee;
+      cursor: pointer;
+      z-index: 11;
+      margin: 0;
+      padding: 0;
+      transition: color .18s;
+    }
+
+    .modal-container .password-toggle:hover,
+    .signup-modal .password-toggle:hover {
+      color: #b089f4;
+    }
+
+    .modal-container .eye-icon,
+    .signup-modal .eye-icon {
+      width: 18px;
+      height: 18px;
+      display: block;
+      stroke: currentColor;
+      pointer-events: none;
+    }
+
+    .gallery-cardstyle {
+      max-width: 1100px;
+      margin: 60px auto;
+      padding: 0 20px;
+      color: #222;
+      text-align: center;
+    }
+
+    .gallery-cardstyle h2 {
+      font-weight: 700;
+      font-size: 2.4rem;
+      margin-bottom: 24px;
+      color: #8b5e2e;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 28px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(180, 140, 65, 0.15);
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 0.35s ease, transform 0.3s ease;
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .caption {
+      padding: 8px 12px;
+      font-weight: 600;
+      color: #6e5a2b;
+      font-size: 1.1rem;
+      text-align: center;
+      background-color: #fff8ec;
+    }
+
+    .card:hover {
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+      transform: translateY(-8px);
+    }
+
+    /* HERO SECTION - FULL SCREEN DI LAPTOP */
     .hero-home {
-      min-height: 500px;
-      height: 65vh;
+      position: relative;
+      min-height: 100vh;
       max-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
     }
 
+    .hero-bg-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .hero-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 1s ease-in-out;
+      opacity: 1;
+      display: block;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+      z-index: 1;
+    }
+
+    .hero-bg.fade-out {
+      opacity: 0;
+    }
+
+    .hero-bg.fade-in {
+      opacity: 1;
+    }
+
+    /* PERBAIKAN UTAMA: Konten hero di kiri untuk layar besar */
     .hero-content {
-      padding: 25px 20px;
+      position: relative;
+      z-index: 2;
+      color: #fff;
+      padding: 40px 50px;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .hero-offer {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      color: #fff;
+      opacity: 0.9;
+      text-align: left;
     }
 
     .hero-title {
-      font-size: 28px;
+      font-size: 48px;
+      font-weight: 800;
+      margin: 0;
+      line-height: 1.1;
+      color: #fff;
+      letter-spacing: 1px;
+      text-align: left;
+    }
+
+    .hero-days {
+      margin: 10px 0;
+      text-align: left;
     }
 
     .hero-days .highlight {
-      font-size: 18px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #FFD700;
     }
 
     .hero-desc {
-      font-size: 12px;
+      font-size: 15px;
+      margin: 15px 0 20px 0;
+      max-width: 550px;
+      line-height: 1.6;
+      opacity: 0.95;
+      text-align: left;
     }
 
     .hero-btn {
-      font-size: 12px;
-      padding: 8px 22px;
+      background-color: transparent;
+      color: #fff;
+      border: 2px solid #fff;
+      padding: 10px 30px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      margin-bottom: 25px;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-btn:hover {
+      background-color: #fff;
+      color: #000;
     }
 
     .hero-carousel {
-      gap: 10px;
+      display: flex;
+      justify-content: flex-start;
+      gap: 15px;
+      margin-top: 20px;
     }
 
     .carousel-item {
-      width: 65px;
-      height: 45px;
+      width: 100px;
+      height: 70px;
+      object-fit: cover;
+      opacity: 0.6;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
     }
-  }
-</style>
+
+    .carousel-item.active {
+      opacity: 1;
+      border-color: #b089f4;
+      box-shadow: 0 4px 12px rgba(176, 137, 244, 0.6);
+      transform: scale(1.05);
+    }
+
+    .carousel-item:hover {
+      opacity: 0.9;
+    }
+
+    /* Responsive untuk layar besar (Monitor 24 inch ke atas) */
+    @media (min-width: 1200px) {
+      .hero-home {
+        min-height: 100vh;
+        height: 100vh;
+        max-height: 100vh;
+      }
+
+      .hero-content {
+        padding: 50px 80px;
+        padding-left: 100px;
+        max-width: 100%;
+        align-items: flex-start;
+      }
+
+      .hero-title {
+        font-size: 56px;
+      }
+
+      .hero-days .highlight {
+        font-size: 28px;
+      }
+
+      .hero-desc {
+        font-size: 16px;
+        max-width: 600px;
+      }
+
+      .carousel-item {
+        width: 110px;
+        height: 75px;
+      }
+    }
+
+    /* Responsive untuk layar sangat besar (Monitor 27 inch ke atas) */
+    @media (min-width: 1600px) {
+      .hero-content {
+        padding: 60px 100px;
+        padding-left: 120px;
+      }
+
+      .hero-title {
+        font-size: 64px;
+      }
+
+      .hero-days .highlight {
+        font-size: 32px;
+      }
+
+      .hero-desc {
+        font-size: 18px;
+        max-width: 650px;
+      }
+
+      .hero-btn {
+        padding: 12px 35px;
+        font-size: 15px;
+      }
+
+      .carousel-item {
+        width: 120px;
+        height: 82px;
+      }
+    }
+
+    /* Responsive untuk layar sedang */
+    @media (max-width: 1199px) and (min-width: 769px) {
+      .hero-home {
+        min-height: 600px;
+        height: 80vh;
+        max-height: 100vh;
+      }
+
+      .hero-content {
+        padding: 40px 50px;
+        align-items: flex-start;
+      }
+
+      .hero-title {
+        font-size: 42px;
+      }
+
+      .hero-days .highlight {
+        font-size: 22px;
+      }
+
+      .hero-desc {
+        font-size: 15px;
+      }
+
+      .carousel-item {
+        width: 90px;
+        height: 62px;
+      }
+    }
+
+    /* Responsive untuk tablet */
+    @media (max-width: 768px) {
+      .hero-home {
+        min-height: 600px;
+        height: 70vh;
+        max-height: 100vh;
+      }
+
+      .hero-content {
+        padding: 30px 25px;
+        align-items: flex-start;
+      }
+
+      .hero-title {
+        font-size: 36px;
+      }
+
+      .hero-days .highlight {
+        font-size: 20px;
+      }
+
+      .hero-desc {
+        font-size: 13px;
+      }
+
+      .carousel-item {
+        width: 75px;
+        height: 52px;
+      }
+    }
+
+    /* Responsive untuk layar kecil (Mobile) */
+    @media (max-width: 480px) {
+      .hero-home {
+        min-height: 500px;
+        height: 65vh;
+        max-height: 100vh;
+      }
+
+      .hero-content {
+        padding: 25px 20px;
+        align-items: flex-start;
+      }
+
+      .hero-title {
+        font-size: 28px;
+      }
+
+      .hero-days .highlight {
+        font-size: 18px;
+      }
+
+      .hero-desc {
+        font-size: 12px;
+      }
+
+      .hero-btn {
+        font-size: 12px;
+        padding: 8px 22px;
+      }
+
+      .hero-carousel {
+        gap: 10px;
+      }
+
+      .carousel-item {
+        width: 65px;
+        height: 45px;
+      }
+    }
+
+    /* ANIMASI FADE TEXT */
+    .hero-bg,
+    .hero-offer,
+    .hero-title,
+    .hero-days-wrapper,
+    /* Tambahkan ini */
+    .hero-desc {
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+
+    .hero-bg.fade-out,
+    .hero-offer.fade-out,
+    .hero-title.fade-out,
+    .hero-days-wrapper.fade-out,
+    /* Tambahkan ini */
+    .hero-desc.fade-out {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .hero-bg.fade-in,
+    .hero-offer.fade-in,
+    .hero-title.fade-in,
+    .hero-days-wrapper.fade-in,
+    /* Tambahkan ini */
+    .hero-desc.fade-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Ensure smooth image transition */
+    .hero-bg {
+      opacity: 1;
+      transition: opacity 0.6s ease-in-out;
+    }
+  </style>
+
 
 
 </head>
@@ -565,7 +681,7 @@ session_start();
   <?php include 'navbar.php'; ?>
 
   <!-- Hero -->
-  <section class="hero-home">
+  <section class="hero-home" id="home">
     <div class="hero-bg-container">
       <img src="img/gambar1.jpg" alt="Gunung Bromo" class="hero-bg" id="hero-bg">
       <div class="hero-overlay"></div>
@@ -573,7 +689,10 @@ session_start();
     <div class="hero-content">
       <span class="hero-offer" id="hero-offer">BEST OFFERS</span>
       <h1 class="hero-title" id="hero-title">GUNUNG BROMO</h1>
-      <div class="hero-days"><span class="highlight" id="hero-days">1 HARI</span></div>
+      <!-- PERBAIKAN: Tambahkan class hero-days-wrapper -->
+      <div class="hero-days hero-days-wrapper">
+        <span class="highlight" id="hero-days">1 HARI</span>
+      </div>
       <p class="hero-desc" id="hero-desc">Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan</p>
       <button class="hero-btn">DETAIL</button>
       <div class="hero-carousel" id="hero-carousel">
@@ -585,12 +704,13 @@ session_start();
   </section>
 
 
+
   <!-- profile -->
   <section class="why-explorer">
     <div class="gallery-collage">
-      <img src="img/ijen.jpg" alt="Trip Foto 1" class="item item1">
-      <img src="img/rinjani.jpg" alt="Trip Foto 2" class="item item2">
-      <img src="img/gunung_rinjani.jpg" alt="Trip Foto 3" class="item item3">
+      <img src="img/gambar1.jpg" alt="Trip Foto 1" class="item item1">
+      <img src="img/gambar2.jpg" alt="Trip Foto 2" class="item item2">
+      <img src="img/gambar3.jpg" alt="Trip Foto 3" class="item item3">
       <img src="img/gambar1.jpg" alt="Trip Foto 4" class="item item4">
       <img src="img/gambar2.jpg" alt="Trip Foto 5" class="item item5">
     </div>
@@ -624,14 +744,14 @@ session_start();
   <div class="destination-carousel">
     <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
 
-    <div class="carousel-track">
-      <!-- Loading spinner sementara -->
-      <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 200px;">
-        <div class="spinner-border text-primary" role="status">
-          <span style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">Loading...</span>
+      <div class="carousel-track">
+        <!-- Loading spinner sementara -->
+        <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 200px;">
+          <div class="spinner-border text-primary" role="status">
+            <span style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">Loading...</span>
+          </div>
         </div>
       </div>
-    </div>
 
     <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
   </div>
@@ -660,9 +780,9 @@ session_start();
   <!-- Testimonials -->
   <section id="testimonials" class="testimonials">
     <div class="container">
-      <h2><span class="title-large">Apa Kata Mereka?</span></h2>
+      <h2 data-aos="fade-down"><span class="title-large">Apa Kata Mereka?</span></h2>
       <div class="testimonial-grid">
-        <div class="testimonial-card elevation-1">
+        <div class="testimonial-card elevation-1" data-aos="fade-up" data-aos-delay="100">
           <p class="testimonial-text">Trip ke Rinjani sangat terorganisir. Guide-nya asik dan perhatian. Saya yang
             pemula merasa aman banget!</p>
           <div class="testimonial-author">
@@ -673,7 +793,7 @@ session_start();
             </div>
           </div>
         </div>
-        <div class="testimonial-card elevation-1">
+        <div class="testimonial-card elevation-1" data-aos="fade-up" data-aos-delay="200">
           <p class="testimonial-text">Baru pertama kali ikut open trip, tapi langsung jatuh cinta. Banyak teman baru dan
             pengalaman tak terlupakan.</p>
           <div class="testimonial-author">
@@ -684,7 +804,7 @@ session_start();
             </div>
           </div>
         </div>
-        <div class="testimonial-card elevation-1">
+        <div class="testimonial-card elevation-1" data-aos="fade-up" data-aos-delay="300">
           <p class="testimonial-text">Sunrise di Bromo, camping di savana, semua sempurna. Majelis MDPL benar-benar
             profesional!</p>
           <div class="testimonial-author">
@@ -762,6 +882,9 @@ session_start();
       </div>
     </div>
   </div>
+
+
+
 
   <!-- POPUP SIGN UP -->
   <div id="signUpModal" class="modal">
@@ -847,6 +970,9 @@ session_start();
   </div>
 
 
+
+
+
   <footer class="footer">
     <div class="container">
       <!-- Kolom Kiri -->
@@ -887,18 +1013,34 @@ session_start();
   </footer>
 
 
+
+
+
   <!-- Tombol WhatsApp -->
-  <div class="whatsapp-container">
+  <div class="whatsapp-container" data-aos="zoom-in" data-aos-delay="500">
     <button class="whatsapp-button" onclick="bukaWhatsapp()">
       <i class="fab fa-whatsapp"></i> Hubungi via WhatsApp
     </button>
   </div>
+
+  <!-- AOS Library Script -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
   <!-- Load SweetAlert first -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Global functions that might be needed -->
   <script>
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true,
+      mirror: false,
+      offset: 100
+    });
+
+
     // Buka WhatsApp helper
     function bukaWhatsapp() {
       const nomor = "6283853493130";
@@ -1137,6 +1279,8 @@ session_start();
 
 
     document.addEventListener('DOMContentLoaded', () => {
+      console.log('Hero carousel script loaded'); // Debug
+
       const heroSlides = [{
           image: "img/herooo.jpg",
           title: "GUNUNG BROMO",
@@ -1167,47 +1311,100 @@ session_start();
       const daysElem = document.getElementById('hero-days');
       const descElem = document.getElementById('hero-desc');
 
+      // Validasi elemen ada atau tidak
+      if (!heroBg || !titleElem || !offerElem || !daysElem || !descElem) {
+        console.error('Hero elements not found!');
+        return;
+      }
+
+      // PERBAIKAN: Cari parent wrapper dengan class hero-days-wrapper
+      const daysWrapper = daysElem.closest('.hero-days-wrapper') || daysElem.parentElement;
+
       let currentIndex = 0;
       let slideInterval;
+      let isAnimating = false;
       const total = heroSlides.length;
 
       function setActiveIndex(index) {
         carouselItems.forEach((item, i) => {
           item.classList.toggle('active', i === index);
         });
-        // Fade out dulu
-        heroBg.classList.remove('fade-in');
-        heroBg.classList.add('fade-out');
 
+        // Collect all text elements
+        const textElements = [offerElem, titleElem, daysWrapper, descElem];
+
+        // STEP 1: Remove all classes first
+        heroBg.classList.remove('fade-in', 'fade-out');
+        textElements.forEach(elem => {
+          if (elem) elem.classList.remove('fade-in', 'fade-out');
+        });
+
+        // Force reflow untuk reset animasi
+        void heroBg.offsetWidth;
+
+        // STEP 2: Fade out everything
+        heroBg.classList.add('fade-out');
+        textElements.forEach(elem => {
+          if (elem) elem.classList.add('fade-out');
+        });
+
+        // STEP 3: Wait for fade-out, then change content
         setTimeout(() => {
-          // Ganti gambar dan text saat sudah fade out
+          // Ganti konten
           heroBg.src = heroSlides[index].image;
           titleElem.textContent = heroSlides[index].title;
           offerElem.textContent = heroSlides[index].offer;
           daysElem.textContent = heroSlides[index].days;
           descElem.textContent = heroSlides[index].desc;
 
+          // Remove fade-out
           heroBg.classList.remove('fade-out');
+          textElements.forEach(elem => {
+            if (elem) elem.classList.remove('fade-out');
+          });
+
+          // Force reflow lagi
+          void heroBg.offsetWidth;
+
+          // STEP 4: Fade in dengan stagger
           heroBg.classList.add('fade-in');
+
+          setTimeout(() => offerElem.classList.add('fade-in'), 100);
+          setTimeout(() => titleElem.classList.add('fade-in'), 200);
+          setTimeout(() => {
+            if (daysWrapper) daysWrapper.classList.add('fade-in');
+          }, 300);
+          setTimeout(() => descElem.classList.add('fade-in'), 400);
+
           currentIndex = index;
-        }, 500); // Setengah detik waktu fade-out
+
+          // Reset animation flag
+          setTimeout(() => {
+            isAnimating = false;
+          }, 700);
+
+        }, 600); // Durasi harus >= CSS transition duration
       }
 
       function startSlideShow() {
         slideInterval = setInterval(() => {
           let nextIndex = (currentIndex + 1) % total;
           setActiveIndex(nextIndex);
-        }, 4000);
+        }, 5000); // 5 detik per slide
       }
 
+      // Click handler untuk carousel items
       carouselItems.forEach(item => {
         item.addEventListener('click', () => {
+          if (isAnimating) return;
+          console.log('Carousel item clicked:', item.dataset.index); // Debug
           clearInterval(slideInterval);
           setActiveIndex(parseInt(item.dataset.index));
-          startSlideShow();
+          setTimeout(startSlideShow, 1000);
         });
       });
 
+      // Initialize
       setActiveIndex(0);
       startSlideShow();
     });

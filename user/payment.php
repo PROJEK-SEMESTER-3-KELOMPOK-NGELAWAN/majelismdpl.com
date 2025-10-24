@@ -35,7 +35,7 @@ if (!$booking) { echo "Booking tidak ditemukan"; exit(); }
 <div id="hasil"></div>
 <script>
 document.getElementById('btn-bayar').onclick = function() {
-    fetch('backend/payment-api.php?booking=<?=$id_booking?>')
+    fetch('../backend/payment-api.php?booking=<?=$id_booking?>')
         .then(r => r.json())
         .then(resp => {
             if(resp.snap_token){
@@ -65,7 +65,7 @@ document.getElementById('btn-bayar').onclick = function() {
 
 // Polling status tiap 4 detik
 setInterval(function() {
-    fetch('backend/payment-status-api.php?id=<?=$id_booking?>')
+    fetch('../backend/payment-status-api.php?id=<?=$id_booking?>')
     .then(r => r.json())
     .then(res => {
         if(res.status)
