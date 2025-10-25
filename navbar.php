@@ -1,21 +1,18 @@
 <?php
 // navbar.php
-// Cek status login user (sesuaikan dengan sistem session dari login-api.php)
 $isLoggedIn = isset($_SESSION['id_user']) && !empty($_SESSION['id_user']);
 $userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
 $userPhoto = 'default.jpg';
 
-// Deteksi path relatif berdasarkan lokasi file yang meng-include navbar
 $navbarPath = '';
 $currentDir = dirname($_SERVER['PHP_SELF']);
 if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== false) {
   $navbarPath = '../';
 }
 
-require_once $navbarPath . 'backend/koneksi.php'; // WAJIB: Tambahkan koneksi database
+require_once $navbarPath . 'backend/koneksi.php';
 
 if ($isLoggedIn) {
-  // AMBIL DATA FOTO DARI DATABASE
   $id_user = $_SESSION['id_user'];
   $stmt = $conn->prepare("SELECT username, foto_profil FROM users WHERE id_user=?");
   $stmt->bind_param("i", $id_user);
@@ -30,39 +27,16 @@ if ($isLoggedIn) {
 }
 
 $photoFileName = htmlspecialchars($userPhoto, ENT_QUOTES, 'UTF-8');
-
-// 1. Tentukan Project Root (Untuk file_exists)
-// __DIR__ adalah lokasi navbar.php. Kita perlu naik ke root proyek majelismdpl.com/.
-// Gunakan $_SERVER['DOCUMENT_ROOT'] yang lebih stabil, dikombinasikan dengan path proyek.
-// Jika proyek Anda diakses melalui http://localhost/majelismdpl.com/, maka path-nya adalah:
-$projectDirName = '/majelismdpl.com'; // <--- SESUAIKAN DENGAN NAMA FOLDER PROYEK ANDA!
-$projectRoot = $_SERVER['DOCUMENT_ROOT'] . $projectDirName; 
-
-// 2. Buat Path Absolut Server yang Benar
+$projectDirName = '/majelismdpl.com';
+$projectRoot = $_SERVER['DOCUMENT_ROOT'] . $projectDirName;
 $absoluteFilePath = $projectRoot . '/img/profile/' . $photoFileName;
-
-// 3. Cek keberadaan file
 $isCustomPhoto = ($userPhoto !== 'default.jpg' && file_exists($absoluteFilePath));
-
-// 4. Perbaiki Path Final URL (Untuk Browser)
-$photoPathFinal = $navbarPath . 'img/profile/' . $photoFileName; 
+$photoPathFinal = $navbarPath . 'img/profile/' . $photoFileName;
 $cacheBuster = '?' . time();
-
-// Deteksi path relatif berdasarkan lokasi file yang meng-include navbar
-$navbarPath = '';
-$currentDir = dirname($_SERVER['PHP_SELF']);
-if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== false) {
-  $navbarPath = '../';
-}
 ?>
 
-<!-- Load Google Fonts Poppins -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-
-<!-- Load Bootstrap Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
-<!-- Load FontAwesome -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
 <nav class="navbar" role="navigation" aria-label="Main Navigation">
@@ -76,7 +50,7 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     <span class="hamburger-line"></span>
   </button>
 
-<ul class="navbar-menu" id="navbarMenu" role="menu">
+  <ul class="navbar-menu" id="navbarMenu" role="menu">
     <li><a href="<?php echo $navbarPath; ?>#home" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
     <li><a href="<?php echo $navbarPath; ?>#profile" role="menuitem"><i class="fa-solid fa-user"></i> Profile</a></li>
     <li><a href="<?php echo $navbarPath; ?>#paketTrips" role="menuitem"><i class="fa-solid fa-calendar-days"></i> Paket Trip</a></li>
@@ -85,22 +59,18 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
   </ul>
 
   <?php if (!$isLoggedIn): ?>
-    <!-- Tampilkan tombol Sign Up dan Login jika belum login -->
     <div class="nav-btns">
       <a href="#" id="open-signup" class="btn">Sign Up</a>
       <a href="#" id="open-login" class="btn">Login</a>
     </div>
   <?php else: ?>
-    <!-- Tampilkan User Menu jika sudah login -->
     <div class="user-menu-container">
       <button class="user-menu-toggle" id="userMenuToggle" aria-label="User Menu" aria-expanded="false">
-
         <?php if ($isCustomPhoto): ?>
           <img src="<?php echo $photoPathFinal . $cacheBuster; ?>" alt="Foto Profil" class="profile-img-nav">
         <?php else: ?>
-          <i class="fa-solid fa-user-circle" style="font-size: 1.5em; color: #a97c50; margin-right: -4px;"></i>
+          <i class="fa-solid fa-user-circle" style="font-size: 1.5em; color: #a97c50;"></i>
         <?php endif; ?>
-
         <span class="user-name"><?php echo htmlspecialchars($userName, ENT_QUOTES, 'UTF-8'); ?></span>
         <i class="fa-solid fa-chevron-down dropdown-icon"></i>
       </button>
@@ -124,12 +94,10 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
   <?php endif; ?>
 </nav>
 
-<!-- Form tersembunyi untuk logout -->
 <form id="logout-form" method="POST" action="<?php echo $navbarPath; ?>user/logout.php" style="display: none;">
   <input type="hidden" name="confirm_logout" value="1">
 </form>
 
-<!-- Custom Logout Modal -->
 <div id="logout-modal" class="logout-modal-overlay">
   <div class="logout-modal-container">
     <div class="logout-modal-icon">
@@ -145,7 +113,6 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
 </div>
 
 <style>
-  /* === RESET DASAR === */
   * {
     margin: 0;
     padding: 0;
@@ -158,52 +125,58 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
 
   body {
     font-family: "Poppins", Arial, sans-serif;
-    background-color: #fafbff;
+    background-color: #ffffff;
     line-height: 1.6;
     color: #333;
     overflow-x: hidden;
   }
 
-  * {
-    box-sizing: border-box;
-  }
-
+  /* ========== NAVBAR ========== */
   .navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100vw;
+    width: 100%;
+    height: 80px;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(9px);
-    box-shadow: none;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(50px) saturate(180%);
+    -webkit-backdrop-filter: blur(50px) saturate(180%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     padding: 10px 40px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom: 1px solid rgba(169, 124, 80, 0.15);
   }
 
   .navbar.scrolled {
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 18px rgba(87, 87, 244, 0.13);
-    padding: 12px 40px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(50px) saturate(180%);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
   }
 
   .navbar-logo {
     display: flex;
     align-items: center;
     gap: 10px;
+    z-index: 1201;
   }
 
   .logo-img {
     height: 50px;
     width: auto;
     object-fit: contain;
-    display: inline-block;
-    vertical-align: middle;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 2px 8px rgba(169, 124, 80, 0.2));
   }
 
+  .logo-img:hover {
+    transform: scale(1.08) rotate(-5deg);
+  }
+
+  /* ========== MENU ITEMS ========== */
   .navbar-menu {
     list-style: none;
     display: flex;
@@ -222,42 +195,180 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     align-items: center;
     text-decoration: none;
     color: #222;
-    font-weight: 500;
-    padding: 7px 19px;
-    border-radius: 19px;
-    font-size: 1.07em;
-    transition: background 0.2s, color 0.2s;
-    gap: 7px;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 1.05em;
+    transition: background 0.25s ease, color 0.25s ease;
+    gap: 10px;
   }
 
-  /* Styling untuk hover saja */
   .navbar-menu a:hover {
     background: #a97c50;
     color: #fff;
   }
 
-  /* Styling untuk active dengan warna berbeda (opsional) */
   .navbar-menu a.active {
     background: #8b5e3c;
     color: #fff;
   }
 
   .navbar-menu a i {
-    font-size: 1.22em;
-    margin-right: 8px;
+    font-size: 1.3em;
     color: #000000;
-    transition: transform 0.23s cubic-bezier(0.54, 0.14, 0.23, 1.12), color 0.15s;
+    transition: transform 0.25s cubic-bezier(0.54, 0.14, 0.23, 1.12), color 0.2s;
+    display: inline-block;
+  }
+
+  /* ========== ICON ANIMATIONS ========== */
+  .navbar-menu li:nth-child(1) a i {
+    animation: jellyBounce 2.5s ease-in-out infinite;
+  }
+
+  @keyframes jellyBounce {
+
+    0%,
+    100% {
+      transform: translateY(0) scaleY(1);
+    }
+
+    30% {
+      transform: translateY(-10px) scaleY(1.08);
+    }
+
+    40% {
+      transform: translateY(-8px) scaleY(0.92);
+    }
+
+    50% {
+      transform: translateY(0) scaleY(1.04);
+    }
+
+    60% {
+      transform: translateY(0) scaleY(0.96);
+    }
+  }
+
+  .navbar-menu li:nth-child(2) a i {
+    animation: crazyWiggle 2s ease-in-out infinite;
+    animation-delay: 0.4s;
+  }
+
+  @keyframes crazyWiggle {
+
+    0%,
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+
+    15% {
+      transform: rotate(-18deg) scale(1.08);
+    }
+
+    30% {
+      transform: rotate(18deg) scale(0.96);
+    }
+
+    45% {
+      transform: rotate(-14deg) scale(1.04);
+    }
+
+    60% {
+      transform: rotate(14deg) scale(0.98);
+    }
+
+    75% {
+      transform: rotate(-8deg) scale(1.02);
+    }
+  }
+
+  .navbar-menu li:nth-child(3) a i {
+    animation: heartbeat 1.8s ease-in-out infinite;
+    animation-delay: 0.6s;
+  }
+
+  @keyframes heartbeat {
+
+    0%,
+    100% {
+      transform: scale(1);
+    }
+
+    10% {
+      transform: scale(1.18);
+    }
+
+    20% {
+      transform: scale(1);
+    }
+
+    30% {
+      transform: scale(1.14);
+    }
+
+    40% {
+      transform: scale(1);
+    }
+  }
+
+  .navbar-menu li:nth-child(4) a i {
+    animation: spinScale 3s ease-in-out infinite;
+    animation-delay: 0.8s;
+  }
+
+  @keyframes spinScale {
+
+    0%,
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+
+    25% {
+      transform: rotate(180deg) scale(1.18);
+    }
+
+    50% {
+      transform: rotate(360deg) scale(1);
+    }
+
+    75% {
+      transform: rotate(540deg) scale(1.12);
+    }
+  }
+
+  .navbar-menu li:nth-child(5) a i {
+    animation: waveFloat 2.2s ease-in-out infinite;
+    animation-delay: 1s;
+  }
+
+  @keyframes waveFloat {
+
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+
+    20% {
+      transform: translateY(-7px) rotate(-10deg);
+    }
+
+    40% {
+      transform: translateY(-3px) rotate(7deg);
+    }
+
+    60% {
+      transform: translateY(-9px) rotate(-7deg);
+    }
+
+    80% {
+      transform: translateY(-2px) rotate(9deg);
+    }
   }
 
   .navbar-menu a:hover i {
+    color: #ffffff;
     transform: scale(1.25) rotate(-13deg) translateY(-5px);
-    color: #ffffff;
     animation: navbarBounce 0.44s cubic-bezier(0.39, 1.6, 0.63, 1) 1;
-  }
-
-  /* Icon untuk active tanpa animasi berlebihan */
-  .navbar-menu a.active i {
-    color: #ffffff;
   }
 
   @keyframes navbarBounce {
@@ -282,6 +393,11 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     }
   }
 
+  .navbar-menu a.active i {
+    color: #ffffff;
+  }
+
+  /* ========== BUTTONS ========== */
   .nav-btns {
     display: flex;
     gap: 10px;
@@ -303,42 +419,82 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     cursor: pointer;
   }
 
-  #open-signup.btn:hover,
-  #open-login.btn:hover {
+  .nav-btns .btn:hover {
     background: #8b5e3c;
     color: #fff;
   }
 
+  /* ========== USER MENU - LIQUID GLASS MODERN ========== */
   .user-menu-container {
     position: relative;
     display: flex;
     align-items: center;
+    z-index: 1100;
   }
 
   .user-menu-toggle {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(169, 124, 80, 0.3);
-    border-radius: 25px;
+    padding: 6px 14px;
+
+    /* Liquid Glass Effect */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.2) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+    border: 1.5px solid rgba(169, 124, 80, 0.25);
+    border-radius: 50px;
+
+    box-shadow: 0 4px 12px rgba(169, 124, 80, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+
     color: #333;
     font-weight: 600;
-    font-size: 0.95em;
+    font-size: 0.88em;
     cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .user-menu-toggle::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -100%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(60deg, transparent 40%, rgba(255, 255, 255, 0.25) 50%, transparent 60%);
+    animation: shimmerMove 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes shimmerMove {
+    0% {
+      left: -100%;
+    }
+
+    50% {
+      left: 100%;
+    }
+
+    100% {
+      left: 100%;
+    }
   }
 
   .user-menu-toggle:hover {
-    background: rgba(169, 124, 80, 0.2);
-    border-color: #a97c50;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.3) 100%);
+    border-color: rgba(255, 212, 74, 0.4);
+    box-shadow: 0 6px 18px rgba(169, 124, 80, 0.18), 0 0 15px rgba(255, 212, 74, 0.12), inset 0 1px 3px rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
   }
 
   .user-menu-toggle .dropdown-icon {
-    font-size: 0.8em;
+    font-size: 0.7em;
     transition: transform 0.3s ease;
+    color: #a97c50;
+    margin-left: 2px;
   }
 
   .user-menu-toggle.active .dropdown-icon {
@@ -346,63 +502,113 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
   }
 
   .user-name {
-    max-width: 150px;
+    max-width: 110px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: 600;
+    color: #5c3922;
   }
 
+  .profile-img-nav {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(169, 124, 80, 0.4);
+    box-shadow: 0 0 8px rgba(169, 124, 80, 0.15);
+    transition: all 0.3s ease;
+  }
+
+  .user-menu-toggle:hover .profile-img-nav {
+    transform: scale(1.08);
+    border-color: #ffd44a;
+    box-shadow: 0 0 12px rgba(255, 212, 74, 0.35);
+  }
+
+  /* ========== DROPDOWN - LIQUID GLASS ========== */
   .user-dropdown {
     position: absolute;
     top: calc(100% + 10px);
     right: 0;
-    min-width: 240px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(15px);
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(169, 124, 80, 0.2);
+    min-width: 230px;
+
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.94) 100%);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+
+    border-radius: 14px;
+
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12), 0 0 15px rgba(169, 124, 80, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+
+    border: 1px solid rgba(169, 124, 80, 0.18);
+
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
+    transform: translateY(-8px) scale(0.96);
+    transform-origin: top right;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1100;
+    z-index: 1150;
     overflow: hidden;
   }
 
   .user-dropdown.show {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 
   .dropdown-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
+    gap: 11px;
+    padding: 11px 16px;
     color: #333;
     text-decoration: none;
-    font-size: 0.95em;
+    font-size: 0.88em;
     font-weight: 500;
-    transition: all 0.2s ease;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.25s ease;
+    border-bottom: 1px solid rgba(169, 124, 80, 0.05);
+    position: relative;
   }
 
   .dropdown-item:last-child {
     border-bottom: none;
   }
 
+  .dropdown-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(135deg, #ffd44a, #a97c50);
+    transform: scaleY(0);
+    transition: transform 0.25s ease;
+  }
+
+  .dropdown-item:hover::before {
+    transform: scaleY(1);
+  }
+
   .dropdown-item i {
-    font-size: 1.1em;
+    font-size: 1em;
     color: #a97c50;
-    width: 20px;
+    width: 17px;
     text-align: center;
+    transition: all 0.25s ease;
   }
 
   .dropdown-item:hover {
-    background: rgba(169, 124, 80, 0.1);
-    padding-left: 24px;
+    background: rgba(169, 124, 80, 0.07);
+    padding-left: 20px;
+    color: #5c3922;
+  }
+
+  .dropdown-item:hover i {
+    transform: scale(1.12);
+    color: #ffd44a;
   }
 
   .dropdown-item.logout {
@@ -415,15 +621,20 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
   }
 
   .dropdown-item.logout:hover {
-    background: rgba(217, 83, 79, 0.1);
+    background: rgba(217, 83, 79, 0.07);
+  }
+
+  .dropdown-item.logout:hover i {
+    color: #ff5459;
   }
 
   .dropdown-divider {
     height: 1px;
-    background: rgba(0, 0, 0, 0.1);
-    margin: 8px 0;
+    background: linear-gradient(90deg, transparent, rgba(169, 124, 80, 0.12), transparent);
+    margin: 5px 0;
   }
 
+  /* ========== HAMBURGER ========== */
   .hamburger {
     display: none;
     background: none;
@@ -435,12 +646,14 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     cursor: pointer;
     padding: 0;
     z-index: 1201;
+    margin-right: 15px;
+    /* Spacing dari user menu */
   }
 
   .hamburger-line {
     width: 100%;
     height: 3px;
-    background-color: #5757f4;
+    background: linear-gradient(90deg, #000000ff, #000000ff);
     border-radius: 10px;
     transition: all 0.3s ease;
   }
@@ -457,7 +670,7 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     transform: translateY(-8px) rotate(-45deg);
   }
 
-  /* Custom Logout Modal Styles */
+  /* ========== LOGOUT MODAL ========== */
   .logout-modal-overlay {
     display: none;
     position: fixed;
@@ -532,14 +745,12 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     font-weight: 700;
     color: #b49666;
     margin-bottom: 10px;
-    font-family: 'Poppins', sans-serif;
   }
 
   .logout-modal-text {
     font-size: 1em;
     color: #666;
     margin-bottom: 30px;
-    font-family: 'Poppins', sans-serif;
   }
 
   .logout-modal-buttons {
@@ -557,7 +768,6 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
   }
 
   .logout-btn-confirm {
@@ -584,98 +794,155 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
   }
 
-  /* Responsive */
-  @media (max-width: 900px) {
+  /* ========== RESPONSIVE - TABLET ========== */
+  @media (max-width: 1200px) and (min-width: 901px) {
     .navbar {
-      padding: 10px 15px;
+      padding: 10px 30px;
     }
 
     .navbar-menu {
-      display: none;
-      flex-direction: column;
-      background: rgba(255, 255, 255, 0.98);
-      position: absolute;
-      top: 60px;
-      left: 0;
-      width: 100vw;
-      padding: 16px 0;
-      gap: 10px;
-      box-shadow: 0 4px 16px rgba(123, 93, 254, 0.13);
-      z-index: 1200;
-    }
-
-    .navbar-menu.show {
-      display: flex;
+      gap: 20px;
     }
 
     .navbar-menu a {
-      margin-left: 24px;
-      width: auto;
-      font-size: 1.09rem;
-      padding: 12px 16px;
+      padding: 7px 16px;
+      font-size: 1rem;
     }
 
+    .user-menu-toggle {
+      padding: 6px 12px;
+      font-size: 0.86em;
+    }
+
+    .user-name {
+      max-width: 100px;
+    }
+  }
+
+  /* ========== RESPONSIVE - MOBILE MEDIUM ========== */
+  @media (max-width: 900px) {
+    .navbar {
+      padding: 8px 20px;
+      height: 75px;
+    }
+
+    .logo-img {
+      height: 42px;
+    }
+
+    /* Show hamburger on mobile */
+    .hamburger {
+      display: flex !important;
+      order: 2;
+      /* Hamburger di tengah (setelah logo) */
+      margin-right: 15px;
+      margin-left: auto;
+      /* Push ke kanan sebelum user menu */
+    }
+
+    /* User menu di paling kanan */
+    .user-menu-container {
+      order: 3;
+    }
+
+    /* Logo tetap di kiri */
+    .navbar-logo {
+      order: 1;
+    }
+
+    /* Hide desktop menu */
+    .navbar-menu {
+      display: none;
+      flex-direction: column;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      position: absolute;
+      top: 65px;
+      left: 0;
+      width: 100%;
+      padding: 15px;
+      gap: 10px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      z-index: 1050;
+      border-top: 1px solid rgba(169, 124, 80, 0.2);
+      max-height: calc(100vh - 65px);
+      overflow-y: auto;
+      order: 4;
+    }
+
+    .navbar-menu.show {
+      display: flex !important;
+    }
+
+    .navbar-menu a {
+      width: 100%;
+      font-size: 1rem;
+      padding: 12px 18px;
+      justify-content: flex-start;
+      border-radius: 12px;
+    }
+
+    /* Hide desktop auth buttons */
     .nav-btns {
       display: none;
       flex-direction: column;
-      background: rgba(255, 255, 255, 0.98);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
       position: absolute;
-      top: 60px;
+      top: 65px;
       left: 0;
-      width: 100vw;
-      padding: 16px 24px;
+      width: 100%;
+      padding: 15px;
       gap: 10px;
-      box-shadow: 0 4px 16px rgba(123, 93, 254, 0.13);
-      z-index: 1200;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      z-index: 1050;
+      border-top: 1px solid rgba(169, 124, 80, 0.2);
+      order: 4;
     }
 
     .nav-btns.show {
-      display: flex;
+      display: flex !important;
     }
 
     .nav-btns .btn {
       width: 100%;
       text-align: center;
+      padding: 11px 20px;
+      font-size: 1rem;
     }
 
-    .hamburger {
-      display: flex;
-    }
-
-    .user-menu-container {
-      display: none;
-      flex-direction: column;
-      background: rgba(255, 255, 255, 0.98);
-      position: absolute;
-      top: 60px;
-      right: 0;
-      width: 100vw;
-      padding: 16px 24px;
-      box-shadow: 0 4px 16px rgba(123, 93, 254, 0.13);
-      z-index: 1200;
-    }
-
-    .user-menu-container.show {
-      display: flex;
-    }
-
+    /* Mobile user menu */
     .user-menu-toggle {
-      width: 100%;
-      justify-content: center;
-      margin-bottom: 10px;
+      padding: 5px 12px;
+      gap: 6px;
+      font-size: 0.82em;
+    }
+
+    .profile-img-nav {
+      width: 24px;
+      height: 24px;
+    }
+
+    .user-name {
+      max-width: 90px;
+      font-size: 0.9em;
     }
 
     .user-dropdown {
-      position: static;
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-      box-shadow: none;
-      border: 1px solid rgba(169, 124, 80, 0.2);
+      min-width: 200px;
+      right: 0;
+    }
+
+    .dropdown-item {
+      padding: 10px 14px;
+      font-size: 0.85em;
     }
 
     .logout-modal-container {
       padding: 30px 20px;
+      max-width: 90%;
     }
 
     .logout-modal-buttons {
@@ -688,38 +955,212 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     }
   }
 
-  /* Tambahkan di dalam <style> di navbar.php */
+  /* ========== RESPONSIVE - MOBILE SMALL ========== */
+  @media (max-width: 600px) {
+    .navbar {
+      padding: 8px 15px;
+      height: 77px;
+    }
 
-  .profile-img-nav {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1.5px solid #ddd;
+    .logo-img {
+      height: 38px;
+    }
+
+    .navbar-menu {
+      top: 60px;
+      padding: 12px;
+      gap: 8px;
+    }
+
+    .navbar-menu a {
+      font-size: 0.95rem;
+      padding: 11px 16px;
+    }
+
+    .nav-btns {
+      top: 60px;
+      padding: 12px;
+    }
+
+    .nav-btns .btn {
+      padding: 10px 18px;
+      font-size: 0.95rem;
+    }
+
+    .hamburger {
+      width: 24px;
+      height: 17px;
+      margin-right: 12px;
+    }
+
+    .hamburger-line {
+      height: 2.5px;
+    }
+
+    .user-menu-toggle {
+      padding: 4px 10px;
+      gap: 5px;
+      font-size: 0.78em;
+    }
+
+    .profile-img-nav {
+      width: 22px;
+      height: 22px;
+    }
+
+    .user-name {
+      max-width: 75px;
+      font-size: 0.85em;
+    }
+
+    .user-dropdown {
+      min-width: 180px;
+      top: calc(100% + 8px);
+    }
+
+    .dropdown-item {
+      padding: 9px 12px;
+      gap: 9px;
+      font-size: 0.82em;
+    }
+
+    .dropdown-item i {
+      font-size: 0.95em;
+      width: 16px;
+    }
+
+    .logout-modal-container {
+      padding: 25px 18px;
+    }
+
+    .logout-modal-icon {
+      width: 70px;
+      height: 70px;
+    }
+
+    .logout-modal-icon i {
+      font-size: 2.2em;
+    }
+
+    .logout-modal-title {
+      font-size: 1.3em;
+    }
+
+    .logout-modal-text {
+      font-size: 0.92em;
+    }
+
+    .logout-btn-confirm,
+    .logout-btn-cancel {
+      padding: 10px 24px;
+      font-size: 0.95em;
+    }
   }
 
-  .user-menu-toggle i {
-    /* Atur semua ikon (termasuk chevron) di dalam toggle */
-    transition: transform 0.3s ease;
+  /* ========== RESPONSIVE - EXTRA SMALL MOBILE ========== */
+  @media (max-width: 375px) {
+    .navbar {
+      padding: 6px 12px;
+      height: 56px;
+    }
+
+    .logo-img {
+      height: 35px;
+    }
+
+    .navbar-menu {
+      top: 56px;
+      padding: 10px;
+    }
+
+    .navbar-menu a {
+      font-size: 0.9rem;
+      padding: 10px 14px;
+    }
+
+    .nav-btns {
+      top: 56px;
+      padding: 10px;
+    }
+
+    .hamburger {
+      width: 22px;
+      height: 16px;
+      margin-right: 10px;
+    }
+
+    .user-menu-toggle {
+      padding: 4px 8px;
+      gap: 4px;
+      font-size: 0.75em;
+    }
+
+    .profile-img-nav {
+      width: 20px;
+      height: 20px;
+    }
+
+    .user-name {
+      max-width: 60px;
+      font-size: 0.8em;
+    }
+
+    .user-dropdown {
+      min-width: 170px;
+    }
+
+    .dropdown-item {
+      padding: 8px 11px;
+      font-size: 0.8em;
+    }
   }
 
-  /* Pastikan tampilan flexbox benar */
-  .user-menu-toggle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    /* Jarak antara elemen */
-    padding: 8px 16px;
-    /* ... properti lainnya ... */
+  /* ========== RESPONSIVE - LARGE DESKTOP ========== */
+  @media (min-width: 1400px) {
+    .navbar {
+      padding: 10px 60px;
+    }
+
+    .navbar-menu {
+      gap: 35px;
+    }
+
+    .navbar-menu a {
+      padding: 8px 22px;
+      font-size: 1.08em;
+    }
+
+    .user-menu-toggle {
+      padding: 7px 16px;
+      font-size: 0.92em;
+    }
+
+    .user-name {
+      max-width: 130px;
+    }
+  }
+
+  /* Smooth scrollbar for mobile menu */
+  .navbar-menu::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .navbar-menu::-webkit-scrollbar-track {
+    background: rgba(169, 124, 80, 0.05);
+  }
+
+  .navbar-menu::-webkit-scrollbar-thumb {
+    background: rgba(169, 124, 80, 0.3);
+    border-radius: 10px;
   }
 </style>
+
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.getElementById('hamburgerBtn');
     const navbarMenu = document.getElementById('navbarMenu');
     const navBtns = document.querySelector('.nav-btns');
-    const userMenuContainer = document.querySelector('.user-menu-container');
     const userMenuToggle = document.getElementById('userMenuToggle');
     const userDropdown = document.getElementById('userDropdown');
     const logoutBtn = document.getElementById('logout-btn');
@@ -728,84 +1169,154 @@ if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== 
     const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
     const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
 
-    // Hamburger menu toggle (untuk mobile)
+    // ========== HAMBURGER MENU TOGGLE ==========
     if (hamburger) {
-      hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navbarMenu.classList.toggle('show');
+      hamburger.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent event bubbling
 
+        // Toggle hamburger animation
+        this.classList.toggle('active');
+
+        // Toggle navbar menu
+        if (navbarMenu) {
+          navbarMenu.classList.toggle('show');
+        }
+
+        // Toggle auth buttons (for non-logged users)
         if (navBtns) {
           navBtns.classList.toggle('show');
         }
 
-        if (userMenuContainer) {
-          userMenuContainer.classList.toggle('show');
-        }
+        // Update aria-expanded
+        const expanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', !expanded);
 
-        const expanded = hamburger.getAttribute('aria-expanded') === 'true' || false;
-        hamburger.setAttribute('aria-expanded', !expanded);
-      });
-    }
-
-    // User menu dropdown toggle (untuk desktop)
-    if (userMenuToggle && userDropdown) {
-      userMenuToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        userMenuToggle.classList.toggle('active');
-        userDropdown.classList.toggle('show');
-
-        const expanded = userMenuToggle.getAttribute('aria-expanded') === 'true' || false;
-        userMenuToggle.setAttribute('aria-expanded', !expanded);
-      });
-
-      // Close dropdown when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!userMenuToggle.contains(e.target) && !userDropdown.contains(e.target)) {
-          userMenuToggle.classList.remove('active');
+        // IMPORTANT: Close user dropdown if it's open
+        if (userDropdown && userDropdown.classList.contains('show')) {
           userDropdown.classList.remove('show');
-          userMenuToggle.setAttribute('aria-expanded', false);
+          if (userMenuToggle) {
+            userMenuToggle.classList.remove('active');
+            userMenuToggle.setAttribute('aria-expanded', 'false');
+          }
         }
       });
     }
 
-    // Logout dengan custom modal
+    // ========== USER MENU TOGGLE (INDEPENDENT) ==========
+    if (userMenuToggle && userDropdown) {
+      userMenuToggle.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent event bubbling
+
+        // Toggle user dropdown
+        userDropdown.classList.toggle('show');
+        this.classList.toggle('active');
+
+        // Update aria-expanded
+        const isExpanded = userDropdown.classList.contains('show');
+        this.setAttribute('aria-expanded', isExpanded);
+
+        // IMPORTANT: Close hamburger menu if it's open (on mobile)
+        if (window.innerWidth <= 900) {
+          if (hamburger && hamburger.classList.contains('active')) {
+            hamburger.classList.remove('active');
+            if (navbarMenu) navbarMenu.classList.remove('show');
+            if (navBtns) navBtns.classList.remove('show');
+            hamburger.setAttribute('aria-expanded', 'false');
+          }
+        }
+      });
+    }
+
+    // ========== CLOSE DROPDOWNS WHEN CLICKING OUTSIDE ==========
+    document.addEventListener('click', function(e) {
+      // Close user dropdown
+      if (userDropdown && userMenuToggle) {
+        if (!userDropdown.contains(e.target) && !userMenuToggle.contains(e.target)) {
+          userDropdown.classList.remove('show');
+          userMenuToggle.classList.remove('active');
+          userMenuToggle.setAttribute('aria-expanded', 'false');
+        }
+      }
+
+      // Close hamburger menu
+      if (hamburger && navbarMenu) {
+        if (!navbarMenu.contains(e.target) &&
+          !hamburger.contains(e.target) &&
+          (!navBtns || !navBtns.contains(e.target))) {
+          hamburger.classList.remove('active');
+          navbarMenu.classList.remove('show');
+          if (navBtns) navBtns.classList.remove('show');
+          hamburger.setAttribute('aria-expanded', 'false');
+        }
+      }
+    });
+
+    // ========== LOGOUT MODAL ==========
     if (logoutBtn && logoutModal && logoutForm) {
-      // Tampilkan modal saat klik logout
-      logoutBtn.addEventListener('click', (e) => {
+      logoutBtn.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         logoutModal.classList.add('show');
       });
 
-      // Konfirmasi logout
-      confirmLogoutBtn.addEventListener('click', () => {
-        logoutModal.classList.remove('show');
-        logoutForm.submit();
-      });
+      if (confirmLogoutBtn) {
+        confirmLogoutBtn.addEventListener('click', function() {
+          logoutModal.classList.remove('show');
+          logoutForm.submit();
+        });
+      }
 
-      // Batal logout
-      cancelLogoutBtn.addEventListener('click', () => {
-        logoutModal.classList.remove('show');
-      });
+      if (cancelLogoutBtn) {
+        cancelLogoutBtn.addEventListener('click', function() {
+          logoutModal.classList.remove('show');
+        });
+      }
 
-      // Close modal saat klik di luar modal
-      logoutModal.addEventListener('click', (e) => {
+      // Close modal when clicking overlay
+      logoutModal.addEventListener('click', function(e) {
         if (e.target === logoutModal) {
           logoutModal.classList.remove('show');
         }
       });
     }
 
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', (e) => {
-      if (hamburger && !hamburger.contains(e.target) &&
-        !navbarMenu.contains(e.target) &&
-        (!navBtns || !navBtns.contains(e.target)) &&
-        (!userMenuContainer || !userMenuContainer.contains(e.target))) {
-        hamburger.classList.remove('active');
-        navbarMenu.classList.remove('show');
+    // ========== CLOSE MENU WHEN CLICKING MENU LINKS (MOBILE) ==========
+    const menuLinks = document.querySelectorAll('.navbar-menu a');
+    menuLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        if (window.innerWidth <= 900) {
+          if (hamburger) {
+            hamburger.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
+          }
+          if (navbarMenu) navbarMenu.classList.remove('show');
+          if (navBtns) navBtns.classList.remove('show');
+        }
+      });
+    });
+
+    // ========== HANDLE WINDOW RESIZE ==========
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 900) {
+        // Reset mobile menu states on desktop
+        if (hamburger) {
+          hamburger.classList.remove('active');
+          hamburger.setAttribute('aria-expanded', 'false');
+        }
+        if (navbarMenu) navbarMenu.classList.remove('show');
         if (navBtns) navBtns.classList.remove('show');
-        if (userMenuContainer) userMenuContainer.classList.remove('show');
-        hamburger.setAttribute('aria-expanded', false);
+      }
+    });
+
+    // ========== NAVBAR SCROLL EFFECT ==========
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (navbar) {
+        if (window.scrollY > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
       }
     });
   });
