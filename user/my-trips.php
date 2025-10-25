@@ -1,81 +1,69 @@
 <?php
-// user/my-trips.php
+// my-trips.php
+// Anda sudah memiliki logika untuk $navbarPath dari navbar.php
+$navbarPath = '../'; // Contoh path relatif dari user/ ke root
+require_once $navbarPath . 'navbar.php';
 
-// WAJIB: Sesuaikan dengan lokasi file koneksi dan navbar Anda
-session_start();
-require_once __DIR__ . '/../backend/koneksi.php'; // Sesuaikan path
-
-// Cek status login
-if (!isset($_SESSION['id_user']) || empty($_SESSION['id_user'])) {
-    // Redirect ke halaman login jika belum login
-    header("Location: ../index.php"); // Atau ke halaman login spesifik
-    exit;
-}
-
-$id_user = $_SESSION['id_user'];
-$userName = $_SESSION['username'] ?? 'Pengguna';
-
-// Query untuk mengambil data pesanan trip user
-// KOREKSI: Mengganti 'pemesanan' menjadi 'bookings' dan 'trip' menjadi 'paket_trips'
-$sql_trips = "
-    SELECT 
-        b.id_booking,
-        pt.nama_gunung AS nama_trip, -- Menggunakan nama_gunung sebagai nama trip
-        pt.harga AS harga_trip_satuan, -- Harga satuan dari paket_trips
-        b.tanggal_booking,
-        b.jumlah_orang,
-        b.total_harga,
-        b.status AS status_pembayaran -- KOREKSI: Mengambil kolom 'status' dari tabel 'bookings'
-    FROM 
-        bookings b
-    JOIN 
-        paket_trips pt ON b.id_trip = pt.id_trip
-    WHERE 
-        b.id_user = ?
-    ORDER BY 
-        b.tanggal_booking DESC
-";
-
-$stmt_trips = $conn->prepare($sql_trips);
-
-// Cek jika prepare gagal (kemungkinan ada masalah di query lain, tapi seharusnya fix sekarang)
-if ($stmt_trips === false) {
-    // Tambahkan error handling jika diperlukan
-    // die('MySQL Prepare Error: ' . $conn->error);
-}
-
-$stmt_trips->bind_param("i", $id_user);
-$stmt_trips->execute();
-$result_trips = $stmt_trips->get_result();
-$pemesanan_list = $result_trips->fetch_all(MYSQLI_ASSOC);
-$stmt_trips->close();
-
-// Fungsi untuk mendapatkan warna status
-function get_status_color($status) {
-    // KOREKSI: Menyesuaikan ENUM status dari tabel 'bookings' ('pending', 'paid', dll.)
-    switch (strtolower($status)) {
-        case 'pending':
-            return 'status-pending'; // Kuning/Jingga
-        case 'paid':
-            return 'status-paid'; // Hijau
-        case 'cancelled':
-            return 'status-cancelled'; // Merah
-        default:
-            return 'status-default';
-    }
-}
-// Fungsi untuk memformat status
-function format_status_text($status) {
-    if (strtolower($status) === 'pending') {
-        return 'Menunggu Pembayaran';
-    } elseif (strtolower($status) === 'paid') {
-        return 'Terbayar';
-    } elseif (strtolower($status) === 'cancelled') {
-        return 'Dibatalkan';
-    }
-    return ucwords($status);
-}
-
+// =======================================================
+// CONTOH DATA TRIP SAYA (SIMULASI DARI JOIN DATABASE)
+// Status yang mungkin: pending, paid, cancelled, finished
+// =======================================================
+$myTrips = [
+    [
+        'id_booking' => 28,
+        'nama_gunung' => 'Gunung Slamet',
+        'jenis_trip' => 'Camp',
+        'tanggal_trip' => '2025-10-30',
+        'durasi' => '3 hari 2 malam',
+        'via_gunung' => 'Rambipuji',
+        'nama_lokasi' => 'Basecamp slamet',
+        'tanggal_booking' => '2025-10-23',
+        'jumlah_orang' => 1,
+        'total_harga' => 500000,
+        'status_booking' => 'pending',
+        'gambar' => $navbarPath . 'img/ijen.jpg', // Ganti dengan path gambar Anda
+        'include' => 'makan, minum, tenda, porter',
+        'exclude' => 'doa, snack pribadi',
+        'syaratKetentuan' => 'ga ngalem: wajib membawa surat keterangan sehat dan fotokopi KTP. Pembayaran DP 50% harus dilakukan dalam 1x24 jam.',
+        'waktu_kumpul' => '02:00:00',
+    ],
+    [
+        'id_booking' => 26,
+        'nama_gunung' => 'Gunung Raung',
+        'jenis_trip' => 'Camp',
+        'tanggal_trip' => '2025-09-26',
+        'durasi' => '2 Hari 1 Malam',
+        'via_gunung' => 'bondowoso',
+        'nama_lokasi' => 'Base Camp Kalibaru',
+        'tanggal_booking' => '2025-10-21',
+        'jumlah_orang' => 1,
+        'total_harga' => 400000,
+        'status_booking' => 'paid',
+        'gambar' => $navbarPath . 'img/rinjani.jpg', // Ganti dengan path gambar Anda
+        'include' => 'mangan, transport pp',
+        'exclude' => 'ngombe, asuransi',
+        'syaratKetentuan' => 'ada deh: peserta dilarang membawa barang yang tidak perlu dan wajib mematuhi protokol basecamp.',
+        'waktu_kumpul' => '11:11:00',
+    ],
+    [
+        'id_booking' => 13,
+        'nama_gunung' => 'Gunung Bokong',
+        'jenis_trip' => 'Camp',
+        'tanggal_trip' => '2025-10-03',
+        'durasi' => '2 Hari 1 Malam',
+        'via_gunung' => 'Sumberwringin',
+        'nama_lokasi' => 'Base Camp Sumberwringin',
+        'tanggal_booking' => '2025-10-10',
+        'jumlah_orang' => 2,
+        'total_harga' => 600000,
+        'status_booking' => 'finished',
+        'gambar' => $navbarPath . 'img/20250917123322_Magelang.jpg', // Ganti dengan path gambar Anda
+        'include' => 'makanan, air mineral',
+        'exclude' => 'tidak ada',
+        'syaratKetentuan' => 'd: trip telah selesai dan peserta mendapatkan sertifikat digital.',
+        'waktu_kumpul' => '23:08:00',
+    ],
+];
 ?>
 
 <!DOCTYPE html>
@@ -84,392 +72,523 @@ function format_status_text($status) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paket Trip Saya | Majelis MDPL</title>
+    <title>Paket Trip Saya - Majelis MDPL</title>
     <style>
-        .mytrips-page-container {
-            padding: 100px 40px 40px 40px;
-            max-width: 1200px;
-            margin: 0 auto;
+        .page-container {
+            padding-top: 80px;
+            /* Jarak dari fixed navbar */
             min-height: 100vh;
         }
 
-        /* === Header Halaman === */
-        .page-header {
+        .my-trips-section {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
             text-align: center;
-            margin-bottom: 50px;
-            padding: 20px;
-            border-bottom: 3px solid #f0f0f0;
+            margin-bottom: 40px;
         }
 
-        .header-icon {
-            font-size: 3em;
-            color: #b49666;
-            margin-bottom: 10px;
-            animation: pulse 1.5s infinite alternate;
-        }
-
-        @keyframes pulse {
-            from {
-                transform: scale(1);
-                opacity: 0.8;
-            }
-
-            to {
-                transform: scale(1.05);
-                opacity: 1;
-            }
-        }
-
-        .page-header h1 {
-            font-size: 2.5em;
+        .page-title {
+            font-size: 2.5rem;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-weight: 700;
         }
 
-        .page-header p {
+        .subtitle {
             color: #666;
-            font-size: 1.1em;
-            max-width: 700px;
-            margin: 0 auto;
+            font-size: 1.1rem;
         }
 
-        /* === Card List Trips === */
-        .trip-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
+        .page-title i {
+            color: #a97c50;
+            /* Warna Emas/Coklat Khas */
+            margin-right: 10px;
         }
 
-        .trip-card {
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            overflow: hidden;
-            border: 1px solid #eee;
+        /* --- List Card Styling (Eksklusif) --- */
+        .trips-list {
             display: flex;
             flex-direction: column;
+            gap: 25px;
         }
 
-        .trip-card:hover {
+        .list-trip-card {
+            display: flex;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #eee;
+            align-items: center;
+            /* Tengah vertikal */
+        }
+
+        .list-trip-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
-        .card-header {
+        .card-image-box {
+            width: 250px;
+            /* Lebar gambar di kiri */
+            min-width: 200px;
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: #fcfcfc;
-            border-bottom: 1px solid #f0f0f0;
+            align-items: flex-end;
+            padding: 10px;
         }
 
-        .trip-name {
-            font-size: 1.15em;
+        .trip-type-badge {
+            background: rgba(169, 124, 80, 0.9);
+            /* Latar belakang coklat gelap transparan */
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 5px;
             font-weight: 600;
-            color: #b49666;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 0.85em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
-        .order-id {
-            font-size: 0.9em;
-            color: #999;
-            font-weight: 500;
-            background: #f4f4f4;
-            padding: 4px 10px;
-            border-radius: 8px;
-        }
-
-        .card-body {
-            padding: 20px;
+        .card-info {
             flex-grow: 1;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px dashed #eee;
-        }
-
-        .detail-row:last-of-type {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            font-weight: 500;
-            color: #555;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .detail-label i {
-            color: #a97c50;
-        }
-
-        .detail-value {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .price-row {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #f0f0f0;
-        }
-
-        .price-value {
-            font-size: 1.2em;
-            color: #b49666;
-        }
-
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: #f9f9f9;
-            border-top: 1px solid #f0f0f0;
+            padding: 15px 25px;
         }
 
         .status-badge {
-            font-size: 0.9em;
-            padding: 5px 12px;
-            border-radius: 15px;
+            padding: 6px 14px;
+            border-radius: 20px;
             font-weight: 600;
+            font-size: 0.8em;
+            color: #fff;
+            margin-bottom: 10px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 7px;
+            text-transform: uppercase;
         }
 
-        /* Warna Status - Disesuaikan dengan status ENUM 'bookings' */
+        /* Warna Status */
         .status-pending {
-            background-color: #ffe0b2;
-            color: #e65100;
+            background-color: #ffc107;
+            color: #333;
         }
 
         .status-paid {
-            background-color: #c8e6c9;
-            color: #2e7d32;
+            background-color: #28a745;
         }
 
         .status-cancelled {
-            background-color: #ffcdd2;
-            color: #c62828;
+            background-color: #dc3545;
         }
 
-        .status-default {
-            background-color: #f0f0f0;
+        .status-finished {
+            background-color: #6c757d;
+        }
+
+        .card-info h3 {
+            font-size: 1.4rem;
+            color: #222;
+            margin-bottom: 15px;
+        }
+
+        .trip-meta {
+            font-size: 0.95em;
             color: #555;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
         }
 
-        .btn-detail {
-            padding: 8px 15px;
-            background: #a97c50;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 10px;
+        .trip-meta i {
+            color: #a97c50;
+            width: 20px;
+            text-align: center;
+        }
+
+        .card-actions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            min-width: 180px;
+            border-left: 1px solid #f0f0f0;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border-radius: 8px;
             font-size: 0.95em;
             font-weight: 600;
-            transition: background 0.3s ease;
-            display: inline-flex;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .btn-detail:hover {
+        .btn-detail-list {
+            background: #4a4a4a;
+            color: #fff;
+        }
+
+        .btn-detail-list:hover {
+            background: #333;
+        }
+
+        .btn-payment-list {
+            background: #a97c50;
+            color: #fff;
+        }
+
+        .btn-payment-list:hover {
             background: #8b5e3c;
         }
 
-        /* === Empty State === */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            background: #ffffff;
-            border: 2px dashed #e0e0e0;
-            border-radius: 20px;
-            margin-top: 40px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        /* --- Modal Styling (Dipertahankan dan Disesuaikan) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .empty-icon {
-            font-size: 4em;
-            color: #cccccc;
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: #fff;
+            border-radius: 15px;
+            max-width: 650px;
+            width: 90%;
+            padding: 30px;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            /* Pop effect */
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.show .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-close-btn {
+            position: sticky;
+            top: 0;
+            right: 0;
+            align-self: flex-end;
+            background: #f8f8f8;
+            border: none;
+            font-size: 2rem;
+            color: #aaa;
+            cursor: pointer;
+            z-index: 1;
+            padding: 0 10px 10px 10px;
+            line-height: 1;
+        }
+
+        .modal-close-btn:hover {
+            color: #dc3545;
+        }
+
+        #modal-title {
+            color: #a97c50;
+            border-bottom: 2px solid #a97c50;
+            padding-bottom: 10px;
             margin-bottom: 20px;
         }
 
-        .empty-state h2 {
-            font-size: 1.8em;
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .info-group {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            background-color: #fcfcfc;
+            border-radius: 10px;
+        }
+
+        .info-group h3 {
+            font-size: 1.15rem;
             color: #333;
             margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            font-size: 1.1em;
-            color: #777;
-            margin-bottom: 30px;
-        }
-
-        .btn-explore {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(180, 150, 102, 0.4);
         }
 
-        .btn-explore:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(180, 150, 102, 0.6);
+        .info-group h3 i {
+            color: #a97c50;
+            margin-right: 8px;
+            font-size: 1.3em;
         }
 
+        .info-group p {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.6;
+            margin-left: 30px;
+            white-space: pre-wrap;
+            /* Mempertahankan format baris */
+        }
 
-        /* === Responsive Design === */
-        @media (max-width: 900px) {
-            .mytrips-page-container {
-                padding: 80px 15px 30px 15px;
-            }
+        .btn-map {
+            margin-top: 15px;
+            background: #333;
+            color: #fff;
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
 
-            .page-header h1 {
-                font-size: 2em;
-            }
+        .btn-map:hover {
+            background: #000;
+        }
 
-            .page-header p {
-                font-size: 1em;
-            }
+        /* No Trips State (Dipertahankan) */
+        .no-trips {
+            text-align: center;
+            padding: 60px 20px;
+            background: #f8f8f8;
+            border: 2px dashed #ddd;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
 
-            .trip-cards-grid {
-                grid-template-columns: 1fr;
-            }
+        .no-trips i {
+            font-size: 3em;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
 
-            .card-header {
+        .explore-btn {
+            margin-top: 20px;
+            display: inline-block;
+            background: #a97c50;
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 30px;
+        }
+
+        .explore-btn:hover {
+            background: #8b5e3c;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .list-trip-card {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-
-            .order-id {
-                align-self: flex-end;
-            }
-
-            .card-footer {
-                flex-direction: column;
-                gap: 10px;
+                /* Ubah menjadi tumpukan vertikal */
                 align-items: stretch;
             }
 
-            .btn-detail {
+            .card-image-box {
                 width: 100%;
-                justify-content: center;
+                height: 150px;
+                /* Kurangi tinggi untuk mobile */
+                min-width: 100%;
+            }
+
+            .card-info {
+                padding: 15px;
+            }
+
+            .card-actions-list {
+                flex-direction: row;
+                /* Tombol jadi horizontal */
+                border-left: none;
+                border-top: 1px solid #f0f0f0;
+                padding: 15px;
+                min-width: auto;
+            }
+
+            .btn-detail-list,
+            .btn-payment-list {
+                flex: 1;
+                /* Agar lebar tombol sama */
+            }
+
+            .modal-container {
+                padding: 20px;
+            }
+
+            .info-group p {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .info-group h3 i {
+                display: none;
+                /* Sembunyikan ikon di mobile agar judul lebih pendek */
             }
         }
     </style>
 </head>
 
 <body>
-    <?php
-    // Memuat navbar
-    include '../navbar.php'; // Sesuaikan path
-    ?>
+    <div class="page-container">
+        <main class="my-trips-section">
+            <div class="header-content">
+                <h1 class="page-title">
+                    <i class="fa-solid fa-mountain-sun"></i> Paket Trip Saya
+                </h1>
+                <p class="subtitle">Daftar reservasi dan info penting untuk pendakian Anda.</p>
+            </div>
 
-    <div class="mytrips-page-container">
-        <header class="page-header">
-            <i class="fa-solid fa-mountain header-icon"></i>
-            <h1>Paket Trip Saya</h1>
-            <p>Lihat semua riwayat pemesanan trip Anda, termasuk status pembayaran dan detail perjalanan.</p>
-        </header>
-
-        <section class="trip-list-section">
-            <?php if (empty($pemesanan_list)) : ?>
-                <div class="empty-state">
-                    <i class="fa-solid fa-box-open empty-icon"></i>
-                    <h2>Belum Ada Pemesanan Trip</h2>
-                    <p>Yuk, rencanakan petualangan mendaki Anda bersama kami!</p>
-                    <a href="<?php echo $navbarPath; ?>#paketTrips" class="btn-explore">
-                        <i class="fa-solid fa-compass"></i> Jelajahi Paket Trip
-                    </a>
-                </div>
-            <?php else : ?>
-                <div class="trip-cards-grid">
-                    <?php foreach ($pemesanan_list as $pemesanan) :
-                        $status_class = get_status_color($pemesanan['status_pembayaran']);
-                        $status_text = format_status_text($pemesanan['status_pembayaran']); // Menggunakan fungsi format
-                        $formatted_date = date("d M Y", strtotime($pemesanan['tanggal_booking'])); // Menggunakan tanggal_booking
-                        $formatted_price = "Rp " . number_format($pemesanan['total_harga'], 0, ',', '.');
-                    ?>
-                        <div class="trip-card">
-                            <div class="card-header">
-                                <span class="trip-name">
-                                    <i class="fa-solid fa-map-location-dot"></i>
-                                    <?php echo htmlspecialchars($pemesanan['nama_trip']); ?>
+            <div class="trips-list">
+                <?php if (empty($myTrips)): ?>
+                    <div class="no-trips">
+                        <i class="fa-solid fa-box-open"></i>
+                        <h2>Oops! Belum Ada Trip</h2>
+                        <p>Anda belum memesan paket trip apapun. Yuk, jelajahi penawaran kami!</p>
+                        <a href="<?php echo $navbarPath; ?>#paketTrips" class="btn explore-btn">Lihat Paket Trip</a>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($myTrips as $trip): ?>
+                        <div class="list-trip-card" data-status="<?php echo strtolower($trip['status_booking']); ?>">
+                            <div class="card-image-box" style="background-image: url('<?php echo htmlspecialchars($trip['gambar']); ?>');">
+                                <span class="trip-type-badge"><?php echo htmlspecialchars($trip['jenis_trip']); ?></span>
+                            </div>
+                            <div class="card-info">
+                                <span class="status-badge status-<?php echo strtolower($trip['status_booking']); ?>">
+                                    <?php
+                                    $status = strtolower($trip['status_booking']);
+                                    if ($status === 'pending') echo '<i class="fa-solid fa-hourglass-half"></i> Menunggu Pembayaran';
+                                    else if ($status === 'paid') echo '<i class="fa-solid fa-check-circle"></i> Pembayaran Selesai';
+                                    else if ($status === 'cancelled') echo '<i class="fa-solid fa-times-circle"></i> Dibatalkan';
+                                    else if ($status === 'finished') echo '<i class="fa-solid fa-flag-checkered"></i> Selesai';
+                                    else echo ucwords($trip['status_booking']);
+                                    ?>
                                 </span>
-                                <span class="order-id">#ID<?php echo $pemesanan['id_booking']; ?></span>
-                            </div>
-                            <div class="card-body">
-                                <div class="detail-row">
-                                    <span class="detail-label"><i class="fa-solid fa-calendar-alt"></i> Tgl. Pesan:</span>
-                                    <span class="detail-value"><?php echo $formatted_date; ?></span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label"><i class="fa-solid fa-user-group"></i> Peserta:</span>
-                                    <span class="detail-value"><?php echo $pemesanan['jumlah_orang']; ?> Orang</span>
-                                </div>
-                                <div class="detail-row price-row">
-                                    <span class="detail-label"><i class="fa-solid fa-money-bill-wave"></i> Total Harga:</span>
-                                    <span class="detail-value price-value"><?php echo $formatted_price; ?></span>
+
+                                <h3><?php echo htmlspecialchars($trip['nama_gunung']); ?> (Via <?php echo htmlspecialchars($trip['via_gunung']); ?>)</h3>
+
+                                <div class="trip-meta">
+                                    <p><i class="fa-solid fa-calendar-alt"></i> Trip: <strong><?php echo date('d M Y', strtotime($trip['tanggal_trip'])); ?></strong> (<?php echo htmlspecialchars($trip['durasi']); ?>)</p>
+                                    <p><i class="fa-solid fa-users"></i> Peserta: <strong><?php echo htmlspecialchars($trip['jumlah_orang']); ?> Orang</strong></p>
+                                    <p><i class="fa-solid fa-tag"></i> Total: <strong>Rp <?php echo number_format($trip['total_harga'], 0, ',', '.'); ?></strong></p>
                                 </div>
                             </div>
-                            <div class="card-footer">
-                                <div class="status-badge <?php echo $status_class; ?>">
-                                    Status:
-                                    <span class="status-text">
-                                        <?php echo $status_text; ?>
-                                    </span>
-                                </div>
-                                <a href="<?php echo $navbarPath; ?>user/payment-status.php?order_id=<?php echo $pemesanan['id_booking']; ?>" class="btn-detail">
-                                    <i class="fa-solid fa-circle-info"></i> Detail
-                                </a>
+                            <div class="card-actions-list">
+                                <button class="btn btn-detail-list" onclick="openDetailModal(<?php echo htmlspecialchars(json_encode($trip)); ?>)" title="Lihat Detail & Perlengkapan">
+                                    <i class="fa-solid fa-eye"></i> Detail Trip
+                                </button>
+                                <?php if (strtolower($trip['status_booking']) == 'pending'): ?>
+                                    <a href="<?php echo $navbarPath; ?>user/payment-status.php?booking_id=<?php echo $trip['id_booking']; ?>" class="btn btn-payment-list" title="Lanjutkan Proses Pembayaran">
+                                        <i class="fa-solid fa-money-bill-wave"></i> Bayar
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </main>
+    </div>
+
+    <div id="detail-modal" class="modal-overlay">
+        <div class="modal-container">
+            <button class="modal-close-btn" onclick="closeDetailModal()">×</button>
+            <h2 id="modal-title"></h2>
+            <div class="modal-content">
+                <div class="info-group">
+                    <h3><i class="fa-solid fa-location-dot"></i> Lokasi & Waktu Kumpul</h3>
+                    <p><strong>Tempat Kumpul:</strong> <span id="modal-lokasi"></span></p>
+                    <p><strong>Alamat Lengkap:</strong> <span id="modal-alamat"></span></p>
+                    <p><strong>Waktu Kumpul:</strong> <span id="modal-waktu-kumpul"></span> WIB</p>
+                    <a id="modal-link-map" href="#" target="_blank" class="btn btn-map"><i class="fa-solid fa-map-location-dot"></i> Lihat Peta</a>
                 </div>
-            <?php endif; ?>
-        </section>
+
+                <div class="info-group">
+                    <h3><i class="fa-solid fa-check-circle"></i> Include (Termasuk)</h3>
+                    <p id="modal-include"></p>
+                </div>
+
+                <div class="info-group">
+                    <h3><i class="fa-solid fa-times-circle"></i> Exclude (Tidak Termasuk)</h3>
+                    <p id="modal-exclude"></p>
+                </div>
+
+                <div class="info-group last-group">
+                    <h3><i class="fa-solid fa-file-contract"></i> Syarat & Ketentuan</h3>
+                    <p id="modal-sk"></p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Logika untuk menyorot link "Paket Trip Saya" di dropdown
-            const tripLink = document.querySelector('.user-dropdown a[href*="my-trips.php"]');
+        // JavaScript Logic (Sama seperti sebelumnya, memastikan fungsi openDetailModal() bekerja)
+        function openDetailModal(tripData) {
+            const modal = document.getElementById('detail-modal');
 
-            if (tripLink) {
-                // Hapus class 'active' dari semua link utama (jika ada)
-                document.querySelectorAll('.navbar-menu a').forEach(link => {
-                    link.classList.remove('active');
-                });
+            // Perbarui konten modal
+            document.getElementById('modal-title').innerText = `Detail Trip: ${tripData.nama_gunung}`;
+            document.getElementById('modal-lokasi').innerText = tripData.nama_lokasi;
+            document.getElementById('modal-alamat').innerText = tripData.alamat;
+            document.getElementById('modal-waktu-kumpul').innerText = tripData.waktu_kumpul.substring(0, 5); // Hanya ambil jam:menit
+            document.getElementById('modal-include').innerText = tripData.include || 'Tidak ada data include.';
+            document.getElementById('modal-exclude').innerText = tripData.exclude || 'Tidak ada data exclude.';
+            document.getElementById('modal-sk').innerText = tripData.syaratKetentuan || 'Tidak ada data syarat & ketentuan.';
 
-                // Hapus class 'active' dari semua dropdown item lain (optional)
-                document.querySelectorAll('.user-dropdown a').forEach(link => {
-                    link.classList.remove('active');
-                });
+            // Perbaiki link map:
+            const mapLinkElement = document.getElementById('modal-link-map');
+            let mapUrl = tripData.link_map;
 
-                // Tambahkan class 'active' ke link "Paket Trip Saya"
-                tripLink.classList.add('active');
+            // Logika sederhana untuk membersihkan URL iframe/embed
+            if (mapUrl && mapUrl.includes('http://googleusercontent.com/maps.google.com/')) {
+                // Menggunakan link dummy yang lebih baik:
+                mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(tripData.nama_lokasi);
             }
 
-            // ... (Kode JS navbar.php lainnya) ...
+            mapLinkElement.href = mapUrl || '#'; // Set link
+            mapLinkElement.style.display = mapUrl ? 'inline-block' : 'none'; // Sembunyikan jika tidak ada link
+
+            // Tampilkan modal
+            modal.classList.add('show');
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('show');
+        }
+
+        // Tutup modal jika user mengklik di luar area modal
+        document.getElementById('detail-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'detail-modal') {
+                closeDetailModal();
+            }
         });
     </script>
 </body>
