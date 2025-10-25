@@ -32,7 +32,7 @@ if ($isLoggedIn) {
 $photoFileName = htmlspecialchars($userPhoto, ENT_QUOTES, 'UTF-8');
 
 // 1. Tentukan Project Root (Untuk file_exists)
-// _DIR_ adalah lokasi navbar.php. Kita perlu naik ke root proyek majelismdpl.com/.
+// __DIR__ adalah lokasi navbar.php. Kita perlu naik ke root proyek majelismdpl.com/.
 // Gunakan $_SERVER['DOCUMENT_ROOT'] yang lebih stabil, dikombinasikan dengan path proyek.
 // Jika proyek Anda diakses melalui http://localhost/majelismdpl.com/, maka path-nya adalah:
 $projectDirName = '/majelismdpl.com'; // <--- SESUAIKAN DENGAN NAMA FOLDER PROYEK ANDA!
