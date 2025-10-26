@@ -3,27 +3,27 @@ require_once 'auth_check.php';
 
 // Debug dan perbaiki session username
 if (!isset($_SESSION['username']) || empty($_SESSION['username']) || $_SESSION['username'] === 'root') {
-    // Jika session bermasalah, ambil dari database
-    if (isset($_SESSION['id_user']) && !empty($_SESSION['id_user'])) {
-        require_once '../backend/koneksi.php';
-        $stmt = $conn->prepare("SELECT username, role FROM users WHERE id_user = ?");
-        $stmt->bind_param("i", $_SESSION['id_user']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-            
-            // Update global variables dari auth_check.php
-            $username = $user['username'];
-            $user_role = $user['role'];
-            $is_super_admin = RoleHelper::isSuperAdmin($user_role);
-            $is_admin = RoleHelper::isAdmin($user_role);
-        }
-        $stmt->close();
+  // Jika session bermasalah, ambil dari database
+  if (isset($_SESSION['id_user']) && !empty($_SESSION['id_user'])) {
+    require_once '../backend/koneksi.php';
+    $stmt = $conn->prepare("SELECT username, role FROM users WHERE id_user = ?");
+    $stmt->bind_param("i", $_SESSION['id_user']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+      $user = $result->fetch_assoc();
+      $_SESSION['username'] = $user['username'];
+      $_SESSION['role'] = $user['role'];
+
+      // Update global variables dari auth_check.php
+      $username = $user['username'];
+      $user_role = $user['role'];
+      $is_super_admin = RoleHelper::isSuperAdmin($user_role);
+      $is_admin = RoleHelper::isAdmin($user_role);
     }
+    $stmt->close();
+  }
 }
 
 // Ambil username dari session dengan fallback yang lebih baik
@@ -32,33 +32,33 @@ $display_role = $user_role ?? 'user';
 
 // Jika masih "root" atau kosong, redirect ke login
 if ($display_username === 'root' || $display_username === 'Guest' || empty($display_username)) {
-    session_destroy();
-    header('Location: ../login.php?error=session_invalid');
-    exit;
+  session_destroy();
+  header('Location: ../login.php?error=session_invalid');
+  exit;
 }
 
 // Handle error messages dari parameter URL
 $error_message = '';
 $error_type = '';
 if (isset($_GET['error'])) {
-    switch ($_GET['error']) {
-        case 'access_denied':
-            $error_message = $_GET['message'] ?? 'Akses ditolak. Anda tidak memiliki permission yang diperlukan untuk mengakses halaman tersebut.';
-            $error_type = 'warning';
-            break;
-        case 'unauthorized':
-            $error_message = 'Anda tidak memiliki akses ke halaman tersebut. Silakan hubungi administrator.';
-            $error_type = 'error';
-            break;
-        case 'session_expired':
-            $error_message = 'Session Anda telah berakhir. Silakan login kembali.';
-            $error_type = 'info';
-            break;
-        case 'session_invalid':
-            $error_message = 'Session tidak valid. Silakan login kembali.';
-            $error_type = 'error';
-            break;
-    }
+  switch ($_GET['error']) {
+    case 'access_denied':
+      $error_message = $_GET['message'] ?? 'Akses ditolak. Anda tidak memiliki permission yang diperlukan untuk mengakses halaman tersebut.';
+      $error_type = 'warning';
+      break;
+    case 'unauthorized':
+      $error_message = 'Anda tidak memiliki akses ke halaman tersebut. Silakan hubungi administrator.';
+      $error_type = 'error';
+      break;
+    case 'session_expired':
+      $error_message = 'Session Anda telah berakhir. Silakan login kembali.';
+      $error_type = 'info';
+      break;
+    case 'session_invalid':
+      $error_message = 'Session tidak valid. Silakan login kembali.';
+      $error_type = 'error';
+      break;
+  }
 }
 ?>
 
@@ -121,7 +121,8 @@ if (isset($_GET['error'])) {
     }
 
     .main {
-      margin-left: 280px; /* Disesuaikan dengan sidebar baru */
+      margin-left: 280px;
+      /* Disesuaikan dengan sidebar baru */
       min-height: 100vh;
       padding: 20px 25px;
       background: #f6f0e8;
@@ -240,22 +241,22 @@ if (isset($_GET['error'])) {
         font-size: 12px;
         min-width: 150px;
       }
-      
+
       .admin-info .user-icon {
         width: 32px;
         height: 32px;
         font-size: 18px;
       }
-      
+
       .admin-info .username {
         font-size: 13px;
       }
-      
+
       .main-header {
         flex-direction: column;
         align-items: flex-start;
       }
-      
+
       .main-header h2 {
         font-size: 1.2rem;
       }
@@ -266,11 +267,11 @@ if (isset($_GET['error'])) {
         padding: 6px 12px;
         min-width: 120px;
       }
-      
+
       .admin-info .user-details {
         display: none;
       }
-      
+
       .admin-info::after {
         content: attr(data-username);
         font-size: 12px;
@@ -501,6 +502,165 @@ if (isset($_GET['error'])) {
     .swal2-confirm:hover {
       background-color: #8b6332 !important;
     }
+
+    /* ========== MODAL PROFIL ADMIN ========== */
+    .profile-modal-overlay {
+      display: none;
+      /* Default hidden */
+      position: fixed;
+      z-index: 10001;
+      /* Above everything */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(3px);
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .profile-modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 90%;
+      animation: slideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px) scale(0.95);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+
+    .profile-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .profile-modal-header h3 {
+      margin: 0;
+      color: #432f17;
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+
+    .close-modal-btn {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .close-modal-btn:hover,
+    .close-modal-btn:focus {
+      color: #432f17;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .profile-photo-area {
+      text-align: center;
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .profile-icon-large {
+      font-size: 7rem;
+      /* Ukuran ikon besar */
+      color: #a97c50;
+      border: 5px solid #f6f0e8;
+      border-radius: 50%;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 120px;
+      height: 120px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .change-photo-btn {
+      position: absolute;
+      bottom: 0;
+      right: 100px;
+      /* Sesuaikan posisi agar di sudut bawah kanan ikon */
+      background: #432f17;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      transition: background 0.2s;
+    }
+
+    .change-photo-btn:hover {
+      background: #a97c50;
+    }
+
+    .user-info-detail {
+      margin-bottom: 15px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f6f0e8;
+    }
+
+    .user-info-detail p {
+      font-size: 0.9em;
+      color: #a97c50;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .user-info-detail h4 {
+      font-size: 1.1em;
+      color: #432f17;
+      margin: 5px 0 0 0;
+      font-weight: 700;
+    }
+
+    .role-modal {
+      font-size: 14px !important;
+      padding: 4px 10px !important;
+      margin-top: 5px;
+    }
+
+    .profile-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding-top: 15px;
+    }
   </style>
 </head>
 
@@ -512,26 +672,26 @@ if (isset($_GET['error'])) {
   <main class="main">
     <div class="main-header">
       <h2>Dashboard Admin</h2>
-      <div class="admin-info" 
-           title="Pengguna yang sedang login: <?= htmlspecialchars($display_username) ?>"
-           data-username="<?= htmlspecialchars($display_username) ?>">
-        <i class="bi bi-person-circle user-icon"></i>
+      <button class="admin-info" id="openProfileModal"
+        title="Buka Menu Profil"
+        data-username="<?= htmlspecialchars($display_username) ?>">
+        <i class="bi bi-person-circle user-icon" id="adminIcon"></i>
         <div class="user-details">
           <span class="username"><?= htmlspecialchars($display_username) ?></span>
           <span class="role-badge role-<?= $display_role ?>">
             <?= RoleHelper::getRoleDisplayName($display_role) ?>
           </span>
         </div>
-      </div>
+      </button>
     </div>
 
     <!-- Welcome Section -->
     <section class="welcome-section">
       <h3 id="welcomeMessage">
-        <?php 
+        <?php
         // Pastikan tidak menampilkan "root"
         $displayName = ($display_username && $display_username !== 'root' && $display_username !== 'Guest') ? $display_username : 'Pengguna';
-        echo "Selamat Datang, " . htmlspecialchars($displayName) . "!"; 
+        echo "Selamat Datang, " . htmlspecialchars($displayName) . "!";
         ?>
       </h3>
       <p>Selamat beraktivitas di sistem Majelis MDPL - <?= RoleHelper::getRoleDisplayName($display_role) ?></p>
@@ -603,28 +763,68 @@ if (isset($_GET['error'])) {
       </table>
     </section>
 
+    <div class="profile-modal-overlay" id="profileModalOverlay">
+     <div class="profile-modal-content">
+       <div class="profile-modal-header">
+          <h3>Profil Admin</h3>
+         <button class="close-modal-btn" id="closeProfileModal">&times;</button>
+          </div>
+
+       <div class="profile-modal-body">
+          <form id="profilePhotoForm" action="../backend/admin-update-photo.php" method="POST" enctype="multipart/form-data">
+         <div class="profile-photo-area">
+             <i class="bi bi-person-circle profile-icon-large" id="modalProfileIcon"></i>
+         
+          <label for="inputAdminPhoto" class="change-photo-btn">
+               <i class="bi bi-camera-fill"></i> Ganti Foto
+              </label>
+              <input type="file" name="admin_foto_profil" id="inputAdminPhoto" accept="image/*" style="display: none;">
+            </div>
+            <button type="submit" id="submitAdminPhoto" style="display: none;"></button>
+          </form>
+       
+          <div class="user-info-detail">
+            <p>Nama Pengguna:</p>
+            <h4><?= htmlspecialchars($display_username) ?></h4>
+           </div>
+         
+          <div class="user-info-detail">
+          <p>Role:</p>
+            <span class="role-badge role-modal role-<?= $display_role ?>">
+              <?= RoleHelper::getRoleDisplayName($display_role) ?>
+             </span>
+           </div>
+         </div>
+        
+       <div class="profile-modal-footer">
+         <button class="btn btn-sm btn-outline-secondary" onclick="showToast('info', 'Halaman Ganti Password belum diimplementasikan.')"
+          <a href="logout.php" class="btn btn-sm btn-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+          </div>
+        </div>
+    </div>
+
   </main>
-  
+
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="../frontend/dashboard.js"></script>
-  
+
   <!-- Error handling dan dynamic greeting script -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // Error handling dengan SweetAlert2
       <?php if (!empty($error_message)): ?>
-      Swal.fire({
-        title: '<?= $error_type === "warning" ? "Peringatan!" : ($error_type === "error" ? "Error!" : "Informasi") ?>',
-        text: '<?= addslashes($error_message) ?>',
-        icon: '<?= $error_type === "warning" ? "warning" : ($error_type === "error" ? "error" : "info") ?>',
-        confirmButtonText: 'Mengerti',
-        confirmButtonColor: '#a97c50',
-        timer: <?= $error_type === "info" ? 5000 : 0 ?>,
-        timerProgressBar: <?= $error_type === "info" ? "true" : "false" ?>,
-        showCloseButton: true
-      });
+        Swal.fire({
+          title: '<?= $error_type === "warning" ? "Peringatan!" : ($error_type === "error" ? "Error!" : "Informasi") ?>',
+          text: '<?= addslashes($error_message) ?>',
+          icon: '<?= $error_type === "warning" ? "warning" : ($error_type === "error" ? "error" : "info") ?>',
+          confirmButtonText: 'Mengerti',
+          confirmButtonColor: '#a97c50',
+          timer: <?= $error_type === "info" ? 5000 : 0 ?>,
+          timerProgressBar: <?= $error_type === "info" ? "true" : "false" ?>,
+          showCloseButton: true
+        });
       <?php endif; ?>
 
       // Search functionality
@@ -645,7 +845,7 @@ if (isset($_GET['error'])) {
       // Dynamic greeting berdasarkan waktu
       const currentHour = new Date().getHours();
       let greeting = '';
-      
+
       if (currentHour < 10) {
         greeting = 'Selamat Pagi';
       } else if (currentHour < 15) {
@@ -659,7 +859,7 @@ if (isset($_GET['error'])) {
       // Update welcome message dengan greeting yang sesuai waktu
       const welcomeTitle = document.getElementById('welcomeMessage');
       const currentUsername = "<?= addslashes($displayName) ?>";
-      
+
       if (welcomeTitle && currentUsername && currentUsername !== 'root' && currentUsername !== 'Pengguna') {
         welcomeTitle.innerHTML = `${greeting}, ${currentUsername}!`;
       } else if (welcomeTitle) {
@@ -673,7 +873,7 @@ if (isset($_GET['error'])) {
           card.style.opacity = '0';
           card.style.transform = 'translateY(20px)';
           card.style.transition = 'all 0.5s ease';
-          
+
           setTimeout(() => {
             card.style.opacity = '1';
             card.style.transform = 'translateY(0)';
@@ -698,6 +898,71 @@ if (isset($_GET['error'])) {
         }
       });
     }
+
+    // ... (script yang sudah ada) ...
+
+    // Function untuk menampilkan toast notification
+    function showToast(type, message) {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+    }
+
+    // NEW: Logika Modal Profil dan Ganti Foto
+    const modalOverlay = document.getElementById('profileModalOverlay');
+    const openBtn = document.getElementById('openProfileModal');
+    const closeBtn = document.getElementById('closeProfileModal');
+    const inputPhoto = document.getElementById('inputAdminPhoto');
+    const photoForm = document.getElementById('profilePhotoForm');
+
+    if (openBtn) {
+      openBtn.addEventListener('click', () => {
+        modalOverlay.style.display = 'flex';
+      });
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        modalOverlay.style.display = 'none';
+      });
+    }
+
+    // Tutup modal saat klik di luar area konten
+    if (modalOverlay) {
+      modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) {
+          modalOverlay.style.display = 'none';
+        }
+      });
+    }
+
+    // Trigger submit form ketika file dipilih
+    if (inputPhoto) {
+      inputPhoto.addEventListener('change', function() {
+        if (this.files.length > 0) {
+          // Cek ukuran file (Misal Max 2MB)
+          if (this.files[0].size > 2 * 1024 * 1024) {
+            showToast('error', "Ukuran file terlalu besar! Maksimal 2MB.");
+            this.value = ''; // Reset input
+            return;
+          }
+          // Kirim form
+          photoForm.submit();
+        }
+      });
+    }
+
+    // ... (lanjutan script yang sudah ada)
   </script>
 
 </body>

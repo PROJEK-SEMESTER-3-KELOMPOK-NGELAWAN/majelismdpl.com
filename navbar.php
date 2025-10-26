@@ -1,8 +1,10 @@
 <?php
 // navbar.php
 $isLoggedIn = isset($_SESSION['id_user']) && !empty($_SESSION['id_user']);
-$userName = $isLoggedIn ? ($_SESSION['username'] ?? 'User') : '';
-$userPhoto = 'default.jpg';
+$userName = 'User';
+$photoFileName = 'default.jpg';
+$isCustomPhoto = false;
+$initials = ''; // NEW: Inisial untuk placeholder
 
 $navbarPath = '';
 $currentDir = dirname($_SERVER['PHP_SELF']);
@@ -22,16 +24,25 @@ if ($isLoggedIn) {
 
   if ($result) {
     $userName = $result['username'];
-    $userPhoto = $result['foto_profil'] ?? 'default.jpg';
+    $photoFileName = $result['foto_profil'] ?? 'default.jpg';
+    $initials = strtoupper(substr($userName, 0, 1));
   }
 }
 
-$photoFileName = htmlspecialchars($userPhoto, ENT_QUOTES, 'UTF-8');
+// Menentukan apakah menggunakan foto kustom (BUKAN default.jpg DAN file-nya ADA)
+$escapedPhotoFileName = htmlspecialchars($photoFileName, ENT_QUOTES, 'UTF-8');
+// Sesuaikan projectDirName jika berbeda
 $projectDirName = '/majelismdpl.com';
 $projectRoot = $_SERVER['DOCUMENT_ROOT'] . $projectDirName;
-$absoluteFilePath = $projectRoot . '/img/profile/' . $photoFileName;
-$isCustomPhoto = ($userPhoto !== 'default.jpg' && file_exists($absoluteFilePath));
-$photoPathFinal = $navbarPath . 'img/profile/' . $photoFileName;
+
+// Path ABSOLUT ke file untuk cek keberadaan
+$absoluteFilePath = $projectRoot . '/img/profile/' . $escapedPhotoFileName;
+
+// Kondisi Custom Photo: Bukan default.jpg DAN file ADA di server
+$isCustomPhoto = ($photoFileName !== 'default.jpg' && file_exists($absoluteFilePath));
+
+// Path RELATIF FINAL untuk tag <img>
+$photoPathFinal = $navbarPath . 'img/profile/' . $escapedPhotoFileName;
 $cacheBuster = '?' . time();
 ?>
 
@@ -69,7 +80,9 @@ $cacheBuster = '?' . time();
         <?php if ($isCustomPhoto): ?>
           <img src="<?php echo $photoPathFinal . $cacheBuster; ?>" alt="Foto Profil" class="profile-img-nav">
         <?php else: ?>
-          <i class="fa-solid fa-user-circle" style="font-size: 1.5em; color: #a97c50;"></i>
+          <div class="profile-initials-nav">
+            <?php echo htmlspecialchars($initials, ENT_QUOTES, 'UTF-8'); ?>
+          </div>
         <?php endif; ?>
         <span class="user-name"><?php echo htmlspecialchars($userName, ENT_QUOTES, 'UTF-8'); ?></span>
         <i class="fa-solid fa-chevron-down dropdown-icon"></i>
@@ -174,6 +187,35 @@ $cacheBuster = '?' . time();
 
   .logo-img:hover {
     transform: scale(1.08) rotate(-5deg);
+  }
+
+  .profile-initials-nav {
+    width: 26px;
+    /* Sama dengan .profile-img-nav */
+    height: 26px;
+    /* Sama dengan .profile-img-nav */
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(169, 124, 80, 0.4);
+    box-shadow: 0 0 8px rgba(169, 124, 80, 0.15);
+    transition: all 0.3s ease;
+
+    /* Style visual */
+    background-color: #a97c50;
+    /* Warna Coklat Emas */
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    /* Ukuran font inisial */
+    font-weight: 700;
+  }
+
+  .user-menu-toggle:hover .profile-initials-nav {
+    transform: scale(1.08);
+    border-color: #ffd44a;
+    box-shadow: 0 0 12px rgba(255, 212, 74, 0.35);
   }
 
   /* ========== MENU ITEMS ========== */
