@@ -8,7 +8,7 @@ use PHPMailer\PHPMailer\Exception;
 require __DIR__ . '/../vendor/autoload.php';
 
 $message = '';
-$step = 1; // default: minta OTP
+$step = 1;
 
 // Tahap 1: Minta OTP
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_otp'])) {
@@ -23,20 +23,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_otp'])) {
     $result = $stmt->get_result();
     if ($result->num_rows) {
       $user = $result->fetch_assoc();
-      $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT); // 6 digit
+      $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
       $expires = date("Y-m-d H:i:s", strtotime("+10 minutes"));
       $stmt2 = $conn->prepare("INSERT INTO reset_tokens (user_id, token, otp_code, expires_at, used) VALUES (?, '', ?, ?, 0)");
       $stmt2->bind_param("iss", $user['id_user'], $otp, $expires);
       $stmt2->execute();
-      // Kirim ke email
+
       $mail = new PHPMailer(true);
 
       try {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'dimasdwinugroho15@gmail.com'; // email kamu
-        $mail->Password = 'ptut xpxs tajt nikm'; // app password
+        $mail->Username = 'dimasdwinugroho15@gmail.com';
+        $mail->Password = 'ptut xpxs tajt nikm';
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
         $mail->setFrom('dimasdwinugroho15@gmail.com', 'Majelis MDPL');
@@ -44,7 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_otp'])) {
 
         $mail->Subject = 'Kode OTP Reset Password Majelis MDPL';
 
-        // Email HTML body lebih menarik
         $mail->isHTML(true);
         $mail->Body = '
         <div style="background:#f3f3f3;padding:30px;font-family:Arial,sans-serif;">
@@ -76,8 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_otp'])) {
 
         $mail->send();
         $message = 'Kode OTP sudah dikirim ke email Anda. Silakan cek inbox email Anda lalu masukkan kode di bawah!';
-        $step = 2; // Tampilkan form OTP
-        $_SESSION['reset_email'] = $email; // simpan agar tidak perlu input ulang
+        $step = 2;
+        $_SESSION['reset_email'] = $email;
       } catch (Exception $e) {
         $message = 'Pengiriman email gagal: ' . $mail->ErrorInfo;
         $step = 1;
@@ -89,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_otp'])) {
   }
 }
 
-// Tahap 2: Submit OTP - lolos OTP baru boleh reset PW
+// Tahap 2: Submit OTP
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
   $email = trim($_POST['email'] ?? '');
   $otp = trim($_POST['otp'] ?? '');
@@ -109,7 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
         $message = 'Kode OTP sudah kedaluwarsa.';
         $step = 2;
       } else {
-        // OTP Valid: simpan di session, langsung tampilkan form reset password
         $_SESSION['reset_valid'] = true;
         $_SESSION['reset_user_id'] = $row['user_id'];
         $_SESSION['reset_email'] = $email;
@@ -144,7 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_pw'])) {
       $message = 'Password minimal 6 karakter.';
       $step = 3;
     } else {
-      // Pastikan OTP masih valid, belum digunakan, dan belum kedaluwarsa
       $stmt = $conn->prepare(
         "SELECT t.id, t.used, t.expires_at FROM reset_tokens t WHERE t.user_id=? AND t.otp_code=? ORDER BY t.id DESC LIMIT 1"
       );
@@ -167,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_pw'])) {
           $stmt3->bind_param("i", $row['id']);
           $stmt3->execute();
           $message = 'Password berhasil direset. Silakan login kembali.';
-          session_unset(); // bersihkan session reset
+          session_unset();
           $step = 1;
         }
       } else {
@@ -183,199 +180,273 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_pw'])) {
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>Lupa Password - Majelis MDPL</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       min-height: 100vh;
-      background: url('assets/bg-lupa-password.jpg') center center/cover no-repeat fixed;
+      background: url('../assets/bg-lupa-password.jpg') center center/cover no-repeat fixed;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffffffff;
+      color: #fff;
+      font-family: 'Poppins', Arial, sans-serif;
     }
 
-    /* GLASS EFFECT / TRANSPARENT CARD */
+    /* ✅ GLASS EFFECT CARD */
     .forgot-container {
       background: rgba(255, 255, 255, 0.17);
       border-radius: 18px;
-      box-shadow: 0 6px 32px #0002;
-      max-width: 370px;
-      width: 100%;
-      padding: 38px 32px 30px 32px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255, 255, 255, 0.21);
+      max-width: 400px;
+      width: 95%;
+      padding: 40px 32px;
       position: relative;
       text-align: center;
-      margin-top: 40px;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border: 1.5px solid rgba(255, 255, 255, 0.21);
+      margin: 40px 20px;
     }
 
-    /* LOGO TRANSPARENT BG */
+    /* ✅ LOGO */
     .forgot-logo {
-      width: 62px;
-      height: 62px;
-      margin-bottom: 12px;
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 16px;
       background: rgba(255, 255, 255, 0.18);
       border-radius: 50%;
-      box-shadow: 0 1px 6px #e2c7fd33;
+      box-shadow: 0 2px 8px rgba(226, 199, 253, 0.2);
       object-fit: contain;
+      padding: 8px;
     }
 
-    /* FORM INPUT TRANSPARENT */
-    .form-control,
-    .forgot-input {
-      background: rgba(255, 255, 255, 0.40) !important;
-      border: 1.5px solid rgba(140, 96, 43, 0.13);
-      border-radius: 6px;
-      color: #ffffffff !important;
-      font-weight: 500;
-    }
-
-    .form-control:focus,
-    .forgot-input:focus {
-      background: rgba(255, 255, 255, 0.70) !important;
-      border-color: #b089f4;
-      box-shadow: 0 0 0 2px #b089f433;
-      color: #ffffffff !important;
-    }
-
-    /* JUDUL DAN DESKRIPSI */
+    /* ✅ TITLE & DESCRIPTION (PUTIH) */
     .forgot-title {
       font-weight: 700;
-      color: #ffffffff;
-      font-size: 1.33em;
+      color: #fff;
+      font-size: 1.5em;
       margin-bottom: 8px;
-      background: none;
     }
 
     .forgot-desc {
-      font-size: .94em;
-      color: #ffffffff;
-      margin-bottom: 20px;
-      background: none;
+      font-size: 0.95em;
+      color: #fff;
+      margin-bottom: 24px;
+      line-height: 1.5;
     }
 
-    /* BUTTON */
+    /* ✅ LABEL (PUTIH) */
+    .mb-3 label {
+      font-weight: 600;
+      font-size: 0.9em;
+      color: #fff;
+      margin-bottom: 6px;
+      display: block;
+      text-align: left;
+    }
+
+    /* ✅ INPUT FIELDS - TEXT HITAM (HANYA INI) */
+    .form-control,
+    .forgot-input {
+      background: rgba(255, 255, 255, 0.4) !important;
+      border: 1.5px solid rgba(140, 96, 43, 0.13);
+      border-radius: 8px;
+      /* ✅ TEXT HITAM (HANYA DI INPUT) */
+      color: #000 !important;
+      font-weight: 500;
+      padding: 12px 14px;
+      transition: all 0.3s ease;
+    }
+
+    /* ✅ PLACEHOLDER TEXT */
+    .form-control::placeholder,
+    .forgot-input::placeholder {
+      color: #555 !important;
+      opacity: 0.8;
+    }
+
+    /* ✅ FOCUS STATE */
+    .form-control:focus,
+    .forgot-input:focus {
+      background: rgba(255, 255, 255, 0.7) !important;
+      border-color: #b089f4;
+      box-shadow: 0 0 0 3px rgba(176, 137, 244, 0.25);
+      /* ✅ Text tetap hitam saat focus */
+      color: #000 !important;
+      outline: none;
+    }
+
+    /* ✅ AUTOFILL FIX (Chrome) */
+    .form-control:-webkit-autofill,
+    .forgot-input:-webkit-autofill {
+      -webkit-text-fill-color: #000 !important;
+      -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.6) inset !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* ✅ BUTTON */
     .forgot-btn {
       background: linear-gradient(90deg, #a97c50 60%, #b089f4 100%);
       color: #fff;
       width: 100%;
       border: 0;
-      border-radius: 7px;
-      padding: 12px 0;
-      font-weight: 600;
+      border-radius: 8px;
+      padding: 13px 0;
+      font-weight: 700;
       font-size: 1.05em;
-      letter-spacing: .5px;
-      margin-top: 10px;
-      transition: background .3s;
-      box-shadow: 0 2px 10px #b089f441;
+      letter-spacing: 0.5px;
+      margin-top: 12px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(176, 137, 244, 0.25);
+      cursor: pointer;
     }
 
     .forgot-btn:hover {
       background: linear-gradient(90deg, #b089f4 20%, #a97c50 100%);
-      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(176, 137, 244, 0.4);
     }
 
-    /* LINK */
+    /* ✅ LINK (PUTIH) */
     .login-link {
-      margin-top: 21px;
+      margin-top: 20px;
       display: block;
-      color: #ffffffff;
-      font-size: .96em;
+      color: #fff;
+      font-size: 0.95em;
       text-decoration: none;
-      transition: color .2s;
+      transition: all 0.2s ease;
+      font-weight: 600;
     }
 
     .login-link:hover {
-      color: #000000ff;
+      color: #b089f4;
       text-decoration: underline;
     }
 
-    .mb-3 label {
-      font-weight: 500;
-      font-size: .98em;
-      color: #ffffffff;
-      margin-bottom: 4px;
-      display: block;
-      text-align: left;
-      background: none;
+    /* ✅ RESPONSIVE */
+    @media (max-width: 480px) {
+      .forgot-container {
+        padding: 32px 24px;
+        margin: 20px 10px;
+      }
+
+      .forgot-title {
+        font-size: 1.3em;
+      }
+
+      .forgot-desc {
+        font-size: 0.9em;
+      }
+
+      .forgot-logo {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .forgot-container {
+        padding: 28px 20px;
+      }
+
+      .forgot-title {
+        font-size: 1.2em;
+      }
+
+      .forgot-btn {
+        font-size: 1em;
+        padding: 12px 0;
+      }
     }
   </style>
 </head>
 
 <body>
   <div class="forgot-container">
-    <img src="assets/logo_majelis_noBg.png" alt="Logo Majelis" class="forgot-logo">
+    <img src="../assets/logo_majelis_noBg.png" alt="Logo Majelis" class="forgot-logo">
     <div class="forgot-title">Lupa Password</div>
     <div class="forgot-desc">Masukkan email Anda untuk mendapatkan kode OTP dan mengatur ulang password.</div>
+
     <?php if ($step === 1): ?>
-      <!-- Tahap 1 -->
+      <!-- ✅ Tahap 1: Minta Email -->
       <form method="post" action="" class="mb-3" autocomplete="off">
         <div class="mb-3">
           <label>Email</label>
-          <input type="email" name="email" value="<?= htmlspecialchars($_SESSION['reset_email'] ?? '') ?>" class="form-control forgot-input" placeholder="Email aktif" required>
+          <input type="email" name="email" value="<?= htmlspecialchars($_SESSION['reset_email'] ?? '') ?>" class="form-control forgot-input" placeholder="contoh@email.com" required>
         </div>
-        <button type="submit" name="send_otp" class="forgot-btn"><i class="bi bi-envelope-fill me-1"></i>Kirim OTP</button>
+        <button type="submit" name="send_otp" class="forgot-btn">
+          <i class="bi bi-envelope-fill me-1"></i> Kirim OTP
+        </button>
       </form>
+
     <?php elseif ($step === 2): ?>
-      <!-- Tahap 2 -->
+      <!-- ✅ Tahap 2: Verifikasi OTP -->
       <form method="post" action="" class="mb-3" autocomplete="off">
         <div class="mb-3">
           <label>Email</label>
-          <input type="email" name="email" value="<?= htmlspecialchars($_SESSION['reset_email'] ?? '') ?>" class="form-control forgot-input" placeholder="Email aktif" required>
+          <input type="email" name="email" value="<?= htmlspecialchars($_SESSION['reset_email'] ?? '') ?>" class="form-control forgot-input" placeholder="contoh@email.com" required readonly>
         </div>
         <div class="mb-3">
           <label>Kode OTP</label>
-          <input type="text" name="otp" maxlength="6" class="form-control forgot-input" placeholder="Kode OTP dari email" required>
+          <input type="text" name="otp" maxlength="6" class="form-control forgot-input" placeholder="Masukkan 6 digit OTP" required autofocus>
         </div>
-        <button type="submit" name="verify_otp" class="forgot-btn"><i class="bi bi-shield-lock me-1"></i>Verifikasi OTP</button>
+        <button type="submit" name="verify_otp" class="forgot-btn">
+          <i class="bi bi-shield-lock me-1"></i> Verifikasi OTP
+        </button>
       </form>
+
     <?php elseif ($step === 3): ?>
-      <!-- Tahap 3 -->
+      <!-- ✅ Tahap 3: Reset Password -->
       <form method="post" action="" class="mb-3" autocomplete="off">
         <div class="mb-3">
           <label>Password Baru</label>
-          <input type="password" name="password" class="form-control forgot-input" placeholder="Password baru" required>
+          <input type="password" name="password" class="form-control forgot-input" placeholder="Minimal 6 karakter" required>
         </div>
         <div class="mb-3">
           <label>Konfirmasi Password</label>
-          <input type="password" name="confirm" class="form-control forgot-input" placeholder="Konfirmasi password baru" required>
+          <input type="password" name="confirm" class="form-control forgot-input" placeholder="Ketik ulang password" required>
         </div>
-        <button type="submit" name="reset_pw" class="forgot-btn"><i class="bi bi-arrow-repeat me-1"></i>Reset Password</button>
+        <button type="submit" name="reset_pw" class="forgot-btn">
+          <i class="bi bi-arrow-repeat me-1"></i> Reset Password
+        </button>
       </form>
     <?php endif; ?>
+
     <a href="/majelismdpl.com/index.php" class="login-link">← Kembali ke Login</a>
   </div>
-  <!-- Popup SweetAlert2 jika ada pesan -->
+
+  <!-- ✅ SWEETALERT POPUP -->
   <?php if (isset($message) && $message): ?>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-        // Deteksi jika pesan adalah untuk OTP success
         let isOtpSent = <?= json_encode(strpos($message, "Kode OTP sudah dikirim") !== false) ?>;
         let isSuccess = isOtpSent || <?= json_encode(strpos($message, "Password berhasil") !== false) ?>;
+
         Swal.fire({
           icon: isSuccess ? "success" : "error",
           title: isOtpSent ? "Kode OTP Berhasil Dikirim" : (isSuccess ? "Berhasil" : "Oops!"),
           text: "<?= htmlspecialchars(strip_tags($message)) ?>",
-          confirmButtonText: 'OK'
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#a97c50'
         }).then((result) => {
           if (isSuccess && !isOtpSent) {
             window.location.href = "/majelismdpl.com";
           }
-          // OTP success: tetap di halaman, tidak redirect
         });
       });
     </script>
   <?php endif; ?>
-
-
-
-  <!-- Icon library for Bootstrap (optional, for icon inside buttons) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </body>
 
 </html>
