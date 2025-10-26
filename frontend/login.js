@@ -1,15 +1,31 @@
 function closeLoginModal() {
   const modal = document.getElementById("loginModal");
   if (modal) {
-    modal.style.display = "none";
+    // Close using the global closeModal function from auth-modals.php
+    if (typeof closeModal === "function") {
+      closeModal(modal);
+    } else {
+      modal.style.display = "none";
+      modal.classList.remove("open");
+      document.body.style.overflow = "";
+    }
   }
 }
 
 // Fungsi untuk handle Google OAuth Login
 function handleGoogleLogin() {
+  const basePath = getBasePath();
   window.location.href =
-    window.location.origin +
-    "/majelismdpl.com/backend/google-oauth.php?type=login";
+    window.location.origin + basePath + "backend/google-oauth.php?type=login";
+}
+
+// Helper function untuk detect base path
+function getBasePath() {
+  const path = window.location.pathname;
+  if (path.includes("/user/") || path.includes("/admin/")) {
+    return "/majelismdpl.com/";
+  }
+  return "/majelismdpl.com/";
 }
 
 // Function untuk attach Google login button listener
@@ -19,14 +35,12 @@ function attachGoogleLoginListener() {
   if (googleLoginBtn && !googleLoginBtn.hasAttribute("data-login-listener")) {
     googleLoginBtn.setAttribute("data-login-listener", "true");
 
-    // Method 1: addEventListener
     googleLoginBtn.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
       handleGoogleLogin();
     });
 
-    // Method 2: onclick as backup
     googleLoginBtn.onclick = function (e) {
       e.preventDefault();
       handleGoogleLogin();
@@ -45,9 +59,10 @@ document.addEventListener("DOMContentLoaded", function () {
     loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
       const formData = new FormData(this);
+      const basePath = getBasePath();
 
       try {
-        const response = await fetch("/majelismdpl.com/backend/login-api.php", {
+        const response = await fetch(basePath + "backend/login-api.php", {
           method: "POST",
           body: formData,
         });
@@ -57,28 +72,45 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const result = await response.json();
-        closeLoginModal();
+
         if (result.success) {
+          // ✅ CLOSE LOGIN MODAL FIRST
+          closeLoginModal();
+
+          // ✅ SHOW SUCCESS POPUP (Custom atau SweetAlert)
           Swal.fire({
             title: "Login berhasil!",
-            text: "Selamat datang " + formData.get("username"),
+            text:
+              "Selamat datang " + (result.username || formData.get("username")),
             icon: "success",
             confirmButtonText: "Lanjutkan",
+            confirmButtonColor: "#7971ea",
+            background: "#fff",
+            color: "#34495e",
+            showClass: {
+              popup: "animate__animated animate__fadeIn animate__faster",
+            },
+            hideClass: {
+              popup: "animate__animated animate__fadeOut animate__faster",
+            },
           }).then(() => {
+            // Redirect based on role
             if (["admin", "super_admin"].includes(result.role)) {
               setTimeout(() => {
-                window.location.href = "/majelismdpl.com/admin/index.php";
+                window.location.href = basePath + "admin/index.php";
               }, 100);
             } else {
-              window.location.href = "/majelismdpl.com";
+              window.location.href = basePath;
             }
           });
         } else {
+          // ✅ SHOW ERROR (MODAL TETAP TERBUKA)
           Swal.fire({
             title: "Login gagal",
             text: result.message,
             icon: "error",
             confirmButtonText: "Coba lagi",
+            confirmButtonColor: "#7971ea",
           });
         }
       } catch (error) {
@@ -88,6 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
           text: "Terjadi kesalahan sistem. Silakan coba lagi.",
           icon: "error",
           confirmButtonText: "OK",
+          confirmButtonColor: "#7971ea",
         });
       }
     });
@@ -95,7 +128,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Try to attach Google login listener immediately
   if (!attachGoogleLoginListener()) {
-    // Try with delay
     setTimeout(() => {
       attachGoogleLoginListener();
     }, 500);

@@ -1,13 +1,11 @@
 <?php
-// my-trips.php
-// Anda sudah memiliki logika untuk $navbarPath dari navbar.php
-$navbarPath = '../'; // Contoh path relatif dari user/ ke root
-require_once $navbarPath . 'navbar.php';
+// ✅ START SESSION
+session_start();
 
-// =======================================================
-// CONTOH DATA TRIP SAYA (SIMULASI DARI JOIN DATABASE)
-// Status yang mungkin: pending, paid, cancelled, finished
-// =======================================================
+// ✅ SET NAVBAR PATH
+$navbarPath = '../';
+
+// ✅ CONTOH DATA TRIP (HARDCODED) - SUDAH LENGKAP
 $myTrips = [
     [
         'id_booking' => 28,
@@ -16,16 +14,18 @@ $myTrips = [
         'tanggal_trip' => '2025-10-30',
         'durasi' => '3 hari 2 malam',
         'via_gunung' => 'Rambipuji',
-        'nama_lokasi' => 'Basecamp slamet',
+        'nama_lokasi' => 'Basecamp Slamet',
+        'alamat' => 'Jl. Basecamp Slamet No. 123, Purbalingga, Jawa Tengah', // ✅ FIX: Tambah field
         'tanggal_booking' => '2025-10-23',
         'jumlah_orang' => 1,
         'total_harga' => 500000,
         'status_booking' => 'pending',
-        'gambar' => $navbarPath . 'img/ijen.jpg', // Ganti dengan path gambar Anda
+        'gambar' => $navbarPath . 'img/ijen.jpg',
         'include' => 'makan, minum, tenda, porter',
         'exclude' => 'doa, snack pribadi',
-        'syaratKetentuan' => 'ga ngalem: wajib membawa surat keterangan sehat dan fotokopi KTP. Pembayaran DP 50% harus dilakukan dalam 1x24 jam.',
+        'syaratKetentuan' => 'wajib membawa surat keterangan sehat dan fotokopi KTP. Pembayaran DP 50% harus dilakukan dalam 1x24 jam.',
         'waktu_kumpul' => '02:00:00',
+        'link_map' => 'https://maps.google.com/?q=Basecamp+Slamet', // ✅ FIX: Tambah field
     ],
     [
         'id_booking' => 26,
@@ -33,35 +33,39 @@ $myTrips = [
         'jenis_trip' => 'Camp',
         'tanggal_trip' => '2025-09-26',
         'durasi' => '2 Hari 1 Malam',
-        'via_gunung' => 'bondowoso',
+        'via_gunung' => 'Bondowoso',
         'nama_lokasi' => 'Base Camp Kalibaru',
+        'alamat' => 'Jl. Kalibaru, Bondowoso, Jawa Timur', // ✅ FIX
         'tanggal_booking' => '2025-10-21',
         'jumlah_orang' => 1,
         'total_harga' => 400000,
         'status_booking' => 'paid',
-        'gambar' => $navbarPath . 'img/rinjani.jpg', // Ganti dengan path gambar Anda
-        'include' => 'mangan, transport pp',
-        'exclude' => 'ngombe, asuransi',
-        'syaratKetentuan' => 'ada deh: peserta dilarang membawa barang yang tidak perlu dan wajib mematuhi protokol basecamp.',
+        'gambar' => $navbarPath . 'img/rinjani.jpg',
+        'include' => 'makan, transport pp',
+        'exclude' => 'minum, asuransi',
+        'syaratKetentuan' => 'peserta dilarang membawa barang yang tidak perlu dan wajib mematuhi protokol basecamp.',
         'waktu_kumpul' => '11:11:00',
+        'link_map' => 'https://maps.google.com/?q=Base+Camp+Kalibaru', // ✅ FIX
     ],
     [
         'id_booking' => 13,
-        'nama_gunung' => 'Gunung Bokong',
+        'nama_gunung' => 'Gunung Argopuro',
         'jenis_trip' => 'Camp',
         'tanggal_trip' => '2025-10-03',
         'durasi' => '2 Hari 1 Malam',
         'via_gunung' => 'Sumberwringin',
         'nama_lokasi' => 'Base Camp Sumberwringin',
+        'alamat' => 'Desa Sumberwringin, Bondowoso, Jawa Timur', // ✅ FIX
         'tanggal_booking' => '2025-10-10',
         'jumlah_orang' => 2,
         'total_harga' => 600000,
         'status_booking' => 'finished',
-        'gambar' => $navbarPath . 'img/20250917123322_Magelang.jpg', // Ganti dengan path gambar Anda
+        'gambar' => $navbarPath . 'img/20250917123322_Magelang.jpg',
         'include' => 'makanan, air mineral',
         'exclude' => 'tidak ada',
-        'syaratKetentuan' => 'd: trip telah selesai dan peserta mendapatkan sertifikat digital.',
+        'syaratKetentuan' => 'trip telah selesai dan peserta mendapatkan sertifikat digital.',
         'waktu_kumpul' => '23:08:00',
+        'link_map' => 'https://maps.google.com/?q=Base+Camp+Sumberwringin', // ✅ FIX
     ],
 ];
 ?>
@@ -73,10 +77,26 @@ $myTrips = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paket Trip Saya - Majelis MDPL</title>
+
+    <!-- ✅ LOAD FONT AWESOME & BOOTSTRAP ICONS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+        }
+
         .page-container {
-            padding-top: 80px;
-            /* Jarak dari fixed navbar */
+            padding-top: 100px;
             min-height: 100vh;
         }
 
@@ -105,11 +125,9 @@ $myTrips = [
 
         .page-title i {
             color: #a97c50;
-            /* Warna Emas/Coklat Khas */
             margin-right: 10px;
         }
 
-        /* --- List Card Styling (Eksklusif) --- */
         .trips-list {
             display: flex;
             flex-direction: column;
@@ -125,7 +143,6 @@ $myTrips = [
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid #eee;
             align-items: center;
-            /* Tengah vertikal */
         }
 
         .list-trip-card:hover {
@@ -135,7 +152,6 @@ $myTrips = [
 
         .card-image-box {
             width: 250px;
-            /* Lebar gambar di kiri */
             min-width: 200px;
             height: 180px;
             background-size: cover;
@@ -148,7 +164,6 @@ $myTrips = [
 
         .trip-type-badge {
             background: rgba(169, 124, 80, 0.9);
-            /* Latar belakang coklat gelap transparan */
             color: #fff;
             padding: 5px 12px;
             border-radius: 5px;
@@ -175,7 +190,6 @@ $myTrips = [
             text-transform: uppercase;
         }
 
-        /* Warna Status */
         .status-pending {
             background-color: #ffc107;
             color: #333;
@@ -258,7 +272,6 @@ $myTrips = [
             background: #8b5e3c;
         }
 
-        /* --- Modal Styling (Dipertahankan dan Disesuaikan) --- */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -289,7 +302,6 @@ $myTrips = [
             position: relative;
             transform: scale(0.95);
             transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            /* Pop effect */
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -357,7 +369,6 @@ $myTrips = [
             line-height: 1.6;
             margin-left: 30px;
             white-space: pre-wrap;
-            /* Mempertahankan format baris */
         }
 
         .btn-map {
@@ -376,7 +387,6 @@ $myTrips = [
             background: #000;
         }
 
-        /* No Trips State (Dipertahankan) */
         .no-trips {
             text-align: center;
             padding: 60px 20px;
@@ -399,24 +409,22 @@ $myTrips = [
             color: #fff;
             padding: 12px 30px;
             border-radius: 30px;
+            text-decoration: none;
         }
 
         .explore-btn:hover {
             background: #8b5e3c;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .list-trip-card {
                 flex-direction: column;
-                /* Ubah menjadi tumpukan vertikal */
                 align-items: stretch;
             }
 
             .card-image-box {
                 width: 100%;
                 height: 150px;
-                /* Kurangi tinggi untuk mobile */
                 min-width: 100%;
             }
 
@@ -426,7 +434,6 @@ $myTrips = [
 
             .card-actions-list {
                 flex-direction: row;
-                /* Tombol jadi horizontal */
                 border-left: none;
                 border-top: 1px solid #f0f0f0;
                 padding: 15px;
@@ -436,7 +443,6 @@ $myTrips = [
             .btn-detail-list,
             .btn-payment-list {
                 flex: 1;
-                /* Agar lebar tombol sama */
             }
 
             .modal-container {
@@ -450,13 +456,18 @@ $myTrips = [
 
             .info-group h3 i {
                 display: none;
-                /* Sembunyikan ikon di mobile agar judul lebih pendek */
             }
         }
     </style>
 </head>
 
 <body>
+    <!-- ✅ INCLUDE NAVBAR -->
+    <?php include '../navbar.php'; ?>
+
+    <!-- ✅ INCLUDE AUTH MODALS -->
+    <?php include '../auth-modals.php'; ?>
+
     <div class="page-container">
         <main class="my-trips-section">
             <div class="header-content">
@@ -501,7 +512,7 @@ $myTrips = [
                                 </div>
                             </div>
                             <div class="card-actions-list">
-                                <button class="btn btn-detail-list" onclick="openDetailModal(<?php echo htmlspecialchars(json_encode($trip)); ?>)" title="Lihat Detail & Perlengkapan">
+                                <button class="btn btn-detail-list" onclick='openDetailModal(<?php echo htmlspecialchars(json_encode($trip), ENT_QUOTES, 'UTF-8'); ?>)' title="Lihat Detail & Perlengkapan">
                                     <i class="fa-solid fa-eye"></i> Detail Trip
                                 </button>
                                 <?php if (strtolower($trip['status_booking']) == 'pending'): ?>
@@ -517,6 +528,7 @@ $myTrips = [
         </main>
     </div>
 
+    <!-- Detail Modal -->
     <div id="detail-modal" class="modal-overlay">
         <div class="modal-container">
             <button class="modal-close-btn" onclick="closeDetailModal()">×</button>
@@ -548,34 +560,39 @@ $myTrips = [
         </div>
     </div>
 
+    <!-- ✅ LOAD JAVASCRIPT FILES -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../frontend/registrasi.js"></script>
+    <script src="../frontend/login.js"></script>
+
     <script>
-        // JavaScript Logic (Sama seperti sebelumnya, memastikan fungsi openDetailModal() bekerja)
+        // ✅ FIX: Modal Functions with Proper Error Handling
         function openDetailModal(tripData) {
             const modal = document.getElementById('detail-modal');
 
-            // Perbarui konten modal
             document.getElementById('modal-title').innerText = `Detail Trip: ${tripData.nama_gunung}`;
-            document.getElementById('modal-lokasi').innerText = tripData.nama_lokasi;
-            document.getElementById('modal-alamat').innerText = tripData.alamat;
-            document.getElementById('modal-waktu-kumpul').innerText = tripData.waktu_kumpul.substring(0, 5); // Hanya ambil jam:menit
+            document.getElementById('modal-lokasi').innerText = tripData.nama_lokasi || 'Belum ditentukan';
+            document.getElementById('modal-alamat').innerText = tripData.alamat || 'Belum ditentukan';
+
+            // ✅ FIX: Handle waktu_kumpul dengan aman
+            const waktuKumpul = tripData.waktu_kumpul || '-';
+            document.getElementById('modal-waktu-kumpul').innerText = waktuKumpul.substring(0, 5);
+
             document.getElementById('modal-include').innerText = tripData.include || 'Tidak ada data include.';
             document.getElementById('modal-exclude').innerText = tripData.exclude || 'Tidak ada data exclude.';
             document.getElementById('modal-sk').innerText = tripData.syaratKetentuan || 'Tidak ada data syarat & ketentuan.';
 
-            // Perbaiki link map:
+            // ✅ FIX: Handle link_map dengan aman
             const mapLinkElement = document.getElementById('modal-link-map');
-            let mapUrl = tripData.link_map;
+            let mapUrl = tripData.link_map || '';
 
-            // Logika sederhana untuk membersihkan URL iframe/embed
             if (mapUrl && mapUrl.includes('http://googleusercontent.com/maps.google.com/')) {
-                // Menggunakan link dummy yang lebih baik:
                 mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(tripData.nama_lokasi);
             }
 
-            mapLinkElement.href = mapUrl || '#'; // Set link
-            mapLinkElement.style.display = mapUrl ? 'inline-block' : 'none'; // Sembunyikan jika tidak ada link
+            mapLinkElement.href = mapUrl || '#';
+            mapLinkElement.style.display = mapUrl ? 'inline-block' : 'none';
 
-            // Tampilkan modal
             modal.classList.add('show');
         }
 
@@ -584,7 +601,7 @@ $myTrips = [
             modal.classList.remove('show');
         }
 
-        // Tutup modal jika user mengklik di luar area modal
+        // Close modal when clicking outside
         document.getElementById('detail-modal').addEventListener('click', (e) => {
             if (e.target.id === 'detail-modal') {
                 closeDetailModal();

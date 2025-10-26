@@ -2,6 +2,9 @@
 require_once '../backend/koneksi.php';
 session_start();
 
+// ✅ Set navbar path untuk file di folder user/
+$navbarPath = '../';
+
 $isLogin = isset($_SESSION['id_user']);
 $userLogin = null;
 if ($isLogin) {
@@ -77,10 +80,11 @@ function createIconList($text, $iconClass)
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-KFnuwUuiq_i1OUJf"></script>
+
     <style>
         /* ============================================
-       LUXURY GRADIENT BACKGROUND + RESPONSIVE FORM
-       ============================================ */
+           LUXURY GRADIENT BACKGROUND + RESPONSIVE FORM
+           ============================================ */
 
         * {
             margin: 0;
@@ -115,7 +119,6 @@ function createIconList($text, $iconClass)
 
         body {
             font-family: 'Poppins', sans-serif;
-            /* LUXURY GRADIENT BACKGROUND */
             background:
                 radial-gradient(ellipse at top left, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
                 radial-gradient(ellipse at bottom right, rgba(139, 115, 85, 0.06) 0%, transparent 50%),
@@ -126,7 +129,6 @@ function createIconList($text, $iconClass)
             overflow-x: hidden;
         }
 
-        /* Premium Texture Overlay */
         body::before {
             content: "";
             position: fixed;
@@ -152,8 +154,8 @@ function createIconList($text, $iconClass)
         }
 
         /* ============================================
-       HERO SECTION - STATIC IMAGE
-       ============================================ */
+           HERO SECTION
+           ============================================ */
 
         .hero {
             position: relative;
@@ -177,7 +179,6 @@ function createIconList($text, $iconClass)
             z-index: 1;
         }
 
-        /* Luxury Overlay */
         .hero-overlay {
             position: absolute;
             inset: 0;
@@ -284,14 +285,9 @@ function createIconList($text, $iconClass)
             opacity: 0.6;
         }
 
-        .btn-hero i {
-            position: relative;
-            z-index: 1;
-        }
-
         /* ============================================
-       INFO BAR - GLASS MORPHISM
-       ============================================ */
+           INFO BAR
+           ============================================ */
 
         .info-bar {
             background: var(--glass-bg);
@@ -358,8 +354,8 @@ function createIconList($text, $iconClass)
         }
 
         /* ============================================
-       CONTENT AREA
-       ============================================ */
+           CONTENT AREA
+           ============================================ */
 
         .content-area {
             background: var(--glass-bg);
@@ -450,8 +446,145 @@ function createIconList($text, $iconClass)
         }
 
         /* ============================================
-       MODAL BOOKING - OPTIMIZED SIZE
-       ============================================ */
+           CUSTOM LOGIN WARNING MODAL - LUXURY STYLE
+           ============================================ */
+
+        #loginWarningModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        #loginWarningModal.active {
+            display: flex;
+        }
+
+        .login-warning-container {
+            background: linear-gradient(135deg, #3C3731 0%, #292524 100%);
+            border: 2px solid rgba(212, 175, 55, 0.25);
+            border-radius: 25px;
+            max-width: 450px;
+            width: 90%;
+            padding: 45px 35px;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            position: relative;
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .login-warning-icon {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.08));
+            border: 3px solid var(--luxury-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 35px rgba(212, 175, 55, 0.5);
+            }
+        }
+
+        .login-warning-icon i {
+            font-size: 3rem;
+            color: var(--luxury-gold);
+        }
+
+        .login-warning-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .login-warning-text {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+
+        .login-warning-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-warning-login,
+        .btn-warning-cancel {
+            flex: 1;
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-warning-login {
+            background: linear-gradient(135deg, var(--luxury-gold), var(--luxury-brown));
+            color: #FFF;
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-warning-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-warning-cancel {
+            background: rgba(250, 250, 249, 0.08);
+            color: var(--text-light);
+            border: 2px solid rgba(250, 250, 249, 0.15);
+        }
+
+        .btn-warning-cancel:hover {
+            background: rgba(250, 250, 249, 0.15);
+            border-color: rgba(250, 250, 249, 0.3);
+        }
+
+        /* ============================================
+           BOOKING MODAL
+           ============================================ */
 
         #modal-booking {
             display: none;
@@ -462,7 +595,6 @@ function createIconList($text, $iconClass)
             backdrop-filter: blur(10px);
             align-items: center;
             justify-content: center;
-            /* LAPTOP: More padding top/bottom */
             padding: 110px 20px 40px 20px;
             animation: fadeIn 0.3s ease-out;
             overflow-y: auto;
@@ -474,7 +606,6 @@ function createIconList($text, $iconClass)
 
         #modal-booking .booking-modal-box {
             background: linear-gradient(135deg, #292524 0%, #1C1917 100%);
-            /* LAPTOP: Smaller max-width for compact look */
             max-width: 650px;
             width: 100%;
             margin: auto;
@@ -483,32 +614,16 @@ function createIconList($text, $iconClass)
             box-shadow: var(--shadow-lg);
             position: relative;
             animation: slideUp 0.4s ease-out;
-            /* Bottom spacing */
             margin-bottom: 40px;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .scroll-area-modal {
             width: 100%;
-            /* LAPTOP: Reduced max-height for compact look */
             max-height: calc(85vh - 150px);
             overflow-y: auto;
-            /* LAPTOP: Less padding */
             padding: 45px 35px 35px;
         }
 
-        /* Custom Scrollbar */
         .scroll-area-modal::-webkit-scrollbar {
             width: 8px;
         }
@@ -525,7 +640,6 @@ function createIconList($text, $iconClass)
 
         .booking-modal-box h3 {
             margin: 0 0 25px;
-            /* LAPTOP: Smaller title */
             font-size: 1.6rem;
             font-weight: 900;
             color: var(--luxury-gold);
@@ -537,7 +651,6 @@ function createIconList($text, $iconClass)
         .booking-form label {
             display: block;
             font-weight: 600;
-            /* LAPTOP: Less margin */
             margin: 15px 0 7px;
             font-size: 0.85rem;
             color: var(--text-light);
@@ -551,7 +664,6 @@ function createIconList($text, $iconClass)
         .booking-form textarea,
         .booking-form input[type=file] {
             width: 100%;
-            /* LAPTOP: Smaller padding */
             padding: 12px 14px;
             border: 1px solid var(--glass-border);
             background: rgba(212, 175, 55, 0.05);
@@ -576,7 +688,6 @@ function createIconList($text, $iconClass)
         }
 
         .booking-form .group-title {
-            /* LAPTOP: Less margin */
             margin: 28px 0 18px;
             font-size: 1.1rem;
             color: var(--luxury-gold);
@@ -587,7 +698,6 @@ function createIconList($text, $iconClass)
             border-bottom: 2px solid rgba(212, 175, 55, 0.2);
         }
 
-        /* RESPONSIVE FORM GRID */
         .booking-form .row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -684,118 +794,6 @@ function createIconList($text, $iconClass)
             background: rgba(250, 250, 249, 0.15);
             border-color: var(--luxury-gold);
             transform: rotate(90deg);
-        }
-
-        /* ============================================
-       FOOTER
-       ============================================ */
-
-        .footer {
-            position: relative;
-            overflow: hidden;
-            padding: 60px 20px 20px;
-            background: linear-gradient(135deg, #1C1917 0%, #292524 50%, #1C1917 100%);
-            color: var(--text-light);
-            margin-top: 80px;
-        }
-
-        .footer .container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            max-width: 1200px;
-            margin: auto;
-            gap: 40px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .footer-col {
-            padding: 25px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.4s ease;
-        }
-
-        .footer-col:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15);
-            border-color: rgba(212, 175, 55, 0.25);
-        }
-
-        .footer-col h3 {
-            font-size: 1.3rem;
-            margin-bottom: 18px;
-            font-weight: 700;
-            color: var(--luxury-gold);
-        }
-
-        .footer-col p {
-            margin: 10px 0;
-            line-height: 1.7;
-            font-size: 0.95rem;
-            color: var(--text-muted);
-        }
-
-        .footer-col ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .footer-col ul li {
-            margin-bottom: 12px;
-        }
-
-        .footer-col ul li a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        .footer-col ul li a:hover {
-            color: var(--luxury-gold);
-            padding-left: 5px;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 45px;
-            height: 45px;
-            font-size: 1.2rem;
-            color: var(--text-light);
-            background: rgba(212, 175, 55, 0.08);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 50%;
-            transition: all 0.4s ease;
-        }
-
-        .social-links a:hover {
-            color: var(--luxury-gold);
-            border-color: var(--luxury-gold);
-            background: rgba(212, 175, 55, 0.15);
-            transform: translateY(-5px);
-        }
-
-        .footer .copyright {
-            text-align: center;
-            border-top: 1px solid rgba(212, 175, 55, 0.15);
-            margin-top: 40px;
-            padding-top: 25px;
-            font-size: 0.9rem;
-            color: rgba(250, 250, 249, 0.7);
         }
 
         /* === WHATSAPP BUTTON === */
@@ -1228,10 +1226,6 @@ function createIconList($text, $iconClass)
             }
         }
 
-        /* ============================================
-       PAYMENT MODAL
-       ============================================ */
-
         #modal-payment {
             display: none;
             position: fixed;
@@ -1280,255 +1274,13 @@ function createIconList($text, $iconClass)
             padding: 20px;
             font-size: 1.1rem;
         }
-
-        /* ============================================
-       RESPONSIVE DESIGN
-       ============================================ */
-
-        /* Tablet & Laptop (768px - 1200px) */
-        @media (min-width: 768px) and (max-width: 1200px) {
-            .container {
-                padding: 0 30px;
-            }
-
-            #modal-booking {
-                padding: 105px 25px 35px 25px;
-            }
-
-            #modal-booking .booking-modal-box {
-                max-width: 620px;
-            }
-
-            .scroll-area-modal {
-                padding: 42px 32px 32px;
-                max-height: calc(85vh - 140px);
-            }
-
-            .booking-form .row {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        /* Mobile Large (480px - 767px) */
-        @media (min-width: 480px) and (max-width: 767px) {
-            .container {
-                margin: 70px auto 0;
-                padding: 0 15px;
-            }
-
-            .hero-text {
-                font-size: clamp(2rem, 10vw, 3.5rem);
-            }
-
-            .hero-content {
-                padding: 0 20px;
-            }
-
-            .btn-hero {
-                padding: 12px 25px;
-                font-size: 0.95rem;
-            }
-
-            .info-bar {
-                grid-template-columns: repeat(2, 1fr);
-                padding: 20px;
-                gap: 15px;
-            }
-
-            .info-item i {
-                font-size: 2rem;
-            }
-
-            .content-area {
-                padding: 25px 20px;
-            }
-
-            section.detail-section h2 {
-                font-size: 1.4rem;
-            }
-
-            /* MOBILE: Less top padding, more vertical space */
-            #modal-booking {
-                padding: 95px 15px 25px 15px;
-            }
-
-            #modal-booking .booking-modal-box {
-                max-width: 95%;
-                border-radius: 22px;
-                margin-bottom: 25px;
-            }
-
-            .scroll-area-modal {
-                padding: 45px 22px 25px;
-                /* MOBILE: More height available */
-                max-height: calc(88vh - 120px);
-            }
-
-            .booking-modal-box h3 {
-                font-size: 1.5rem;
-                margin-bottom: 22px;
-            }
-
-            .booking-form .row {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-
-            .booking-form label {
-                margin: 14px 0 6px;
-            }
-
-            .booking-form input,
-            .booking-form textarea {
-                padding: 12px 14px;
-                font-size: 0.95rem;
-            }
-
-            .booking-form .group-title {
-                font-size: 1.05rem;
-                margin: 24px 0 16px;
-            }
-
-            .whatsapp-button {
-                padding: 12px 20px;
-                font-size: 0.9rem;
-            }
-
-            .footer {
-                padding: 40px 15px 15px;
-            }
-
-            .footer .container {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .social-links {
-                justify-content: center;
-            }
-        }
-
-        /* Mobile Small (<480px) */
-        @media (max-width: 479px) {
-            .container {
-                margin: 70px auto 0;
-                padding: 0 15px;
-            }
-
-            .hero-text {
-                font-size: clamp(1.8rem, 12vw, 2.5rem);
-            }
-
-            .hero-content {
-                padding: 0 20px;
-            }
-
-            .btn-hero-wrapper {
-                flex-direction: column;
-            }
-
-            .btn-hero {
-                width: 100%;
-                justify-content: center;
-                padding: 12px 25px;
-                font-size: 0.95rem;
-            }
-
-            .info-bar {
-                grid-template-columns: 1fr;
-                gap: 12px;
-                padding: 20px;
-            }
-
-            .info-item i {
-                font-size: 2rem;
-            }
-
-            .content-area {
-                padding: 20px 15px;
-            }
-
-            section.detail-section h2 {
-                font-size: 1.4rem;
-            }
-
-            /* MOBILE SMALL: Even less top padding for more space */
-            #modal-booking {
-                padding: 85px 12px 20px 12px;
-            }
-
-            #modal-booking .booking-modal-box {
-                max-width: 96%;
-                border-radius: 20px;
-                margin-bottom: 20px;
-            }
-
-            .scroll-area-modal {
-                padding: 42px 18px 22px;
-                /* MOBILE SMALL: Maximum vertical space */
-                max-height: calc(90vh - 105px);
-            }
-
-            .booking-modal-box h3 {
-                font-size: 1.3rem;
-                margin-bottom: 20px;
-            }
-
-            .booking-form .row {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-
-            .booking-form label {
-                margin: 13px 0 6px;
-                font-size: 0.8rem;
-            }
-
-            .booking-form input,
-            .booking-form textarea {
-                padding: 11px 13px;
-                font-size: 0.92rem;
-            }
-
-            .booking-form .group-title {
-                font-size: 1rem;
-                margin: 22px 0 14px;
-            }
-
-            .btn-main,
-            .btn-cancel {
-                font-size: 0.98rem;
-                padding: 13px;
-            }
-
-            .booking-modal-box .close-btn {
-                width: 38px;
-                height: 38px;
-                font-size: 1.2rem;
-                top: 15px;
-                right: 15px;
-            }
-
-            .footer {
-                padding: 40px 15px 15px;
-            }
-
-            .footer .container {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .social-links {
-                justify-content: center;
-            }
-        }
     </style>
-
-
 </head>
 
 <body>
     <?php include '../navbar.php'; ?>
+    <?php include '../auth-modals.php'; ?>
+
     <?php $heroSubtitle = "Extraordinary Adventure Awaits"; ?>
 
     <?php
@@ -1644,7 +1396,26 @@ function createIconList($text, $iconClass)
         </div>
     </div>
 
-    <!-- Modal Pendaftaran -->
+    <!-- ✅ CUSTOM LOGIN WARNING MODAL -->
+    <div id="loginWarningModal">
+        <div class="login-warning-container">
+            <div class="login-warning-icon">
+                <i class="bi bi-exclamation-circle"></i>
+            </div>
+            <h2 class="login-warning-title">Login Diperlukan</h2>
+            <p class="login-warning-text">Silakan login terlebih dahulu untuk melakukan booking.</p>
+            <div class="login-warning-buttons">
+                <button class="btn-warning-login" onclick="openLoginFromWarning()">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </button>
+                <button class="btn-warning-cancel" onclick="closeLoginWarning()">
+                    <i class="bi bi-x-circle"></i> Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Booking (tetap sama) -->
     <div id="modal-booking">
         <div class="booking-modal-box">
             <button class="close-btn" onclick="closeBooking()"><i class="bi bi-x-lg"></i></button>
@@ -1717,7 +1488,7 @@ function createIconList($text, $iconClass)
         </div>
     </div>
 
-    <!-- Modal Pembayaran -->
+    <!-- Modal Payment (tetap sama) -->
     <div id="modal-payment">
         <div>
             <button onclick="closePayment()"><i class="bi bi-x-lg"></i></button>
@@ -1725,40 +1496,9 @@ function createIconList($text, $iconClass)
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-col">
-                <h3>Majelis MDPL</h3>
-                <p>Nikmati pengalaman tak terlupakan bersama Majelis MDPL. Rasakan panorama puncak yang menakjubkan.</p>
-                <div class="social-links">
-                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
-                </div>
-            </div>
+    <?php include '../footer.php'; ?>
 
-            <div class="footer-col">
-                <h3>Kontak Kami</h3>
-                <p><strong>Alamat:</strong> Jl. aseleole, Kaliwates, Jember 55582</p>
-                <p><strong>WhatsApp:</strong> 08562898933</p>
-                <p><strong>Email:</strong> majelismdpl@gmail.com</p>
-            </div>
-
-            <div class="footer-col">
-                <h3>Quick Link</h3>
-                <ul>
-                    <li><a href="#">Profile</a></li>
-                    <li><a href="#">Paket Trip</a></li>
-                    <li><a href="#">Kontak</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="copyright">
-            <p>© 2025 Majelis MDPL. All rights reserved.</p>
-        </div>
-    </footer>
-
+    <!-- Tombol WhatsApp -->
     <div class="whatsapp-container" data-aos="zoom-in" data-aos-delay="500">
         <button class="whatsapp-button" id="whatsappBtn" onclick="bukaWhatsapp()">
             <div class="whatsapp-icon-wrapper">
@@ -1770,8 +1510,45 @@ function createIconList($text, $iconClass)
         <div class="whatsapp-tooltip">Ada yang bisa kami bantu? 💬</div>
     </div>
 
+    <!-- ✅ SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../frontend/registrasi.js"></script>
+    <script src="../frontend/login.js"></script>
+
     <script>
+        // ========== LOGIN WARNING MODAL FUNCTIONS ==========
+        function showLoginWarning() {
+            document.getElementById('loginWarningModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLoginWarning() {
+            document.getElementById('loginWarningModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function openLoginFromWarning() {
+            // Close warning modal
+            closeLoginWarning();
+
+            // Open login modal
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal) {
+                loginModal.style.display = 'flex';
+                loginModal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // ========== BOOKING MODAL FUNCTIONS ==========
         function bookTripModal() {
+            <?php if (!$isLogin): ?>
+                // Show custom warning modal instead of SweetAlert
+                showLoginWarning();
+                return;
+            <?php endif; ?>
+
+            // Jika sudah login, buka modal booking
             document.getElementById('modal-booking').classList.add('active');
             document.querySelector('.scroll-area-modal').scrollTop = 0;
         }
@@ -1812,16 +1589,20 @@ function createIconList($text, $iconClass)
             document.getElementById('jumlah-peserta').value = document.querySelectorAll('.peserta-baru').length + 1;
         }
 
+        // ========== BOOKING FORM SUBMISSION ==========
         <?php if ($isLogin): ?>
             document.getElementById('form-book-trip').onsubmit = async function(e) {
                 e.preventDefault();
                 const data = new FormData(e.target);
+
                 try {
-                    let res = await fetch('backend/booking-api.php', {
+                    let res = await fetch('../backend/booking-api.php', {
                         method: 'POST',
                         body: data
                     });
+
                     let json = await res.json();
+
                     if (json.success && json.id_booking) {
                         Swal.fire({
                             title: 'Berhasil!',
@@ -1836,7 +1617,7 @@ function createIconList($text, $iconClass)
                     } else {
                         Swal.fire({
                             title: 'Gagal',
-                            text: json.message,
+                            text: json.message || 'Terjadi kesalahan',
                             icon: 'error',
                             background: '#292524',
                             color: '#FAFAF9',
@@ -1844,9 +1625,10 @@ function createIconList($text, $iconClass)
                         });
                     }
                 } catch (err) {
+                    console.error('Error:', err);
                     Swal.fire({
                         title: 'Error',
-                        text: 'Terjadi kesalahan',
+                        text: 'Terjadi kesalahan sistem: ' + err.message,
                         icon: 'error',
                         background: '#292524',
                         color: '#FAFAF9',
@@ -1856,25 +1638,42 @@ function createIconList($text, $iconClass)
             };
         <?php endif; ?>
 
+        // ========== PAYMENT MODAL FUNCTIONS ==========
         function openPayment(id) {
             document.getElementById('modal-payment').style.display = 'flex';
             document.getElementById('hasil-pembayaran').innerHTML = "Memproses...";
-            fetch('backend/payment-api.php?booking=' + id)
+
+            // ✅ FIX: Path relatif yang benar
+            fetch('../backend/payment-api.php?booking=' + id)
                 .then(r => r.json())
                 .then(resp => {
                     if (resp.snap_token) {
                         window.snap.pay(resp.snap_token, {
                             onSuccess: () => {
-                                document.getElementById('hasil-pembayaran').innerHTML = "Sukses!";
-                                setTimeout(closePayment, 2000);
+                                document.getElementById('hasil-pembayaran').innerHTML = "Pembayaran Berhasil!";
+                                setTimeout(() => {
+                                    closePayment();
+                                    window.location.reload();
+                                }, 2000);
                             },
-                            onPending: () => document.getElementById('hasil-pembayaran').innerHTML = "Pending",
-                            onError: () => document.getElementById('hasil-pembayaran').innerHTML = "Gagal",
-                            onClose: () => document.getElementById('hasil-pembayaran').innerHTML = "Ditutup"
+                            onPending: () => {
+                                document.getElementById('hasil-pembayaran').innerHTML = "Menunggu Pembayaran...";
+                            },
+                            onError: () => {
+                                document.getElementById('hasil-pembayaran').innerHTML = "Pembayaran Gagal!";
+                            },
+                            onClose: () => {
+                                document.getElementById('hasil-pembayaran').innerHTML = "Popup Ditutup";
+                                setTimeout(closePayment, 1500);
+                            }
                         });
                     } else {
-                        document.getElementById('hasil-pembayaran').innerHTML = resp.error || 'Error';
+                        document.getElementById('hasil-pembayaran').innerHTML = resp.error || 'Error memuat pembayaran';
                     }
+                })
+                .catch(err => {
+                    console.error('Payment error:', err);
+                    document.getElementById('hasil-pembayaran').innerHTML = 'Error: ' + err.message;
                 });
         }
 
@@ -1882,9 +1681,7 @@ function createIconList($text, $iconClass)
             document.getElementById('modal-payment').style.display = 'none';
         }
 
-
-        // Buka WhatsApp helper
-        // ========== WHATSAPP BUTTON - CUTE & RESPONSIVE ==========
+        // ========== WHATSAPP BUTTON - RESPONSIVE ==========
         (function() {
             const whatsappBtn = document.getElementById('whatsappBtn');
 
@@ -1892,33 +1689,26 @@ function createIconList($text, $iconClass)
                 let expandTimeout;
                 let isExpanded = false;
 
-                // Handle click on WhatsApp button
                 whatsappBtn.addEventListener('click', function(e) {
-                    // Mobile: First tap expands, second tap opens WhatsApp
                     if (window.innerWidth <= 768) {
                         if (!isExpanded) {
-                            // First tap - expand button
                             e.preventDefault();
                             e.stopPropagation();
 
                             this.classList.add('expanded');
                             isExpanded = true;
 
-                            // Auto-collapse after 3 seconds
                             clearTimeout(expandTimeout);
                             expandTimeout = setTimeout(() => {
                                 whatsappBtn.classList.remove('expanded');
                                 isExpanded = false;
                             }, 3000);
                         } else {
-                            // Second tap - open WhatsApp (bukaWhatsapp() will be called)
                             clearTimeout(expandTimeout);
                         }
                     }
-                    // Desktop: Direct open WhatsApp
                 });
 
-                // Handle window resize
                 window.addEventListener('resize', function() {
                     if (window.innerWidth > 768) {
                         whatsappBtn.classList.remove('expanded');
@@ -1927,7 +1717,6 @@ function createIconList($text, $iconClass)
                     }
                 });
 
-                // Close expanded state when clicking outside
                 document.addEventListener('click', function(e) {
                     if (window.innerWidth <= 768 && isExpanded) {
                         if (!whatsappBtn.contains(e.target)) {
@@ -1940,97 +1729,13 @@ function createIconList($text, $iconClass)
             }
         })();
 
-        // ========== BUKA WHATSAPP FUNCTION ==========
         function bukaWhatsapp() {
-            const nomor = "6285233463360"; // Nomor WhatsApp Anda
+            const nomor = "6285233463360";
             const pesan = encodeURIComponent("Halo! Saya ingin bertanya tentang paket trip Majelis MDPL.");
             const url = `https://wa.me/${nomor}?text=${pesan}`;
 
-            // Open WhatsApp in new tab
             window.open(url, "_blank");
 
-            // Add click feedback animation
-            const whatsappBtn = document.getElementById('whatsappBtn');
-            if (whatsappBtn) {
-                whatsappBtn.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    whatsappBtn.style.transform = '';
-                }, 150);
-            }
-        }
-
-        // ========== GOOGLE OAUTH & LOGIN ==========
-        function handleGoogleOAuth() {
-            const baseURL = window.location.origin;
-            window.location.href = `${baseURL}/majelismdpl.com/backend/google-oauth.php`;
-        }
-
-        function handleGoogleLogin() {
-            const baseURL = window.location.origin;
-            window.location.href = `${baseURL}/majelismdpl.com/backend/google-oauth.php?type=login`;
-        }
-
-        // ========== MODAL ANIMATION HELPERS ==========
-        const OPEN = "open";
-        const CLOSING = "closing";
-        const DURATION = 300;
-
-        function openModal(el) {
-            if (!el) return;
-
-            el.classList.remove(CLOSING);
-            el.style.display = "flex";
-
-            // Force reflow for smooth animation
-            void el.offsetWidth;
-
-            el.classList.add(OPEN);
-
-            // Prevent body scroll when modal is open
-            document.body.style.overflow = "hidden";
-        }
-
-        function closeModal(el) {
-            if (!el) return;
-
-            el.classList.remove(OPEN);
-            el.classList.add(CLOSING);
-
-            setTimeout(() => {
-                el.classList.remove(CLOSING);
-                el.style.display = "none";
-
-                // Restore body scroll
-                document.body.style.overflow = "";
-            }, DURATION);
-        }
-
-        // ========== CLOSE MODAL ON ESCAPE KEY ==========
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                const openModals = document.querySelectorAll('.modal.open');
-                openModals.forEach(modal => closeModal(modal));
-            }
-        });
-
-        // ========== CLOSE MODAL ON OUTSIDE CLICK ==========
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal')) {
-                closeModal(e.target);
-            }
-        });
-
-
-        // ========== BUKA WHATSAPP FUNCTION ==========
-        function bukaWhatsapp() {
-            const nomor = "6285233463360"; // Nomor WhatsApp Anda
-            const pesan = encodeURIComponent("Halo! Saya ingin bertanya tentang paket trip Majelis MDPL.");
-            const url = `https://wa.me/${nomor}?text=${pesan}`;
-
-            // Open WhatsApp in new tab
-            window.open(url, "_blank");
-
-            // Add click feedback animation
             const whatsappBtn = document.getElementById('whatsappBtn');
             if (whatsappBtn) {
                 whatsappBtn.style.transform = 'scale(0.95)';
