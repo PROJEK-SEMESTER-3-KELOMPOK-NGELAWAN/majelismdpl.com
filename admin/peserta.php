@@ -203,10 +203,17 @@ require_once 'auth_check.php';
       letter-spacing: 1px;
     }
 
+    /* START: New/Updated Table Styles */
+    .table-responsive-custom {
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
     table {
+      min-width: 700px;
       width: 100%;
       border-spacing: 0 8px;
-      font-size: 13px;
+      font-size: 14px;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -219,10 +226,11 @@ require_once 'auth_check.php';
 
     thead th {
       color: #fff;
-      padding: 12px 10px;
+      padding: 14px 15px;
       font-weight: 700;
       letter-spacing: 0.7px;
       text-align: left;
+      white-space: nowrap;
     }
 
     tbody tr {
@@ -239,10 +247,18 @@ require_once 'auth_check.php';
     }
 
     tbody td {
-      padding: 11px 10px;
+      padding: 13px 15px;
       vertical-align: middle;
       font-weight: 500;
       color: #432f17;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Hide specific columns on the main table view */
+    .hide-col {
+      display: none !important;
     }
 
     img.participant-photo {
@@ -250,6 +266,13 @@ require_once 'auth_check.php';
       height: 40px;
       object-fit: cover;
       border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    img.participant-photo:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .btn-action-group {
@@ -285,28 +308,12 @@ require_once 'auth_check.php';
       background-color: #a71d2a;
     }
 
+    /* END: New/Updated Table Styles */
+
     .loading {
       text-align: center;
       padding: 20px;
       color: #666;
-    }
-
-    img.participant-photo {
-      width: 60px;
-      height: 40px;
-      object-fit: cover;
-      border-radius: 5px;
-      cursor: pointer;
-      /* BARU: Tambahkan cursor pointer */
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      /* BARU: Smooth hover effect */
-    }
-
-    img.participant-photo:hover {
-      transform: scale(1.05);
-      /* BARU: Sedikit zoom saat hover */
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      /* BARU: Shadow saat hover */
     }
 
     /* Style untuk modal preview - UPDATED untuk perfect centering */
@@ -393,10 +400,10 @@ require_once 'auth_check.php';
 
 <body>
 
-    <!-- Include Sidebar -->
-    <?php include 'sidebar.php'; ?>
+  <!-- Include Sidebar -->
+  <?php include 'sidebar.php'; ?>
 
-    
+
   <main class="main">
     <div class="daftar-heading">Daftar Peserta</div>
 
@@ -405,30 +412,32 @@ require_once 'auth_check.php';
       <i class="bi bi-search search-icon"></i>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nama</th>
-          <th>Email</th>
-          <th>No WA</th>
-          <th>Alamat</th>
-          <th>Riwayat Penyakit</th>
-          <th>No WA Darurat</th>
-          <th>Tgl Lahir</th>
-          <th>Tmp Lahir</th>
-          <th>NIK</th>
-          <th>Foto KTP</th>
-          <th>ID Booking</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="participantsTableBody">
-        <tr>
-          <td colspan="13" class="loading">Memuat data peserta...</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive-custom">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Email</th>
+            <th>No WA</th>
+            <th>Alamat</th>
+            <th>Riwayat Penyakit</th>
+            <th>No WA Darurat</th>
+            <th>Tgl Lahir</th>
+            <th>Tmp Lahir</th>
+            <th>NIK</th>
+            <th>Foto KTP</th>
+            <th>ID Booking</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="participantsTableBody">
+          <tr>
+            <td colspan="13" class="loading">Memuat data peserta...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div> 
 
     <!-- Modal Edit Peserta-->
     <div class="modal fade" id="editPesertaModal" tabindex="-1" aria-labelledby="editPesertaModalLabel" aria-hidden="true">

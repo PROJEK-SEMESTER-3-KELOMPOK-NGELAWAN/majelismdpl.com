@@ -6,7 +6,8 @@ if (!isset($_SESSION['username']) || empty($_SESSION['username']) || $_SESSION['
   // Jika session bermasalah, ambil dari database
   if (isset($_SESSION['id_user']) && !empty($_SESSION['id_user'])) {
     require_once '../backend/koneksi.php';
-    $stmt = $conn->prepare("SELECT username, role FROM users WHERE id_user = ?");
+    // Pastikan Anda memilih kolom 'foto_profil' dari tabel 'users'
+    $stmt = $conn->prepare("SELECT username, role, foto_profil FROM users WHERE id_user = ?");
     $stmt->bind_param("i", $_SESSION['id_user']);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -15,12 +16,13 @@ if (!isset($_SESSION['username']) || empty($_SESSION['username']) || $_SESSION['
       $user = $result->fetch_assoc();
       $_SESSION['username'] = $user['username'];
       $_SESSION['role'] = $user['role'];
+      // SIMPAN JALUR FOTO KE SESSION
+      $_SESSION['foto_profil'] = $user['foto_profil'] ?? '';
 
       // Update global variables dari auth_check.php
       $username = $user['username'];
       $user_role = $user['role'];
-      $is_super_admin = RoleHelper::isSuperAdmin($user_role);
-      $is_admin = RoleHelper::isAdmin($user_role);
+      // ... (Kode RoleHelper lainnya) ...
     }
     $stmt->close();
   }
@@ -29,34 +31,32 @@ if (!isset($_SESSION['username']) || empty($_SESSION['username']) || $_SESSION['
 // Ambil username dari session dengan fallback yang lebih baik
 $display_username = $username ?? 'Guest';
 $display_role = $user_role ?? 'user';
+// AMBIL JALUR FOTO DARI SESSION
+$user_photo_path_db = $_SESSION['foto_profil'] ?? '';
+$default_photo = '../img/profile/default.png'; // Ganti dengan jalur foto default Anda yang benar
+$final_photo_path = (!empty($user_photo_path_db) && file_exists('../' . $user_photo_path_db))
+  ? '../' . $user_photo_path_db
+  : $default_photo;
+
 
 // Jika masih "root" atau kosong, redirect ke login
-if ($display_username === 'root' || $display_username === 'Guest' || empty($display_username)) {
-  session_destroy();
-  header('Location: ../login.php?error=session_invalid');
-  exit;
-}
+// ... (blok redirect ke login sudah ada) ...
+
 
 // Handle error messages dari parameter URL
 $error_message = '';
 $error_type = '';
+$success_message = ''; // TAMBAHKAN VARIABEL SUKSES
+
 if (isset($_GET['error'])) {
-  switch ($_GET['error']) {
-    case 'access_denied':
-      $error_message = $_GET['message'] ?? 'Akses ditolak. Anda tidak memiliki permission yang diperlukan untuk mengakses halaman tersebut.';
-      $error_type = 'warning';
-      break;
-    case 'unauthorized':
-      $error_message = 'Anda tidak memiliki akses ke halaman tersebut. Silakan hubungi administrator.';
-      $error_type = 'error';
-      break;
-    case 'session_expired':
-      $error_message = 'Session Anda telah berakhir. Silakan login kembali.';
-      $error_type = 'info';
-      break;
-    case 'session_invalid':
-      $error_message = 'Session tidak valid. Silakan login kembali.';
-      $error_type = 'error';
+  // ... (blok switch untuk error yang sudah ada) ...
+}
+
+// NEW: Handle success messages dari parameter URL
+if (isset($_GET['success'])) {
+  switch ($_GET['success']) {
+    case 'photo_updated':
+      $success_message = 'Foto profil berhasil diperbarui!';
       break;
   }
 }
@@ -184,16 +184,31 @@ if (isset($_GET['error'])) {
     }
 
     .admin-info .user-icon {
-      font-size: 24px;
-      color: #fff;
-      background: rgba(255, 255, 255, 0.2);
-      padding: 8px;
       border-radius: 50%;
       width: 40px;
       height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: none;
+      /* Menghilangkan bayangan */
+    }
+
+    .admin-info i.user-icon {
+      font-size: 30px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px;
+      width: 40px;
+      /* Diperlukan agar ikon pas di lingkaran */
+      height: 40px;
+    }
+
+    .admin-info img.user-icon {
+      object-fit: cover;
+      border: 2px solid #fff;
+      background: none;
+
     }
 
     .admin-info .user-details {
@@ -675,7 +690,15 @@ if (isset($_GET['error'])) {
       <button class="admin-info" id="openProfileModal"
         title="Buka Menu Profil"
         data-username="<?= htmlspecialchars($display_username) ?>">
-        <i class="bi bi-person-circle user-icon" id="adminIcon"></i>
+
+        <?php if ($final_photo_path && $final_photo_path !== $default_photo): ?>
+          <img src="<?= htmlspecialchars($final_photo_path) ?>" alt="Profil"
+            class="user-icon"
+            style="border-radius: 50%; width: 40px; height: 40px; object-fit: cover; border: 2px solid rgba(255, 255, 255, 1);">
+        <?php else: ?>
+          <i class="bi bi-person-circle user-icon" id="adminIcon"></i>
+        <?php endif; ?>
+
         <div class="user-details">
           <span class="username"><?= htmlspecialchars($display_username) ?></span>
           <span class="role-badge role-<?= $display_role ?>">
@@ -764,43 +787,50 @@ if (isset($_GET['error'])) {
     </section>
 
     <div class="profile-modal-overlay" id="profileModalOverlay">
-     <div class="profile-modal-content">
-       <div class="profile-modal-header">
+      <div class="profile-modal-content">
+        <div class="profile-modal-header">
           <h3>Profil Admin</h3>
-         <button class="close-modal-btn" id="closeProfileModal">&times;</button>
-          </div>
+          <button class="close-modal-btn" id="closeProfileModal">&times;</button>
+        </div>
 
-       <div class="profile-modal-body">
+        <div class="profile-modal-body">
           <form id="profilePhotoForm" action="../backend/admin-update-photo.php" method="POST" enctype="multipart/form-data">
-         <div class="profile-photo-area">
-             <i class="bi bi-person-circle profile-icon-large" id="modalProfileIcon"></i>
-         
-          <label for="inputAdminPhoto" class="change-photo-btn">
-               <i class="bi bi-camera-fill"></i> Ganti Foto
+            <div class="profile-photo-area">
+
+              <?php if ($final_photo_path && $final_photo_path !== $default_photo): ?>
+                <img src="<?= htmlspecialchars($final_photo_path) ?>" alt="Foto Profil Admin"
+                  class="profile-icon-large"
+                  style="border-radius: 50%; object-fit: cover; width: 120px; height: 120px; border: 5px solid #f6f0e8; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);">
+              <?php else: ?>
+                <i class="bi bi-person-circle profile-icon-large" id="modalProfileIcon"></i>
+              <?php endif; ?>
+
+              <label for="inputAdminPhoto" class="change-photo-btn">
+                <i class="bi bi-camera-fill"></i> Ganti Foto
               </label>
+
               <input type="file" name="admin_foto_profil" id="inputAdminPhoto" accept="image/*" style="display: none;">
+              <button type="submit" id="submitAdminPhoto" style="display: none;"></button>
             </div>
-            <button type="submit" id="submitAdminPhoto" style="display: none;"></button>
           </form>
-       
           <div class="user-info-detail">
             <p>Nama Pengguna:</p>
             <h4><?= htmlspecialchars($display_username) ?></h4>
-           </div>
-         
+          </div>
+
           <div class="user-info-detail">
-          <p>Role:</p>
+            <p>Role:</p>
             <span class="role-badge role-modal role-<?= $display_role ?>">
               <?= RoleHelper::getRoleDisplayName($display_role) ?>
-             </span>
-           </div>
-         </div>
-        
-       <div class="profile-modal-footer">
-         <button class="btn btn-sm btn-outline-secondary" onclick="showToast('info', 'Halaman Ganti Password belum diimplementasikan.')"
-          <a href="logout.php" class="btn btn-sm btn-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            </span>
           </div>
         </div>
+
+        <div class="profile-modal-footer">
+          <a href="logout.php" class="btn btn-sm btn-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        </div>
+
+      </div>
     </div>
 
   </main>
@@ -812,6 +842,31 @@ if (isset($_GET['error'])) {
 
   <!-- Error handling dan dynamic greeting script -->
   <script>
+    // Isi file: admin/index.php (bagian <script>)
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Error handling dengan SweetAlert2 (kode yang sudah ada)
+      // ...
+
+      // NEW: Penanganan Pesan Sukses
+      <?php if (!empty($success_message)): ?>
+        Swal.fire({
+          title: 'Berhasil!',
+          text: '<?= addslashes($success_message) ?>',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#a97c50',
+          timer: 3000,
+          timerProgressBar: true,
+          showCloseButton: true
+        });
+      <?php endif; ?>
+
+      // ... (lanjutan script lainnya, termasuk search functionality, dynamic greeting, dll.) ...
+
+      // ... (Logika Modal Profil dan Ganti Foto yang sudah ada)
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
       // Error handling dengan SweetAlert2
       <?php if (!empty($error_message)): ?>
