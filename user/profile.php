@@ -499,7 +499,7 @@ $initials = strtoupper(substr($userData['username'], 0, 1));
                     container: 'my-swal'
                 },
                 // Tambahkan background blur jika perlu
-                // backdrop: rgba(0,0,123,0.4) url("/images/nyan-cat.gif") center left no-repeat
+                // backdrop: `rgba(0,0,123,0.4) url("/images/nyan-cat.gif") center left no-repeat`
             });
         }
 
@@ -511,7 +511,7 @@ $initials = strtoupper(substr($userData['username'], 0, 1));
             const form = document.getElementById('editForm');
 
             // Atur judul dan field yang akan diupdate
-            titleElement.textContent = Ubah ${title};
+            titleElement.textContent = `Ubah ${title}`;
             document.getElementById('fieldToUpdate').value = field;
 
             inputArea.innerHTML = ''; // Kosongkan area input
@@ -535,9 +535,9 @@ $initials = strtoupper(substr($userData['username'], 0, 1));
             } else {
                 // Form Edit Data Umum (Username, Email, WA, Alamat)
                 if (type === 'textarea') {
-                    inputArea.innerHTML = <textarea name="${field}" required placeholder="Masukkan ${title}">${currentValue.trim()}</textarea>;
+                    inputArea.innerHTML = `<textarea name="${field}" required placeholder="Masukkan ${title}">${currentValue.trim()}</textarea>`;
                 } else {
-                    inputArea.innerHTML = <input type="${type}" name="${field}" value="${currentValue}" required placeholder="Masukkan ${title}">;
+                    inputArea.innerHTML = `<input type="${type}" name="${field}" value="${currentValue}" required placeholder="Masukkan ${title}">`;
                 }
                 form.action = '../backend/update-profile.php'; // Pastikan path benar
                 form.method = 'POST';
