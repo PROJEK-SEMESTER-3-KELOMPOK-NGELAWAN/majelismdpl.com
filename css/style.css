@@ -364,12 +364,12 @@ section.gallery-cardstyle {
   z-index: 2;
 }
 
-/* HERO CONTENT - PERBAIKAN UTAMA */
+/* HERO CONTENT - DEFAULT (MOBILE FIRST) */
 .hero-content {
   position: relative;
   z-index: 5;
   color: #fff;
-  padding: 40px 50px;
+  padding: 40px 50px; /* ← PADDING NORMAL KEMBALI */
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -377,6 +377,7 @@ section.gallery-cardstyle {
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  /* ← TIDAK ADA TRANSFORM DI SINI */
 }
 
 .hero-offer {
@@ -689,10 +690,12 @@ section.gallery-cardstyle {
   }
 
   .hero-content {
-    padding: 50px 80px;
-    padding-left: 100px;
+    padding: 22px 37px 120px 37px; /* ← UBAH PADDING */
+    padding-left: 50px; /* ← UBAH */
     max-width: 100%;
     align-items: flex-start;
+    transform: scale(0.75); /* ← TAMBAHKAN */
+    transform-origin: left center; /* ← TAMBAHKAN */
   }
 
   .hero-title {
@@ -721,8 +724,9 @@ section.gallery-cardstyle {
 /* Responsive untuk layar sangat besar (Monitor 27 inch ke atas) */
 @media (min-width: 1600px) {
   .hero-content {
-    padding: 60px 100px;
-    padding-left: 120px;
+    padding: 50px 80px 100px 100px; /* ← UBAH PADDING */
+    transform: scale(1); /* ← TAMBAHKAN (100% normal) */
+    transform-origin: left center; /* ← TAMBAHKAN */
   }
 
   .hero-title {
@@ -754,7 +758,7 @@ section.gallery-cardstyle {
 }
 
 /* Responsive untuk layar sedang (Laptop) */
-@media (max-width: 1199px) and (min-width: 769px) {
+@media (min-width: 1024px) and (max-width: 1366px) {
   .hero-home {
     min-height: 100vh;
     height: 100vh;
@@ -762,8 +766,18 @@ section.gallery-cardstyle {
   }
 
   .hero-content {
-    padding: 40px 50px;
+    position: relative;
+    z-index: 5;
+    color: #fff;
+    padding: 40px 50px; /* ← PADDING NORMAL KEMBALI */
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
     align-items: flex-start;
+    justify-content: center;
+    /* ← TIDAK ADA TRANSFORM DI SINI */
   }
 
   .hero-title {
@@ -794,52 +808,77 @@ section.gallery-cardstyle {
 }
 
 /* Responsive untuk tablet */
-@media (max-width: 768px) {
+@media (min-width: 1024px) and (max-width: 1366px) {
   .hero-home {
-    /* FULL SCREEN - 100vh */
     min-height: 100vh;
     height: 100vh;
     max-height: 100vh;
   }
 
   .hero-content {
-    padding: 30px 25px;
+    position: relative;
+    z-index: 5;
+    color: #fff;
+    padding: 180px 60px 100px 55px; /* ← Lebih banyak padding untuk ruang carousel */
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
     align-items: flex-start;
+    justify-content: center; /* ← Konten lebih ke tengah vertikal */
+    transform: scale(0.85); /* ← 85% bukan 75%, jadi lebih besar */
+    transform-origin: left center;
+  }
+
+  .hero-offer {
+    font-size: 1em;
+    margin-bottom: 10px;
   }
 
   .hero-title {
-    font-size: 2.3em;
+    font-size: 5em; /* ← Lebih besar dari 2.8em */
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  .hero-days-wrapper {
+    margin: 8px 0;
   }
 
   .hero-days {
-    font-size: 1.25em;
+    font-size: 2em; /* ← Lebih besar dari 1.4em */
   }
 
   .highlight {
-    font-size: 1.25em;
+    font-size: 1.5em; /* ← Lebih besar dari 1.4em */
   }
 
   .hero-desc {
-    font-size: 0.95em;
-    max-width: 480px;
+    font-size: 1.05em; /* ← Lebih besar dari 1em */
+    max-width: 550px; /* ← Lebih lebar */
+    line-height: 1.6;
+    margin: 12px 0 18px 0;
   }
 
   .hero-btn {
     font-size: 0.95em;
-    padding: 11px 28px;
+    padding: 12px 30px;
+    margin-bottom: 20px;
+  }
+
+  .hero-carousel {
+    gap: 12px;
+    margin-top: 18px;
   }
 
   .carousel-item {
-    width: 75px;
-    height: 52px;
+    width: 120px; /* ← Lebih besar dari 90px */
+    height: 100px; /* ← Lebih besar dari 62px */
   }
 
   .blur-wave-wrapper {
-    height: 60px;
-  }
-
-  .hero-offer {
-    font-size: 0.85em;
+    height: 70px;
   }
 }
 
@@ -853,14 +892,15 @@ section.gallery-cardstyle {
   }
 
   .hero-content {
-    padding: 25px 20px;
+    padding: 100px 60px 50px 30px;
     align-items: flex-start;
-    /* Center content vertically */
     justify-content: center;
+    transform: scale(1); /* ← TAMBAHKAN - reset ke normal */
+    transform-origin: center; /* ← TAMBAHKAN */
   }
 
   .hero-title {
-    font-size: 1.8em;
+    font-size: 2.5em;
   }
 
   .hero-days {
@@ -886,8 +926,8 @@ section.gallery-cardstyle {
   }
 
   .carousel-item {
-    width: 65px;
-    height: 45px;
+    width: 75px;
+    height: 70px;
   }
 
   .blur-wave-wrapper {
@@ -941,7 +981,7 @@ html {
 .why-explorer.style-4 {
   width: 100%;
   min-height: 100vh;
-  padding: 120px 5vw 80px;
+  padding: 65px 5vw 80px;
   position: relative;
   overflow: hidden;
   display: flex;

@@ -20,8 +20,6 @@ session_start();
   <!-- AOS Animation Library -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-
-
 </head>
 
 <body>
@@ -36,7 +34,6 @@ session_start();
       <img src="img/profil_foto.jpeg" alt="Gunung Bromo" class="hero-bg" id="hero-bg">
       <div class="hero-overlay"></div>
     </div>
-
     <div class="hero-content">
       <span class="hero-offer" id="hero-offer">BEST OFFERS</span>
       <h1 class="hero-title" id="hero-title">GUNUNG BROMO</h1>
@@ -61,11 +58,13 @@ session_start();
   <section class="why-explorer style-4" id="profile">
     <!-- Animated Gradient Background - Brown Theme -->
     <div class="gradient-bg"></div>
+    <div class="blur"></div>
     <div class="floating-shapes">
       <div class="shape shape-1"></div>
       <div class="shape shape-2"></div>
       <div class="shape shape-3"></div>
     </div>
+
 
     <!-- Header -->
     <div class="profile-header" data-aos="fade-down" data-aos-duration="600" data-aos-once="true">
