@@ -9,7 +9,7 @@ session_start();
 // Saya akan asumsikan path relatif sudah benar atau menggunakan path absolut root /
 if (!isset($_SESSION['id_user'])) {
     // Sesuaikan path ini jika Anda yakin di mana login.php berada
-    header('Location: /login.php');
+    header('Location: /login.php'); 
     exit();
 }
 
@@ -74,10 +74,10 @@ $initials = strtoupper(substr($userData['username'], 0, 1));
     <title>Profil Saya | Majelis MDPL</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
+    
     <style>
         /* CSS Anda yang sudah ada... */
         body {
@@ -158,32 +158,23 @@ $initials = strtoupper(substr($userData['username'], 0, 1));
         .camera-icon-overlay {
             position: absolute;
             bottom: 0px;
-            right: 0px;
-            /* Atur ke 0px agar berada di sudut bingkai */
-            /* MENGGUNAKAN GAYA MIRIP ADMIN DASHBOARD */
-            background: #432f17;
-            /* Warna gelap admin */
+            right: -5px;
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
             color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
+            padding: 12px 20px;
+            border-radius: 25px;
             display: flex;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 20px rgba(34, 153, 84, 0.7);
             border: 3px solid #f0f2f5;
-            /* Border yang kontras dengan background */
-            transition: background 0.2s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 13px;
-            /* Ukuran font lebih kecil */
-            font-weight: 600;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.1rem;
         }
 
         .profile-photo-wrapper:hover .camera-icon-overlay {
-            /* MENGGUNAKAN GAYA MIRIP ADMIN DASHBOARD */
-            transform: translateY(-2px);
-            /* Naik sedikit saat hover */
-            background: #a97c50;
-            /* Warna hover admin */
-            box-shadow: 0 4px 15px rgba(169, 124, 80, 0.3);
+            transform: translateX(-5px);
+            background: linear-gradient(135deg, #229954, #1e8449);
+            box-shadow: 0 6px 25px rgba(30, 132, 73, 0.8);
         }
 
         .profile-header h1 {

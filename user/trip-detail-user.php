@@ -102,27 +102,27 @@ function createIconList($text, $iconClass)
             --tan-light: #E0C9A8;
             --tan-lighter: #EBD9BD;
             --tan-pale: #F5EAD8;
-            
+
             /* Card Colors */
             --card-white: #F8F4EE;
             --card-cream: #F2EDE5;
-            
+
             /* Accent */
             --accent-gold: #FFB800;
             --accent-gold-hover: #E6A600;
-            
+
             /* Neutral */
             --white: #FFFFFF;
             --text-dark: #3D2F21;
             --text-medium: #6B5847;
             --text-light: #9B8A76;
-            
+
             /* Enhanced Liquid Glass - More Visible */
             --glass-strong: rgba(255, 255, 255, 0.35);
             --glass-medium: rgba(255, 255, 255, 0.25);
             --glass-light: rgba(255, 255, 255, 0.15);
             --glass-border: rgba(255, 255, 255, 0.4);
-            
+
             /* Shadows */
             --shadow-sm: 0 2px 8px rgba(61, 47, 33, 0.08);
             --shadow-md: 0 4px 16px rgba(61, 47, 33, 0.12);
@@ -144,7 +144,7 @@ function createIconList($text, $iconClass)
             content: "";
             position: fixed;
             inset: 0;
-            background-image: 
+            background-image:
                 radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
                 radial-gradient(circle at 75% 75%, rgba(255, 184, 0, 0.04) 0%, transparent 50%);
             pointer-events: none;
@@ -212,6 +212,7 @@ function createIconList($text, $iconClass)
                 opacity: 0;
                 transform: translateY(50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -235,7 +236,7 @@ function createIconList($text, $iconClass)
             line-height: 0.95;
             margin-bottom: 32px;
             color: var(--white);
-            text-shadow: 
+            text-shadow:
                 0 4px 16px rgba(0, 0, 0, 0.5),
                 0 12px 48px rgba(0, 0, 0, 0.3);
         }
@@ -261,7 +262,7 @@ function createIconList($text, $iconClass)
             border: none;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            box-shadow: 
+            box-shadow:
                 0 8px 32px rgba(255, 184, 0, 0.35),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
             overflow: hidden;
@@ -282,7 +283,7 @@ function createIconList($text, $iconClass)
 
         .btn-hero:hover {
             transform: translateY(-4px);
-            box-shadow: 
+            box-shadow:
                 0 16px 48px rgba(255, 184, 0, 0.5),
                 inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
@@ -321,6 +322,7 @@ function createIconList($text, $iconClass)
                 opacity: 0;
                 transform: translateY(50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -346,7 +348,7 @@ function createIconList($text, $iconClass)
             backdrop-filter: blur(30px) saturate(200%);
             -webkit-backdrop-filter: blur(30px) saturate(200%);
             border: 2px solid var(--glass-border);
-            box-shadow: 
+            box-shadow:
                 0 4px 16px rgba(255, 255, 255, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.6);
         }
@@ -354,7 +356,7 @@ function createIconList($text, $iconClass)
         .info-item:hover {
             background: rgba(255, 255, 255, 0.45);
             transform: scale(1.05);
-            box-shadow: 
+            box-shadow:
                 0 8px 24px rgba(208, 178, 140, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
@@ -467,7 +469,7 @@ function createIconList($text, $iconClass)
             backdrop-filter: blur(30px) saturate(200%);
             -webkit-backdrop-filter: blur(30px) saturate(200%);
             border: 2px solid var(--glass-border);
-            box-shadow: 
+            box-shadow:
                 0 2px 8px rgba(255, 255, 255, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.5);
         }
@@ -476,7 +478,7 @@ function createIconList($text, $iconClass)
             color: var(--text-dark);
             background: rgba(255, 255, 255, 0.45);
             padding-left: 66px;
-            box-shadow: 
+            box-shadow:
                 0 4px 16px rgba(208, 178, 140, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.7);
         }
@@ -528,8 +530,13 @@ function createIconList($text, $iconClass)
         }
 
         @keyframes modalBackdrop {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         #loginWarningModal.active {
@@ -546,7 +553,7 @@ function createIconList($text, $iconClass)
             width: 90%;
             padding: 56px 48px;
             text-align: center;
-            box-shadow: 
+            box-shadow:
                 0 20px 60px rgba(0, 0, 0, 0.18),
                 inset 0 1px 0 rgba(255, 255, 255, 0.9);
             position: relative;
@@ -558,6 +565,7 @@ function createIconList($text, $iconClass)
                 opacity: 0;
                 transform: translateY(80px) scale(0.9);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -579,10 +587,13 @@ function createIconList($text, $iconClass)
         }
 
         @keyframes iconPulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
                 box-shadow: 0 0 32px rgba(255, 184, 0, 0.3);
             }
+
             50% {
                 transform: scale(1.06);
                 box-shadow: 0 0 48px rgba(255, 184, 0, 0.5);
@@ -683,7 +694,7 @@ function createIconList($text, $iconClass)
             margin: auto;
             border-radius: 28px;
             border: 2px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 
+            box-shadow:
                 0 20px 60px rgba(0, 0, 0, 0.18),
                 inset 0 1px 0 rgba(255, 255, 255, 0.9);
             position: relative;
@@ -945,12 +956,16 @@ function createIconList($text, $iconClass)
         }
 
         @keyframes iconFloat {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0) rotate(0deg);
             }
+
             25% {
                 transform: translateY(-3px) rotate(-2deg);
             }
+
             75% {
                 transform: translateY(3px) rotate(2deg);
             }
@@ -970,10 +985,13 @@ function createIconList($text, $iconClass)
         }
 
         @keyframes dotPing {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
                 opacity: 1;
             }
+
             50% {
                 transform: scale(1.35);
                 opacity: 0.7;
@@ -1055,7 +1073,7 @@ function createIconList($text, $iconClass)
             width: 95%;
             border-radius: 28px;
             border: 2px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 
+            box-shadow:
                 0 20px 60px rgba(0, 0, 0, 0.18),
                 inset 0 1px 0 rgba(255, 255, 255, 0.9);
             text-align: center;
@@ -1096,6 +1114,7 @@ function createIconList($text, $iconClass)
             .container {
                 padding: 0 24px;
             }
+
             .whatsapp-container {
                 bottom: 26px;
                 right: 26px;
@@ -1106,27 +1125,35 @@ function createIconList($text, $iconClass)
             .container {
                 padding: 0 16px;
             }
+
             .hero {
                 height: 92vh;
             }
+
             .hero-text {
                 font-size: 2.8rem;
             }
+
             .info-bar {
                 grid-template-columns: 1fr 1fr;
                 padding: 30px 20px;
                 gap: 20px;
             }
+
             .content-area {
                 padding: 36px 24px;
             }
-            .btn-main, .btn-hero {
+
+            .btn-main,
+            .btn-hero {
                 width: 100%;
             }
+
             .whatsapp-container {
                 bottom: 20px;
                 right: 20px;
             }
+
             .whatsapp-button {
                 padding: 15px;
                 width: 58px;
@@ -1134,19 +1161,24 @@ function createIconList($text, $iconClass)
                 border-radius: 50%;
                 justify-content: center;
             }
+
             .whatsapp-text {
                 display: none;
             }
+
             .whatsapp-icon-wrapper {
                 width: 28px;
                 height: 28px;
             }
+
             .whatsapp-button i {
                 font-size: 32px;
             }
+
             .whatsapp-tooltip {
                 display: none;
             }
+
             .scroll-area-modal {
                 padding: 40px 24px 32px;
             }
@@ -1156,13 +1188,16 @@ function createIconList($text, $iconClass)
             .container {
                 padding: 0 12px;
             }
+
             .hero-content {
                 padding: 0 4%;
             }
+
             .info-bar {
                 gap: 16px;
                 padding: 24px 16px;
             }
+
             .content-area {
                 padding: 28px 20px;
             }
@@ -1516,44 +1551,113 @@ function createIconList($text, $iconClass)
 
         function openPayment(id) {
             document.getElementById('modal-payment').style.display = 'flex';
-            document.getElementById('hasil-pembayaran').innerHTML = "Memproses...";
+            document.getElementById('hasil-pembayaran').innerHTML = "⏳ Memproses pembayaran...";
 
             fetch('../backend/payment-api.php?booking=' + id)
-                .then(r => r.json())
+                .then(r => {
+                    const contentType = r.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Server mengembalikan HTML bukan JSON. Periksa error di backend.');
+                    }
+                    return r.json();
+                })
                 .then(resp => {
                     if (resp.snap_token) {
                         window.snap.pay(resp.snap_token, {
-                            onSuccess: () => {
-                                document.getElementById('hasil-pembayaran').innerHTML = "Pembayaran Berhasil!";
+                            onSuccess: (result) => {
+                                document.getElementById('hasil-pembayaran').innerHTML = "✅ Pembayaran Berhasil! Mengecek status...";
+
+                                // ✅ MANUAL STATUS CHECK - Karena webhook tidak jalan di localhost
+                                fetch('../backend/check-payment-status.php?order_id=' + resp.order_id)
+                                    .then(r => r.json())
+                                    .then(statusResp => {
+                                        if (statusResp.status === 'paid') {
+                                            setTimeout(() => {
+                                                closePayment();
+                                                Swal.fire({
+                                                    title: 'Pembayaran Berhasil!',
+                                                    text: 'Booking Anda telah dikonfirmasi.',
+                                                    icon: 'success',
+                                                    background: 'rgba(255, 255, 255, 0.95)',
+                                                    color: '#3D2F21',
+                                                    confirmButtonColor: '#FFB800'
+                                                }).then(() => {
+                                                    window.location.reload();
+                                                });
+                                            }, 1000);
+                                        } else {
+                                            document.getElementById('hasil-pembayaran').innerHTML = "⚠️ Status: " + statusResp.status;
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error('Status check error:', err);
+                                        setTimeout(() => {
+                                            window.location.reload();
+                                        }, 2000);
+                                    });
+                            },
+                            onPending: (result) => {
+                                document.getElementById('hasil-pembayaran').innerHTML = "⏳ Menunggu Pembayaran...";
                                 setTimeout(() => {
                                     closePayment();
-                                    window.location.reload();
+                                    Swal.fire({
+                                        title: 'Pembayaran Pending',
+                                        text: 'Silakan selesaikan pembayaran Anda.',
+                                        icon: 'info',
+                                        background: 'rgba(255, 255, 255, 0.95)',
+                                        color: '#3D2F21',
+                                        confirmButtonColor: '#FFB800'
+                                    });
                                 }, 2000);
                             },
-                            onPending: () => {
-                                document.getElementById('hasil-pembayaran').innerHTML = "Menunggu Pembayaran...";
-                            },
-                            onError: () => {
-                                document.getElementById('hasil-pembayaran').innerHTML = "Pembayaran Gagal!";
+                            onError: (result) => {
+                                document.getElementById('hasil-pembayaran').innerHTML = "❌ Pembayaran Gagal!";
+                                setTimeout(() => {
+                                    closePayment();
+                                    Swal.fire({
+                                        title: 'Pembayaran Gagal',
+                                        text: result.status_message || 'Terjadi kesalahan',
+                                        icon: 'error',
+                                        background: 'rgba(255, 255, 255, 0.95)',
+                                        color: '#3D2F21',
+                                        confirmButtonColor: '#FFB800'
+                                    });
+                                }, 2000);
                             },
                             onClose: () => {
-                                document.getElementById('hasil-pembayaran').innerHTML = "Popup Ditutup";
-                                setTimeout(closePayment, 1500);
+                                document.getElementById('hasil-pembayaran').innerHTML = "⚠️ Popup Ditutup";
+                                setTimeout(() => {
+                                    closePayment();
+                                }, 1500);
                             }
                         });
                     } else {
-                        document.getElementById('hasil-pembayaran').innerHTML = resp.error || 'Error memuat pembayaran';
+                        throw new Error(resp.error || 'Gagal mendapatkan Snap Token');
                     }
                 })
                 .catch(err => {
                     console.error('Payment error:', err);
-                    document.getElementById('hasil-pembayaran').innerHTML = 'Error: ' + err.message;
+                    document.getElementById('hasil-pembayaran').innerHTML = '❌ Error: ' + err.message;
+
+                    setTimeout(() => {
+                        closePayment();
+                        Swal.fire({
+                            title: 'Error Pembayaran',
+                            text: err.message,
+                            icon: 'error',
+                            background: 'rgba(255, 255, 255, 0.95)',
+                            color: '#3D2F21',
+                            confirmButtonColor: '#FFB800'
+                        });
+                    }, 2000);
                 });
         }
 
         function closePayment() {
             document.getElementById('modal-payment').style.display = 'none';
         }
+
+
 
         (function() {
             const whatsappBtn = document.getElementById('whatsappBtn');

@@ -1,5 +1,6 @@
 <?php
-// ✅ START SESSION
+// ✅ INCLUDE DATABASE
+require_once '../backend/koneksi.php';
 session_start();
 
 // ✅ SET NAVBAR PATH
@@ -11,37 +12,34 @@ if (!isset($_SESSION['id_user']) || empty($_SESSION['id_user'])) {
     exit;
 }
 
-// ✅ CONTOH DATA TRANSAKSI (HARDCODED)
-$booking_list = [
-    [
-        'id_booking' => 28,
-        'nama_trip' => 'Gunung Slamet',
-        'tanggal_booking' => '2025-10-23',
-        'total_harga' => 500000,
-        'status_pembayaran' => 'pending',
-    ],
-    [
-        'id_booking' => 26,
-        'nama_trip' => 'Gunung Raung',
-        'tanggal_booking' => '2025-10-21',
-        'total_harga' => 400000,
-        'status_pembayaran' => 'settlement',
-    ],
-    [
-        'id_booking' => 13,
-        'nama_trip' => 'Gunung Argopuro',
-        'tanggal_booking' => '2025-10-10',
-        'total_harga' => 600000,
-        'status_pembayaran' => 'cancelled',
-    ],
-    [
-        'id_booking' => 17,
-        'nama_trip' => 'Gunung Semeru',
-        'tanggal_booking' => '2025-10-11',
-        'total_harga' => 300000,
-        'status_pembayaran' => 'expire',
-    ],
-];
+$id_user = $_SESSION['id_user'];
+
+// ✅ QUERY REAL DATA DARI DATABASE
+$stmt = $conn->prepare("
+    SELECT 
+        b.id_booking,
+        b.tanggal_booking,
+        b.total_harga,
+        b.jumlah_orang,
+        b.status as booking_status,
+        t.nama_gunung,
+        t.jenis_trip,
+        p.id_payment,
+        p.status_pembayaran,
+        p.order_id,
+        p.tanggal as payment_date
+    FROM bookings b
+    JOIN paket_trips t ON b.id_trip = t.id_trip
+    LEFT JOIN payments p ON b.id_booking = p.id_booking
+    WHERE b.id_user = ?
+    ORDER BY b.tanggal_booking DESC
+");
+
+$stmt->bind_param("i", $id_user);
+$stmt->execute();
+$result = $stmt->get_result();
+$booking_list = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
 
 // ✅ FUNGSI HELPER
 function get_status_class_payment($status)
@@ -76,7 +74,7 @@ function format_status_text_payment($status)
         case 'cancelled':
             return '<i class="fa-solid fa-ban"></i> Dibatalkan';
         default:
-            return ucwords($status);
+            return '<i class="fa-solid fa-question-circle"></i> ' . ucwords($status);
     }
 }
 ?>
@@ -97,6 +95,7 @@ function format_status_text_payment($status)
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-KFnuwUuiq_i1OUJf"></script>
 
     <style>
+        /* ... CSS yang sama seperti sebelumnya ... */
         * {
             margin: 0;
             padding: 0;
@@ -468,36 +467,6 @@ function format_status_text_payment($status)
                 padding: 11px 10px;
             }
         }
-
-        @media (max-width: 375px) {
-            .page-title {
-                font-size: 1.4rem;
-            }
-
-            .subtitle {
-                font-size: 0.85rem;
-            }
-
-            .trip-title {
-                font-size: 1.1rem;
-            }
-
-            .trip-order-id {
-                font-size: 0.75rem;
-            }
-
-            .detail-label {
-                font-size: 0.75rem;
-            }
-
-            .detail-value {
-                font-size: 0.9rem;
-            }
-
-            .price-value {
-                font-size: 1.05rem;
-            }
-        }
     </style>
 </head>
 
@@ -530,7 +499,7 @@ function format_status_text_payment($status)
                 <?php else : ?>
                     <div class="status-list-grid">
                         <?php foreach ($booking_list as $booking) :
-                            $status = strtolower($booking['status_pembayaran']);
+                            $status = strtolower($booking['status_pembayaran'] ?? 'pending');
                             $status_class = get_status_class_payment($status);
                             $status_text_full = format_status_text_payment($status);
                             $status_text_clean = strip_tags($status_text_full);
@@ -546,7 +515,7 @@ function format_status_text_payment($status)
                                 <div class="card-main-info">
                                     <h3 class="trip-title">
                                         <i class="fa-solid fa-mountain-sun" style="color: #a97c50;"></i>
-                                        <?= htmlspecialchars($booking['nama_trip']); ?>
+                                        <?= htmlspecialchars($booking['nama_gunung']); ?>
                                     </h3>
                                     <p class="trip-order-id">
                                         Booking ID: #<?= $booking['id_booking']; ?>
@@ -574,7 +543,7 @@ function format_status_text_payment($status)
                                         <button class="btn-action btn-detail" type="button" onclick="showDetail(<?= $booking['id_booking']; ?>)">
                                             <i class="fa-solid fa-search"></i> Detail
                                         </button>
-                                        <?php if ($status === 'pending') : ?>
+                                        <?php if ($status === 'pending' && !empty($booking['order_id'])) : ?>
                                             <button class="btn-action btn-continue" type="button" onclick="lanjutkanPembayaran(<?= $booking['id_booking']; ?>)">
                                                 <i class="fa-solid fa-credit-card"></i> Bayar
                                             </button>
@@ -589,7 +558,7 @@ function format_status_text_payment($status)
         </main>
     </div>
 
-    <!-- ✅ PAYMENT MODAL (FIXED: display none by default) -->
+    <!-- ✅ PAYMENT MODAL -->
     <div id="modal-payment-midtrans" class="payment-modal-overlay">
         <div class="payment-modal-content">
             <p id="midtrans-status-message" class="payment-modal-text">Menyiapkan pembayaran...</p>
@@ -602,199 +571,157 @@ function format_status_text_payment($status)
     <script src="../frontend/login.js"></script>
 
     <script>
-        // ✅ SIMULASI DATA LENGKAP TRANSAKSI
-        const transactionDetails = {
-            28: {
-                booking_id: 28,
-                payment_id: 24,
-                trip_name: 'Gunung Slamet',
-                trip_via: 'Rambipuji',
-                trip_date: '30 Okt 2025',
-                total_price: 500000,
-                status: 'pending',
-                booked_date: '23 Okt 2025',
-                participants_count: 1,
-                basecamp: 'Basecamp Slamet',
-                include: 'makan, minum, tenda',
-                exclude: 'doa',
-                sk: 'wajib membawa surat keterangan sehat dan fotokopi KTP. Pembayaran DP 50% harus dilakukan dalam 1x24 jam.',
-                waktu_kumpul: '02:00',
-                participants: [{
-                    id: 55,
-                    name: 'Samid',
-                    email: 'samid@example.com',
-                    phone: '6285362783678',
-                    dob: '23 Okt 2025',
-                    nik: '123456789'
-                }]
-            },
-            26: {
-                booking_id: 26,
-                payment_id: 23,
-                trip_name: 'Gunung Raung',
-                trip_via: 'Bondowoso',
-                trip_date: '26 Sep 2025',
-                total_price: 400000,
-                status: 'settlement',
-                booked_date: '21 Okt 2025',
-                participants_count: 1,
-                basecamp: 'Base Camp Kalibaru',
-                include: 'makan, transport pp',
-                exclude: 'minum, asuransi',
-                sk: 'peserta dilarang membawa barang yang tidak perlu dan wajib mematuhi protokol basecamp.',
-                waktu_kumpul: '11:11',
-                participants: [{
-                    id: 48,
-                    name: 'John Doe',
-                    email: 'john@example.com',
-                    phone: '6285362783678',
-                    dob: '02 Okt 2025',
-                    nik: '123321'
-                }]
-            },
-            13: {
-                status: 'cancelled',
-                payment_id: 13,
-                booking_id: 13,
-                total_price: 600000
-            },
-            17: {
-                status: 'expire',
-                payment_id: 17,
-                booking_id: 17,
-                total_price: 300000
-            },
-        };
-
-        const simulatedBookingData = {
-            28: {
-                snap_token: 'dummy-token-28'
-            },
-            26: {
-                snap_token: 'dummy-token-26'
-            },
-            13: {
-                message: 'Transaksi dibatalkan.'
-            },
-            17: {
-                message: 'Transaksi kadaluarsa.'
-            },
-        };
-
+        // ✅ FUNGSI LANJUTKAN PEMBAYARAN (REAL INTEGRATION)
         function lanjutkanPembayaran(bookingId) {
-            // ✅ Show modal dengan class 'active'
             const modal = document.getElementById('modal-payment-midtrans');
             modal.classList.add('active');
             document.getElementById('midtrans-status-message').textContent = "Meminta token pembayaran...";
 
-            const data = simulatedBookingData[bookingId];
+            fetch('../backend/payment-api.php?booking=' + bookingId)
+                .then(r => {
+                    const contentType = r.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Server error - bukan JSON');
+                    }
+                    return r.json();
+                })
+                .then(resp => {
+                    if (resp.snap_token) {
+                        document.getElementById('midtrans-status-message').textContent = "Membuka jendela pembayaran...";
 
-            if (data && data.snap_token) {
-                document.getElementById('midtrans-status-message').textContent = "Membuka jendela pembayaran...";
+                        setTimeout(() => {
+                            closePaymentModal();
 
-                setTimeout(() => {
+                            // ✅ BUKA MIDTRANS SNAP
+                            window.snap.pay(resp.snap_token, {
+                                onSuccess: (result) => {
+                                    // ✅ AUTO CHECK STATUS SETELAH PEMBAYARAN
+                                    fetch('../backend/check-payment-status.php?order_id=' + resp.order_id)
+                                        .then(r => r.json())
+                                        .then(statusResp => {
+                                            if (statusResp.status === 'paid') {
+                                                Swal.fire({
+                                                    title: 'Pembayaran Berhasil!',
+                                                    text: 'Booking Anda telah dikonfirmasi.',
+                                                    icon: 'success',
+                                                    confirmButtonColor: '#a97c50'
+                                                }).then(() => {
+                                                    window.location.reload();
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    title: 'Pembayaran Diproses',
+                                                    text: 'Menunggu konfirmasi pembayaran.',
+                                                    icon: 'info',
+                                                    confirmButtonColor: '#a97c50'
+                                                }).then(() => {
+                                                    window.location.reload();
+                                                });
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.error('Status check error:', err);
+                                            window.location.reload();
+                                        });
+                                },
+                                onPending: (result) => {
+                                    Swal.fire({
+                                        title: 'Pembayaran Pending',
+                                        text: 'Silakan selesaikan pembayaran Anda.',
+                                        icon: 'info',
+                                        confirmButtonColor: '#a97c50'
+                                    });
+                                },
+                                onError: (result) => {
+                                    Swal.fire({
+                                        title: 'Pembayaran Gagal',
+                                        text: result.status_message || 'Terjadi kesalahan',
+                                        icon: 'error',
+                                        confirmButtonColor: '#a97c50'
+                                    });
+                                },
+                                onClose: () => {
+                                    console.log('Popup ditutup');
+                                }
+                            });
+                        }, 500);
+
+                    } else {
+                        throw new Error(resp.error || 'Gagal mendapatkan token');
+                    }
+                })
+                .catch(err => {
+                    console.error('Payment error:', err);
                     closePaymentModal();
                     Swal.fire({
-                        title: 'Simulasi Pembayaran',
-                        text: `Token SNAP berhasil didapatkan untuk #ID${bookingId}. Jendela Midtrans akan muncul di sini.`,
-                        icon: 'info',
-                        showCancelButton: true,
-                        confirmButtonText: 'Simulasi Sukses',
-                        cancelButtonText: 'Simulasi Pending',
-                        confirmButtonColor: '#a97c50',
-                        cancelButtonColor: '#6c757d'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'Sukses!',
-                                text: 'Pembayaran Berhasil Disimulasikan.',
-                                icon: 'success',
-                                confirmButtonColor: '#a97c50'
-                            });
-                        } else if (result.dismiss === Swal.DismissReason.cancel) {
-                            Swal.fire({
-                                title: 'Pending',
-                                text: 'Pembayaran masih menunggu konfirmasi.',
-                                icon: 'warning',
-                                confirmButtonColor: '#a97c50'
-                            });
-                        }
-                    });
-                }, 1000);
-
-            } else {
-                setTimeout(() => {
-                    closePaymentModal();
-                    Swal.fire({
-                        title: 'Error',
-                        text: data.message || 'Gagal mendapatkan token pembayaran.',
+                        title: 'Error Pembayaran',
+                        text: err.message,
                         icon: 'error',
                         confirmButtonColor: '#a97c50'
                     });
-                }, 1000);
-            }
+                });
         }
 
         function closePaymentModal() {
-            // ✅ Hide modal dengan remove class 'active'
             const modal = document.getElementById('modal-payment-midtrans');
             modal.classList.remove('active');
         }
 
-        function formatStatusText(status) {
-            switch (status.toLowerCase()) {
-                case 'pending':
-                    return '<span style="color:#e65100;">Menunggu Pembayaran</span>';
-                case 'settlement':
-                case 'paid':
-                    return '<span style="color:#2e7d32;">Pembayaran Diterima</span>';
-                case 'expire':
-                    return '<span style="color:#c62828;">Kadaluarsa</span>';
-                case 'cancelled':
-                    return '<span style="color:#c62828;">Dibatalkan</span>';
-                default:
-                    return status;
-            }
-        }
-
+        // ✅ FUNGSI SHOW DETAIL (FETCH DARI DATABASE)
         function showDetail(bookingId) {
-            const data = transactionDetails[bookingId];
+            Swal.fire({
+                title: 'Memuat Detail...',
+                html: '<i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:#a97c50;"></i>',
+                showConfirmButton: false,
+                allowOutsideClick: false
+            });
 
-            if (!data) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Detail transaksi tidak ditemukan.',
-                    icon: 'error',
-                    confirmButtonColor: '#a97c50'
-                });
-                return;
-            }
+            fetch(`../backend/get-booking-detail.php?id=${bookingId}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.error,
+                            icon: 'error',
+                            confirmButtonColor: '#a97c50'
+                        });
+                        return;
+                    }
 
-            const invoiceNumber = `INV-MDPL-PAY-${data.payment_id || 'N/A'}`;
+                    // ✅ RENDER DETAIL LENGKAP
+                    const invoiceNumber = `INV-MDPL-PAY-${data.id_payment || 'N/A'}`;
+                    const isPaid = data.status_pembayaran === 'paid' || data.status_pembayaran === 'settlement';
+                    const invoiceUrl = `view-invoice.php?payment_id=${data.id_payment}`;
 
-            let participantsHTML = '<div class="participant-list-detail">';
-            if (data.participants) {
-                data.participants.forEach((p, index) => {
-                    participantsHTML += `
+                    let participantsHTML = '<div class="participant-list-detail">';
+                    if (data.participants && data.participants.length > 0) {
+                        data.participants.forEach((p, index) => {
+                            participantsHTML += `
                         <div class="participant-item">
-                            <p><strong>${index + 1}. ${p.name}</strong></p>
-                            <small>Email: ${p.email}</small> | <small>NIK: ${p.nik}</small>
+                            <p><strong>${index + 1}. ${p.nama}</strong></p>
+                            <small>📧 ${p.email}</small><br>
+                            <small>📱 ${p.no_wa}</small> | <small>🆔 ${p.nik}</small><br>
+                            <small>🎂 ${p.tempat_lahir}, ${p.tanggal_lahir}</small>
                         </div>
                     `;
-                });
-            } else {
-                participantsHTML += '<p style="color: #999;">Detail peserta tidak tersedia.</p>';
-            }
-            participantsHTML += '</div>';
+                        });
+                    } else {
+                        participantsHTML += '<p style="color: #999;">Detail peserta tidak tersedia.</p>';
+                    }
+                    participantsHTML += '</div>';
 
-            const invoiceUrl = `../user/view-invoice.php?payment_id=${data.payment_id}`;
-            const isPaid = data.status.toLowerCase() === 'settlement' || data.status.toLowerCase() === 'paid';
+                    const invoiceButton = isPaid ?
+                        `<a href="${invoiceUrl}" target="_blank" class="btn-invoice-detail"><i class="fa-solid fa-file-invoice"></i> Lihat Invoice</a>` :
+                        `<button disabled class="btn-invoice-detail disabled-btn"><i class="fa-solid fa-times-circle"></i> Invoice Belum Tersedia</button>`;
 
-            const invoiceButton = isPaid ?
-                `<a href="${invoiceUrl}" target="_blank" class="btn-invoice-detail"><i class="fa-solid fa-file-invoice"></i> Lihat Invoice</a>` :
-                `<button disabled class="btn-invoice-detail disabled-btn"><i class="fa-solid fa-times-circle"></i> Invoice Belum Tersedia</button>`;
+                    const formatStatus = (status) => {
+                        if (status === 'paid' || status === 'settlement') return '<span style="color:#2e7d32;">✅ Lunas</span>';
+                        if (status === 'pending') return '<span style="color:#e65100;">⏳ Menunggu Pembayaran</span>';
+                        return '<span style="color:#c62828;">❌ ' + status + '</span>';
+                    };
 
-            const modalContent = `
+                    const modalContent = `
             <style>
                 .swal2-popup { font-size: clamp(0.85rem, 2vw, 1rem) !important; padding: clamp(15px, 3vw, 25px) !important; }
                 .swal2-title { color: #a97c50 !important; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 15px; font-size: clamp(1.1rem, 4vw, 1.5rem) !important; }
@@ -805,10 +732,11 @@ function format_status_text_payment($status)
                 .info-row-detail strong { color: #222; }
                 .info-row-detail span { color: #555; }
                 .total-price-detail { font-size: clamp(1.1rem, 3vw, 1.4rem); color: #a97c50; font-weight: 700; margin-top: 8px; }
-                .participant-list-detail { margin-top: 10px; max-height: 120px; overflow-y: auto; padding: 0 5px; }
-                .participant-item { padding: 6px 0; border-bottom: 1px dotted #e0e0e0; }
-                .participant-item p { margin: 0; font-weight: 600; color: #444; font-size: clamp(0.85rem, 2vw, 0.95rem); }
-                .participant-item small { color: #777; font-size: clamp(0.75rem, 1.8vw, 0.8rem); }
+                .participant-list-detail { margin-top: 10px; max-height: 180px; overflow-y: auto; padding: 0 5px; }
+                .participant-item { padding: 8px 0; border-bottom: 1px dotted #e0e0e0; }
+                .participant-item:last-child { border-bottom: none; }
+                .participant-item p { margin: 0; font-weight: 600; color: #444; font-size: clamp(0.85rem, 2vw, 0.95rem); margin-bottom: 3px; }
+                .participant-item small { color: #777; font-size: clamp(0.75rem, 1.8vw, 0.8rem); display: inline-block; margin-right: 5px; }
                 .btn-invoice-detail { margin-top: 15px; background: #333; color: #fff; padding: clamp(8px, 2vw, 10px) clamp(15px, 3vw, 20px); border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: none; font-weight: 600; font-size: clamp(0.85rem, 2vw, 0.95rem); }
                 .btn-invoice-detail:hover:not(:disabled) { background: #000; }
                 .disabled-btn { background: #ccc; color: #777; cursor: not-allowed; }
@@ -824,30 +752,32 @@ function format_status_text_payment($status)
                 <div class="info-box-group">
                     <h4><i class="fa-solid fa-receipt"></i> Ringkasan Transaksi</h4>
                     <div class="info-row-detail"><span>Nomor Invoice:</span> <strong>${invoiceNumber}</strong></div>
-                    <div class="info-row-detail"><span>ID Booking:</span> <strong>#${data.booking_id}</strong></div>
-                    <div class="info-row-detail"><span>Tanggal Pesan:</span> <strong>${data.booked_date || 'N/A'}</strong></div>
-                    <div class="info-row-detail"><span>Status Pembayaran:</span> <strong>${formatStatusText(data.status)}</strong></div>
-                    <div class="info-row-detail"><span>Jumlah Peserta:</span> <strong>${data.participants_count || 'N/A'} Orang</strong></div>
-                    <div class="info-row-detail"><span>Total Tagihan:</span> <strong class="total-price-detail">Rp ${data.total_price ? data.total_price.toLocaleString('id-ID') : 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>ID Booking:</span> <strong>#${data.id_booking}</strong></div>
+                    <div class="info-row-detail"><span>Tanggal Pesan:</span> <strong>${data.tanggal_booking_formatted}</strong></div>
+                    <div class="info-row-detail"><span>Status Pembayaran:</span> <strong>${formatStatus(data.status_pembayaran)}</strong></div>
+                    <div class="info-row-detail"><span>Jumlah Peserta:</span> <strong>${data.jumlah_orang} Orang</strong></div>
+                    <div class="info-row-detail"><span>Total Tagihan:</span> <strong class="total-price-detail">Rp ${parseInt(data.total_harga).toLocaleString('id-ID')}</strong></div>
                 </div>
 
                 <div class="info-box-group">
                     <h4><i class="fa-solid fa-mountain"></i> Detail Trip</h4>
-                    <div class="info-row-detail"><span>Nama Trip:</span> <strong>${data.trip_name || 'N/A'} (Via ${data.trip_via || 'N/A'})</strong></div>
-                    <div class="info-row-detail"><span>Tanggal Trip:</span> <strong>${data.trip_date || 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>Nama Trip:</span> <strong>${data.nama_gunung}</strong></div>
+                    <div class="info-row-detail"><span>Via:</span> <strong>${data.jenis_trip || 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>Tanggal Trip:</span> <strong>${data.tanggal_trip_formatted}</strong></div>
+                    <div class="info-row-detail"><span>Durasi:</span> <strong>${data.durasi || 'N/A'}</strong></div>
                     <div class="info-row-detail"><span>Waktu Kumpul:</span> <strong>${data.waktu_kumpul || 'N/A'} WIB</strong></div>
-                    <div class="info-row-detail"><span>Lokasi Kumpul:</span> <strong>${data.basecamp || 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>Lokasi Kumpul:</span> <strong>${data.nama_lokasi || 'N/A'}</strong></div>
                 </div>
 
                 <div class="info-box-group">
                     <h4><i class="fa-solid fa-clipboard-list"></i> Info Penting</h4>
                     <div style="padding: 5px 0;"><span><strong>Include:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${data.include || 'N/A'}</small></div>
                     <div style="padding: 5px 0;"><span><strong>Exclude:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${data.exclude || 'N/A'}</small></div>
-                    <div style="padding: 5px 0;"><span><strong>Syarat & Ketentuan:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${data.sk || 'N/A'}</small></div>
+                    <div style="padding: 5px 0;"><span><strong>Syarat & Ketentuan:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${data.syarat_ketentuan || 'N/A'}</small></div>
                 </div>
                 
                 <div class="info-box-group">
-                    <h4><i class="fa-solid fa-users"></i> Daftar Peserta (${data.participants_count || 'N/A'} Orang)</h4>
+                    <h4><i class="fa-solid fa-users"></i> Daftar Peserta (${data.jumlah_orang} Orang)</h4>
                     ${participantsHTML}
                 </div>
                 
@@ -857,15 +787,25 @@ function format_status_text_payment($status)
             </div>
         `;
 
-            Swal.fire({
-                title: `Detail Transaksi #${data.booking_id}`,
-                html: modalContent,
-                icon: false,
-                width: 'clamp(300px, 90vw, 700px)',
-                showCloseButton: true,
-                showConfirmButton: false,
-                focusConfirm: false,
-            });
+                    Swal.fire({
+                        title: `Detail Transaksi #${data.id_booking}`,
+                        html: modalContent,
+                        icon: false,
+                        width: 'clamp(300px, 90vw, 700px)',
+                        showCloseButton: true,
+                        showConfirmButton: false,
+                        focusConfirm: false,
+                    });
+                })
+                .catch(err => {
+                    console.error('Detail error:', err);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Gagal memuat detail transaksi: ' + err.message,
+                        icon: 'error',
+                        confirmButtonColor: '#a97c50'
+                    });
+                });
         }
     </script>
 </body>

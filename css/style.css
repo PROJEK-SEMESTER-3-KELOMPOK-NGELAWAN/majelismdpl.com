@@ -1408,6 +1408,31 @@ html {
   }
 }
 
+/* Laptop Acer Swift 3 & Similar (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .why-explorer.style-4 {
+    padding: 60px 5vw 60px; /* ← Lebih kecil untuk laptop */
+    gap: 35px; /* ← Gap lebih kecil */
+  }
+
+  .style-4 .profile-header {
+    margin-bottom: 0; /* ← Hilangkan margin bawah */
+  }
+
+  .style-4 .profile-title {
+    font-size: 2.8rem; /* ← Lebih kecil dari 3.5rem */
+    margin-bottom: 15px;
+  }
+
+  .style-4 .profile-subtitle {
+    font-size: 1rem; /* ← Lebih kecil dari 1.15rem */
+  }
+
+  .style-4 .glass-cards-wrapper {
+    gap: 25px; /* ← Kurangi gap antar cards */
+  }
+}
+
 /* Mobile Extra Small (<400px) */
 @media (max-width: 400px) {
   .why-explorer.style-4 {
