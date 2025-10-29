@@ -144,9 +144,9 @@ function format_status_text_payment($status)
         }
 
         body {
-            font-family: "Poppins", Arial, sans-serif;
-            background-color: #f4f4f4;
-            overflow-x: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8dcc4 100%);
+            min-height: 100vh;
         }
 
         .payment-page-container {

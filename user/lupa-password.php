@@ -375,7 +375,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_pw'])) {
 <body>
   <div class="forgot-container">
     <img src="../assets/logo_majelis_noBg.png" alt="Logo Majelis" class="forgot-logo">
-    <div class="forgot-title">Lupa Password</div>
+    <div class="forgot-title">Reset Password</div>
     <div class="forgot-desc">Masukkan email Anda untuk mendapatkan kode OTP dan mengatur ulang password.</div>
 
     <?php if ($step === 1): ?>
