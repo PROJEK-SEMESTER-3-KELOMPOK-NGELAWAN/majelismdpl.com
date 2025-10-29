@@ -6,13 +6,31 @@ $photoFileName = 'default.jpg';
 $isCustomPhoto = false;
 $initials = '';
 
-$navbarPath = '';
-$currentDir = dirname($_SERVER['PHP_SELF']);
-if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== false) {
-  $navbarPath = '../';
+// PERBAIKAN: Deteksi path yang lebih akurat
+if (!isset($navbarPath)) {
+  $navbarPath = '';
+  $currentDir = dirname($_SERVER['PHP_SELF']);
+  if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== false) {
+    $navbarPath = '../';
+  }
 }
 
-require_once $navbarPath . 'backend/koneksi.php';
+// Pastikan koneksi database dengan error handling
+$koneksiPath = $navbarPath . 'backend/koneksi.php';
+if (file_exists($koneksiPath)) {
+  require_once $koneksiPath;
+} else {
+  // Fallback jika path tidak ditemukan
+  if (file_exists('../backend/koneksi.php')) {
+    require_once '../backend/koneksi.php';
+    $navbarPath = '../';
+  } elseif (file_exists('backend/koneksi.php')) {
+    require_once 'backend/koneksi.php';
+    $navbarPath = '';
+  } else {
+    die("Error: File koneksi database tidak ditemukan!");
+  }
+}
 
 if ($isLoggedIn) {
   $id_user = $_SESSION['id_user'];
@@ -42,17 +60,20 @@ $cacheBuster = '?' . time();
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
+
 <nav class="navbar" role="navigation" aria-label="Main Navigation">
   <div class="navbar-logo">
-    <img src="<?php echo $navbarPath; ?>img/majelis.png" alt="Logo Majelis MDPL" class="logo-img" />
+    <a href="<?php echo $navbarPath; ?>index.php">
+      <img src="<?php echo $navbarPath; ?>img/majelis.png" alt="Logo Majelis MDPL" class="logo-img" />
+    </a>
   </div>
 
   <ul class="navbar-menu" id="navbarMenu" role="menu">
-    <li><a href="<?php echo $navbarPath; ?>#home" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
-    <li><a href="<?php echo $navbarPath; ?>#profile" role="menuitem"><i class="fa-solid fa-user"></i> Profile</a></li>
-    <li><a href="<?php echo $navbarPath; ?>#paketTrips" role="menuitem"><i class="fa-solid fa-calendar-days"></i> Paket Trip</a></li>
-    <li><a href="<?php echo $navbarPath; ?>#gallerys" role="menuitem"><i class="fa-solid fa-image"></i> Galeri</a></li>
-    <li><a href="<?php echo $navbarPath; ?>#testimonials" role="menuitem"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
+    <li><a href="<?php echo $navbarPath; ?>index.php#home" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="<?php echo $navbarPath; ?>index.php#profile" role="menuitem"><i class="fa-solid fa-user"></i> Profile</a></li>
+    <li><a href="<?php echo $navbarPath; ?>index.php#paketTrips" role="menuitem"><i class="fa-solid fa-calendar-days"></i> Paket Trip</a></li>
+    <li><a href="<?php echo $navbarPath; ?>index.php#gallerys" role="menuitem"><i class="fa-solid fa-image"></i> Galeri</a></li>
+    <li><a href="<?php echo $navbarPath; ?>index.php#testimonials" role="menuitem"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
   </ul>
 
   <?php if (!$isLoggedIn): ?>
@@ -157,7 +178,7 @@ $cacheBuster = '?' . time();
   }
 
   .navbar.scrolled {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(50px) saturate(180%);
     box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
   }
@@ -167,6 +188,12 @@ $cacheBuster = '?' . time();
     align-items: center;
     gap: 10px;
     z-index: 1201;
+  }
+
+  .navbar-logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
   }
 
   .logo-img {
@@ -253,11 +280,27 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes jellyBounce {
-    0%, 100% { transform: translateY(0) scaleY(1); }
-    30% { transform: translateY(-10px) scaleY(1.08); }
-    40% { transform: translateY(-8px) scaleY(0.92); }
-    50% { transform: translateY(0) scaleY(1.04); }
-    60% { transform: translateY(0) scaleY(0.96); }
+
+    0%,
+    100% {
+      transform: translateY(0) scaleY(1);
+    }
+
+    30% {
+      transform: translateY(-10px) scaleY(1.08);
+    }
+
+    40% {
+      transform: translateY(-8px) scaleY(0.92);
+    }
+
+    50% {
+      transform: translateY(0) scaleY(1.04);
+    }
+
+    60% {
+      transform: translateY(0) scaleY(0.96);
+    }
   }
 
   .navbar-menu li:nth-child(2) a i {
@@ -266,12 +309,31 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes crazyWiggle {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    15% { transform: rotate(-18deg) scale(1.08); }
-    30% { transform: rotate(18deg) scale(0.96); }
-    45% { transform: rotate(-14deg) scale(1.04); }
-    60% { transform: rotate(14deg) scale(0.98); }
-    75% { transform: rotate(-8deg) scale(1.02); }
+
+    0%,
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+
+    15% {
+      transform: rotate(-18deg) scale(1.08);
+    }
+
+    30% {
+      transform: rotate(18deg) scale(0.96);
+    }
+
+    45% {
+      transform: rotate(-14deg) scale(1.04);
+    }
+
+    60% {
+      transform: rotate(14deg) scale(0.98);
+    }
+
+    75% {
+      transform: rotate(-8deg) scale(1.02);
+    }
   }
 
   .navbar-menu li:nth-child(3) a i {
@@ -280,11 +342,27 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes heartbeat {
-    0%, 100% { transform: scale(1); }
-    10% { transform: scale(1.18); }
-    20% { transform: scale(1); }
-    30% { transform: scale(1.14); }
-    40% { transform: scale(1); }
+
+    0%,
+    100% {
+      transform: scale(1);
+    }
+
+    10% {
+      transform: scale(1.18);
+    }
+
+    20% {
+      transform: scale(1);
+    }
+
+    30% {
+      transform: scale(1.14);
+    }
+
+    40% {
+      transform: scale(1);
+    }
   }
 
   .navbar-menu li:nth-child(4) a i {
@@ -293,10 +371,23 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes spinScale {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(180deg) scale(1.18); }
-    50% { transform: rotate(360deg) scale(1); }
-    75% { transform: rotate(540deg) scale(1.12); }
+
+    0%,
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+
+    25% {
+      transform: rotate(180deg) scale(1.18);
+    }
+
+    50% {
+      transform: rotate(360deg) scale(1);
+    }
+
+    75% {
+      transform: rotate(540deg) scale(1.12);
+    }
   }
 
   .navbar-menu li:nth-child(5) a i {
@@ -305,11 +396,27 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes waveFloat {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    20% { transform: translateY(-7px) rotate(-10deg); }
-    40% { transform: translateY(-3px) rotate(7deg); }
-    60% { transform: translateY(-9px) rotate(-7deg); }
-    80% { transform: translateY(-2px) rotate(9deg); }
+
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+
+    20% {
+      transform: translateY(-7px) rotate(-10deg);
+    }
+
+    40% {
+      transform: translateY(-3px) rotate(7deg);
+    }
+
+    60% {
+      transform: translateY(-9px) rotate(-7deg);
+    }
+
+    80% {
+      transform: translateY(-2px) rotate(9deg);
+    }
   }
 
   .navbar-menu a:hover i {
@@ -319,11 +426,25 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes navbarBounce {
-    0% { transform: scale(1.07) rotate(-8deg) translateY(0); }
-    28% { transform: scale(1.28) rotate(-13deg) translateY(-10px); }
-    49% { transform: scale(1.24) rotate(-9deg) translateY(2px); }
-    70% { transform: scale(1.2) rotate(-11deg) translateY(-3px); }
-    100% { transform: scale(1.25) rotate(-13deg) translateY(-5px); }
+    0% {
+      transform: scale(1.07) rotate(-8deg) translateY(0);
+    }
+
+    28% {
+      transform: scale(1.28) rotate(-13deg) translateY(-10px);
+    }
+
+    49% {
+      transform: scale(1.24) rotate(-9deg) translateY(2px);
+    }
+
+    70% {
+      transform: scale(1.2) rotate(-11deg) translateY(-3px);
+    }
+
+    100% {
+      transform: scale(1.25) rotate(-13deg) translateY(-5px);
+    }
   }
 
   .navbar-menu a.active i {
@@ -399,9 +520,17 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes shimmerMove {
-    0% { left: -100%; }
-    50% { left: 100%; }
-    100% { left: 100%; }
+    0% {
+      left: -100%;
+    }
+
+    50% {
+      left: 100%;
+    }
+
+    100% {
+      left: 100%;
+    }
   }
 
   .user-menu-toggle:hover {
@@ -605,8 +734,13 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 
   .logout-modal-container {
@@ -625,6 +759,7 @@ $cacheBuster = '?' . time();
       transform: translateY(-50px);
       opacity: 0;
     }
+
     to {
       transform: translateY(0);
       opacity: 1;
@@ -881,7 +1016,7 @@ $cacheBuster = '?' . time();
       hamburger.addEventListener('click', function(e) {
         e.stopPropagation();
         this.classList.toggle('active');
-        
+
         if (navbarMenu) {
           navbarMenu.classList.toggle('show');
         }
@@ -906,7 +1041,7 @@ $cacheBuster = '?' . time();
         e.stopPropagation();
         userDropdown.classList.toggle('show');
         this.classList.toggle('active');
-        
+
         const isExpanded = userDropdown.classList.contains('show');
         this.setAttribute('aria-expanded', isExpanded);
 

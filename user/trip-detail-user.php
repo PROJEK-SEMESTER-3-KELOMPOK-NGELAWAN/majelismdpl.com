@@ -75,8 +75,10 @@ function createIconList($text, $iconClass)
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
     <title><?= htmlspecialchars($trip['nama_gunung']) ?> | Majelis MDPL</title>
+
+    <!-- ✅ WAJIB: Load Font Poppins (SAMA dengan navbar.php) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-KFnuwUuiq_i1OUJf"></script>
@@ -131,7 +133,7 @@ function createIconList($text, $iconClass)
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #D0B28C;
             background-attachment: fixed;
             color: var(--text-dark);
@@ -160,13 +162,12 @@ function createIconList($text, $iconClass)
         }
 
         /* ============================================
-   HERO SECTION - FULL SCREEN
-   ============================================ */
+           HERO SECTION - FULL SCREEN
+           ============================================ */
 
         .hero {
             position: relative;
             height: 100vh;
-            /* Full viewport height di desktop */
             width: 100vw;
             margin: 0;
             overflow: hidden;
@@ -300,7 +301,6 @@ function createIconList($text, $iconClass)
             margin-right: 10px;
         }
 
-
         /* ============================================
            INFO BAR - Enhanced Glass Effect
            ============================================ */
@@ -345,7 +345,6 @@ function createIconList($text, $iconClass)
             padding: 20px 16px;
             border-radius: 16px;
             transition: all 0.4s cubic-bezier(0.33, 1, 0.68, 1);
-            /* Enhanced Glass Effect */
             background: var(--glass-strong);
             backdrop-filter: blur(30px) saturate(200%);
             -webkit-backdrop-filter: blur(30px) saturate(200%);
@@ -435,7 +434,7 @@ function createIconList($text, $iconClass)
             left: 0;
             width: 60px;
             height: 4px;
-            background: #866e2e;
+            background: var(--accent-gold);
             border-radius: 2px;
         }
 
@@ -466,7 +465,6 @@ function createIconList($text, $iconClass)
             color: var(--text-medium);
             transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
             border-radius: 14px;
-            /* Enhanced Glass Effect */
             background: var(--glass-strong);
             backdrop-filter: blur(30px) saturate(200%);
             -webkit-backdrop-filter: blur(30px) saturate(200%);
@@ -490,7 +488,7 @@ function createIconList($text, $iconClass)
             left: 22px;
             top: 20px;
             font-size: 1.3rem;
-            color: #000000;
+            color: var(--accent-gold);
             transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
         }
 
@@ -679,12 +677,9 @@ function createIconList($text, $iconClass)
             align-items: center;
             justify-content: center;
             padding: 25px 20px;
-            /* Ubah dari 40px → 25px (lebih mepet) */
             animation: modalBackdrop 0.4s ease-out;
             overflow-y: auto;
         }
-
-
 
         #modal-booking.active {
             display: flex;
@@ -697,7 +692,6 @@ function createIconList($text, $iconClass)
             max-width: 680px;
             width: 92%;
             max-height: 92vh;
-            /* Ubah dari 85vh → 92vh (lebih tinggi) */
             margin: auto;
             border-radius: 28px;
             border: 2px solid rgba(255, 255, 255, 0.6);
@@ -710,17 +704,13 @@ function createIconList($text, $iconClass)
             flex-direction: column;
         }
 
-
         .scroll-area-modal {
             width: 100%;
             max-height: calc(92vh - 60px);
-            /* Ubah dari calc(85vh - 80px) */
             overflow-y: auto;
             padding: 56px 48px 48px;
             flex: 1;
         }
-
-
 
         .scroll-area-modal::-webkit-scrollbar {
             width: 8px;
@@ -772,7 +762,7 @@ function createIconList($text, $iconClass)
             border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         .booking-form input:focus,
@@ -801,7 +791,6 @@ function createIconList($text, $iconClass)
         .booking-form .row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            /* 2 kolom dengan lebar sama */
             gap: 20px;
             margin-bottom: 12px;
         }
@@ -815,7 +804,6 @@ function createIconList($text, $iconClass)
             display: block;
             font-weight: 700;
             margin: 0 0 10px;
-            /* Ubah dari 20px 0 10px */
             font-size: 0.88rem;
             color: var(--tan-darkest);
             text-transform: uppercase;
@@ -833,9 +821,8 @@ function createIconList($text, $iconClass)
             border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
-
 
         .booking-form .btn-add,
         .booking-form .btn-rm {
@@ -926,177 +913,12 @@ function createIconList($text, $iconClass)
             align-items: center;
             justify-content: center;
             z-index: 100;
-            /* Di atas konten scroll */
         }
-
 
         .booking-modal-box .close-btn:hover {
             background: rgba(208, 178, 140, 0.25);
             border-color: rgba(208, 178, 140, 0.5);
             transform: rotate(90deg);
-        }
-
-        /* ============================================
-           WHATSAPP BUTTON
-           ============================================ */
-
-        .whatsapp-container {
-            position: fixed;
-            bottom: 32px;
-            right: 32px;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 16px;
-        }
-
-        .whatsapp-button {
-            background: #25D366;
-            color: white;
-            padding: 16px 28px;
-            border-radius: 18px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            font-family: "Inter", Arial, sans-serif;
-            font-size: 15px;
-            font-weight: 700;
-            transition: all 0.4s cubic-bezier(0.33, 1, 0.68, 1);
-            box-shadow: 0 8px 32px rgba(37, 211, 102, 0.4);
-            position: relative;
-            order: 2;
-            backdrop-filter: blur(10px);
-        }
-
-        .whatsapp-button::before {
-            content: "";
-            position: absolute;
-            inset: -2px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 18px;
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-
-        .whatsapp-button:hover::before {
-            opacity: 1;
-        }
-
-        .whatsapp-icon-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            height: 30px;
-            z-index: 1;
-        }
-
-        .whatsapp-button i {
-            font-size: 30px;
-            animation: iconFloat 3s ease-in-out infinite;
-            position: relative;
-            z-index: 2;
-        }
-
-        @keyframes iconFloat {
-
-            0%,
-            100% {
-                transform: translateY(0) rotate(0deg);
-            }
-
-            25% {
-                transform: translateY(-3px) rotate(-2deg);
-            }
-
-            75% {
-                transform: translateY(3px) rotate(2deg);
-            }
-        }
-
-        .ping-dot {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            width: 11px;
-            height: 11px;
-            background: #FF4757;
-            border: 2.5px solid white;
-            border-radius: 50%;
-            animation: dotPing 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-            z-index: 3;
-        }
-
-        @keyframes dotPing {
-
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-
-            50% {
-                transform: scale(1.35);
-                opacity: 0.7;
-            }
-        }
-
-        .whatsapp-text {
-            position: relative;
-            z-index: 1;
-            white-space: nowrap;
-        }
-
-        .whatsapp-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 14px 40px rgba(37, 211, 102, 0.55);
-        }
-
-        .whatsapp-button:active {
-            transform: translateY(-3px);
-        }
-
-        .whatsapp-tooltip {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            color: var(--tan-darkest);
-            padding: 12px 22px;
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 700;
-            font-family: "Inter", Arial, sans-serif;
-            box-shadow: var(--shadow-md);
-            border: 2px solid rgba(208, 178, 140, 0.3);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(14px) scale(0.9);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            white-space: nowrap;
-            order: 1;
-        }
-
-        .whatsapp-tooltip::after {
-            content: "";
-            position: absolute;
-            bottom: -7px;
-            right: 50px;
-            width: 14px;
-            height: 14px;
-            background: rgba(255, 255, 255, 0.95);
-            transform: rotate(45deg);
-            border-right: 2px solid rgba(208, 178, 140, 0.3);
-            border-bottom: 2px solid rgba(208, 178, 140, 0.3);
-        }
-
-        .whatsapp-container:hover .whatsapp-tooltip {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
         }
 
         #modal-payment {
@@ -1162,11 +984,6 @@ function createIconList($text, $iconClass)
                 padding: 0 24px;
             }
 
-            .whatsapp-container {
-                bottom: 26px;
-                right: 26px;
-            }
-
             #modal-booking .booking-modal-box {
                 max-width: 90%;
             }
@@ -1179,11 +996,8 @@ function createIconList($text, $iconClass)
 
             .hero {
                 height: 100vh;
-                /* Tetap full screen di mobile */
                 min-height: 100vh;
-                /* Minimum height 100vh */
                 min-height: -webkit-fill-available;
-                /* iOS Safari fix */
             }
 
             .hero-content {
@@ -1211,10 +1025,6 @@ function createIconList($text, $iconClass)
                 border-radius: 14px;
             }
 
-            .hero-text {
-                font-size: 2.8rem;
-            }
-
             .info-bar {
                 grid-template-columns: 1fr 1fr;
                 padding: 30px 20px;
@@ -1230,43 +1040,34 @@ function createIconList($text, $iconClass)
                 width: 100%;
             }
 
-            /* ========== MODAL BOOKING RESPONSIVE ========== */
             #modal-booking {
                 padding: 15px 10px;
-                /* Kurangi padding untuk mobile */
             }
 
             #modal-booking .booking-modal-box {
                 max-width: 95%;
-                /* Gunakan hampir seluruh lebar layar */
                 width: 95%;
                 max-height: 95vh;
-                /* Maksimalkan tinggi */
                 border-radius: 20px;
-                /* Radius lebih kecil */
             }
 
             .scroll-area-modal {
                 padding: 40px 20px 32px;
-                /* Kurangi padding horizontal */
                 max-height: calc(95vh - 40px);
             }
 
             .booking-modal-box h3 {
                 font-size: 1.5rem;
-                /* Perkecil judul */
                 margin-bottom: 28px;
             }
 
             .booking-form .group-title {
                 font-size: 1.1rem;
-                /* Perkecil section title */
                 margin: 30px 0 20px;
             }
 
             .booking-form label {
                 font-size: 0.8rem;
-                /* Perkecil label */
                 margin: 15px 0 8px;
             }
 
@@ -1276,17 +1077,12 @@ function createIconList($text, $iconClass)
             .booking-form textarea,
             .booking-form input[type=file] {
                 padding: 12px 14px;
-                /* Kurangi padding input */
                 font-size: 0.95rem;
-                /* Perkecil font input */
             }
 
-            /* ========== ROW GRID 1 KOLOM DI MOBILE ========== */
             .booking-form .row {
                 grid-template-columns: 1fr;
-                /* 1 kolom untuk mobile */
                 gap: 0;
-                /* Hilangkan gap karena sudah ada margin di label */
             }
 
             .booking-modal-box .close-btn {
@@ -1302,37 +1098,6 @@ function createIconList($text, $iconClass)
                 font-size: 0.95rem;
                 padding: 16px;
             }
-
-            /* ========== WHATSAPP BUTTON ========== */
-            .whatsapp-container {
-                bottom: 20px;
-                right: 20px;
-            }
-
-            .whatsapp-button {
-                padding: 15px;
-                width: 58px;
-                height: 58px;
-                border-radius: 50%;
-                justify-content: center;
-            }
-
-            .whatsapp-text {
-                display: none;
-            }
-
-            .whatsapp-icon-wrapper {
-                width: 28px;
-                height: 28px;
-            }
-
-            .whatsapp-button i {
-                font-size: 32px;
-            }
-
-            .whatsapp-tooltip {
-                display: none;
-            }
         }
 
         @media (max-width: 480px) {
@@ -1344,7 +1109,6 @@ function createIconList($text, $iconClass)
                 height: 100vh;
                 min-height: 100vh;
                 min-height: -webkit-fill-available;
-                /* iOS Safari fix */
             }
 
             .hero-content {
@@ -1383,14 +1147,12 @@ function createIconList($text, $iconClass)
                 gap: 16px;
                 padding: 24px 16px;
                 grid-template-columns: 1fr;
-                /* 1 kolom untuk mobile kecil */
             }
 
             .content-area {
                 padding: 28px 20px;
             }
 
-            /* ========== MODAL BOOKING MOBILE KECIL ========== */
             #modal-booking {
                 padding: 10px 5px;
             }
@@ -1461,7 +1223,6 @@ function createIconList($text, $iconClass)
                 font-size: 0.85rem;
             }
 
-            /* ========== LOGIN WARNING MODAL RESPONSIVE ========== */
             .login-warning-container {
                 max-width: 90%;
                 padding: 40px 28px;
@@ -1498,25 +1259,8 @@ function createIconList($text, $iconClass)
                 padding: 14px;
                 font-size: 0.9rem;
             }
-
-            /* ========== WHATSAPP BUTTON ========== */
-            .whatsapp-container {
-                bottom: 16px;
-                right: 16px;
-            }
-
-            .whatsapp-button {
-                width: 54px;
-                height: 54px;
-            }
-
-            .whatsapp-button i {
-                font-size: 28px;
-            }
         }
 
-
-        /* Mobile Extra Small - 360px */
         @media (max-width: 360px) {
             .hero-text {
                 font-size: clamp(1.5rem, 6vw, 2rem);
@@ -1553,30 +1297,8 @@ function createIconList($text, $iconClass)
                 padding: 13px;
             }
         }
-
-        @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            10%,
-            30%,
-            50%,
-            70%,
-            90% {
-                transform: translateX(-8px);
-            }
-
-            20%,
-            40%,
-            60%,
-            80% {
-                transform: translateX(8px);
-            }
-        }
     </style>
+
 </head>
 
 <body>
@@ -1794,17 +1516,6 @@ function createIconList($text, $iconClass)
 
     <?php include '../footer.php'; ?>
 
-    <div class="whatsapp-container">
-        <div class="whatsapp-tooltip">Ada yang bisa kami bantu? 💬</div>
-        <button class="whatsapp-button" id="whatsappBtn" onclick="bukaWhatsapp()">
-            <div class="whatsapp-icon-wrapper">
-                <i class="fab fa-whatsapp"></i>
-                <span class="ping-dot"></span>
-            </div>
-            <span class="whatsapp-text">Chat WhatsApp</span>
-        </button>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../frontend/registrasi.js"></script>
     <script src="../frontend/login.js"></script>
@@ -1841,34 +1552,6 @@ function createIconList($text, $iconClass)
 
         function closeBooking() {
             document.getElementById('modal-booking').classList.remove('active');
-        }
-
-        function addPeserta() {
-            const id = document.querySelectorAll('#extra-participants .peserta-baru').length + 2;
-            const div = document.createElement('div');
-            div.className = 'peserta-baru';
-            div.innerHTML = `
-                <div class="group-title">Peserta #${id}</div>
-                <div class="row">
-                    <div><label>Nama</label><input type="text" name="nama[]" required /></div>
-                    <div><label>Email</label><input type="email" name="email[]" required /></div>
-                </div>
-                <div class="row">
-                    <div><label>Tanggal Lahir</label><input type="date" name="tanggal_lahir[]" required /></div>
-                    <div><label>Tempat Lahir</label><input type="text" name="tempat_lahir[]" /></div>
-                </div>
-                <label>NIK</label><input type="text" name="nik[]" />
-                <div class="row">
-                    <div><label>No. WA</label><input type="text" name="no_wa[]" required /></div>
-                    <div><label>No. Darurat</label><input type="text" name="no_wa_darurat[]" /></div>
-                </div>
-                <label>Alamat</label><textarea name="alamat[]" required></textarea>
-                <label>Riwayat Penyakit</label><input type="text" name="riwayat_penyakit[]" />
-                <label>Foto KTP</label><input type="file" name="foto_ktp[]" accept="image/*" />
-                <button class="btn-rm" type="button" onclick="this.parentElement.remove();updateJumlah();">Hapus</button>
-            `;
-            document.getElementById('extra-participants').appendChild(div);
-            updateJumlah();
         }
 
         function updateJumlah() {
@@ -1941,7 +1624,6 @@ function createIconList($text, $iconClass)
                             onSuccess: (result) => {
                                 document.getElementById('hasil-pembayaran').innerHTML = "✅ Pembayaran Berhasil! Mengecek status...";
 
-                                // ✅ MANUAL STATUS CHECK - Karena webhook tidak jalan di localhost
                                 fetch('../backend/check-payment-status.php?order_id=' + resp.order_id)
                                     .then(r => r.json())
                                     .then(statusResp => {
@@ -2031,77 +1713,12 @@ function createIconList($text, $iconClass)
             document.getElementById('modal-payment').style.display = 'none';
         }
 
-
-
-        (function() {
-            const whatsappBtn = document.getElementById('whatsappBtn');
-            if (whatsappBtn) {
-                let expandTimeout;
-                let isExpanded = false;
-
-                whatsappBtn.addEventListener('click', function(e) {
-                    if (window.innerWidth <= 768) {
-                        if (!isExpanded) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            this.classList.add('expanded');
-                            isExpanded = true;
-                            clearTimeout(expandTimeout);
-                            expandTimeout = setTimeout(() => {
-                                whatsappBtn.classList.remove('expanded');
-                                isExpanded = false;
-                            }, 3000);
-                        } else {
-                            clearTimeout(expandTimeout);
-                        }
-                    }
-                });
-
-                window.addEventListener('resize', function() {
-                    if (window.innerWidth > 768) {
-                        whatsappBtn.classList.remove('expanded');
-                        isExpanded = false;
-                        clearTimeout(expandTimeout);
-                    }
-                });
-
-                document.addEventListener('click', function(e) {
-                    if (window.innerWidth <= 768 && isExpanded) {
-                        if (!whatsappBtn.contains(e.target)) {
-                            whatsappBtn.classList.remove('expanded');
-                            isExpanded = false;
-                            clearTimeout(expandTimeout);
-                        }
-                    }
-                });
-            }
-        })();
-
-        function bukaWhatsapp() {
-            const nomor = "6285233463360";
-            const pesan = encodeURIComponent("Halo! Saya ingin bertanya tentang paket trip Majelis MDPL.");
-            const url = `https://wa.me/${nomor}?text=${pesan}`;
-            window.open(url, "_blank");
-
-            const whatsappBtn = document.getElementById('whatsappBtn');
-            if (whatsappBtn) {
-                whatsappBtn.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    whatsappBtn.style.transform = '';
-                }, 150);
-            }
-        }
-
-
-        // Ambil slot tersedia dari PHP
         const slotTersedia = <?= intval($trip['slot']) ?>;
 
         function addPeserta() {
             const jumlahPesertaSaatIni = document.querySelectorAll('#extra-participants .peserta-baru').length + 1;
 
-            // ✅ CEK APAKAH SLOT CUKUP
             if (jumlahPesertaSaatIni >= slotTersedia) {
-                // Tampilkan warning inline di atas tombol "Tambah Peserta"
                 const warningDiv = document.getElementById('slot-warning');
                 if (!warningDiv) {
                     const warning = document.createElement('div');
@@ -2128,7 +1745,6 @@ function createIconList($text, $iconClass)
                     const btnAdd = document.querySelector('.btn-add');
                     btnAdd.parentNode.insertBefore(warning, btnAdd);
 
-                    // Auto-hide warning setelah 5 detik
                     setTimeout(() => {
                         warning.style.transition = 'all 0.3s ease-out';
                         warning.style.opacity = '0';
@@ -2137,10 +1753,9 @@ function createIconList($text, $iconClass)
                     }, 5000);
                 }
 
-                return; // ❌ Stop function, tidak tambah peserta
+                return;
             }
 
-            // ✅ JIKA SLOT CUKUP, TAMBAHKAN PESERTA BARU
             const id = jumlahPesertaSaatIni + 1;
             const div = document.createElement('div');
             div.className = 'peserta-baru';
@@ -2167,17 +1782,12 @@ function createIconList($text, $iconClass)
             document.getElementById('extra-participants').appendChild(div);
             updateJumlah();
 
-            // Hapus warning jika ada
             const existingWarning = document.getElementById('slot-warning');
             if (existingWarning) {
                 existingWarning.remove();
             }
         }
-
-        function updateJumlah() {
-            document.getElementById('jumlah-peserta').value = document.querySelectorAll('.peserta-baru').length + 1;
-        }
     </script>
 </body>
 
-</ht
+</html>
