@@ -192,9 +192,7 @@ $user_role = $user_role ?? 'user';
     }
 
 
-    /* ----------------------------------------------------------- */
     /* --- SUMMARY CARDS (KEMBALI KE GAYA VERTIKAL ASLI) --- */
-    /* ----------------------------------------------------------- */
     .payment-summary {
       max-width: 900px;
       margin: 0 auto 30px auto;
@@ -206,14 +204,11 @@ $user_role = $user_role ?? 'user';
     .summary-item {
       background: #fff;
       border-radius: 16px;
-      /* Radius Asli */
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       padding: 20px 40px;
-      /* Padding Asli */
       text-align: center;
       display: flex;
       flex-direction: column;
-      /* Vertikal */
       align-items: center;
       flex: 1 1 250px;
       transition: all 0.3s ease;
@@ -226,10 +221,8 @@ $user_role = $user_role ?? 'user';
 
     .summary-item i {
       font-size: 2.5rem;
-      /* Icon besar */
       margin-bottom: 10px;
       color: #a97c50;
-      /* Default brown */
       background: none;
       padding: 0;
       border-radius: 0;
@@ -242,14 +235,12 @@ $user_role = $user_role ?? 'user';
       margin-bottom: 5px;
     }
 
-    /* KOREKSI: SUMMARY VALUE ASLI */
     .summary-value {
       font-size: 1.5rem;
       font-weight: 700;
       color: #432f17;
     }
 
-    /* Tambahkan warna spesifik untuk ikon status di summary */
     .summary-item.lunas i {
       color: #28a745 !important;
     }
@@ -259,7 +250,7 @@ $user_role = $user_role ?? 'user';
     }
 
 
-    /* --- CHART & TABLE CONTAINER (KONSISTENSI DENGAN CARD) --- */
+    /* --- CHART & TABLE CONTAINER KONSISTENSI --- */
     .chart-container {
       background: #fff;
       padding: 25px;
@@ -286,7 +277,6 @@ $user_role = $user_role ?? 'user';
     .table-responsive {
       margin-top: 20px;
       border-radius: 15px;
-      /* PENTING: Untuk melengkungkan sudut tabel */
       overflow: hidden;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     }
@@ -317,11 +307,44 @@ $user_role = $user_role ?? 'user';
       color: #432f17;
     }
 
-    /* --- SEARCH INPUT KONSISTENSI --- */
-    .search-container {
-      max-width: 450px;
+    /* --- FILTER/SEARCH KONSISTENSI (REVISI PENJELARAN) --- */
+
+    /* Container untuk Filter dan Search */
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .search-container {
       position: relative;
+      /* REVISI: Batasi lebar agar filter dan search rata */
+      max-width: 350px;
+      min-width: 250px;
+      flex-grow: 1;
+    }
+
+    .filter-select {
+      border-radius: 8px;
+      height: 42px;
+      border: 2px solid #e9ecef;
+      padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+      font-size: 0.95rem;
+      color: #495057;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      width: 100%;
+      /* Maksimum lebar filter agar menyisakan ruang untuk search */
+      max-width: 200px;
+    }
+
+    .filter-select:focus {
+      border-color: #a97c50;
+      box-shadow: 0 0 0 0.2rem rgba(169, 124, 80, 0.15);
+      outline: none;
     }
 
     .search-input {
@@ -371,22 +394,17 @@ $user_role = $user_role ?? 'user';
       font-weight: 600;
     }
 
-    /* --- Styling Tombol Detail Khusus --- */
+    /* --- TOMBOL DETAIL KHUSUS --- */
     .btn-detail {
-      /* Mengikuti gaya tombol aksi (Edit/Hapus) di menu Peserta */
       width: 40px;
       height: 40px;
       display: flex;
       justify-content: center;
       align-items: center;
       border-radius: 8px;
-      /* Sudut melengkung */
       border: none;
       padding: 0;
       font-size: 1.2rem;
-      /* Ukuran ikon */
-
-      /* Menggunakan warna utama (Cokelat) */
       background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
       color: white;
       transition: all 0.2s ease-in-out;
@@ -395,10 +413,7 @@ $user_role = $user_role ?? 'user';
     .btn-detail:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(169, 124, 80, 0.4);
-      /* Ganti warna saat hover jika diperlukan */
     }
-
-    /* --- End Tombol Detail Khusus --- */
   </style>
 </head>
 
@@ -449,9 +464,18 @@ $user_role = $user_role ?? 'user';
         </h5>
       </div>
       <div class="card-body p-4">
-        <div class="search-container">
-          <input type="text" id="paymentSearchInput" class="search-input" placeholder="Cari ID Booking, Nama Peserta, atau Status..." />
-          <i class="bi bi-search search-icon"></i>
+
+        <div class="table-controls">
+          <div>
+            <select id="gunungFilter" class="filter-select">
+              <option value="">Semua Gunung (Trip)</option>
+            </select>
+          </div>
+
+          <div class="search-container">
+            <input type="text" id="paymentSearchInput" class="search-input" placeholder="Cari ID Booking, Status, atau Nama Peserta..." />
+            <i class="bi bi-search search-icon"></i>
+          </div>
         </div>
 
         <div class="table-responsive">
@@ -460,11 +484,11 @@ $user_role = $user_role ?? 'user';
               <tr>
                 <th>ID Payment</th>
                 <th>ID Booking</th>
+                <th>Gunung (Trip)</th>
                 <th>Jumlah Bayar</th>
                 <th>Tanggal</th>
                 <th>Jenis Pembayaran</th>
                 <th>Metode</th>
-                <th>Sisa Bayar</th>
                 <th>Status Pembayaran</th>
                 <th>Aksi</th>
               </tr>
@@ -520,10 +544,7 @@ $user_role = $user_role ?? 'user';
                 <div class="fw-bold text-brown" style="font-size:1.1rem;" id="jumlah_total">Rp 0</div>
               </div>
             </div>
-            <div class="d-flex justify-content-between">
-              <div class="text-muted" style="font-size:0.99rem;"><i class="bi bi-coin me-1"></i> Sisa Pembayaran</div>
-              <div class="fw-bold text-danger" id="detail_sisabayar">Rp 0</div>
-            </div>
+
             <div class="d-flex justify-content-between mt-2">
               <div class="text-muted" style="font-size:0.99rem;"><i class="bi bi-info-circle me-1"></i> Status Verifikasi</div>
               <span class="fw-bold" id="detail_statuspembayaran">-</span>
@@ -541,64 +562,136 @@ $user_role = $user_role ?? 'user';
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+    let allPayments = []; // Variabel global untuk menyimpan semua data pembayaran
+
     async function loadPayments() {
-      // Menggunakan data dummy untuk demonstrasi (Hapus ini jika API sudah siap)
+      // Data dummy dengan ID Gunung
       const payments = [{
           idpayment: 'P001',
           idbooking: 'B001',
+          gunung: 'Gunung Rinjani',
           jumlahbayar: 500000,
           tanggal: '2025-10-25',
           jenispembayaran: 'DP',
           metode: 'Transfer BCA',
-          sisabayar: 1500000,
-          statuspembayaran: 'Menunggu'
+          statuspembayaran: 'Menunggu',
+          total_trip: 2000000
         },
         {
           idpayment: 'P002',
           idbooking: 'B002',
+          gunung: 'Gunung Semeru',
           jumlahbayar: 2000000,
           tanggal: '2025-10-20',
           jenispembayaran: 'Full',
           metode: 'Transfer Mandiri',
-          sisabayar: 0,
-          statuspembayaran: 'Selesai'
+          statuspembayaran: 'Selesai',
+          total_trip: 2000000
         },
         {
           idpayment: 'P003',
           idbooking: 'B001',
+          gunung: 'Gunung Rinjani',
           jumlahbayar: 1000000,
           tanggal: '2025-10-27',
           jenispembayaran: 'Cicilan',
           metode: 'Cash',
-          sisabayar: 500000,
-          statuspembayaran: 'Selesai'
+          statuspembayaran: 'Selesai',
+          total_trip: 2000000
         },
         {
           idpayment: 'P004',
           idbooking: 'B003',
+          gunung: 'Gunung Prau',
           jumlahbayar: 1500000,
           tanggal: '2025-09-10',
           jenispembayaran: 'Full',
           metode: 'Transfer BCA',
-          sisabayar: 0,
-          statuspembayaran: 'Selesai'
+          statuspembayaran: 'Selesai',
+          total_trip: 1500000
+        },
+        {
+          idpayment: 'P005',
+          idbooking: 'B004',
+          gunung: 'Gunung Semeru',
+          jumlahbayar: 500000,
+          tanggal: '2025-10-01',
+          jenispembayaran: 'DP',
+          metode: 'Transfer BNI',
+          statuspembayaran: 'Menunggu',
+          total_trip: 1500000
         },
       ];
 
+      payments.forEach(p => {
+        p.sisabayar = p.total_trip - p.jumlahbayar;
+        if (p.sisabayar < 0) p.sisabayar = 0;
+      });
+
+      allPayments = payments;
+
+      populateGunungFilter(payments);
       renderPayments(payments);
       updateSummary(payments);
       updateChart(payments);
+      setupFilterListeners();
+    }
+
+    function populateGunungFilter(payments) {
+      const select = document.getElementById('gunungFilter');
+      const uniqueGunungs = [...new Set(payments.map(p => p.gunung))].sort();
+
+      select.innerHTML = '<option value="">Semua Gunung (Trip)</option>';
+
+      uniqueGunungs.forEach(gunung => {
+        const option = document.createElement('option');
+        option.value = gunung;
+        option.textContent = gunung;
+        select.appendChild(option);
+      });
+    }
+
+    function setupFilterListeners() {
+      const searchInput = document.getElementById('paymentSearchInput');
+      const gunungFilter = document.getElementById('gunungFilter');
+
+      const applyFilters = () => {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const selectedGunung = gunungFilter.value;
+
+        let filtered = allPayments.filter(p => {
+          const matchGunung = selectedGunung === '' || p.gunung === selectedGunung;
+
+          const searchFields = [
+            p.idpayment, p.idbooking, p.statuspembayaran, p.gunung
+          ];
+          const matchSearch = searchTerm === '' || searchFields.some(field =>
+            (field || '').toString().toLowerCase().includes(searchTerm)
+          );
+
+          return matchGunung && matchSearch;
+        });
+
+        renderPayments(filtered);
+      };
+
+      searchInput.addEventListener('input', applyFilters);
+      gunungFilter.addEventListener('change', applyFilters);
     }
 
     function renderPayments(payments) {
       const tbody = document.getElementById('paymentList');
       tbody.innerHTML = '';
+
+      if (payments.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center opacity-50 p-4">Tidak ada data pembayaran yang cocok dengan filter.</td></tr>`;
+        return;
+      }
+
       payments.forEach((p, index) => {
         const tr = document.createElement('tr');
 
         let statusClass = 'bg-secondary';
-        let statusText = p.statuspembayaran;
-
         if (p.statuspembayaran.toLowerCase() === 'selesai' || p.statuspembayaran.toLowerCase() === 'lunas') {
           statusClass = 'bg-success';
         } else if (p.statuspembayaran.toLowerCase() === 'menunggu' || p.statuspembayaran.toLowerCase() === 'proses') {
@@ -607,19 +700,19 @@ $user_role = $user_role ?? 'user';
           statusClass = 'bg-danger';
         }
 
-        const statusBadge = `<span class="badge ${statusClass}">${statusText}</span>`;
+        const statusBadge = `<span class="badge ${statusClass}">${p.statuspembayaran}</span>`;
 
         tr.innerHTML = `
                     <td>${p.idpayment}</td>
                     <td>${p.idbooking}</td>
+                    <td>${p.gunung || '-'}</td>
                     <td>Rp ${p.jumlahbayar.toLocaleString('id-ID')}</td>
                     <td>${p.tanggal}</td>
                     <td>${p.jenispembayaran}</td>
                     <td>${p.metode}</td>
-                    <td>Rp ${p.sisabayar.toLocaleString('id-ID')}</td>
                     <td>${statusBadge}</td>
                     <td>
-                        <button class="btn-detail detail-btn" data-index="${index}">
+                        <button class="btn-detail detail-btn">
                             <i class="bi bi-eye"></i>
                         </button>
                     </td>
@@ -628,9 +721,12 @@ $user_role = $user_role ?? 'user';
       });
 
       document.querySelectorAll('.detail-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const idx = btn.getAttribute('data-index');
-          showPaymentDetail(payments[idx]);
+        btn.addEventListener('click', (e) => {
+          const rowElement = e.target.closest('tr');
+          const paymentId = rowElement.querySelector('td:nth-child(1)').textContent;
+
+          const paymentDetail = allPayments.find(p => p.idpayment === paymentId);
+          if (paymentDetail) showPaymentDetail(paymentDetail);
         });
       });
     }
@@ -719,8 +815,9 @@ $user_role = $user_role ?? 'user';
       document.getElementById('detail_metode').textContent = payment.metode;
       document.getElementById('detail_jumlahbayar').textContent = 'Rp ' + payment.jumlahbayar.toLocaleString('id-ID');
       document.getElementById('subtotal_bayar').textContent = 'Rp ' + payment.jumlahbayar.toLocaleString('id-ID');
-      document.getElementById('jumlah_total').textContent = 'Rp ' + (payment.jumlahbayar + payment.sisabayar).toLocaleString('id-ID');
-      document.getElementById('detail_sisabayar').textContent = 'Rp ' + payment.sisabayar.toLocaleString('id-ID');
+
+      // Menggunakan total_trip yang sudah ada di data dummy
+      document.getElementById('jumlah_total').textContent = 'Rp ' + payment.total_trip.toLocaleString('id-ID');
 
       let statusClass = 'text-secondary';
       if (payment.statuspembayaran.toLowerCase() === 'selesai' || payment.statuspembayaran.toLowerCase() === 'lunas') {
