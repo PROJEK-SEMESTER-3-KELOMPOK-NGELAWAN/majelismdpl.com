@@ -160,12 +160,13 @@ function createIconList($text, $iconClass)
         }
 
         /* ============================================
-           HERO SECTION
-           ============================================ */
+   HERO SECTION - FULL SCREEN
+   ============================================ */
 
         .hero {
             position: relative;
             height: 100vh;
+            /* Full viewport height di desktop */
             width: 100vw;
             margin: 0;
             overflow: hidden;
@@ -298,6 +299,7 @@ function createIconList($text, $iconClass)
         .btn-hero i {
             margin-right: 10px;
         }
+
 
         /* ============================================
            INFO BAR - Enhanced Glass Effect
@@ -670,16 +672,19 @@ function createIconList($text, $iconClass)
             display: none;
             position: fixed;
             inset: 0;
-            z-index: 999;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(25px) brightness(0.92);
-            -webkit-backdrop-filter: blur(25px) brightness(0.92);
+            z-index: 10000;
+            background: rgba(61, 47, 33, 0.45);
+            backdrop-filter: blur(12px) brightness(0.85);
+            -webkit-backdrop-filter: blur(12px) brightness(0.85);
             align-items: center;
             justify-content: center;
-            padding: 110px 20px 40px 20px;
+            padding: 25px 20px;
+            /* Ubah dari 40px → 25px (lebih mepet) */
             animation: modalBackdrop 0.4s ease-out;
             overflow-y: auto;
         }
+
+
 
         #modal-booking.active {
             display: flex;
@@ -689,8 +694,10 @@ function createIconList($text, $iconClass)
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(40px) saturate(200%);
             -webkit-backdrop-filter: blur(40px) saturate(200%);
-            max-width: 780px;
-            width: 100%;
+            max-width: 680px;
+            width: 92%;
+            max-height: 92vh;
+            /* Ubah dari 85vh → 92vh (lebih tinggi) */
             margin: auto;
             border-radius: 28px;
             border: 2px solid rgba(255, 255, 255, 0.6);
@@ -699,15 +706,21 @@ function createIconList($text, $iconClass)
                 inset 0 1px 0 rgba(255, 255, 255, 0.9);
             position: relative;
             animation: modalSlideIn 0.6s cubic-bezier(0.33, 1, 0.68, 1);
-            margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
         }
+
 
         .scroll-area-modal {
             width: 100%;
-            max-height: calc(85vh - 150px);
+            max-height: calc(92vh - 60px);
+            /* Ubah dari calc(85vh - 80px) */
             overflow-y: auto;
             padding: 56px 48px 48px;
+            flex: 1;
         }
+
+
 
         .scroll-area-modal::-webkit-scrollbar {
             width: 8px;
@@ -787,10 +800,42 @@ function createIconList($text, $iconClass)
 
         .booking-form .row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: 1fr 1fr;
+            /* 2 kolom dengan lebar sama */
             gap: 20px;
             margin-bottom: 12px;
         }
+
+        .booking-form .row>div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .booking-form .row label {
+            display: block;
+            font-weight: 700;
+            margin: 0 0 10px;
+            /* Ubah dari 20px 0 10px */
+            font-size: 0.88rem;
+            color: var(--tan-darkest);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .booking-form .row input[type=text],
+        .booking-form .row input[type=email],
+        .booking-form .row input[type=date] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid rgba(208, 178, 140, 0.3);
+            background: rgba(255, 255, 255, 0.65);
+            color: var(--text-dark);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+            font-family: 'Inter', sans-serif;
+        }
+
 
         .booking-form .btn-add,
         .booking-form .btn-rm {
@@ -866,8 +911,8 @@ function createIconList($text, $iconClass)
 
         .booking-modal-box .close-btn {
             position: absolute;
-            top: 24px;
-            right: 24px;
+            top: 20px;
+            right: 20px;
             font-size: 1.3rem;
             background: rgba(208, 178, 140, 0.15);
             width: 44px;
@@ -880,8 +925,10 @@ function createIconList($text, $iconClass)
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10;
+            z-index: 100;
+            /* Di atas konten scroll */
         }
+
 
         .booking-modal-box .close-btn:hover {
             background: rgba(208, 178, 140, 0.25);
@@ -1119,6 +1166,10 @@ function createIconList($text, $iconClass)
                 bottom: 26px;
                 right: 26px;
             }
+
+            #modal-booking .booking-modal-box {
+                max-width: 90%;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1127,7 +1178,37 @@ function createIconList($text, $iconClass)
             }
 
             .hero {
-                height: 92vh;
+                height: 100vh;
+                /* Tetap full screen di mobile */
+                min-height: 100vh;
+                /* Minimum height 100vh */
+                min-height: -webkit-fill-available;
+                /* iOS Safari fix */
+            }
+
+            .hero-content {
+                padding: 0 6%;
+            }
+
+            .hero-text {
+                font-size: clamp(2.2rem, 8vw, 3.5rem);
+                margin-bottom: 24px;
+            }
+
+            .hero-subtitle {
+                font-size: 0.75rem;
+                margin-bottom: 16px;
+            }
+
+            .btn-hero-wrapper {
+                margin-top: 32px;
+                gap: 12px;
+            }
+
+            .btn-hero {
+                padding: 16px 40px;
+                font-size: 0.95rem;
+                border-radius: 14px;
             }
 
             .hero-text {
@@ -1149,6 +1230,80 @@ function createIconList($text, $iconClass)
                 width: 100%;
             }
 
+            /* ========== MODAL BOOKING RESPONSIVE ========== */
+            #modal-booking {
+                padding: 15px 10px;
+                /* Kurangi padding untuk mobile */
+            }
+
+            #modal-booking .booking-modal-box {
+                max-width: 95%;
+                /* Gunakan hampir seluruh lebar layar */
+                width: 95%;
+                max-height: 95vh;
+                /* Maksimalkan tinggi */
+                border-radius: 20px;
+                /* Radius lebih kecil */
+            }
+
+            .scroll-area-modal {
+                padding: 40px 20px 32px;
+                /* Kurangi padding horizontal */
+                max-height: calc(95vh - 40px);
+            }
+
+            .booking-modal-box h3 {
+                font-size: 1.5rem;
+                /* Perkecil judul */
+                margin-bottom: 28px;
+            }
+
+            .booking-form .group-title {
+                font-size: 1.1rem;
+                /* Perkecil section title */
+                margin: 30px 0 20px;
+            }
+
+            .booking-form label {
+                font-size: 0.8rem;
+                /* Perkecil label */
+                margin: 15px 0 8px;
+            }
+
+            .booking-form input[type=text],
+            .booking-form input[type=email],
+            .booking-form input[type=date],
+            .booking-form textarea,
+            .booking-form input[type=file] {
+                padding: 12px 14px;
+                /* Kurangi padding input */
+                font-size: 0.95rem;
+                /* Perkecil font input */
+            }
+
+            /* ========== ROW GRID 1 KOLOM DI MOBILE ========== */
+            .booking-form .row {
+                grid-template-columns: 1fr;
+                /* 1 kolom untuk mobile */
+                gap: 0;
+                /* Hilangkan gap karena sudah ada margin di label */
+            }
+
+            .booking-modal-box .close-btn {
+                top: 15px;
+                right: 15px;
+                width: 38px;
+                height: 38px;
+                font-size: 1.1rem;
+            }
+
+            .btn-main,
+            .btn-cancel {
+                font-size: 0.95rem;
+                padding: 16px;
+            }
+
+            /* ========== WHATSAPP BUTTON ========== */
             .whatsapp-container {
                 bottom: 20px;
                 right: 20px;
@@ -1178,10 +1333,6 @@ function createIconList($text, $iconClass)
             .whatsapp-tooltip {
                 display: none;
             }
-
-            .scroll-area-modal {
-                padding: 40px 24px 32px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -1189,17 +1340,240 @@ function createIconList($text, $iconClass)
                 padding: 0 12px;
             }
 
+            .hero {
+                height: 100vh;
+                min-height: 100vh;
+                min-height: -webkit-fill-available;
+                /* iOS Safari fix */
+            }
+
             .hero-content {
-                padding: 0 4%;
+                padding: 0 5%;
+            }
+
+            .hero-text {
+                font-size: clamp(1.8rem, 7vw, 2.5rem);
+                margin-bottom: 20px;
+                line-height: 1.1;
+            }
+
+            .hero-subtitle {
+                font-size: 0.7rem;
+                letter-spacing: 0.15em;
+                margin-bottom: 14px;
+            }
+
+            .btn-hero-wrapper {
+                margin-top: 28px;
+                gap: 10px;
+            }
+
+            .btn-hero {
+                padding: 14px 32px;
+                font-size: 0.85rem;
+                border-radius: 12px;
+            }
+
+            .btn-hero i {
+                margin-right: 8px;
+                font-size: 0.9rem;
             }
 
             .info-bar {
                 gap: 16px;
                 padding: 24px 16px;
+                grid-template-columns: 1fr;
+                /* 1 kolom untuk mobile kecil */
             }
 
             .content-area {
                 padding: 28px 20px;
+            }
+
+            /* ========== MODAL BOOKING MOBILE KECIL ========== */
+            #modal-booking {
+                padding: 10px 5px;
+            }
+
+            #modal-booking .booking-modal-box {
+                max-width: 98%;
+                width: 98%;
+                max-height: 97vh;
+                border-radius: 16px;
+            }
+
+            .scroll-area-modal {
+                padding: 35px 16px 28px;
+                max-height: calc(97vh - 30px);
+            }
+
+            .booking-modal-box h3 {
+                font-size: 1.3rem;
+                margin-bottom: 24px;
+            }
+
+            .booking-form .group-title {
+                font-size: 1rem;
+                margin: 25px 0 18px;
+                padding-bottom: 12px;
+            }
+
+            .booking-form label {
+                font-size: 0.75rem;
+                margin: 12px 0 6px;
+            }
+
+            .booking-form input[type=text],
+            .booking-form input[type=email],
+            .booking-form input[type=date],
+            .booking-form textarea,
+            .booking-form input[type=file] {
+                padding: 11px 12px;
+                font-size: 0.9rem;
+                border-radius: 10px;
+            }
+
+            .booking-form textarea {
+                min-height: 80px;
+            }
+
+            .booking-modal-box .close-btn {
+                top: 12px;
+                right: 12px;
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
+
+            .btn-main {
+                font-size: 0.9rem;
+                padding: 14px;
+                margin-top: 28px;
+            }
+
+            .btn-cancel {
+                font-size: 0.85rem;
+                padding: 13px;
+            }
+
+            .btn-add,
+            .btn-rm {
+                font-size: 0.85rem;
+            }
+
+            /* ========== LOGIN WARNING MODAL RESPONSIVE ========== */
+            .login-warning-container {
+                max-width: 90%;
+                padding: 40px 28px;
+                border-radius: 20px;
+            }
+
+            .login-warning-icon {
+                width: 72px;
+                height: 72px;
+                margin-bottom: 24px;
+            }
+
+            .login-warning-icon i {
+                font-size: 2.5rem;
+            }
+
+            .login-warning-title {
+                font-size: 1.5rem;
+                margin-bottom: 14px;
+            }
+
+            .login-warning-text {
+                font-size: 0.95rem;
+                margin-bottom: 32px;
+            }
+
+            .login-warning-buttons {
+                flex-direction: column;
+            }
+
+            .btn-warning-login,
+            .btn-warning-cancel {
+                width: 100%;
+                padding: 14px;
+                font-size: 0.9rem;
+            }
+
+            /* ========== WHATSAPP BUTTON ========== */
+            .whatsapp-container {
+                bottom: 16px;
+                right: 16px;
+            }
+
+            .whatsapp-button {
+                width: 54px;
+                height: 54px;
+            }
+
+            .whatsapp-button i {
+                font-size: 28px;
+            }
+        }
+
+
+        /* Mobile Extra Small - 360px */
+        @media (max-width: 360px) {
+            .hero-text {
+                font-size: clamp(1.5rem, 6vw, 2rem);
+            }
+
+            .hero-subtitle {
+                font-size: 0.65rem;
+            }
+
+            .btn-hero {
+                padding: 13px 28px;
+                font-size: 0.8rem;
+            }
+
+            .booking-modal-box h3 {
+                font-size: 1.15rem;
+            }
+
+            .scroll-area-modal {
+                padding: 30px 12px 24px;
+            }
+
+            .booking-form input[type=text],
+            .booking-form input[type=email],
+            .booking-form input[type=date],
+            .booking-form textarea,
+            .booking-form input[type=file] {
+                padding: 10px 11px;
+                font-size: 0.85rem;
+            }
+
+            .btn-main {
+                font-size: 0.85rem;
+                padding: 13px;
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-8px);
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(8px);
             }
         }
     </style>
@@ -1717,7 +2091,93 @@ function createIconList($text, $iconClass)
                 }, 150);
             }
         }
+
+
+        // Ambil slot tersedia dari PHP
+        const slotTersedia = <?= intval($trip['slot']) ?>;
+
+        function addPeserta() {
+            const jumlahPesertaSaatIni = document.querySelectorAll('#extra-participants .peserta-baru').length + 1;
+
+            // ✅ CEK APAKAH SLOT CUKUP
+            if (jumlahPesertaSaatIni >= slotTersedia) {
+                // Tampilkan warning inline di atas tombol "Tambah Peserta"
+                const warningDiv = document.getElementById('slot-warning');
+                if (!warningDiv) {
+                    const warning = document.createElement('div');
+                    warning.id = 'slot-warning';
+                    warning.style.cssText = `
+                background: rgba(255, 71, 87, 0.15);
+                border: 2px solid rgba(255, 71, 87, 0.4);
+                border-radius: 12px;
+                padding: 16px 20px;
+                margin: 20px 0 12px;
+                color: #C92A2A;
+                font-weight: 700;
+                font-size: 0.95rem;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                animation: shake 0.5s ease;
+            `;
+                    warning.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill" style="font-size: 1.4rem; color: #FF4757;"></i>
+                <span>⚠️ Slot tidak cukup! Hanya tersisa <strong>${slotTersedia} slot</strong> untuk trip ini.</span>
+            `;
+
+                    const btnAdd = document.querySelector('.btn-add');
+                    btnAdd.parentNode.insertBefore(warning, btnAdd);
+
+                    // Auto-hide warning setelah 5 detik
+                    setTimeout(() => {
+                        warning.style.transition = 'all 0.3s ease-out';
+                        warning.style.opacity = '0';
+                        warning.style.transform = 'translateY(-10px)';
+                        setTimeout(() => warning.remove(), 300);
+                    }, 5000);
+                }
+
+                return; // ❌ Stop function, tidak tambah peserta
+            }
+
+            // ✅ JIKA SLOT CUKUP, TAMBAHKAN PESERTA BARU
+            const id = jumlahPesertaSaatIni + 1;
+            const div = document.createElement('div');
+            div.className = 'peserta-baru';
+            div.innerHTML = `
+        <div class="group-title">Peserta #${id}</div>
+        <div class="row">
+            <div><label>Nama</label><input type="text" name="nama[]" required /></div>
+            <div><label>Email</label><input type="email" name="email[]" required /></div>
+        </div>
+        <div class="row">
+            <div><label>Tanggal Lahir</label><input type="date" name="tanggal_lahir[]" required /></div>
+            <div><label>Tempat Lahir</label><input type="text" name="tempat_lahir[]" /></div>
+        </div>
+        <label>NIK</label><input type="text" name="nik[]" />
+        <div class="row">
+            <div><label>No. WA</label><input type="text" name="no_wa[]" required /></div>
+            <div><label>No. Darurat</label><input type="text" name="no_wa_darurat[]" /></div>
+        </div>
+        <label>Alamat</label><textarea name="alamat[]" required></textarea>
+        <label>Riwayat Penyakit</label><input type="text" name="riwayat_penyakit[]" />
+        <label>Foto KTP</label><input type="file" name="foto_ktp[]" accept="image/*" />
+        <button class="btn-rm" type="button" onclick="this.parentElement.remove();updateJumlah();">Hapus</button>
+    `;
+            document.getElementById('extra-participants').appendChild(div);
+            updateJumlah();
+
+            // Hapus warning jika ada
+            const existingWarning = document.getElementById('slot-warning');
+            if (existingWarning) {
+                existingWarning.remove();
+            }
+        }
+
+        function updateJumlah() {
+            document.getElementById('jumlah-peserta').value = document.querySelectorAll('.peserta-baru').length + 1;
+        }
     </script>
 </body>
 
-</html>
+</ht

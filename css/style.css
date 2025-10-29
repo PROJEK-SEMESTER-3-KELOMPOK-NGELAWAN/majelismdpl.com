@@ -1579,20 +1579,38 @@ html {
   overflow-y: hidden;
   scroll-behavior: smooth;
   padding: 20px 20px 30px 20px;
-
-  /* Hide scrollbar tapi tetap bisa scroll */
   scrollbar-width: none;
   -ms-overflow-style: none;
-
-  /* Smooth scrolling dengan momentum */
   -webkit-overflow-scrolling: touch;
-
-  /* Snap to cards */
   scroll-snap-type: x mandatory;
+  justify-content: center;
 }
 
 .carousel-track::-webkit-scrollbar {
   display: none;
+}
+
+.carousel-track:has(.destination-card:only-child) {
+  justify-content: center !important;
+}
+
+.carousel-track:has(.destination-card:only-child) ~ .scroll-indicators {
+  display: none !important;
+}
+
+.carousel-track .destination-card:only-child {
+  min-width: 400px !important;
+  max-width: 400px !important;
+}
+
+/* Handle ketika 2-3 cards */
+.carousel-track:has(.destination-card:nth-child(3):last-child) {
+  justify-content: center;
+}
+
+/* Handle ketika 4+ cards - justify left */
+.carousel-track:has(.destination-card:nth-child(4)) {
+  justify-content: flex-start;
 }
 
 /* Loading Container */
@@ -1925,11 +1943,18 @@ html {
   }
 
   .scroll-indicators {
-    display: none; /* Hide on mobile, use swipe */
+    display: none !important;
   }
 
   .carousel-track {
-    padding: 20px 10px 30px 10px;
+    justify-content: flex-start !important;
+    padding: 20px 15px 30px 15px;
+  }
+
+  .carousel-track .destination-card:only-child {
+    min-width: 320px !important;
+    max-width: 320px !important;
+    margin: 0 !important; /* Remove auto margin */
   }
 
   .destination-card {
@@ -1943,6 +1968,14 @@ html {
 }
 
 @media (max-width: 480px) {
+  .carousel-track {
+    padding: 20px 10px 30px 10px;
+  }
+
+  .carousel-track .destination-card:only-child {
+    min-width: 290px !important;
+    max-width: 290px !important;
+  }
   .paket-trip-section {
     padding: 90px 0 120px;
   }
@@ -1957,8 +1990,8 @@ html {
   }
 
   .destination-card {
-    min-width: 280px;
-    max-width: 280px;
+    min-width: 290px !important;
+    max-width: 290px !important;
   }
 
   .card-image-container {
@@ -1967,6 +2000,23 @@ html {
 
   .mountain-wave-divider {
     height: 120px;
+  }
+}
+
+/* Desktop: Single card tetap centered dan lebih besar */
+@media (min-width: 769px) {
+  .carousel-track:has(.destination-card:only-child) {
+    justify-content: center !important;
+  }
+
+  .carousel-track .destination-card:only-child {
+    min-width: 400px !important;
+    max-width: 400px !important;
+  }
+
+  /* Hide scroll buttons untuk single card di desktop */
+  .carousel-track:has(.destination-card:only-child) ~ .scroll-indicators {
+    display: none !important;
   }
 }
 

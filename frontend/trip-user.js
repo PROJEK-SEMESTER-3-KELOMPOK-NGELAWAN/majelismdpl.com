@@ -56,7 +56,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         card.innerHTML = `
           <div class="card-custom">
-            <span class="status-badge ${trip.status === "sold" ? "sold" : "available"}">
+            <span class="status-badge ${
+              trip.status === "sold" ? "sold" : "available"
+            }">
               ${
                 trip.status === "sold"
                   ? '<i class="bi bi-x-circle"></i> Sold'
@@ -64,7 +66,9 @@ document.addEventListener("DOMContentLoaded", function () {
               }
             </span>
             <div class="card-image-container">
-              <img src="${imagePath}" alt="${trip.nama_gunung}" class="card-image">
+              <img src="${imagePath}" alt="${
+          trip.nama_gunung
+        }" class="card-image">
             </div>
             <div class="card-content">
               <div class="card-row-date-duration">
@@ -73,7 +77,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 </span>
                 <span class="card-duration">
                   <i class="bi bi-clock"></i> ${
-                    trip.jenis_trip === "camp" ? trip.durasi || "1 hari" : "1 hari"
+                    trip.jenis_trip === "camp"
+                      ? trip.durasi || "1 hari"
+                      : "1 hari"
                   }
                 </span>
               </div>
@@ -81,13 +87,18 @@ document.addEventListener("DOMContentLoaded", function () {
               <div class="card-type mb-2">
                 <span class="badge trip-type-badge bg-light text-dark">
                   <i class="bi bi-flag-fill"></i>
-                  ${trip.jenis_trip.charAt(0).toUpperCase() + trip.jenis_trip.slice(1)}
+                  ${
+                    trip.jenis_trip.charAt(0).toUpperCase() +
+                    trip.jenis_trip.slice(1)
+                  }
                 </span>
               </div>
               <div class="card-rating mb-2">
                 <i class="bi bi-star-fill text-warning"></i>
                 <span class="rating-number">5</span>
-                <span class="rating-reviews">(${Math.floor(Math.random() * 200) + 549}+ ulasan)</span>
+                <span class="rating-reviews">(${
+                  Math.floor(Math.random() * 200) + 549
+                }+ ulasan)</span>
               </div>
               <div class="card-location mb-2">
                 <i class="bi bi-signpost-2"></i>
@@ -100,14 +111,21 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
         `;
 
-        card.addEventListener("click", function() {
+        card.addEventListener("click", function () {
           window.location.href = `user/trip-detail-user.php?id=${trip.id_trip}`;
         });
 
         carousel.appendChild(card);
       });
 
+      // Setup navigation after cards are loaded
       setupCarouselNavigation();
+
+      // Handle centering dan button visibility
+      handleCarouselLayout();
+
+      // Re-check on window resize
+      window.addEventListener("resize", handleCarouselLayout);
     })
     .catch((err) => {
       const carousel = document.querySelector(
@@ -123,6 +141,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+/**
+ * Setup carousel navigation buttons
+ */
 function setupCarouselNavigation() {
   const prevBtn = document.querySelector(".destination-carousel .prev");
   const nextBtn = document.querySelector(".destination-carousel .next");
@@ -131,28 +152,130 @@ function setupCarouselNavigation() {
   if (prevBtn && nextBtn && track) {
     prevBtn.addEventListener("click", () => {
       track.scrollBy({
-        left: -340,
+        left: -360,
         behavior: "smooth",
       });
     });
 
     nextBtn.addEventListener("click", () => {
       track.scrollBy({
-        left: 340,
+        left: 360,
         behavior: "smooth",
       });
     });
   }
 }
 
-async function autofillForm(){
-  let res = await fetch('backend/user-session-api.php');
+/**
+ * Handle carousel layout untuk centering dan visibility buttons
+ */
+/**
+ * Handle carousel layout untuk centering dan visibility buttons
+ */
+/**
+ * Handle carousel layout untuk centering dan visibility buttons
+ */
+function handleCarouselLayout() {
+  const carouselTrack = document.querySelector(".carousel-track");
+  const scrollIndicators = document.querySelector(".scroll-indicators");
+  const prevBtn = document.querySelector(".scroll-indicator.prev");
+  const nextBtn = document.querySelector(".scroll-indicator.next");
+
+  if (!carouselTrack) return;
+
+  const cards = carouselTrack.querySelectorAll(".destination-card");
+  const cardCount = cards.length;
+
+  // Skip jika tidak ada cards
+  if (cardCount === 0) return;
+
+  const isMobile = window.innerWidth <= 768;
+
+  // ========== MOBILE LAYOUT ==========
+  if (isMobile) {
+    // ALWAYS left-aligned di mobile (untuk swipe)
+    carouselTrack.style.justifyContent = "flex-start";
+
+    // Hide scroll indicators
+    if (scrollIndicators) {
+      scrollIndicators.style.display = "none";
+    }
+
+    // Set card sizes - SAMA untuk single atau multiple
+    cards.forEach((card) => {
+      if (window.innerWidth > 480) {
+        card.style.minWidth = "320px";
+        card.style.maxWidth = "320px";
+      } else {
+        card.style.minWidth = "290px";
+        card.style.maxWidth = "290px";
+      }
+    });
+
+    return; // Exit untuk mobile
+  }
+
+  // ========== DESKTOP LAYOUT ==========
+
+  // Single card - centered dan besar
+  if (cardCount === 1) {
+    carouselTrack.style.justifyContent = "center";
+
+    // Hide scroll indicators
+    if (scrollIndicators) {
+      scrollIndicators.style.display = "none";
+    }
+
+    // Resize single card - lebih besar di desktop
+    const singleCard = cards[0];
+    singleCard.style.minWidth = "400px";
+    singleCard.style.maxWidth = "400px";
+
+    return;
+  }
+
+  // Multiple cards - centering untuk 2-3 cards
+  if (cardCount <= 3) {
+    carouselTrack.style.justifyContent = "center";
+  } else {
+    carouselTrack.style.justifyContent = "flex-start";
+  }
+
+  // Show scroll indicators
+  if (scrollIndicators) {
+    scrollIndicators.style.display = "flex";
+  }
+
+  // Check overflow untuk hide/show buttons
+  const hasOverflow = carouselTrack.scrollWidth > carouselTrack.clientWidth;
+
+  if (!hasOverflow) {
+    if (prevBtn) prevBtn.style.display = "none";
+    if (nextBtn) nextBtn.style.display = "none";
+  } else {
+    if (prevBtn) prevBtn.style.display = "flex";
+    if (nextBtn) nextBtn.style.display = "flex";
+  }
+
+  // Reset card sizes untuk multiple cards
+  cards.forEach((card) => {
+    card.style.minWidth = "350px";
+    card.style.maxWidth = "350px";
+  });
+}
+
+/**
+ * Autofill form dengan data user
+ */
+async function autofillForm() {
+  let res = await fetch("backend/user-session-api.php");
   let json = await res.json();
-  if(json.logged_in && document.querySelector('[name=nama]')){
-    document.querySelector('[name=nama]').value = json.user.nama || '';
-    document.querySelector('[name=email]').value = json.user.email || '';
-    document.querySelector('[name=alamat]').value = json.user.alamat || '';
-    document.querySelector('[name=no_wa]').value = json.user.no_wa || '';
-    document.querySelector('[name=tanggal_lahir]').value = json.user.tanggal_lahir || '';
+  if (json.logged_in && document.querySelector("[name=nama]")) {
+    document.querySelector("[name=nama]").value = json.user.nama || "";
+    document.querySelector("[name=email]").value = json.user.email || "";
+    document.querySelector("[name=alamat]").value = json.user.alamat || "";
+    document.querySelector("[name=no_wa]").value = json.user.no_wa || "";
+    document.querySelector("[name=tanggal_lahir]").value =
+      json.user.tanggal_lahir || "";
   }
 }

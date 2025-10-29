@@ -4,7 +4,7 @@ $isLoggedIn = isset($_SESSION['id_user']) && !empty($_SESSION['id_user']);
 $userName = 'User';
 $photoFileName = 'default.jpg';
 $isCustomPhoto = false;
-$initials = ''; // NEW: Inisial untuk placeholder
+$initials = '';
 
 $navbarPath = '';
 $currentDir = dirname($_SERVER['PHP_SELF']);
@@ -29,19 +29,11 @@ if ($isLoggedIn) {
   }
 }
 
-// Menentukan apakah menggunakan foto kustom (BUKAN default.jpg DAN file-nya ADA)
 $escapedPhotoFileName = htmlspecialchars($photoFileName, ENT_QUOTES, 'UTF-8');
-// Sesuaikan projectDirName jika berbeda
 $projectDirName = '/majelismdpl.com';
 $projectRoot = $_SERVER['DOCUMENT_ROOT'] . $projectDirName;
-
-// Path ABSOLUT ke file untuk cek keberadaan
 $absoluteFilePath = $projectRoot . '/img/profile/' . $escapedPhotoFileName;
-
-// Kondisi Custom Photo: Bukan default.jpg DAN file ADA di server
 $isCustomPhoto = ($photoFileName !== 'default.jpg' && file_exists($absoluteFilePath));
-
-// Path RELATIF FINAL untuk tag <img>
 $photoPathFinal = $navbarPath . 'img/profile/' . $escapedPhotoFileName;
 $cacheBuster = '?' . time();
 ?>
@@ -54,12 +46,6 @@ $cacheBuster = '?' . time();
   <div class="navbar-logo">
     <img src="<?php echo $navbarPath; ?>img/majelis.png" alt="Logo Majelis MDPL" class="logo-img" />
   </div>
-
-  <button class="hamburger" id="hamburgerBtn" aria-label="Toggle Menu" aria-expanded="false" aria-controls="navbarMenu">
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-  </button>
 
   <ul class="navbar-menu" id="navbarMenu" role="menu">
     <li><a href="<?php echo $navbarPath; ?>#home" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
@@ -105,6 +91,12 @@ $cacheBuster = '?' . time();
       </div>
     </div>
   <?php endif; ?>
+
+  <button class="hamburger" id="hamburgerBtn" aria-label="Toggle Menu" aria-expanded="false" aria-controls="navbarMenu">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
 </nav>
 
 <form id="logout-form" method="POST" action="<?php echo $navbarPath; ?>user/logout.php" style="display: none;">
@@ -191,24 +183,17 @@ $cacheBuster = '?' . time();
 
   .profile-initials-nav {
     width: 26px;
-    /* Sama dengan .profile-img-nav */
     height: 26px;
-    /* Sama dengan .profile-img-nav */
     border-radius: 50%;
-    object-fit: cover;
     border: 2px solid rgba(169, 124, 80, 0.4);
     box-shadow: 0 0 8px rgba(169, 124, 80, 0.15);
     transition: all 0.3s ease;
-
-    /* Style visual */
     background-color: #a97c50;
-    /* Warna Coklat Emas */
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.8em;
-    /* Ukuran font inisial */
     font-weight: 700;
   }
 
@@ -268,27 +253,11 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes jellyBounce {
-
-    0%,
-    100% {
-      transform: translateY(0) scaleY(1);
-    }
-
-    30% {
-      transform: translateY(-10px) scaleY(1.08);
-    }
-
-    40% {
-      transform: translateY(-8px) scaleY(0.92);
-    }
-
-    50% {
-      transform: translateY(0) scaleY(1.04);
-    }
-
-    60% {
-      transform: translateY(0) scaleY(0.96);
-    }
+    0%, 100% { transform: translateY(0) scaleY(1); }
+    30% { transform: translateY(-10px) scaleY(1.08); }
+    40% { transform: translateY(-8px) scaleY(0.92); }
+    50% { transform: translateY(0) scaleY(1.04); }
+    60% { transform: translateY(0) scaleY(0.96); }
   }
 
   .navbar-menu li:nth-child(2) a i {
@@ -297,31 +266,12 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes crazyWiggle {
-
-    0%,
-    100% {
-      transform: rotate(0deg) scale(1);
-    }
-
-    15% {
-      transform: rotate(-18deg) scale(1.08);
-    }
-
-    30% {
-      transform: rotate(18deg) scale(0.96);
-    }
-
-    45% {
-      transform: rotate(-14deg) scale(1.04);
-    }
-
-    60% {
-      transform: rotate(14deg) scale(0.98);
-    }
-
-    75% {
-      transform: rotate(-8deg) scale(1.02);
-    }
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    15% { transform: rotate(-18deg) scale(1.08); }
+    30% { transform: rotate(18deg) scale(0.96); }
+    45% { transform: rotate(-14deg) scale(1.04); }
+    60% { transform: rotate(14deg) scale(0.98); }
+    75% { transform: rotate(-8deg) scale(1.02); }
   }
 
   .navbar-menu li:nth-child(3) a i {
@@ -330,27 +280,11 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes heartbeat {
-
-    0%,
-    100% {
-      transform: scale(1);
-    }
-
-    10% {
-      transform: scale(1.18);
-    }
-
-    20% {
-      transform: scale(1);
-    }
-
-    30% {
-      transform: scale(1.14);
-    }
-
-    40% {
-      transform: scale(1);
-    }
+    0%, 100% { transform: scale(1); }
+    10% { transform: scale(1.18); }
+    20% { transform: scale(1); }
+    30% { transform: scale(1.14); }
+    40% { transform: scale(1); }
   }
 
   .navbar-menu li:nth-child(4) a i {
@@ -359,23 +293,10 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes spinScale {
-
-    0%,
-    100% {
-      transform: rotate(0deg) scale(1);
-    }
-
-    25% {
-      transform: rotate(180deg) scale(1.18);
-    }
-
-    50% {
-      transform: rotate(360deg) scale(1);
-    }
-
-    75% {
-      transform: rotate(540deg) scale(1.12);
-    }
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(180deg) scale(1.18); }
+    50% { transform: rotate(360deg) scale(1); }
+    75% { transform: rotate(540deg) scale(1.12); }
   }
 
   .navbar-menu li:nth-child(5) a i {
@@ -384,27 +305,11 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes waveFloat {
-
-    0%,
-    100% {
-      transform: translateY(0) rotate(0deg);
-    }
-
-    20% {
-      transform: translateY(-7px) rotate(-10deg);
-    }
-
-    40% {
-      transform: translateY(-3px) rotate(7deg);
-    }
-
-    60% {
-      transform: translateY(-9px) rotate(-7deg);
-    }
-
-    80% {
-      transform: translateY(-2px) rotate(9deg);
-    }
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    20% { transform: translateY(-7px) rotate(-10deg); }
+    40% { transform: translateY(-3px) rotate(7deg); }
+    60% { transform: translateY(-9px) rotate(-7deg); }
+    80% { transform: translateY(-2px) rotate(9deg); }
   }
 
   .navbar-menu a:hover i {
@@ -414,25 +319,11 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes navbarBounce {
-    0% {
-      transform: scale(1.07) rotate(-8deg) translateY(0);
-    }
-
-    28% {
-      transform: scale(1.28) rotate(-13deg) translateY(-10px);
-    }
-
-    49% {
-      transform: scale(1.24) rotate(-9deg) translateY(2px);
-    }
-
-    70% {
-      transform: scale(1.2) rotate(-11deg) translateY(-3px);
-    }
-
-    100% {
-      transform: scale(1.25) rotate(-13deg) translateY(-5px);
-    }
+    0% { transform: scale(1.07) rotate(-8deg) translateY(0); }
+    28% { transform: scale(1.28) rotate(-13deg) translateY(-10px); }
+    49% { transform: scale(1.24) rotate(-9deg) translateY(2px); }
+    70% { transform: scale(1.2) rotate(-11deg) translateY(-3px); }
+    100% { transform: scale(1.25) rotate(-13deg) translateY(-5px); }
   }
 
   .navbar-menu a.active i {
@@ -454,7 +345,7 @@ $cacheBuster = '?' . time();
     color: #fff;
     background: #b49666;
     text-decoration: none;
-    transition: background 0.18s, color 0.17s;
+    transition: background 0.18s, color 0.17s, transform 0.2s;
     display: inline-block;
     box-shadow: 0 2px 8px rgba(168, 100, 48, 0.06);
     outline: none;
@@ -464,9 +355,10 @@ $cacheBuster = '?' . time();
   .nav-btns .btn:hover {
     background: #8b5e3c;
     color: #fff;
+    transform: translateY(-2px);
   }
 
-  /* ========== USER MENU - LIQUID GLASS MODERN ========== */
+  /* ========== USER MENU ========== */
   .user-menu-container {
     position: relative;
     display: flex;
@@ -479,17 +371,12 @@ $cacheBuster = '?' . time();
     align-items: center;
     gap: 8px;
     padding: 6px 14px;
-
-    /* Liquid Glass Effect */
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.2) 100%);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-
     border: 1.5px solid rgba(169, 124, 80, 0.25);
     border-radius: 50px;
-
     box-shadow: 0 4px 12px rgba(169, 124, 80, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.3);
-
     color: #333;
     font-weight: 600;
     font-size: 0.88em;
@@ -512,17 +399,9 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes shimmerMove {
-    0% {
-      left: -100%;
-    }
-
-    50% {
-      left: 100%;
-    }
-
-    100% {
-      left: 100%;
-    }
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
   }
 
   .user-menu-toggle:hover {
@@ -568,23 +447,18 @@ $cacheBuster = '?' . time();
     box-shadow: 0 0 12px rgba(255, 212, 74, 0.35);
   }
 
-  /* ========== DROPDOWN - LIQUID GLASS ========== */
+  /* ========== DROPDOWN ========== */
   .user-dropdown {
     position: absolute;
     top: calc(100% + 10px);
     right: 0;
     min-width: 230px;
-
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.94) 100%);
     backdrop-filter: blur(25px) saturate(180%);
     -webkit-backdrop-filter: blur(25px) saturate(180%);
-
     border-radius: 14px;
-
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12), 0 0 15px rgba(169, 124, 80, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.5);
-
     border: 1px solid rgba(169, 124, 80, 0.18);
-
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px) scale(0.96);
@@ -688,14 +562,12 @@ $cacheBuster = '?' . time();
     cursor: pointer;
     padding: 0;
     z-index: 1201;
-    margin-right: 15px;
-    /* Spacing dari user menu */
   }
 
   .hamburger-line {
     width: 100%;
     height: 3px;
-    background: linear-gradient(90deg, #000000ff, #000000ff);
+    background: #000000;
     border-radius: 10px;
     transition: all 0.3s ease;
   }
@@ -733,13 +605,8 @@ $cacheBuster = '?' . time();
   }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   .logout-modal-container {
@@ -758,7 +625,6 @@ $cacheBuster = '?' . time();
       transform: translateY(-50px);
       opacity: 0;
     }
-
     to {
       transform: translateY(0);
       opacity: 1;
@@ -836,63 +702,67 @@ $cacheBuster = '?' . time();
     box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
   }
 
-  /* ========== RESPONSIVE - TABLET ========== */
-  @media (max-width: 1200px) and (min-width: 901px) {
-    .navbar {
-      padding: 10px 30px;
-    }
-
-    .navbar-menu {
-      gap: 20px;
-    }
-
-    .navbar-menu a {
-      padding: 7px 16px;
-      font-size: 1rem;
-    }
-
-    .user-menu-toggle {
-      padding: 6px 12px;
-      font-size: 0.86em;
-    }
-
-    .user-name {
-      max-width: 100px;
-    }
-  }
-
-  /* ========== RESPONSIVE - MOBILE MEDIUM ========== */
+  /* ========== RESPONSIVE - MOBILE ========== */
   @media (max-width: 900px) {
     .navbar {
-      padding: 8px 20px;
-      height: 75px;
+      padding: 10px 15px;
+      height: 70px;
     }
 
     .logo-img {
-      height: 42px;
+      height: 40px;
     }
 
-    /* Show hamburger on mobile */
-    .hamburger {
-      display: flex !important;
-      order: 2;
-      /* Hamburger di tengah (setelah logo) */
-      margin-right: 15px;
-      margin-left: auto;
-      /* Push ke kanan sebelum user menu */
-    }
-
-    /* User menu di paling kanan */
-    .user-menu-container {
-      order: 3;
-    }
-
-    /* Logo tetap di kiri */
     .navbar-logo {
       order: 1;
     }
 
-    /* Hide desktop menu */
+    /* Auth buttons di tengah */
+    .nav-btns {
+      order: 2;
+      margin-left: auto;
+      margin-right: 10px;
+      gap: 6px;
+    }
+
+    .nav-btns .btn {
+      padding: 7px 16px;
+      font-size: 0.85em;
+      border-radius: 18px;
+    }
+
+    /* User menu di tengah (untuk logged in) */
+    .user-menu-container {
+      order: 2;
+      margin-left: auto;
+      margin-right: 10px;
+    }
+
+    .user-menu-toggle {
+      padding: 5px 10px;
+      gap: 5px;
+      font-size: 0.78em;
+    }
+
+    .profile-img-nav,
+    .profile-initials-nav {
+      width: 22px;
+      height: 22px;
+      font-size: 0.75em;
+    }
+
+    .user-name {
+      max-width: 70px;
+      font-size: 0.85em;
+    }
+
+    /* Hamburger di paling kanan */
+    .hamburger {
+      display: flex !important;
+      order: 3;
+    }
+
+    /* Navbar menu dropdown */
     .navbar-menu {
       display: none;
       flex-direction: column;
@@ -900,21 +770,24 @@ $cacheBuster = '?' . time();
       backdrop-filter: blur(25px) saturate(180%);
       -webkit-backdrop-filter: blur(25px) saturate(180%);
       position: absolute;
-      top: 65px;
+      top: 70px;
       left: 0;
       width: 100%;
       padding: 15px;
-      gap: 10px;
+      gap: 8px;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
       z-index: 1050;
       border-top: 1px solid rgba(169, 124, 80, 0.2);
-      max-height: calc(100vh - 65px);
+      max-height: calc(100vh - 70px);
       overflow-y: auto;
-      order: 4;
     }
 
     .navbar-menu.show {
       display: flex !important;
+    }
+
+    .navbar-menu li {
+      width: 100%;
     }
 
     .navbar-menu a {
@@ -925,284 +798,76 @@ $cacheBuster = '?' . time();
       border-radius: 12px;
     }
 
-    /* Hide desktop auth buttons */
-    .nav-btns {
-      display: none;
-      flex-direction: column;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
-      backdrop-filter: blur(25px) saturate(180%);
-      -webkit-backdrop-filter: blur(25px) saturate(180%);
-      position: absolute;
-      top: 65px;
-      left: 0;
-      width: 100%;
-      padding: 15px;
-      gap: 10px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-      z-index: 1050;
-      border-top: 1px solid rgba(169, 124, 80, 0.2);
-      order: 4;
-    }
-
-    .nav-btns.show {
-      display: flex !important;
-    }
-
-    .nav-btns .btn {
-      width: 100%;
-      text-align: center;
-      padding: 11px 20px;
-      font-size: 1rem;
-    }
-
-    /* Mobile user menu */
-    .user-menu-toggle {
-      padding: 5px 12px;
-      gap: 6px;
-      font-size: 0.82em;
-    }
-
-    .profile-img-nav {
-      width: 24px;
-      height: 24px;
-    }
-
-    .user-name {
-      max-width: 90px;
-      font-size: 0.9em;
-    }
-
     .user-dropdown {
       min-width: 200px;
-      right: 0;
     }
 
     .dropdown-item {
       padding: 10px 14px;
       font-size: 0.85em;
     }
-
-    .logout-modal-container {
-      padding: 30px 20px;
-      max-width: 90%;
-    }
-
-    .logout-modal-buttons {
-      flex-direction: column;
-    }
-
-    .logout-btn-confirm,
-    .logout-btn-cancel {
-      width: 100%;
-    }
   }
 
-  /* ========== RESPONSIVE - MOBILE SMALL ========== */
   @media (max-width: 600px) {
     .navbar {
-      padding: 8px 15px;
-      height: 77px;
+      padding: 8px 12px;
+      height: 65px;
     }
 
     .logo-img {
-      height: 38px;
+      height: 36px;
     }
 
     .navbar-menu {
-      top: 60px;
-      padding: 12px;
-      gap: 8px;
-    }
-
-    .navbar-menu a {
-      font-size: 0.95rem;
-      padding: 11px 16px;
-    }
-
-    .nav-btns {
-      top: 60px;
-      padding: 12px;
-    }
-
-    .nav-btns .btn {
-      padding: 10px 18px;
-      font-size: 0.95rem;
+      top: 65px;
     }
 
     .hamburger {
       width: 24px;
       height: 17px;
-      margin-right: 12px;
-    }
-
-    .hamburger-line {
-      height: 2.5px;
-    }
-
-    .user-menu-toggle {
-      padding: 4px 10px;
-      gap: 5px;
-      font-size: 0.78em;
-    }
-
-    .profile-img-nav {
-      width: 22px;
-      height: 22px;
-    }
-
-    .user-name {
-      max-width: 75px;
-      font-size: 0.85em;
-    }
-
-    .user-dropdown {
-      min-width: 180px;
-      top: calc(100% + 8px);
-    }
-
-    .dropdown-item {
-      padding: 9px 12px;
-      gap: 9px;
-      font-size: 0.82em;
-    }
-
-    .dropdown-item i {
-      font-size: 0.95em;
-      width: 16px;
-    }
-
-    .logout-modal-container {
-      padding: 25px 18px;
-    }
-
-    .logout-modal-icon {
-      width: 70px;
-      height: 70px;
-    }
-
-    .logout-modal-icon i {
-      font-size: 2.2em;
-    }
-
-    .logout-modal-title {
-      font-size: 1.3em;
-    }
-
-    .logout-modal-text {
-      font-size: 0.92em;
-    }
-
-    .logout-btn-confirm,
-    .logout-btn-cancel {
-      padding: 10px 24px;
-      font-size: 0.95em;
-    }
-  }
-
-  /* ========== RESPONSIVE - EXTRA SMALL MOBILE ========== */
-  @media (max-width: 375px) {
-    .navbar {
-      padding: 6px 12px;
-      height: 56px;
-    }
-
-    .logo-img {
-      height: 35px;
-    }
-
-    .navbar-menu {
-      top: 56px;
-      padding: 10px;
-    }
-
-    .navbar-menu a {
-      font-size: 0.9rem;
-      padding: 10px 14px;
     }
 
     .nav-btns {
-      top: 56px;
-      padding: 10px;
+      margin-right: 8px;
     }
 
-    .hamburger {
-      width: 22px;
-      height: 16px;
-      margin-right: 10px;
+    .nav-btns .btn {
+      padding: 6px 14px;
+      font-size: 0.8em;
+    }
+
+    .user-menu-container {
+      margin-right: 8px;
     }
 
     .user-menu-toggle {
       padding: 4px 8px;
-      gap: 4px;
-      font-size: 0.75em;
+      font-size: 0.72em;
     }
 
-    .profile-img-nav {
+    .profile-img-nav,
+    .profile-initials-nav {
       width: 20px;
       height: 20px;
     }
 
     .user-name {
       max-width: 60px;
-      font-size: 0.8em;
-    }
-
-    .user-dropdown {
-      min-width: 170px;
-    }
-
-    .dropdown-item {
-      padding: 8px 11px;
-      font-size: 0.8em;
     }
   }
 
-  /* ========== RESPONSIVE - LARGE DESKTOP ========== */
-  @media (min-width: 1400px) {
-    .navbar {
-      padding: 10px 60px;
+  @media (max-width: 480px) {
+    .nav-btns .btn {
+      padding: 5px 12px;
+      font-size: 0.75em;
     }
-
-    .navbar-menu {
-      gap: 35px;
-    }
-
-    .navbar-menu a {
-      padding: 8px 22px;
-      font-size: 1.08em;
-    }
-
-    .user-menu-toggle {
-      padding: 7px 16px;
-      font-size: 0.92em;
-    }
-
-    .user-name {
-      max-width: 130px;
-    }
-  }
-
-  /* Smooth scrollbar for mobile menu */
-  .navbar-menu::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  .navbar-menu::-webkit-scrollbar-track {
-    background: rgba(169, 124, 80, 0.05);
-  }
-
-  .navbar-menu::-webkit-scrollbar-thumb {
-    background: rgba(169, 124, 80, 0.3);
-    border-radius: 10px;
   }
 </style>
-
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.getElementById('hamburgerBtn');
     const navbarMenu = document.getElementById('navbarMenu');
-    const navBtns = document.querySelector('.nav-btns');
     const userMenuToggle = document.getElementById('userMenuToggle');
     const userDropdown = document.getElementById('userDropdown');
     const logoutBtn = document.getElementById('logout-btn');
@@ -1211,29 +876,20 @@ $cacheBuster = '?' . time();
     const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
     const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
 
-    // ========== HAMBURGER MENU TOGGLE ==========
+    // Hamburger menu toggle
     if (hamburger) {
       hamburger.addEventListener('click', function(e) {
-        e.stopPropagation(); // Prevent event bubbling
-
-        // Toggle hamburger animation
+        e.stopPropagation();
         this.classList.toggle('active');
-
-        // Toggle navbar menu
+        
         if (navbarMenu) {
           navbarMenu.classList.toggle('show');
         }
 
-        // Toggle auth buttons (for non-logged users)
-        if (navBtns) {
-          navBtns.classList.toggle('show');
-        }
-
-        // Update aria-expanded
         const expanded = this.getAttribute('aria-expanded') === 'true';
         this.setAttribute('aria-expanded', !expanded);
 
-        // IMPORTANT: Close user dropdown if it's open
+        // Close user dropdown if open
         if (userDropdown && userDropdown.classList.contains('show')) {
           userDropdown.classList.remove('show');
           if (userMenuToggle) {
@@ -1244,34 +900,29 @@ $cacheBuster = '?' . time();
       });
     }
 
-    // ========== USER MENU TOGGLE (INDEPENDENT) ==========
+    // User menu toggle
     if (userMenuToggle && userDropdown) {
       userMenuToggle.addEventListener('click', function(e) {
-        e.stopPropagation(); // Prevent event bubbling
-
-        // Toggle user dropdown
+        e.stopPropagation();
         userDropdown.classList.toggle('show');
         this.classList.toggle('active');
-
-        // Update aria-expanded
+        
         const isExpanded = userDropdown.classList.contains('show');
         this.setAttribute('aria-expanded', isExpanded);
 
-        // IMPORTANT: Close hamburger menu if it's open (on mobile)
+        // Close hamburger menu on mobile
         if (window.innerWidth <= 900) {
           if (hamburger && hamburger.classList.contains('active')) {
             hamburger.classList.remove('active');
             if (navbarMenu) navbarMenu.classList.remove('show');
-            if (navBtns) navBtns.classList.remove('show');
             hamburger.setAttribute('aria-expanded', 'false');
           }
         }
       });
     }
 
-    // ========== CLOSE DROPDOWNS WHEN CLICKING OUTSIDE ==========
+    // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
-      // Close user dropdown
       if (userDropdown && userMenuToggle) {
         if (!userDropdown.contains(e.target) && !userMenuToggle.contains(e.target)) {
           userDropdown.classList.remove('show');
@@ -1280,20 +931,16 @@ $cacheBuster = '?' . time();
         }
       }
 
-      // Close hamburger menu
       if (hamburger && navbarMenu) {
-        if (!navbarMenu.contains(e.target) &&
-          !hamburger.contains(e.target) &&
-          (!navBtns || !navBtns.contains(e.target))) {
+        if (!navbarMenu.contains(e.target) && !hamburger.contains(e.target)) {
           hamburger.classList.remove('active');
           navbarMenu.classList.remove('show');
-          if (navBtns) navBtns.classList.remove('show');
           hamburger.setAttribute('aria-expanded', 'false');
         }
       }
     });
 
-    // ========== LOGOUT MODAL ==========
+    // Logout modal
     if (logoutBtn && logoutModal && logoutForm) {
       logoutBtn.addEventListener('click', function(e) {
         e.preventDefault();
@@ -1314,7 +961,6 @@ $cacheBuster = '?' . time();
         });
       }
 
-      // Close modal when clicking overlay
       logoutModal.addEventListener('click', function(e) {
         if (e.target === logoutModal) {
           logoutModal.classList.remove('show');
@@ -1322,7 +968,7 @@ $cacheBuster = '?' . time();
       });
     }
 
-    // ========== CLOSE MENU WHEN CLICKING MENU LINKS (MOBILE) ==========
+    // Close menu when clicking menu links (mobile)
     const menuLinks = document.querySelectorAll('.navbar-menu a');
     menuLinks.forEach(function(link) {
       link.addEventListener('click', function() {
@@ -1332,25 +978,22 @@ $cacheBuster = '?' . time();
             hamburger.setAttribute('aria-expanded', 'false');
           }
           if (navbarMenu) navbarMenu.classList.remove('show');
-          if (navBtns) navBtns.classList.remove('show');
         }
       });
     });
 
-    // ========== HANDLE WINDOW RESIZE ==========
+    // Handle window resize
     window.addEventListener('resize', function() {
       if (window.innerWidth > 900) {
-        // Reset mobile menu states on desktop
         if (hamburger) {
           hamburger.classList.remove('active');
           hamburger.setAttribute('aria-expanded', 'false');
         }
         if (navbarMenu) navbarMenu.classList.remove('show');
-        if (navBtns) navBtns.classList.remove('show');
       }
     });
 
-    // ========== NAVBAR SCROLL EFFECT ==========
+    // Navbar scroll effect
     window.addEventListener('scroll', function() {
       const navbar = document.querySelector('.navbar');
       if (navbar) {

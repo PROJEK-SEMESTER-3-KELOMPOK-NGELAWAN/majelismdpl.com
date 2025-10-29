@@ -1,82 +1,112 @@
 <?php
-// ✅ INCLUDE DATABASE
-require_once '../backend/koneksi.php';
+// ✅ START SESSION
 session_start();
+
+// ✅ Redirect jika belum login
+if (!isset($_SESSION['id_user'])) {
+    header('Location: ../index.php');
+    exit;
+}
 
 // ✅ SET NAVBAR PATH
 $navbarPath = '../';
 
-// ✅ CEK STATUS LOGIN
-if (!isset($_SESSION['id_user']) || empty($_SESSION['id_user'])) {
-    header("Location: ../index.php");
-    exit;
-}
+// ✅ KONEKSI DATABASE
+require_once '../backend/koneksi.php';
 
+// ✅ AMBIL DATA USER YANG LOGIN
 $id_user = $_SESSION['id_user'];
 
-// ✅ QUERY REAL DATA DARI DATABASE
-$stmt = $conn->prepare("
+// ✅ QUERY UNTUK MENGAMBIL SEMUA TRIP USER
+$query = "
     SELECT 
         b.id_booking,
-        b.tanggal_booking,
-        b.total_harga,
+        b.id_trip,
         b.jumlah_orang,
-        b.status as booking_status,
+        b.total_harga,
+        b.tanggal_booking,
+        b.status as status_booking,
         t.nama_gunung,
         t.jenis_trip,
-        p.id_payment,
-        p.status_pembayaran,
-        p.order_id,
-        p.tanggal as payment_date
+        t.tanggal as tanggal_trip,
+        t.durasi,
+        t.via_gunung,
+        t.harga,
+        t.gambar,
+        d.nama_lokasi,
+        d.alamat,
+        d.waktu_kumpul,
+        d.link_map,
+        d.include,
+        d.exclude,
+        d.syaratKetentuan,
+        p.status_pembayaran
     FROM bookings b
     JOIN paket_trips t ON b.id_trip = t.id_trip
+    LEFT JOIN detail_trips d ON t.id_trip = d.id_trip
     LEFT JOIN payments p ON b.id_booking = p.id_booking
     WHERE b.id_user = ?
     ORDER BY b.tanggal_booking DESC
-");
+";
 
+$stmt = $conn->prepare($query);
 $stmt->bind_param("i", $id_user);
 $stmt->execute();
 $result = $stmt->get_result();
-$booking_list = $result->fetch_all(MYSQLI_ASSOC);
+
+// ✅ SIMPAN DATA KE ARRAY
+$myTrips = [];
+while ($row = $result->fetch_assoc()) {
+    // Determine final status based on booking status and payment status
+    $finalStatus = $row['status_booking'];
+
+    // Jika status_pembayaran = 'paid', override status booking
+    if ($row['status_pembayaran'] === 'paid') {
+        $finalStatus = 'paid';
+    } elseif ($row['status_booking'] === 'confirmed') {
+        $finalStatus = 'paid';
+    } elseif ($row['status_booking'] === 'cancelled') {
+        $finalStatus = 'cancelled';
+    } elseif ($row['status_booking'] === 'finished') {
+        $finalStatus = 'finished';
+    } elseif ($row['status_booking'] === 'pending' && $row['status_pembayaran'] !== 'paid') {
+        $finalStatus = 'pending';
+    }
+
+    // Format gambar path
+    $imagePath = $navbarPath . 'img/default-mountain.jpg';
+    if (!empty($row['gambar'])) {
+        if (strpos($row['gambar'], 'img/') === 0) {
+            $imagePath = $navbarPath . $row['gambar'];
+        } else {
+            $imagePath = $navbarPath . 'img/' . $row['gambar'];
+        }
+    }
+
+    $myTrips[] = [
+        'id_booking' => $row['id_booking'],
+        'id_trip' => $row['id_trip'],
+        'nama_gunung' => $row['nama_gunung'],
+        'jenis_trip' => $row['jenis_trip'],
+        'tanggal_trip' => $row['tanggal_trip'],
+        'durasi' => $row['durasi'] ?? '1 hari',
+        'via_gunung' => $row['via_gunung'] ?? 'Via Utama',
+        'nama_lokasi' => $row['nama_lokasi'] ?? 'Lokasi kumpul belum ditentukan',
+        'alamat' => $row['alamat'] ?? 'Alamat belum ditentukan',
+        'tanggal_booking' => $row['tanggal_booking'],
+        'jumlah_orang' => $row['jumlah_orang'],
+        'total_harga' => $row['total_harga'],
+        'status_booking' => $finalStatus,
+        'gambar' => $imagePath,
+        'include' => $row['include'] ?? 'Informasi akan diupdate',
+        'exclude' => $row['exclude'] ?? 'Informasi akan diupdate',
+        'syaratKetentuan' => $row['syaratKetentuan'] ?? 'Informasi akan diupdate',
+        'waktu_kumpul' => $row['waktu_kumpul'] ?? '00:00:00',
+        'link_map' => $row['link_map'] ?? '#',
+    ];
+}
+
 $stmt->close();
-
-// ✅ FUNGSI HELPER
-function get_status_class_payment($status)
-{
-    switch (strtolower($status)) {
-        case 'pending':
-            return 'status-pending';
-        case 'paid':
-        case 'settlement':
-            return 'status-paid';
-        case 'expire':
-        case 'failed':
-        case 'cancelled':
-            return 'status-cancelled';
-        default:
-            return 'status-default';
-    }
-}
-
-function format_status_text_payment($status)
-{
-    switch (strtolower($status)) {
-        case 'pending':
-            return '<i class="fa-solid fa-hourglass-half"></i> Menunggu Pembayaran';
-        case 'paid':
-        case 'settlement':
-            return '<i class="fa-solid fa-check-circle"></i> Pembayaran Diterima';
-        case 'expire':
-            return '<i class="fa-solid fa-clock-rotate-left"></i> Kadaluarsa';
-        case 'failed':
-            return '<i class="fa-solid fa-times-circle"></i> Gagal';
-        case 'cancelled':
-            return '<i class="fa-solid fa-ban"></i> Dibatalkan';
-        default:
-            return '<i class="fa-solid fa-question-circle"></i> ' . ucwords($status);
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -84,18 +114,15 @@ function format_status_text_payment($status)
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Status Pembayaran Saya | Majelis MDPL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paket Trip Saya - Majelis MDPL</title>
 
-    <!-- ✅ LOAD LIBRARIES -->
+    <!-- ✅ LOAD FONT AWESOME & BOOTSTRAP ICONS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-KFnuwUuiq_i1OUJf"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-        /* ... CSS yang sama seperti sebelumnya ... */
         * {
             margin: 0;
             padding: 0;
@@ -103,17 +130,17 @@ function format_status_text_payment($status)
         }
 
         body {
-            font-family: "Poppins", Arial, sans-serif;
-            background-color: #f4f4f4;
-            overflow-x: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8dcc4 100%);
+            min-height: 100vh;
         }
 
-        .payment-page-container {
+        .page-container {
             padding-top: 100px;
             min-height: 100vh;
         }
 
-        .payment-section {
+        .my-trips-section {
             max-width: 1000px;
             margin: 40px auto;
             padding: 0 20px;
@@ -125,17 +152,15 @@ function format_status_text_payment($status)
         }
 
         .page-title {
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-size: 2.5rem;
             color: #333;
             margin-bottom: 5px;
             font-weight: 700;
-            line-height: 1.2;
         }
 
         .subtitle {
             color: #666;
-            font-size: clamp(0.85rem, 3vw, 1.1rem);
-            padding: 0 10px;
+            font-size: 1.1rem;
         }
 
         .page-title i {
@@ -143,151 +168,120 @@ function format_status_text_payment($status)
             margin-right: 10px;
         }
 
-        .status-list-grid {
+        .trips-list {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
         }
 
-        .status-card {
+        .list-trip-card {
+            display: flex;
             background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
+            border-radius: 12px;
             overflow: hidden;
-            display: grid;
-            grid-template-columns: 1fr 200px;
-            align-items: stretch;
-            border: 1px solid #e0e0e0;
-        }
-
-        .status-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
-        }
-
-        .card-main-info {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .trip-title {
-            font-size: clamp(1.2rem, 4vw, 1.6rem);
-            font-weight: 700;
-            color: #222;
-            margin-bottom: 5px;
-            line-height: 1.3;
-        }
-
-        .trip-order-id {
-            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-            color: #a97c50;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .detail-group {
-            border-top: 1px dashed #eee;
-            padding-top: 15px;
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-        }
-
-        .detail-item {
-            flex-basis: 50%;
-        }
-
-        .detail-label {
-            font-size: clamp(0.75rem, 2vw, 0.9rem);
-            color: #777;
-            margin-bottom: 3px;
-            display: flex;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #eee;
             align-items: center;
-            gap: 5px;
         }
 
-        .detail-value {
-            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+        .list-trip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-image-box {
+            width: 250px;
+            min-width: 200px;
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 10px;
+        }
+
+        .trip-type-badge {
+            background: rgba(169, 124, 80, 0.9);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 5px;
             font-weight: 600;
+            font-size: 0.85em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-info {
+            flex-grow: 1;
+            padding: 15px 25px;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8em;
+            color: #fff;
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background-color: #ffc107;
             color: #333;
         }
 
-        .price-value {
-            font-size: clamp(1.1rem, 3vw, 1.4rem);
-            font-weight: 700;
-            color: #a97c50;
+        .status-paid {
+            background-color: #28a745;
         }
 
-        .card-status-action {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 15px;
-            border-left: 1px solid #f0f0f0;
-            background: #fcfcfc;
+        .status-cancelled {
+            background-color: #dc3545;
         }
 
-        .status-badge-container {
-            text-align: center;
-            padding: 10px;
-            border-radius: 10px;
-            width: 100%;
+        .status-finished {
+            background-color: #6c757d;
+        }
+
+        .card-info h3 {
+            font-size: 1.4rem;
+            color: #222;
             margin-bottom: 15px;
         }
 
-        .status-icon-big {
-            font-size: clamp(2rem, 5vw, 2.5rem);
-            margin-bottom: 5px;
-            display: block;
+        .trip-meta {
+            font-size: 0.95em;
+            color: #555;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
         }
 
-        .status-text-small {
-            font-size: clamp(0.7rem, 2vw, 0.9rem);
-            font-weight: 600;
-            text-transform: uppercase;
-            display: block;
+        .trip-meta i {
+            color: #a97c50;
+            width: 20px;
+            text-align: center;
         }
 
-        .status-pending .status-icon-big {
-            color: #ffc107;
-        }
-
-        .status-pending .status-text-small {
-            color: #e65100;
-        }
-
-        .status-paid .status-icon-big {
-            color: #28a745;
-        }
-
-        .status-paid .status-text-small {
-            color: #2e7d32;
-        }
-
-        .status-cancelled .status-icon-big {
-            color: #dc3545;
-        }
-
-        .status-cancelled .status-text-small {
-            color: #c62828;
-        }
-
-        .action-group {
+        .card-actions-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            width: 100%;
+            padding: 15px;
+            min-width: 180px;
+            border-left: 1px solid #f0f0f0;
         }
 
-        .btn-action {
-            padding: 10px 12px;
+        .btn {
+            padding: 10px 15px;
             border-radius: 8px;
-            font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+            font-size: 0.95em;
             font-weight: 600;
             text-decoration: none;
             text-align: center;
@@ -297,177 +291,533 @@ function format_status_text_payment($status)
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
         }
 
-        .btn-continue {
-            background: #a97c50;
-            color: #fff;
-            box-shadow: 0 3px 10px rgba(169, 124, 80, 0.4);
-        }
-
-        .btn-continue:hover {
-            background: #8b5e3c;
-        }
-
-        .btn-detail {
+        .btn-detail-list {
             background: #4a4a4a;
             color: #fff;
         }
 
-        .btn-detail:hover {
+        .btn-detail-list:hover {
             background: #333;
         }
 
-        .btn-action:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            color: #777;
+        .btn-payment-list {
+            background: #a97c50;
+            color: #fff;
         }
 
-        .empty-state {
+        .btn-payment-list:hover {
+            background: #8b5e3c;
+        }
+
+        /* ========== MODAL STYLING - EXTRA LARGE ========== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 30px;
+            /* ✅ PERBESAR PADDING */
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+            border-radius: 25px;
+            max-width: 1100px;
+            /* ✅ EXTRA LARGE dari 900px */
+            width: 95%;
+            /* ✅ PERBESAR */
+            position: relative;
+            transform: scale(0.9) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 92vh;
+            /* ✅ PERBESAR */
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.show .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Modal Header */
+        .modal-header {
+            background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
+            padding: 40px 50px;
+            /* ✅ EXTRA LARGE */
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: #fff;
+            position: relative;
+        }
+
+        .modal-header i {
+            font-size: 2.8em;
+            /* ✅ EXTRA LARGE */
+            color: #ffd44a;
+        }
+
+        .modal-header h2 {
+            font-size: 2.2rem;
+            /* ✅ EXTRA LARGE */
+            margin: 0;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        /* Modal Close Button */
+        .modal-close-btn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            width: 52px;
+            /* ✅ EXTRA LARGE */
+            height: 52px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            /* ✅ EXTRA LARGE */
+            color: #fff;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(220, 53, 69, 0.95);
+            border-color: #dc3545;
+            transform: rotate(90deg) scale(1.15);
+        }
+
+        /* Modal Content */
+        .modal-content {
+            padding: 50px;
+            /* ✅ EXTRA LARGE */
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 12px;
+            /* ✅ PERBESAR */
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #a97c50;
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #8b5e3c;
+        }
+
+        /* Info Group */
+        .info-group {
+            background: #fff;
+            border: 2px solid #e8e8e8;
+            /* ✅ PERBESAR BORDER */
+            border-radius: 18px;
+            /* ✅ PERBESAR */
+            margin-bottom: 30px;
+            /* ✅ PERBESAR */
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .info-group:hover {
+            box-shadow: 0 6px 25px rgba(169, 124, 80, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .info-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Info Header */
+        .info-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f1f2 100%);
+            padding: 22px 30px;
+            /* ✅ EXTRA LARGE */
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            border-bottom: 4px solid #a97c50;
+            /* ✅ PERBESAR */
+        }
+
+        .info-header i {
+            font-size: 2em;
+            /* ✅ EXTRA LARGE */
+            color: #a97c50;
+        }
+
+        .info-header h3 {
+            font-size: 1.5rem;
+            /* ✅ EXTRA LARGE */
+            color: #333;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        /* Info Body */
+        .info-body {
+            padding: 30px;
+            /* ✅ EXTRA LARGE */
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 15px 0;
+            /* ✅ PERBESAR */
+            border-bottom: 1px dashed #e0e0e0;
+            gap: 25px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 1.15em;
+            /* ✅ EXTRA LARGE */
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #222;
+            font-weight: 500;
+            text-align: right;
+            font-size: 1.15em;
+            /* ✅ EXTRA LARGE */
+            line-height: 1.5;
+        }
+
+        .info-body p {
+            font-size: 1.15em;
+            /* ✅ EXTRA LARGE */
+            color: #555;
+            line-height: 1.9;
+            margin: 0;
+        }
+
+        /* Button Map */
+        .btn-map {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #333 0%, #000 100%);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 30px;
+            /* ✅ EXTRA LARGE */
+            border-radius: 12px;
+            font-size: 1.15em;
+            /* ✅ EXTRA LARGE */
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-map:hover {
+            background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(169, 124, 80, 0.4);
+        }
+
+        .btn-map i {
+            font-size: 1.3em;
+        }
+
+        /* Empty State */
+        .no-trips {
             text-align: center;
             padding: 60px 20px;
             background: #f8f8f8;
             border: 2px dashed #ddd;
             border-radius: 15px;
+            margin-top: 20px;
         }
 
-        .empty-icon {
-            font-size: clamp(2rem, 8vw, 3rem);
+        .no-trips i {
+            font-size: 3em;
             color: #ccc;
             margin-bottom: 15px;
         }
 
-        /* ✅ PAYMENT MODAL STYLING */
-        .payment-modal-overlay {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            inset: 0;
-            background: rgba(20, 15, 12, 0.88);
+        .explore-btn {
+            margin-top: 20px;
+            display: inline-block;
+            background: #a97c50;
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+        }
+
+        .explore-btn:hover {
+            background: #8b5e3c;
+        }
+
+        .swal2-popup {
+            font-size: clamp(0.85rem, 2vw, 1rem) !important;
+            padding: clamp(15px, 3vw, 25px) !important;
+            max-width: 1100px !important;
+            width: 95% !important;
+            border-radius: 20px !important;
+        }
+
+        .swal2-title {
+            color: #a97c50 !important;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px !important;
+            margin-bottom: 15px !important;
+            font-size: clamp(1.1rem, 4vw, 1.5rem) !important;
+        }
+
+        .swal2-html-container {
+            max-height: 70vh !important;
+            overflow-y: auto !important;
+            margin: 0 !important;
+        }
+
+        /* Info Box Group - SAMA SEPERTI PAYMENT-STATUS.PHP */
+        .info-box-group {
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: clamp(12px, 2.5vw, 15px);
+            background: #fcfcfc;
+        }
+
+        .info-box-group h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box-group h4 i {
+            color: #a97c50;
+        }
+
+        .info-row-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .info-row-detail strong {
+            color: #222;
+        }
+
+        .info-row-detail span {
+            color: #555;
+        }
+
+        .total-price-detail {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: #a97c50;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .btn-map-detail {
+            margin-top: 15px;
+            background: #333;
+            color: #fff;
+            padding: clamp(8px, 2vw, 10px) clamp(15px, 3vw, 20px);
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 15px;
-        }
-
-        .payment-modal-overlay.active {
-            display: flex;
-        }
-
-        .payment-modal-content {
-            background: #fff;
-            padding: 30px 20px;
-            max-width: 430px;
-            width: 100%;
-            border-radius: 17px;
-            box-shadow: 0 5px 65px rgba(0, 0, 0, 0.6);
-            text-align: center;
-        }
-
-        .payment-modal-text {
-            font-size: clamp(0.9rem, 3vw, 1rem);
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .payment-modal-btn {
-            margin-top: 15px;
-            background: #eee;
-            border: 1px solid #ccc;
-            padding: 10px 18px;
-            border-radius: 5px;
+            gap: 8px;
             cursor: pointer;
-            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            border: none;
             font-weight: 600;
-            transition: all 0.2s ease;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            transition: all 0.3s ease;
         }
 
-        .payment-modal-btn:hover {
-            background: #ddd;
+        .btn-map-detail:hover {
+            background: #000;
         }
 
-        /* ✅ RESPONSIVE BREAKPOINTS */
+
+        /* ========== RESPONSIVE - MOBILE ========== */
         @media (max-width: 768px) {
-            .payment-page-container {
-                padding-top: 90px;
+            .list-trip-card {
+                flex-direction: column;
+                align-items: stretch;
             }
 
-            .status-card {
-                grid-template-columns: 1fr;
+            .card-image-box {
+                width: 100%;
+                height: 150px;
+                min-width: 100%;
             }
 
-            .card-status-action {
-                border-left: none;
-                border-top: 1px solid #f0f0f0;
-                flex-direction: row;
-                gap: 12px;
+            .card-info {
                 padding: 15px;
             }
 
-            .status-badge-container {
-                width: 32%;
-                margin-bottom: 0;
-            }
-
-            .action-group {
-                width: 68%;
+            .card-actions-list {
                 flex-direction: row;
-                gap: 6px;
+                border-left: none;
+                border-top: 1px solid #f0f0f0;
+                padding: 15px;
+                min-width: auto;
             }
 
-            .btn-action {
+            .btn-detail-list,
+            .btn-payment-list {
                 flex: 1;
-                font-size: 0.85rem;
-                padding: 10px 8px;
             }
 
-            .detail-group {
+            /* Modal Responsive */
+            .modal-overlay {
+                padding: 15px;
+            }
+
+            .modal-container {
+                max-width: 100%;
+                width: 95%;
+                max-height: 93vh;
+                border-radius: 18px;
+            }
+
+            .modal-header {
+                padding: 28px 22px;
+            }
+
+            .modal-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .modal-header i {
+                font-size: 2em;
+            }
+
+            .modal-close-btn {
+                top: 22px;
+                right: 22px;
+                width: 44px;
+                height: 44px;
+                font-size: 1.5rem;
+            }
+
+            .modal-content {
+                padding: 28px 22px;
+            }
+
+            .info-header {
+                padding: 18px 20px;
+            }
+
+            .info-header h3 {
+                font-size: 1.2rem;
+            }
+
+            .info-header i {
+                font-size: 1.6em;
+            }
+
+            .info-body {
+                padding: 22px;
+            }
+
+            .info-row {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
+                padding: 12px 0;
+            }
+
+            .info-value {
+                text-align: left;
+            }
+
+            .info-label,
+            .info-value {
+                font-size: 1em;
+            }
+
+            .info-body p {
+                font-size: 1em;
+            }
+
+            .btn-map {
+                padding: 12px 24px;
+                font-size: 1em;
             }
         }
 
         @media (max-width: 480px) {
-            .payment-page-container {
-                padding-top: 85px;
+            .modal-header {
+                padding: 22px 18px;
             }
 
-            .payment-section {
-                margin: 25px auto;
-                padding: 0 12px;
+            .modal-header h2 {
+                font-size: 1.3rem;
             }
 
-            .status-card {
-                border-radius: 12px;
+            .modal-content {
+                padding: 22px 18px;
             }
 
-            .card-main-info {
-                padding: 16px;
+            .info-header {
+                padding: 15px 18px;
             }
 
-            .card-status-action {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .status-badge-container {
-                width: 100%;
-                margin-bottom: 8px;
-            }
-
-            .action-group {
-                width: 100%;
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .btn-action {
-                width: 100%;
-                padding: 11px 10px;
+            .info-body {
+                padding: 18px;
             }
         }
     </style>
+
 </head>
 
 <body>
@@ -477,337 +827,156 @@ function format_status_text_payment($status)
     <!-- ✅ INCLUDE AUTH MODALS -->
     <?php include '../auth-modals.php'; ?>
 
-    <div class="payment-page-container">
-        <main class="payment-section">
+    <div class="page-container">
+        <main class="my-trips-section">
             <div class="header-content">
                 <h1 class="page-title">
-                    <i class="fa-solid fa-credit-card"></i> Status Pembayaran Saya
+                    <i class="fa-solid fa-mountain-sun"></i> Paket Trip Saya
                 </h1>
-                <p class="subtitle">Lacak riwayat transaksi Anda untuk setiap pemesanan trip.</p>
+                <p class="subtitle">Daftar reservasi dan info penting untuk pendakian Anda.</p>
             </div>
 
-            <section class="status-list-section">
-                <?php if (empty($booking_list)) : ?>
-                    <div class="empty-state">
-                        <i class="fa-solid fa-exclamation-circle empty-icon"></i>
-                        <h2>Belum Ada Transaksi</h2>
-                        <p>Anda belum memiliki riwayat pemesanan yang perlu dilacak.</p>
-                        <a href="<?= $navbarPath; ?>#paketTrips" class="btn-continue">
-                            <i class="fa-solid fa-compass"></i> Jelajahi Trip
-                        </a>
+            <div class="trips-list">
+                <?php if (empty($myTrips)): ?>
+                    <div class="no-trips">
+                        <i class="fa-solid fa-box-open"></i>
+                        <h2>Oops! Belum Ada Trip</h2>
+                        <p>Anda belum memesan paket trip apapun. Yuk, jelajahi penawaran kami!</p>
+                        <a href="<?php echo $navbarPath; ?>#paketTrips" class="btn explore-btn">Lihat Paket Trip</a>
                     </div>
-                <?php else : ?>
-                    <div class="status-list-grid">
-                        <?php foreach ($booking_list as $booking) :
-                            $status = strtolower($booking['status_pembayaran'] ?? 'pending');
-                            $status_class = get_status_class_payment($status);
-                            $status_text_full = format_status_text_payment($status);
-                            $status_text_clean = strip_tags($status_text_full);
+                <?php else: ?>
+                    <?php foreach ($myTrips as $trip): ?>
+                        <div class="list-trip-card" data-status="<?php echo strtolower($trip['status_booking']); ?>">
+                            <div class="card-image-box" style="background-image: url('<?php echo htmlspecialchars($trip['gambar']); ?>');">
+                                <span class="trip-type-badge"><?php echo htmlspecialchars(ucfirst($trip['jenis_trip'])); ?></span>
+                            </div>
+                            <div class="card-info">
+                                <span class="status-badge status-<?php echo strtolower($trip['status_booking']); ?>">
+                                    <?php
+                                    $status = strtolower($trip['status_booking']);
+                                    if ($status === 'pending') echo '<i class="fa-solid fa-hourglass-half"></i> Menunggu Pembayaran';
+                                    else if ($status === 'paid') echo '<i class="fa-solid fa-check-circle"></i> Pembayaran Selesai';
+                                    else if ($status === 'cancelled') echo '<i class="fa-solid fa-times-circle"></i> Dibatalkan';
+                                    else if ($status === 'finished') echo '<i class="fa-solid fa-flag-checkered"></i> Selesai';
+                                    else echo ucwords($trip['status_booking']);
+                                    ?>
+                                </span>
 
-                            $icon_match = [];
-                            preg_match('/<i class="[^"]+"><\/i>/', $status_text_full, $icon_match);
-                            $icon_html = $icon_match[0] ?? '<i class="fa-solid fa-question-circle"></i>';
+                                <h3><?php echo htmlspecialchars($trip['nama_gunung']); ?> (Via <?php echo htmlspecialchars($trip['via_gunung']); ?>)</h3>
 
-                            $formatted_date = date("d M Y", strtotime($booking['tanggal_booking']));
-                            $formatted_price = "Rp " . number_format($booking['total_harga'], 0, ',', '.');
-                        ?>
-                            <div class="status-card">
-                                <div class="card-main-info">
-                                    <h3 class="trip-title">
-                                        <i class="fa-solid fa-mountain-sun" style="color: #a97c50;"></i>
-                                        <?= htmlspecialchars($booking['nama_gunung']); ?>
-                                    </h3>
-                                    <p class="trip-order-id">
-                                        Booking ID: #<?= $booking['id_booking']; ?>
-                                    </p>
-
-                                    <div class="detail-group">
-                                        <div class="detail-item">
-                                            <p class="detail-label"><i class="fa-solid fa-calendar-alt"></i> Tanggal Pesan</p>
-                                            <p class="detail-value"><?= $formatted_date; ?></p>
-                                        </div>
-                                        <div class="detail-item">
-                                            <p class="detail-label"><i class="fa-solid fa-tag"></i> Total Tagihan</p>
-                                            <p class="detail-value price-value"><?= $formatted_price; ?></p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="card-status-action">
-                                    <div class="status-badge-container <?= $status_class; ?>">
-                                        <span class="status-icon-big"><?= $icon_html; ?></span>
-                                        <span class="status-text-small"><?= $status_text_clean; ?></span>
-                                    </div>
-
-                                    <div class="action-group">
-                                        <button class="btn-action btn-detail" type="button" onclick="showDetail(<?= $booking['id_booking']; ?>)">
-                                            <i class="fa-solid fa-search"></i> Detail
-                                        </button>
-                                        <?php if ($status === 'pending' && !empty($booking['order_id'])) : ?>
-                                            <button class="btn-action btn-continue" type="button" onclick="lanjutkanPembayaran(<?= $booking['id_booking']; ?>)">
-                                                <i class="fa-solid fa-credit-card"></i> Bayar
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
+                                <div class="trip-meta">
+                                    <p><i class="fa-solid fa-calendar-alt"></i> Trip: <strong><?php echo date('d M Y', strtotime($trip['tanggal_trip'])); ?></strong> (<?php echo htmlspecialchars($trip['durasi']); ?>)</p>
+                                    <p><i class="fa-solid fa-users"></i> Peserta: <strong><?php echo htmlspecialchars($trip['jumlah_orang']); ?> Orang</strong></p>
+                                    <p><i class="fa-solid fa-tag"></i> Total: <strong>Rp <?php echo number_format($trip['total_harga'], 0, ',', '.'); ?></strong></p>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
-                    </div>
+                            <div class="card-actions-list">
+                                <button class="btn btn-detail-list" onclick='openDetailModal(<?php echo htmlspecialchars(json_encode($trip), ENT_QUOTES, 'UTF-8'); ?>)' title="Lihat Detail & Perlengkapan">
+                                    <i class="fa-solid fa-eye"></i> Detail Trip
+                                </button>
+                                <?php if (strtolower($trip['status_booking']) == 'pending'): ?>
+                                    <a href="<?php echo $navbarPath; ?>user/payment-status.php?booking_id=<?php echo $trip['id_booking']; ?>" class="btn btn-payment-list" title="Lanjutkan Proses Pembayaran">
+                                        <i class="fa-solid fa-money-bill-wave"></i> Bayar
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 <?php endif; ?>
-            </section>
+            </div>
         </main>
     </div>
 
-    <!-- ✅ PAYMENT MODAL -->
-    <div id="modal-payment-midtrans" class="payment-modal-overlay">
-        <div class="payment-modal-content">
-            <p id="midtrans-status-message" class="payment-modal-text">Menyiapkan pembayaran...</p>
-            <button onclick="closePaymentModal()" class="payment-modal-btn">Tutup</button>
-        </div>
-    </div>
+    <!-- Detail Modal -->
+    <!-- diload menggunakan js dibawah -->
+
 
     <!-- ✅ LOAD JAVASCRIPT FILES -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../frontend/registrasi.js"></script>
     <script src="../frontend/login.js"></script>
 
     <script>
-        // ✅ FUNGSI LANJUTKAN PEMBAYARAN (REAL INTEGRATION)
-        function lanjutkanPembayaran(bookingId) {
-            const modal = document.getElementById('modal-payment-midtrans');
-            modal.classList.add('active');
-            document.getElementById('midtrans-status-message').textContent = "Meminta token pembayaran...";
+        // ✅ Modal Functions - MENGGUNAKAN SWEETALERT2 SEPERTI PAYMENT-STATUS.PHP
+        function openDetailModal(tripData) {
+            // Format status pembayaran
+            function formatStatus(status) {
+                const statusLower = status.toLowerCase();
+                if (statusLower === 'pending') return '<span style="color: #ffc107;">⏳ Menunggu Pembayaran</span>';
+                if (statusLower === 'paid' || statusLower === 'settlement') return '<span style="color: #28a745;">✅ Pembayaran Selesai</span>';
+                if (statusLower === 'expired') return '<span style="color: #dc3545;">❌ Kadaluarsa</span>';
+                if (statusLower === 'cancelled') return '<span style="color: #dc3545;">❌ Dibatalkan</span>';
+                return status;
+            }
 
-            fetch('../backend/payment-api.php?booking=' + bookingId)
-                .then(r => {
-                    const contentType = r.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        throw new Error('Server error - bukan JSON');
-                    }
-                    return r.json();
-                })
-                .then(resp => {
-                    if (resp.snap_token) {
-                        document.getElementById('midtrans-status-message').textContent = "Membuka jendela pembayaran...";
-
-                        setTimeout(() => {
-                            closePaymentModal();
-
-                            // ✅ BUKA MIDTRANS SNAP
-                            window.snap.pay(resp.snap_token, {
-                                onSuccess: (result) => {
-                                    // ✅ AUTO CHECK STATUS SETELAH PEMBAYARAN
-                                    fetch('../backend/check-payment-status.php?order_id=' + resp.order_id)
-                                        .then(r => r.json())
-                                        .then(statusResp => {
-                                            if (statusResp.status === 'paid') {
-                                                Swal.fire({
-                                                    title: 'Pembayaran Berhasil!',
-                                                    text: 'Booking Anda telah dikonfirmasi.',
-                                                    icon: 'success',
-                                                    confirmButtonColor: '#a97c50'
-                                                }).then(() => {
-                                                    window.location.reload();
-                                                });
-                                            } else {
-                                                Swal.fire({
-                                                    title: 'Pembayaran Diproses',
-                                                    text: 'Menunggu konfirmasi pembayaran.',
-                                                    icon: 'info',
-                                                    confirmButtonColor: '#a97c50'
-                                                }).then(() => {
-                                                    window.location.reload();
-                                                });
-                                            }
-                                        })
-                                        .catch(err => {
-                                            console.error('Status check error:', err);
-                                            window.location.reload();
-                                        });
-                                },
-                                onPending: (result) => {
-                                    Swal.fire({
-                                        title: 'Pembayaran Pending',
-                                        text: 'Silakan selesaikan pembayaran Anda.',
-                                        icon: 'info',
-                                        confirmButtonColor: '#a97c50'
-                                    });
-                                },
-                                onError: (result) => {
-                                    Swal.fire({
-                                        title: 'Pembayaran Gagal',
-                                        text: result.status_message || 'Terjadi kesalahan',
-                                        icon: 'error',
-                                        confirmButtonColor: '#a97c50'
-                                    });
-                                },
-                                onClose: () => {
-                                    console.log('Popup ditutup');
-                                }
-                            });
-                        }, 500);
-
-                    } else {
-                        throw new Error(resp.error || 'Gagal mendapatkan token');
-                    }
-                })
-                .catch(err => {
-                    console.error('Payment error:', err);
-                    closePaymentModal();
-                    Swal.fire({
-                        title: 'Error Pembayaran',
-                        text: err.message,
-                        icon: 'error',
-                        confirmButtonColor: '#a97c50'
-                    });
-                });
-        }
-
-        function closePaymentModal() {
-            const modal = document.getElementById('modal-payment-midtrans');
-            modal.classList.remove('active');
-        }
-
-        // ✅ FUNGSI SHOW DETAIL (FETCH DARI DATABASE)
-        function showDetail(bookingId) {
-            Swal.fire({
-                title: 'Memuat Detail...',
-                html: '<i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:#a97c50;"></i>',
-                showConfirmButton: false,
-                allowOutsideClick: false
+            // Format tanggal
+            const tanggalBooking = new Date(tripData.tanggal_booking).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
             });
 
-            fetch(`../backend/get-booking-detail.php?id=${bookingId}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.error) {
-                        Swal.fire({
-                            title: 'Error',
-                            text: data.error,
-                            icon: 'error',
-                            confirmButtonColor: '#a97c50'
-                        });
-                        return;
-                    }
+            const tanggalTrip = new Date(tripData.tanggal_trip).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
 
-                    // ✅ RENDER DETAIL LENGKAP
-                    const invoiceNumber = `INV-MDPL-PAY-${data.id_payment || 'N/A'}`;
-                    const isPaid = data.status_pembayaran === 'paid' || data.status_pembayaran === 'settlement';
-                    const invoiceUrl = `view-invoice.php?payment_id=${data.id_payment}`;
+            // Generate Google Maps button
+            const mapsButton = tripData.link_map && tripData.link_map !== '#' ?
+                `<a href="${tripData.link_map}" target="_blank" class="btn-map-detail">
+                <i class="fa-solid fa-map-location-dot"></i> Lihat Lokasi Kumpul
+            </a>` : '';
 
-                    let participantsHTML = '<div class="participant-list-detail">';
-                    if (data.participants && data.participants.length > 0) {
-                        data.participants.forEach((p, index) => {
-                            participantsHTML += `
-                        <div class="participant-item">
-                            <p><strong>${index + 1}. ${p.nama}</strong></p>
-                            <small>📧 ${p.email}</small><br>
-                            <small>📱 ${p.no_wa}</small> | <small>🆔 ${p.nik}</small><br>
-                            <small>🎂 ${p.tempat_lahir}, ${p.tanggal_lahir}</small>
-                        </div>
-                    `;
-                        });
-                    } else {
-                        participantsHTML += '<p style="color: #999;">Detail peserta tidak tersedia.</p>';
-                    }
-                    participantsHTML += '</div>';
-
-                    const invoiceButton = isPaid ?
-                        `<a href="${invoiceUrl}" target="_blank" class="btn-invoice-detail"><i class="fa-solid fa-file-invoice"></i> Lihat Invoice</a>` :
-                        `<button disabled class="btn-invoice-detail disabled-btn"><i class="fa-solid fa-times-circle"></i> Invoice Belum Tersedia</button>`;
-
-                    const formatStatus = (status) => {
-                        if (status === 'paid' || status === 'settlement') return '<span style="color:#2e7d32;">✅ Lunas</span>';
-                        if (status === 'pending') return '<span style="color:#e65100;">⏳ Menunggu Pembayaran</span>';
-                        return '<span style="color:#c62828;">❌ ' + status + '</span>';
-                    };
-
-                    const modalContent = `
-            <style>
-                .swal2-popup { font-size: clamp(0.85rem, 2vw, 1rem) !important; padding: clamp(15px, 3vw, 25px) !important; }
-                .swal2-title { color: #a97c50 !important; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 15px; font-size: clamp(1.1rem, 4vw, 1.5rem) !important; }
-                .info-box-group { margin-bottom: 20px; border: 1px solid #eee; border-radius: 10px; padding: clamp(12px, 2.5vw, 15px); background: #fcfcfc; }
-                .info-box-group h4 { color: #333; margin-bottom: 8px; font-weight: 600; font-size: clamp(0.95rem, 2.5vw, 1.1rem); border-bottom: 1px dashed #ddd; padding-bottom: 5px; display: flex; align-items: center; gap: 8px; }
-                .info-box-group h4 i { color: #a97c50; }
-                .info-row-detail { display: flex; justify-content: space-between; padding: 5px 0; font-size: clamp(0.8rem, 2vw, 0.95rem); flex-wrap: wrap; gap: 5px; }
-                .info-row-detail strong { color: #222; }
-                .info-row-detail span { color: #555; }
-                .total-price-detail { font-size: clamp(1.1rem, 3vw, 1.4rem); color: #a97c50; font-weight: 700; margin-top: 8px; }
-                .participant-list-detail { margin-top: 10px; max-height: 180px; overflow-y: auto; padding: 0 5px; }
-                .participant-item { padding: 8px 0; border-bottom: 1px dotted #e0e0e0; }
-                .participant-item:last-child { border-bottom: none; }
-                .participant-item p { margin: 0; font-weight: 600; color: #444; font-size: clamp(0.85rem, 2vw, 0.95rem); margin-bottom: 3px; }
-                .participant-item small { color: #777; font-size: clamp(0.75rem, 1.8vw, 0.8rem); display: inline-block; margin-right: 5px; }
-                .btn-invoice-detail { margin-top: 15px; background: #333; color: #fff; padding: clamp(8px, 2vw, 10px) clamp(15px, 3vw, 20px); border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: none; font-weight: 600; font-size: clamp(0.85rem, 2vw, 0.95rem); }
-                .btn-invoice-detail:hover:not(:disabled) { background: #000; }
-                .disabled-btn { background: #ccc; color: #777; cursor: not-allowed; }
-                .invoice-section { border-top: 1px solid #ddd; padding-top: 15px; text-align: center; }
-                @media (max-width: 480px) {
-                    .info-row-detail { flex-direction: column; gap: 2px; }
-                    .info-row-detail span { font-size: 0.8rem; }
-                    .info-row-detail strong { font-size: 0.9rem; }
-                }
-            </style>
-            
+            // Build modal content - PERSIS SEPERTI PAYMENT-STATUS.PHP
+            const modalContent = `
             <div class="transaction-detail-content" style="text-align: left;">
                 <div class="info-box-group">
                     <h4><i class="fa-solid fa-receipt"></i> Ringkasan Transaksi</h4>
-                    <div class="info-row-detail"><span>Nomor Invoice:</span> <strong>${invoiceNumber}</strong></div>
-                    <div class="info-row-detail"><span>ID Booking:</span> <strong>#${data.id_booking}</strong></div>
-                    <div class="info-row-detail"><span>Tanggal Pesan:</span> <strong>${data.tanggal_booking_formatted}</strong></div>
-                    <div class="info-row-detail"><span>Status Pembayaran:</span> <strong>${formatStatus(data.status_pembayaran)}</strong></div>
-                    <div class="info-row-detail"><span>Jumlah Peserta:</span> <strong>${data.jumlah_orang} Orang</strong></div>
-                    <div class="info-row-detail"><span>Total Tagihan:</span> <strong class="total-price-detail">Rp ${parseInt(data.total_harga).toLocaleString('id-ID')}</strong></div>
+                    <div class="info-row-detail"><span>ID Booking:</span> <strong>#${tripData.id_booking}</strong></div>
+                    <div class="info-row-detail"><span>Tanggal Pesan:</span> <strong>${tanggalBooking}</strong></div>
+                    <div class="info-row-detail"><span>Status Pembayaran:</span> <strong>${formatStatus(tripData.status_booking)}</strong></div>
+                    <div class="info-row-detail"><span>Jumlah Peserta:</span> <strong>${tripData.jumlah_orang} Orang</strong></div>
+                    <div class="info-row-detail"><span>Total Tagihan:</span> <strong class="total-price-detail">Rp ${parseInt(tripData.total_harga).toLocaleString('id-ID')}</strong></div>
                 </div>
 
                 <div class="info-box-group">
                     <h4><i class="fa-solid fa-mountain"></i> Detail Trip</h4>
-                    <div class="info-row-detail"><span>Nama Trip:</span> <strong>${data.nama_gunung}</strong></div>
-                    <div class="info-row-detail"><span>Via:</span> <strong>${data.jenis_trip || 'N/A'}</strong></div>
-                    <div class="info-row-detail"><span>Tanggal Trip:</span> <strong>${data.tanggal_trip_formatted}</strong></div>
-                    <div class="info-row-detail"><span>Durasi:</span> <strong>${data.durasi || 'N/A'}</strong></div>
-                    <div class="info-row-detail"><span>Waktu Kumpul:</span> <strong>${data.waktu_kumpul || 'N/A'} WIB</strong></div>
-                    <div class="info-row-detail"><span>Lokasi Kumpul:</span> <strong>${data.nama_lokasi || 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>Nama Trip:</span> <strong>${tripData.nama_gunung}</strong></div>
+                    <div class="info-row-detail"><span>Via:</span> <strong>${tripData.via_gunung || 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>Jenis Trip:</span> <strong>${tripData.jenis_trip || 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>Tanggal Trip:</span> <strong>${tanggalTrip}</strong></div>
+                    <div class="info-row-detail"><span>Durasi:</span> <strong>${tripData.durasi || 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>Waktu Kumpul:</span> <strong>${tripData.waktu_kumpul ? tripData.waktu_kumpul.substring(0, 5) : 'N/A'} WIB</strong></div>
+                    <div class="info-row-detail"><span>Lokasi Kumpul:</span> <strong>${tripData.nama_lokasi || 'N/A'}</strong></div>
+                    ${mapsButton}
                 </div>
 
                 <div class="info-box-group">
                     <h4><i class="fa-solid fa-clipboard-list"></i> Info Penting</h4>
-                    <div style="padding: 5px 0;"><span><strong>Include:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${data.include || 'N/A'}</small></div>
-                    <div style="padding: 5px 0;"><span><strong>Exclude:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${data.exclude || 'N/A'}</small></div>
-                    <div style="padding: 5px 0;"><span><strong>Syarat & Ketentuan:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${data.syarat_ketentuan || 'N/A'}</small></div>
-                </div>
-                
-                <div class="info-box-group">
-                    <h4><i class="fa-solid fa-users"></i> Daftar Peserta (${data.jumlah_orang} Orang)</h4>
-                    ${participantsHTML}
-                </div>
-                
-                <div class="invoice-section">
-                    ${invoiceButton}
+                    <div style="padding: 5px 0;"><span><strong>Include:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${tripData.include || 'N/A'}</small></div>
+                    <div style="padding: 5px 0;"><span><strong>Exclude:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${tripData.exclude || 'N/A'}</small></div>
+                    <div style="padding: 5px 0;"><span><strong>Syarat & Ketentuan:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${tripData.syaratKetentuan || 'N/A'}</small></div>
                 </div>
             </div>
         `;
 
-                    Swal.fire({
-                        title: `Detail Transaksi #${data.id_booking}`,
-                        html: modalContent,
-                        icon: false,
-                        width: 'clamp(300px, 90vw, 700px)',
-                        showCloseButton: true,
-                        showConfirmButton: false,
-                        focusConfirm: false,
-                    });
-                })
-                .catch(err => {
-                    console.error('Detail error:', err);
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Gagal memuat detail transaksi: ' + err.message,
-                        icon: 'error',
-                        confirmButtonColor: '#a97c50'
-                    });
-                });
+            // Show SweetAlert2 modal
+            Swal.fire({
+                title: `<i class="fa-solid fa-mountain"></i> Detail Trip ${tripData.nama_gunung}`,
+                html: modalContent,
+                width: '1100px',
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title',
+                    htmlContainer: 'swal2-html-container'
+                }
+            });
         }
     </script>
+
 </body>
 
-</html>
+</

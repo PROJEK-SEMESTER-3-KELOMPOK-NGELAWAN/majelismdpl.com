@@ -1,69 +1,112 @@
 <?php
-// my-trips.php
-// Anda sudah memiliki logika untuk $navbarPath dari navbar.php
-$navbarPath = '../'; // Contoh path relatif dari user/ ke root
-require_once $navbarPath . 'navbar.php';
+// ✅ START SESSION
+session_start();
 
-// =======================================================
-// CONTOH DATA TRIP SAYA (SIMULASI DARI JOIN DATABASE)
-// Status yang mungkin: pending, paid, cancelled, finished
-// =======================================================
-$myTrips = [
-    [
-        'id_booking' => 28,
-        'nama_gunung' => 'Gunung Slamet',
-        'jenis_trip' => 'Camp',
-        'tanggal_trip' => '2025-10-30',
-        'durasi' => '3 hari 2 malam',
-        'via_gunung' => 'Rambipuji',
-        'nama_lokasi' => 'Basecamp slamet',
-        'tanggal_booking' => '2025-10-23',
-        'jumlah_orang' => 1,
-        'total_harga' => 500000,
-        'status_booking' => 'pending',
-        'gambar' => $navbarPath . 'img/ijen.jpg', // Ganti dengan path gambar Anda
-        'include' => 'makan, minum, tenda, porter',
-        'exclude' => 'doa, snack pribadi',
-        'syaratKetentuan' => 'ga ngalem: wajib membawa surat keterangan sehat dan fotokopi KTP. Pembayaran DP 50% harus dilakukan dalam 1x24 jam.',
-        'waktu_kumpul' => '02:00:00',
-    ],
-    [
-        'id_booking' => 26,
-        'nama_gunung' => 'Gunung Raung',
-        'jenis_trip' => 'Camp',
-        'tanggal_trip' => '2025-09-26',
-        'durasi' => '2 Hari 1 Malam',
-        'via_gunung' => 'bondowoso',
-        'nama_lokasi' => 'Base Camp Kalibaru',
-        'tanggal_booking' => '2025-10-21',
-        'jumlah_orang' => 1,
-        'total_harga' => 400000,
-        'status_booking' => 'paid',
-        'gambar' => $navbarPath . 'img/rinjani.jpg', // Ganti dengan path gambar Anda
-        'include' => 'mangan, transport pp',
-        'exclude' => 'ngombe, asuransi',
-        'syaratKetentuan' => 'ada deh: peserta dilarang membawa barang yang tidak perlu dan wajib mematuhi protokol basecamp.',
-        'waktu_kumpul' => '11:11:00',
-    ],
-    [
-        'id_booking' => 13,
-        'nama_gunung' => 'Gunung Bokong',
-        'jenis_trip' => 'Camp',
-        'tanggal_trip' => '2025-10-03',
-        'durasi' => '2 Hari 1 Malam',
-        'via_gunung' => 'Sumberwringin',
-        'nama_lokasi' => 'Base Camp Sumberwringin',
-        'tanggal_booking' => '2025-10-10',
-        'jumlah_orang' => 2,
-        'total_harga' => 600000,
-        'status_booking' => 'finished',
-        'gambar' => $navbarPath . 'img/20250917123322_Magelang.jpg', // Ganti dengan path gambar Anda
-        'include' => 'makanan, air mineral',
-        'exclude' => 'tidak ada',
-        'syaratKetentuan' => 'd: trip telah selesai dan peserta mendapatkan sertifikat digital.',
-        'waktu_kumpul' => '23:08:00',
-    ],
-];
+// ✅ Redirect jika belum login
+if (!isset($_SESSION['id_user'])) {
+    header('Location: ../index.php');
+    exit;
+}
+
+// ✅ SET NAVBAR PATH
+$navbarPath = '../';
+
+// ✅ KONEKSI DATABASE
+require_once '../backend/koneksi.php';
+
+// ✅ AMBIL DATA USER YANG LOGIN
+$id_user = $_SESSION['id_user'];
+
+// ✅ QUERY UNTUK MENGAMBIL SEMUA TRIP USER
+$query = "
+    SELECT 
+        b.id_booking,
+        b.id_trip,
+        b.jumlah_orang,
+        b.total_harga,
+        b.tanggal_booking,
+        b.status as status_booking,
+        t.nama_gunung,
+        t.jenis_trip,
+        t.tanggal as tanggal_trip,
+        t.durasi,
+        t.via_gunung,
+        t.harga,
+        t.gambar,
+        d.nama_lokasi,
+        d.alamat,
+        d.waktu_kumpul,
+        d.link_map,
+        d.include,
+        d.exclude,
+        d.syaratKetentuan,
+        p.status_pembayaran
+    FROM bookings b
+    JOIN paket_trips t ON b.id_trip = t.id_trip
+    LEFT JOIN detail_trips d ON t.id_trip = d.id_trip
+    LEFT JOIN payments p ON b.id_booking = p.id_booking
+    WHERE b.id_user = ?
+    ORDER BY b.tanggal_booking DESC
+";
+
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $id_user);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// ✅ SIMPAN DATA KE ARRAY
+$myTrips = [];
+while ($row = $result->fetch_assoc()) {
+    // Determine final status based on booking status and payment status
+    $finalStatus = $row['status_booking'];
+
+    // Jika status_pembayaran = 'paid', override status booking
+    if ($row['status_pembayaran'] === 'paid') {
+        $finalStatus = 'paid';
+    } elseif ($row['status_booking'] === 'confirmed') {
+        $finalStatus = 'paid';
+    } elseif ($row['status_booking'] === 'cancelled') {
+        $finalStatus = 'cancelled';
+    } elseif ($row['status_booking'] === 'finished') {
+        $finalStatus = 'finished';
+    } elseif ($row['status_booking'] === 'pending' && $row['status_pembayaran'] !== 'paid') {
+        $finalStatus = 'pending';
+    }
+
+    // Format gambar path
+    $imagePath = $navbarPath . 'img/default-mountain.jpg';
+    if (!empty($row['gambar'])) {
+        if (strpos($row['gambar'], 'img/') === 0) {
+            $imagePath = $navbarPath . $row['gambar'];
+        } else {
+            $imagePath = $navbarPath . 'img/' . $row['gambar'];
+        }
+    }
+
+    $myTrips[] = [
+        'id_booking' => $row['id_booking'],
+        'id_trip' => $row['id_trip'],
+        'nama_gunung' => $row['nama_gunung'],
+        'jenis_trip' => $row['jenis_trip'],
+        'tanggal_trip' => $row['tanggal_trip'],
+        'durasi' => $row['durasi'] ?? '1 hari',
+        'via_gunung' => $row['via_gunung'] ?? 'Via Utama',
+        'nama_lokasi' => $row['nama_lokasi'] ?? 'Lokasi kumpul belum ditentukan',
+        'alamat' => $row['alamat'] ?? 'Alamat belum ditentukan',
+        'tanggal_booking' => $row['tanggal_booking'],
+        'jumlah_orang' => $row['jumlah_orang'],
+        'total_harga' => $row['total_harga'],
+        'status_booking' => $finalStatus,
+        'gambar' => $imagePath,
+        'include' => $row['include'] ?? 'Informasi akan diupdate',
+        'exclude' => $row['exclude'] ?? 'Informasi akan diupdate',
+        'syaratKetentuan' => $row['syaratKetentuan'] ?? 'Informasi akan diupdate',
+        'waktu_kumpul' => $row['waktu_kumpul'] ?? '00:00:00',
+        'link_map' => $row['link_map'] ?? '#',
+    ];
+}
+
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -73,10 +116,27 @@ $myTrips = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paket Trip Saya - Majelis MDPL</title>
+
+    <!-- ✅ LOAD FONT AWESOME & BOOTSTRAP ICONS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8dcc4 100%);
+            min-height: 100vh;
+        }
+
         .page-container {
-            padding-top: 80px;
-            /* Jarak dari fixed navbar */
+            padding-top: 100px;
             min-height: 100vh;
         }
 
@@ -105,11 +165,9 @@ $myTrips = [
 
         .page-title i {
             color: #a97c50;
-            /* Warna Emas/Coklat Khas */
             margin-right: 10px;
         }
 
-        /* --- List Card Styling (Eksklusif) --- */
         .trips-list {
             display: flex;
             flex-direction: column;
@@ -125,7 +183,6 @@ $myTrips = [
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid #eee;
             align-items: center;
-            /* Tengah vertikal */
         }
 
         .list-trip-card:hover {
@@ -135,7 +192,6 @@ $myTrips = [
 
         .card-image-box {
             width: 250px;
-            /* Lebar gambar di kiri */
             min-width: 200px;
             height: 180px;
             background-size: cover;
@@ -148,7 +204,6 @@ $myTrips = [
 
         .trip-type-badge {
             background: rgba(169, 124, 80, 0.9);
-            /* Latar belakang coklat gelap transparan */
             color: #fff;
             padding: 5px 12px;
             border-radius: 5px;
@@ -175,7 +230,6 @@ $myTrips = [
             text-transform: uppercase;
         }
 
-        /* Warna Status */
         .status-pending {
             background-color: #ffc107;
             color: #333;
@@ -258,7 +312,7 @@ $myTrips = [
             background: #8b5e3c;
         }
 
-        /* --- Modal Styling (Dipertahankan dan Disesuaikan) --- */
+        /* ========== MODAL STYLING - EXTRA LARGE ========== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -266,13 +320,15 @@ $myTrips = [
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
             z-index: 2000;
             justify-content: center;
             align-items: center;
             opacity: 0;
             transition: opacity 0.3s ease;
+            padding: 30px;
+            /* ✅ PERBESAR PADDING */
         }
 
         .modal-overlay.show {
@@ -281,102 +337,234 @@ $myTrips = [
         }
 
         .modal-container {
-            background: #fff;
-            border-radius: 15px;
-            max-width: 650px;
-            width: 90%;
-            padding: 30px;
+            background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+            border-radius: 25px;
+            max-width: 1100px;
+            /* ✅ EXTRA LARGE dari 900px */
+            width: 95%;
+            /* ✅ PERBESAR */
             position: relative;
-            transform: scale(0.95);
-            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            /* Pop effect */
-            max-height: 90vh;
-            overflow-y: auto;
+            transform: scale(0.9) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 92vh;
+            /* ✅ PERBESAR */
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
         }
 
         .modal-overlay.show .modal-container {
-            transform: scale(1);
+            transform: scale(1) translateY(0);
         }
 
+        /* Modal Header */
+        .modal-header {
+            background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
+            padding: 40px 50px;
+            /* ✅ EXTRA LARGE */
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: #fff;
+            position: relative;
+        }
+
+        .modal-header i {
+            font-size: 2.8em;
+            /* ✅ EXTRA LARGE */
+            color: #ffd44a;
+        }
+
+        .modal-header h2 {
+            font-size: 2.2rem;
+            /* ✅ EXTRA LARGE */
+            margin: 0;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        /* Modal Close Button */
         .modal-close-btn {
-            position: sticky;
-            top: 0;
-            right: 0;
-            align-self: flex-end;
-            background: #f8f8f8;
-            border: none;
-            font-size: 2rem;
-            color: #aaa;
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            width: 52px;
+            /* ✅ EXTRA LARGE */
+            height: 52px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            /* ✅ EXTRA LARGE */
+            color: #fff;
             cursor: pointer;
-            z-index: 1;
-            padding: 0 10px 10px 10px;
-            line-height: 1;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
         }
 
         .modal-close-btn:hover {
-            color: #dc3545;
+            background: rgba(220, 53, 69, 0.95);
+            border-color: #dc3545;
+            transform: rotate(90deg) scale(1.15);
         }
 
-        #modal-title {
-            color: #a97c50;
-            border-bottom: 2px solid #a97c50;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
+        /* Modal Content */
         .modal-content {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+            padding: 50px;
+            /* ✅ EXTRA LARGE */
+            overflow-y: auto;
+            flex: 1;
         }
 
-        .info-group {
-            padding: 15px;
-            border: 1px solid #e0e0e0;
-            background-color: #fcfcfc;
+        .modal-content::-webkit-scrollbar {
+            width: 12px;
+            /* ✅ PERBESAR */
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f5f5f5;
             border-radius: 10px;
         }
 
-        .info-group h3 {
-            font-size: 1.15rem;
-            color: #333;
-            margin-bottom: 10px;
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #a97c50;
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #8b5e3c;
+        }
+
+        /* Info Group */
+        .info-group {
+            background: #fff;
+            border: 2px solid #e8e8e8;
+            /* ✅ PERBESAR BORDER */
+            border-radius: 18px;
+            /* ✅ PERBESAR */
+            margin-bottom: 30px;
+            /* ✅ PERBESAR */
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .info-group:hover {
+            box-shadow: 0 6px 25px rgba(169, 124, 80, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .info-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Info Header */
+        .info-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f1f2 100%);
+            padding: 22px 30px;
+            /* ✅ EXTRA LARGE */
             display: flex;
             align-items: center;
+            gap: 18px;
+            border-bottom: 4px solid #a97c50;
+            /* ✅ PERBESAR */
         }
 
-        .info-group h3 i {
+        .info-header i {
+            font-size: 2em;
+            /* ✅ EXTRA LARGE */
             color: #a97c50;
-            margin-right: 8px;
-            font-size: 1.3em;
         }
 
-        .info-group p {
-            font-size: 0.95em;
-            color: #666;
-            line-height: 1.6;
-            margin-left: 30px;
-            white-space: pre-wrap;
-            /* Mempertahankan format baris */
+        .info-header h3 {
+            font-size: 1.5rem;
+            /* ✅ EXTRA LARGE */
+            color: #333;
+            margin: 0;
+            font-weight: 600;
         }
 
+        /* Info Body */
+        .info-body {
+            padding: 30px;
+            /* ✅ EXTRA LARGE */
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 15px 0;
+            /* ✅ PERBESAR */
+            border-bottom: 1px dashed #e0e0e0;
+            gap: 25px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 1.15em;
+            /* ✅ EXTRA LARGE */
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #222;
+            font-weight: 500;
+            text-align: right;
+            font-size: 1.15em;
+            /* ✅ EXTRA LARGE */
+            line-height: 1.5;
+        }
+
+        .info-body p {
+            font-size: 1.15em;
+            /* ✅ EXTRA LARGE */
+            color: #555;
+            line-height: 1.9;
+            margin: 0;
+        }
+
+        /* Button Map */
         .btn-map {
-            margin-top: 15px;
-            background: #333;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #333 0%, #000 100%);
             color: #fff;
-            display: inline-block;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 0.95em;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 30px;
+            /* ✅ EXTRA LARGE */
+            border-radius: 12px;
+            font-size: 1.15em;
+            /* ✅ EXTRA LARGE */
             text-decoration: none;
-            transition: background 0.2s;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .btn-map:hover {
-            background: #000;
+            background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(169, 124, 80, 0.4);
         }
 
-        /* No Trips State (Dipertahankan) */
+        .btn-map i {
+            font-size: 1.3em;
+        }
+
+        /* Empty State */
         .no-trips {
             text-align: center;
             padding: 60px 20px;
@@ -399,24 +587,117 @@ $myTrips = [
             color: #fff;
             padding: 12px 30px;
             border-radius: 30px;
+            text-decoration: none;
         }
 
         .explore-btn:hover {
             background: #8b5e3c;
         }
 
-        /* Responsive */
+        .swal2-popup {
+            font-size: clamp(0.85rem, 2vw, 1rem) !important;
+            padding: clamp(15px, 3vw, 25px) !important;
+            max-width: 1100px !important;
+            width: 95% !important;
+            border-radius: 20px !important;
+        }
+
+        .swal2-title {
+            color: #a97c50 !important;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px !important;
+            margin-bottom: 15px !important;
+            font-size: clamp(1.1rem, 4vw, 1.5rem) !important;
+        }
+
+        .swal2-html-container {
+            max-height: 70vh !important;
+            overflow-y: auto !important;
+            margin: 0 !important;
+        }
+
+        /* Info Box Group - SAMA SEPERTI PAYMENT-STATUS.PHP */
+        .info-box-group {
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: clamp(12px, 2.5vw, 15px);
+            background: #fcfcfc;
+        }
+
+        .info-box-group h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box-group h4 i {
+            color: #a97c50;
+        }
+
+        .info-row-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .info-row-detail strong {
+            color: #222;
+        }
+
+        .info-row-detail span {
+            color: #555;
+        }
+
+        .total-price-detail {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: #a97c50;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .btn-map-detail {
+            margin-top: 15px;
+            background: #333;
+            color: #fff;
+            padding: clamp(8px, 2vw, 10px) clamp(15px, 3vw, 20px);
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            transition: all 0.3s ease;
+        }
+
+        .btn-map-detail:hover {
+            background: #000;
+        }
+
+
+        /* ========== RESPONSIVE - MOBILE ========== */
         @media (max-width: 768px) {
             .list-trip-card {
                 flex-direction: column;
-                /* Ubah menjadi tumpukan vertikal */
                 align-items: stretch;
             }
 
             .card-image-box {
                 width: 100%;
                 height: 150px;
-                /* Kurangi tinggi untuk mobile */
                 min-width: 100%;
             }
 
@@ -426,7 +707,6 @@ $myTrips = [
 
             .card-actions-list {
                 flex-direction: row;
-                /* Tombol jadi horizontal */
                 border-left: none;
                 border-top: 1px solid #f0f0f0;
                 padding: 15px;
@@ -436,27 +716,117 @@ $myTrips = [
             .btn-detail-list,
             .btn-payment-list {
                 flex: 1;
-                /* Agar lebar tombol sama */
+            }
+
+            /* Modal Responsive */
+            .modal-overlay {
+                padding: 15px;
             }
 
             .modal-container {
-                padding: 20px;
+                max-width: 100%;
+                width: 95%;
+                max-height: 93vh;
+                border-radius: 18px;
             }
 
-            .info-group p {
-                margin-left: 0;
-                margin-top: 10px;
+            .modal-header {
+                padding: 28px 22px;
             }
 
-            .info-group h3 i {
-                display: none;
-                /* Sembunyikan ikon di mobile agar judul lebih pendek */
+            .modal-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .modal-header i {
+                font-size: 2em;
+            }
+
+            .modal-close-btn {
+                top: 22px;
+                right: 22px;
+                width: 44px;
+                height: 44px;
+                font-size: 1.5rem;
+            }
+
+            .modal-content {
+                padding: 28px 22px;
+            }
+
+            .info-header {
+                padding: 18px 20px;
+            }
+
+            .info-header h3 {
+                font-size: 1.2rem;
+            }
+
+            .info-header i {
+                font-size: 1.6em;
+            }
+
+            .info-body {
+                padding: 22px;
+            }
+
+            .info-row {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px 0;
+            }
+
+            .info-value {
+                text-align: left;
+            }
+
+            .info-label,
+            .info-value {
+                font-size: 1em;
+            }
+
+            .info-body p {
+                font-size: 1em;
+            }
+
+            .btn-map {
+                padding: 12px 24px;
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-header {
+                padding: 22px 18px;
+            }
+
+            .modal-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .modal-content {
+                padding: 22px 18px;
+            }
+
+            .info-header {
+                padding: 15px 18px;
+            }
+
+            .info-body {
+                padding: 18px;
             }
         }
     </style>
+
 </head>
 
 <body>
+    <!-- ✅ INCLUDE NAVBAR -->
+    <?php include '../navbar.php'; ?>
+
+    <!-- ✅ INCLUDE AUTH MODALS -->
+    <?php include '../auth-modals.php'; ?>
+
     <div class="page-container">
         <main class="my-trips-section">
             <div class="header-content">
@@ -478,7 +848,7 @@ $myTrips = [
                     <?php foreach ($myTrips as $trip): ?>
                         <div class="list-trip-card" data-status="<?php echo strtolower($trip['status_booking']); ?>">
                             <div class="card-image-box" style="background-image: url('<?php echo htmlspecialchars($trip['gambar']); ?>');">
-                                <span class="trip-type-badge"><?php echo htmlspecialchars($trip['jenis_trip']); ?></span>
+                                <span class="trip-type-badge"><?php echo htmlspecialchars(ucfirst($trip['jenis_trip'])); ?></span>
                             </div>
                             <div class="card-info">
                                 <span class="status-badge status-<?php echo strtolower($trip['status_booking']); ?>">
@@ -501,7 +871,7 @@ $myTrips = [
                                 </div>
                             </div>
                             <div class="card-actions-list">
-                                <button class="btn btn-detail-list" onclick="openDetailModal(<?php echo htmlspecialchars(json_encode($trip)); ?>)" title="Lihat Detail & Perlengkapan">
+                                <button class="btn btn-detail-list" onclick='openDetailModal(<?php echo htmlspecialchars(json_encode($trip), ENT_QUOTES, 'UTF-8'); ?>)' title="Lihat Detail & Perlengkapan">
                                     <i class="fa-solid fa-eye"></i> Detail Trip
                                 </button>
                                 <?php if (strtolower($trip['status_booking']) == 'pending'): ?>
@@ -517,80 +887,96 @@ $myTrips = [
         </main>
     </div>
 
-    <div id="detail-modal" class="modal-overlay">
-        <div class="modal-container">
-            <button class="modal-close-btn" onclick="closeDetailModal()">×</button>
-            <h2 id="modal-title"></h2>
-            <div class="modal-content">
-                <div class="info-group">
-                    <h3><i class="fa-solid fa-location-dot"></i> Lokasi & Waktu Kumpul</h3>
-                    <p><strong>Tempat Kumpul:</strong> <span id="modal-lokasi"></span></p>
-                    <p><strong>Alamat Lengkap:</strong> <span id="modal-alamat"></span></p>
-                    <p><strong>Waktu Kumpul:</strong> <span id="modal-waktu-kumpul"></span> WIB</p>
-                    <a id="modal-link-map" href="#" target="_blank" class="btn btn-map"><i class="fa-solid fa-map-location-dot"></i> Lihat Peta</a>
-                </div>
+    <!-- Detail Modal -->
+    <!-- diload menggunakan js dibawah -->
 
-                <div class="info-group">
-                    <h3><i class="fa-solid fa-check-circle"></i> Include (Termasuk)</h3>
-                    <p id="modal-include"></p>
-                </div>
 
-                <div class="info-group">
-                    <h3><i class="fa-solid fa-times-circle"></i> Exclude (Tidak Termasuk)</h3>
-                    <p id="modal-exclude"></p>
-                </div>
-
-                <div class="info-group last-group">
-                    <h3><i class="fa-solid fa-file-contract"></i> Syarat & Ketentuan</h3>
-                    <p id="modal-sk"></p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- ✅ LOAD JAVASCRIPT FILES -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../frontend/registrasi.js"></script>
+    <script src="../frontend/login.js"></script>
 
     <script>
-        // JavaScript Logic (Sama seperti sebelumnya, memastikan fungsi openDetailModal() bekerja)
+        // ✅ Modal Functions - MENGGUNAKAN SWEETALERT2 SEPERTI PAYMENT-STATUS.PHP
         function openDetailModal(tripData) {
-            const modal = document.getElementById('detail-modal');
-
-            // Perbarui konten modal
-            document.getElementById('modal-title').innerText = `Detail Trip: ${tripData.nama_gunung}`;
-            document.getElementById('modal-lokasi').innerText = tripData.nama_lokasi;
-            document.getElementById('modal-alamat').innerText = tripData.alamat;
-            document.getElementById('modal-waktu-kumpul').innerText = tripData.waktu_kumpul.substring(0, 5); // Hanya ambil jam:menit
-            document.getElementById('modal-include').innerText = tripData.include || 'Tidak ada data include.';
-            document.getElementById('modal-exclude').innerText = tripData.exclude || 'Tidak ada data exclude.';
-            document.getElementById('modal-sk').innerText = tripData.syaratKetentuan || 'Tidak ada data syarat & ketentuan.';
-
-            // Perbaiki link map:
-            const mapLinkElement = document.getElementById('modal-link-map');
-            let mapUrl = tripData.link_map;
-
-            // Logika sederhana untuk membersihkan URL iframe/embed
-            if (mapUrl && mapUrl.includes('http://googleusercontent.com/maps.google.com/')) {
-                // Menggunakan link dummy yang lebih baik:
-                mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(tripData.nama_lokasi);
+            // Format status pembayaran
+            function formatStatus(status) {
+                const statusLower = status.toLowerCase();
+                if (statusLower === 'pending') return '<span style="color: #ffc107;">⏳ Menunggu Pembayaran</span>';
+                if (statusLower === 'paid' || statusLower === 'settlement') return '<span style="color: #28a745;">✅ Pembayaran Selesai</span>';
+                if (statusLower === 'expired') return '<span style="color: #dc3545;">❌ Kadaluarsa</span>';
+                if (statusLower === 'cancelled') return '<span style="color: #dc3545;">❌ Dibatalkan</span>';
+                return status;
             }
 
-            mapLinkElement.href = mapUrl || '#'; // Set link
-            mapLinkElement.style.display = mapUrl ? 'inline-block' : 'none'; // Sembunyikan jika tidak ada link
+            // Format tanggal
+            const tanggalBooking = new Date(tripData.tanggal_booking).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
 
-            // Tampilkan modal
-            modal.classList.add('show');
+            const tanggalTrip = new Date(tripData.tanggal_trip).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            // Generate Google Maps button
+            const mapsButton = tripData.link_map && tripData.link_map !== '#' ?
+                `<a href="${tripData.link_map}" target="_blank" class="btn-map-detail">
+                <i class="fa-solid fa-map-location-dot"></i> Lihat Lokasi Kumpul
+            </a>` : '';
+
+            // Build modal content - PERSIS SEPERTI PAYMENT-STATUS.PHP
+            const modalContent = `
+            <div class="transaction-detail-content" style="text-align: left;">
+                <div class="info-box-group">
+                    <h4><i class="fa-solid fa-receipt"></i> Ringkasan Transaksi</h4>
+                    <div class="info-row-detail"><span>ID Booking:</span> <strong>#${tripData.id_booking}</strong></div>
+                    <div class="info-row-detail"><span>Tanggal Pesan:</span> <strong>${tanggalBooking}</strong></div>
+                    <div class="info-row-detail"><span>Status Pembayaran:</span> <strong>${formatStatus(tripData.status_booking)}</strong></div>
+                    <div class="info-row-detail"><span>Jumlah Peserta:</span> <strong>${tripData.jumlah_orang} Orang</strong></div>
+                    <div class="info-row-detail"><span>Total Tagihan:</span> <strong class="total-price-detail">Rp ${parseInt(tripData.total_harga).toLocaleString('id-ID')}</strong></div>
+                </div>
+
+                <div class="info-box-group">
+                    <h4><i class="fa-solid fa-mountain"></i> Detail Trip</h4>
+                    <div class="info-row-detail"><span>Nama Trip:</span> <strong>${tripData.nama_gunung}</strong></div>
+                    <div class="info-row-detail"><span>Via:</span> <strong>${tripData.via_gunung || 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>Jenis Trip:</span> <strong>${tripData.jenis_trip || 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>Tanggal Trip:</span> <strong>${tanggalTrip}</strong></div>
+                    <div class="info-row-detail"><span>Durasi:</span> <strong>${tripData.durasi || 'N/A'}</strong></div>
+                    <div class="info-row-detail"><span>Waktu Kumpul:</span> <strong>${tripData.waktu_kumpul ? tripData.waktu_kumpul.substring(0, 5) : 'N/A'} WIB</strong></div>
+                    <div class="info-row-detail"><span>Lokasi Kumpul:</span> <strong>${tripData.nama_lokasi || 'N/A'}</strong></div>
+                    ${mapsButton}
+                </div>
+
+                <div class="info-box-group">
+                    <h4><i class="fa-solid fa-clipboard-list"></i> Info Penting</h4>
+                    <div style="padding: 5px 0;"><span><strong>Include:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${tripData.include || 'N/A'}</small></div>
+                    <div style="padding: 5px 0;"><span><strong>Exclude:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${tripData.exclude || 'N/A'}</small></div>
+                    <div style="padding: 5px 0;"><span><strong>Syarat & Ketentuan:</strong></span> <br><small style="margin-left: 10px; display: block;font-size:clamp(0.8rem, 2vw, 0.9rem);">${tripData.syaratKetentuan || 'N/A'}</small></div>
+                </div>
+            </div>
+        `;
+
+            // Show SweetAlert2 modal
+            Swal.fire({
+                title: `<i class="fa-solid fa-mountain"></i> Detail Trip ${tripData.nama_gunung}`,
+                html: modalContent,
+                width: '1100px',
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title',
+                    htmlContainer: 'swal2-html-container'
+                }
+            });
         }
-
-        function closeDetailModal() {
-            const modal = document.getElementById('detail-modal');
-            modal.classList.remove('show');
-        }
-
-        // Tutup modal jika user mengklik di luar area modal
-        document.getElementById('detail-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'detail-modal') {
-                closeDetailModal();
-            }
-        });
     </script>
+
 </body>
 
 </html>
