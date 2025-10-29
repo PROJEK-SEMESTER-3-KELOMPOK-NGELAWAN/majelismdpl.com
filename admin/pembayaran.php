@@ -1,5 +1,16 @@
 <?php
 require_once 'auth_check.php';
+// Asumsi RoleHelper sudah dimuat di auth_check.php atau file lain yang diperlukan.
+if (!class_exists('RoleHelper')) {
+  class RoleHelper
+  {
+    public static function getRoleDisplayName($role)
+    {
+      return ucwords(str_replace('_', ' ', $role));
+    }
+  }
+}
+$user_role = $user_role ?? 'user';
 ?>
 
 <!DOCTYPE html>
@@ -10,12 +21,12 @@ require_once 'auth_check.php';
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pembayaran | Majelis MDPL</title>
 
-  <!-- Styles and Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <style>
+    /* --- SIDEBAR & GLOBAL (KONSISTENSI FONT & BG) --- */
     body {
       background: #f6f0e8;
       color: #232323;
@@ -25,64 +36,14 @@ require_once 'auth_check.php';
       margin: 0;
     }
 
-    .search-container {
-      position: relative;
-      margin: 0;
-      width: 100%;
-      max-width: 450px;
-    }
-
-    .search-input {
-      width: 100%;
-      padding-left: 15px;
-      padding-right: 45px;
-      border-radius: 50px;
-      border: 1.5px solid #a97c50;
-      height: 38px;
-      font-size: 14px;
-      color: #432f17;
-      transition: border-color 0.3s ease;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: #432f17;
-      box-shadow: 0 0 8px rgba(67, 47, 23, 0.3);
-    }
-
-    .search-icon {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #a97c50;
-      pointer-events: none;
-      font-size: 18px;
-    }
-
-    .sidebar img {
-      width: 43px;
-      height: 43px;
-      border-radius: 11px;
-      background: #fff7eb;
-      border: 2px solid #d9b680;
-      margin-bottom: 13px;
-    }
-
-    .logo-text {
-      font-size: 1.13em;
-      font-weight: 700;
-      color: #fffbe4;
-      margin-bottom: 30px;
-      letter-spacing: 1.5px;
-    }
-
-    .sidebar-nav {
-      flex: 1 1 auto;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .sidebar {
+      background: #a97c50;
+      min-height: 100vh;
+      width: 240px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
     }
 
     .nav-link {
@@ -107,71 +68,14 @@ require_once 'auth_check.php';
       color: #ffd49c;
     }
 
-    .logout {
-      color: #fff;
-      background: #c19c72;
-      font-weight: 600;
-      margin-bottom: 15px;
-    }
 
-    .logout:hover {
-      background: #432f17;
-      color: #fffbe4;
-    }
-
-    @media (max-width: 800px) {
-      .sidebar {
-        width: 100vw;
-        height: 70px;
-        flex-direction: row;
-        padding-top: 0;
-        padding-bottom: 0;
-        bottom: unset;
-        top: 0;
-        justify-content: center;
-        align-items: center;
-        position: fixed;
-        z-index: 100;
-      }
-
-      .sidebar img,
-      .logo-text {
-        display: none;
-      }
-
-      .sidebar-nav {
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        width: 100vw;
-        height: 70px;
-        margin: 0;
-        padding: 0;
-      }
-
-      .nav-link,
-      .logout {
-        width: auto;
-        min-width: 70px;
-        font-size: 15px;
-        margin: 0 3px;
-        border-radius: 14px;
-        padding: 8px 10px;
-        justify-content: center;
-      }
-
-      .logout {
-        order: 99;
-        margin-left: 8px;
-        margin-bottom: 0;
-      }
-    }
-
+    /* --- MAIN CONTENT & LAYOUT KONSISTENSI (Dari Master Admin) --- */
     .main {
       margin-left: 240px;
       min-height: 100vh;
       padding: 20px 25px;
       background: #f6f0e8;
+      transition: margin-left 0.3s ease;
     }
 
     @media (max-width: 800px) {
@@ -183,14 +87,114 @@ require_once 'auth_check.php';
       }
     }
 
-    .daftar-heading {
+    .text-brown {
+      color: #a97c50 !important;
+    }
+
+    .bg-brown {
+      background-color: #a97c50 !important;
+      color: white;
+    }
+
+    /* Header Halaman KONSISTEN */
+    .main-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 32px;
+      padding-bottom: 28px;
+    }
+
+    .main-header h2 {
       font-size: 1.4rem;
       font-weight: 700;
       color: #a97c50;
-      margin: 32px 0 18px;
+      margin-bottom: 0;
       letter-spacing: 1px;
     }
 
+    .permission-badge {
+      background-color: #28a745;
+      color: white;
+      font-size: 0.7em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+
+
+    /* --- CARD & SHADOW KONSISTENSI --- */
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border-bottom: 2px solid #a97c50;
+      border-radius: 15px 15px 0 0 !important;
+      padding: 20px;
+    }
+
+    /* Tombol Primary KONSISTEN */
+    .btn-primary {
+      background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(169, 124, 80, 0.4);
+      background: linear-gradient(135deg, #8b6332 0%, #a97c50 100%);
+    }
+
+    /* Tombol Secondary/Tutup Modal KONSISTEN */
+    .btn-secondary {
+      background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+    }
+
+    /* Close button modal (dari Master Admin) */
+    .btn-close-black {
+      filter: none;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
+
+    .btn-close-black:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .modal-header {
+      /* KONSISTENSI MODAL HEADER */
+      background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
+      color: white;
+      border: none;
+    }
+
+
+    /* ----------------------------------------------------------- */
+    /* --- SUMMARY CARDS (KEMBALI KE GAYA VERTIKAL ASLI) --- */
+    /* ----------------------------------------------------------- */
     .payment-summary {
       max-width: 900px;
       margin: 0 auto 30px auto;
@@ -202,206 +206,287 @@ require_once 'auth_check.php';
     .summary-item {
       background: #fff;
       border-radius: 16px;
+      /* Radius Asli */
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       padding: 20px 40px;
+      /* Padding Asli */
       text-align: center;
-      color: #3a3a3a;
-      font-weight: 700;
-      font-size: 1.2em;
       display: flex;
       flex-direction: column;
+      /* Vertikal */
       align-items: center;
+      flex: 1 1 250px;
+      transition: all 0.3s ease;
+    }
+
+    .summary-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
     }
 
     .summary-item i {
       font-size: 2.5rem;
+      /* Icon besar */
       margin-bottom: 10px;
       color: #a97c50;
+      /* Default brown */
+      background: none;
+      padding: 0;
+      border-radius: 0;
     }
 
+    .summary-label {
+      font-size: 1.0rem;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 5px;
+    }
+
+    /* KOREKSI: SUMMARY VALUE ASLI */
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #432f17;
+    }
+
+    /* Tambahkan warna spesifik untuk ikon status di summary */
+    .summary-item.lunas i {
+      color: #28a745 !important;
+    }
+
+    .summary-item.pending i {
+      color: #ffc107 !important;
+    }
+
+
+    /* --- CHART & TABLE CONTAINER (KONSISTENSI DENGAN CARD) --- */
     .chart-container {
-      max-width: 900px;
-      margin: 0 auto 30px auto;
       background: #fff;
-      padding: 20px 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      margin-bottom: 30px;
+      max-width: 100%;
     }
 
     .chart-title {
-      font-weight: 700;
       font-size: 1.25rem;
+      font-weight: 700;
       color: #a97c50;
       margin-bottom: 15px;
     }
 
-    .cards {
-      display: flex;
-      gap: 19px;
-      margin-bottom: 32px;
-      flex-wrap: nowrap;
-      justify-content: center;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
+    #paymentsChart {
+      width: auto;
+      height: auto;
     }
 
-    .card-stat {
-      background: #fff;
-      border-radius: 1rem;
-      padding: 16px 18px;
-      box-shadow: 0 1px 7px rgba(120, 77, 37, 0.09);
-      min-width: 180px;
-      flex: 1 1 180px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
 
-    .card-stat i {
-      font-size: 2.2rem;
-      color: #a97c50;
-    }
-
-    .stat-label {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #a97c50;
-    }
-
-    .stat-value {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #432f17;
+    /* --- TABLE KONSISTENSI (BORDER RADIUS FIX) --- */
+    .table-responsive {
+      margin-top: 20px;
+      border-radius: 15px;
+      /* PENTING: Untuk melengkungkan sudut tabel */
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     }
 
     table {
+      border-collapse: collapse;
+      font-size: 14px;
       width: 100%;
-      border-spacing: 0 8px;
-      font-size: 13px;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      background-color: #fff;
-    }
-
-    thead {
-      background-color: #a97c50;
     }
 
     thead th {
+      background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
       color: white;
-      padding: 12px 10px;
-      font-weight: 700;
-      letter-spacing: 0.7px;
-      text-align: left;
+      padding: 15px;
+      font-weight: 600;
+      border: none;
     }
 
-    tbody tr {
+    tbody td {
+      padding: 12px 15px;
+      font-weight: 500;
+      color: #432f17;
       border-bottom: 1px solid #f2dbc1;
-    }
-
-    tbody tr:last-child {
-      border-bottom: none;
     }
 
     tbody tr:hover {
       background-color: #f9e8d0;
-      color: #a97c50;
-    }
-
-    tbody td {
-      padding: 11px 10px;
-      vertical-align: middle;
-      font-weight: 500;
       color: #432f17;
     }
 
-    #detailPaymentBody {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px 40px;
-      font-size: 1em;
-      color: #3a3a3a;
+    /* --- SEARCH INPUT KONSISTENSI --- */
+    .search-container {
+      max-width: 450px;
+      margin-bottom: 20px;
+      position: relative;
     }
 
-    #detailPaymentBody p {
-      margin: 0 0 8px 0;
+    .search-input {
+      padding-left: 15px;
+      padding-right: 40px;
+      border-radius: 8px;
+      border: 2px solid #e9ecef;
+      height: 42px;
+      width: 100%;
+      font-size: 0.95rem;
+      color: #495057;
+      transition: all 0.3s ease;
     }
 
-    #detailPaymentBody p strong {
-      color: #a97c50;
+    .search-input:focus {
+      outline: none;
+      border-color: #a97c50;
+      box-shadow: 0 0 0 0.2rem rgba(169, 124, 80, 0.15);
+      transform: translateY(-1px);
     }
+
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      pointer-events: none;
+      font-size: 1.1rem;
+    }
+
+    /* --- MODAL DETAIL (KONSISTENSI) --- */
+    #detailPaymentModal .modal-content {
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    #detailPaymentModal .modal-header {
+      background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
+      color: white;
+      border-radius: 15px 15px 0 0 !important;
+      padding: 20px 25px;
+    }
+
+    #detailPaymentModal .modal-title {
+      color: white !important;
+      font-weight: 600;
+    }
+
+    /* --- Styling Tombol Detail Khusus --- */
+    .btn-detail {
+      /* Mengikuti gaya tombol aksi (Edit/Hapus) di menu Peserta */
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 8px;
+      /* Sudut melengkung */
+      border: none;
+      padding: 0;
+      font-size: 1.2rem;
+      /* Ukuran ikon */
+
+      /* Menggunakan warna utama (Cokelat) */
+      background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
+      color: white;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .btn-detail:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(169, 124, 80, 0.4);
+      /* Ganti warna saat hover jika diperlukan */
+    }
+
+    /* --- End Tombol Detail Khusus --- */
   </style>
 </head>
 
 <body>
 
-  <!-- Include Sidebar -->
   <?php include 'sidebar.php'; ?>
 
   <main class="main">
-    <div class="daftar-heading">Daftar Pembayaran</div>
-    <section class="cards payment-summary">
-      <div class="card-stat">
-        <i class="bi bi-wallet2"></i>
-        <div>
-          <div class="stat-label">Total Bayar</div>
-          <div class="stat-value" id="totalBayarDisplay">Rp 4.200.000</div>
-        </div>
+    <div class="main-header">
+      <div>
+        <h2>Kelola Pembayaran</h2>
+        <small class="text-muted">
+          <i class="bi bi-wallet"></i> Daftar dan status semua transaksi.
+          <span class="permission-badge">
+            <?= RoleHelper::getRoleDisplayName($user_role) ?>
+          </span>
+        </small>
       </div>
-      <div class="card-stat">
-        <i class="bi bi-check2-circle"></i>
-        <div>
-          <div class="stat-label">Lunas</div>
-          <div class="stat-value" id="lunasCountDisplay">15 Pembayaran</div>
-        </div>
-      </div>
-      <div class="card-stat">
-        <i class="bi bi-clock-history"></i>
-        <div>
-          <div class="stat-label">Dalam Proses</div>
-          <div class="stat-value" id="prosesCountDisplay">3 Pembayaran</div>
-        </div>
-      </div>
-    </section>
-    <section class="chart-container">
-      <h3 class="chart-title">Distribusi Pembayaran per Bulan</h3>
-      <canvas id="paymentsChart" width="400" height="100"></canvas>
-    </section>
-    <div class="search-container" style="max-width: 450px; margin-bottom: 15px;">
-      <input type="text" id="paymentSearchInput" class="search-input" placeholder="Cari pembayaran..." />
-      <i class="bi bi-search search-icon"></i>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>ID Payment</th>
-          <th>ID Booking</th>
-          <th>Jumlah Bayar</th>
-          <th>Tanggal</th>
-          <th>Jenis Pembayaran</th>
-          <th>Metode</th>
-          <th>Sisa Bayar</th>
-          <th>Status Pembayaran</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="paymentList"></tbody>
-    </table>
+    <section class="payment-summary">
+      <div class="summary-item">
+        <i class="bi bi-credit-card-2-front"></i>
+        <div class="summary-label">Total Bayar Diterima</div>
+        <div class="summary-value" id="totalBayarDisplay">Rp 0</div>
+      </div>
+      <div class="summary-item lunas">
+        <i class="bi bi-check-circle"></i>
+        <div class="summary-label">Transaksi Lunas</div>
+        <div class="summary-value" id="lunasCountDisplay">0 Transaksi</div>
+      </div>
+      <div class="summary-item pending">
+        <i class="bi bi-clock"></i>
+        <div class="summary-label">Menunggu Verifikasi</div>
+        <div class="summary-value" id="prosesCountDisplay">0 Transaksi</div>
+      </div>
+    </section>
+
+    <section class="chart-container">
+      <h3 class="chart-title">Statistik Pembayaran Bulanan</h3>
+      <canvas id="paymentsChart" width="400" height="100"></canvas>
+    </section>
+
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0 text-brown">
+          <i class="bi bi-table"></i> Riwayat Transaksi
+        </h5>
+      </div>
+      <div class="card-body p-4">
+        <div class="search-container">
+          <input type="text" id="paymentSearchInput" class="search-input" placeholder="Cari ID Booking, Nama Peserta, atau Status..." />
+          <i class="bi bi-search search-icon"></i>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ID Payment</th>
+                <th>ID Booking</th>
+                <th>Jumlah Bayar</th>
+                <th>Tanggal</th>
+                <th>Jenis Pembayaran</th>
+                <th>Metode</th>
+                <th>Sisa Bayar</th>
+                <th>Status Pembayaran</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="paymentList">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </main>
 
-  <!-- Modal Detail Pembayaran -->
   <div class="modal fade" id="detailPaymentModal" tabindex="-1" aria-labelledby="detailPaymentLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content rounded-4 shadow border-0">
         <div class="modal-header">
-          <h5 class="modal-title text-black" id="detailPaymentLabel"><i class="bi bi-receipt-cutoff me-2"></i> Detail Pembayaran</h5>
+          <h5 class="modal-title" id="detailPaymentLabel"><i class="bi bi-receipt-cutoff me-2"></i> Detail Pembayaran</h5>
           <button type="button" class="btn-close btn-close-black" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
-        <div class="modal-body p-0" style="background:#fdfaf7;">
-          <div class="d-flex align-items-center gap-3 p-3 border-bottom" style="background:#fff5e6;">
+        <div class="modal-body p-0">
+          <div class="d-flex align-items-center gap-3 p-3 border-bottom" style="background:#fff7eb;">
             <div class="rounded-3 bg-white shadow-sm" style="width:60px;height:60px;display:flex;align-items:center;justify-content:center;">
               <i class="bi bi-credit-card-2-front text-brown" style="font-size:2.2rem"></i>
             </div>
@@ -410,63 +495,96 @@ require_once 'auth_check.php';
               <div class="text-muted" style="font-size:0.98rem;">ID Booking: <span id="detail_idbooking">-</span></div>
             </div>
           </div>
-          <div class="px-3 pt-3">
-            <div class="mb-2 fw-semibold" style="font-size:1.06rem;">Rincian Harga</div>
-            <div class="rounded-4 p-3 mb-2">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <div><span id="detail_tanggal">-</span></div>
-                  <div class="text-muted" style="font-size:0.96rem;"><span id="detail_jenispembayaran">-</span> (<span id="detail_metode">-</span>)</div>
+          <div class="px-4 pt-4">
+            <div class="mb-3 fw-semibold" style="font-size:1.06rem;">Rincian Transaksi</div>
+            <div class="rounded-4 p-3 mb-3 border" style="border-color:#f0decdff;">
+              <div class="d-flex justify-content-between mb-3">
+                <div class="col-7">
+                  <div class="fw-medium"><span id="detail_tanggal">-</span></div>
+                  <div class="text-muted" style="font-size:0.9rem;"><span id="detail_jenispembayaran">-</span> (<span id="detail_metode">-</span>)</div>
                 </div>
-                <div class="fw text-brown" id="detail_jumlahbayar">Rp 0</div>
+                <div class="fw-bold text-brown" id="detail_jumlahbayar">Rp 0</div>
               </div>
-              <hr class="my-2" style="border-color:#d7b577;">
-              <div class="d-flex justify-content-between">
-                <div class="text-brown fw-semibold">Subtotal</div>
-                <div class="fw text-brown" id="subtotal_bayar">Rp 0</div>
+              <hr class="my-2" style="border-color:#f2dbc1;">
+
+              <div class="d-flex justify-content-between pt-2">
+                <div class="text-brown fw-bold">Total Dibayar</div>
+                <div class="fw-bold text-brown" id="subtotal_bayar">Rp 0</div>
               </div>
             </div>
           </div>
-          <div class="px-3 pb-3">
-            <div class="rounded-4 p-3 mb-3 " style="background:#fff7eb; border:1.5px solid #f0decdff;">
+          <div class="px-4 pb-4">
+            <div class="rounded-4 p-3 mb-3 border" style="background:#fff7eb; border-color:#d9b680;">
               <div class="d-flex justify-content-between align-items-center">
-                <div class="fw-bold" style="font-size:1.13rem; ">Jumlah Total</div>
+                <div class="fw-bold" style="font-size:1.13rem; ">Jumlah Total (Trip)</div>
                 <div class="fw-bold text-brown" style="font-size:1.1rem;" id="jumlah_total">Rp 0</div>
               </div>
             </div>
             <div class="d-flex justify-content-between">
-              <div class="text-muted" style="font-size:0.99rem;"><i class="bi bi-coin"></i> Sisa Bayar</div>
-              <div class="fw" id="detail_sisabayar">Rp 0</div>
+              <div class="text-muted" style="font-size:0.99rem;"><i class="bi bi-coin me-1"></i> Sisa Pembayaran</div>
+              <div class="fw-bold text-danger" id="detail_sisabayar">Rp 0</div>
             </div>
-            <div class="d-flex justify-content-between mt-1">
-              <div class="text-muted" style="font-size:0.99rem;"><i class="bi bi-info-circle"></i> Status</div>
-              <span class="fw" id="detail_statuspembayaran">-</span>
+            <div class="d-flex justify-content-between mt-2">
+              <div class="text-muted" style="font-size:0.99rem;"><i class="bi bi-info-circle me-1"></i> Status Verifikasi</div>
+              <span class="fw-bold" id="detail_statuspembayaran">-</span>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-brown px-4" data-bs-dismiss="modal" style="background:#a97c50; color: white; border:none;">Tutup</button>
+          <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Tutup</button>
         </div>
       </div>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    const paymentSearchInput = document.getElementById('paymentSearchInput');
-    paymentSearchInput.addEventListener('input', function() {
-      const filter = this.value.toLowerCase();
-      const rows = document.querySelectorAll('#paymentList tr');
-      rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(filter) ? '' : 'none';
-      });
-    });
-
     async function loadPayments() {
-      const res = await fetch('payment.json');
-      const payments = await res.json();
+      // Menggunakan data dummy untuk demonstrasi (Hapus ini jika API sudah siap)
+      const payments = [{
+          idpayment: 'P001',
+          idbooking: 'B001',
+          jumlahbayar: 500000,
+          tanggal: '2025-10-25',
+          jenispembayaran: 'DP',
+          metode: 'Transfer BCA',
+          sisabayar: 1500000,
+          statuspembayaran: 'Menunggu'
+        },
+        {
+          idpayment: 'P002',
+          idbooking: 'B002',
+          jumlahbayar: 2000000,
+          tanggal: '2025-10-20',
+          jenispembayaran: 'Full',
+          metode: 'Transfer Mandiri',
+          sisabayar: 0,
+          statuspembayaran: 'Selesai'
+        },
+        {
+          idpayment: 'P003',
+          idbooking: 'B001',
+          jumlahbayar: 1000000,
+          tanggal: '2025-10-27',
+          jenispembayaran: 'Cicilan',
+          metode: 'Cash',
+          sisabayar: 500000,
+          statuspembayaran: 'Selesai'
+        },
+        {
+          idpayment: 'P004',
+          idbooking: 'B003',
+          jumlahbayar: 1500000,
+          tanggal: '2025-09-10',
+          jenispembayaran: 'Full',
+          metode: 'Transfer BCA',
+          sisabayar: 0,
+          statuspembayaran: 'Selesai'
+        },
+      ];
+
       renderPayments(payments);
       updateSummary(payments);
       updateChart(payments);
@@ -477,35 +595,54 @@ require_once 'auth_check.php';
       tbody.innerHTML = '';
       payments.forEach((p, index) => {
         const tr = document.createElement('tr');
+
+        let statusClass = 'bg-secondary';
+        let statusText = p.statuspembayaran;
+
+        if (p.statuspembayaran.toLowerCase() === 'selesai' || p.statuspembayaran.toLowerCase() === 'lunas') {
+          statusClass = 'bg-success';
+        } else if (p.statuspembayaran.toLowerCase() === 'menunggu' || p.statuspembayaran.toLowerCase() === 'proses') {
+          statusClass = 'bg-warning text-dark';
+        } else if (p.statuspembayaran.toLowerCase() === 'batal') {
+          statusClass = 'bg-danger';
+        }
+
+        const statusBadge = `<span class="badge ${statusClass}">${statusText}</span>`;
+
         tr.innerHTML = `
-   <td>${p.idpayment}</td>
-   <td>${p.idbooking}</td>
-   <td>Rp ${p.jumlahbayar.toLocaleString('id-ID')}</td>
-   <td>${p.tanggal}</td>
-   <td>${p.jenispembayaran}</td>
-   <td>${p.metode}</td>
-   <td>Rp ${p.sisabayar.toLocaleString('id-ID')}</td>
-   <td>${p.statuspembayaran}</td>
-   <td><button class="btn btn-primary btn-sm detail-btn" data-index="${index}">Detail</button></td>
-  `;
+                    <td>${p.idpayment}</td>
+                    <td>${p.idbooking}</td>
+                    <td>Rp ${p.jumlahbayar.toLocaleString('id-ID')}</td>
+                    <td>${p.tanggal}</td>
+                    <td>${p.jenispembayaran}</td>
+                    <td>${p.metode}</td>
+                    <td>Rp ${p.sisabayar.toLocaleString('id-ID')}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <button class="btn-detail detail-btn" data-index="${index}">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
+                `;
         tbody.appendChild(tr);
       });
+
       document.querySelectorAll('.detail-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const idx = btn.getAttribute('data-index');
-          showPaymentDetail(JSON.parse(JSON.stringify(payments[idx])));
+          showPaymentDetail(payments[idx]);
         });
       });
     }
 
     function updateSummary(payments) {
-      const totalBayar = payments.reduce((acc, p) => acc + p.jumlahbayar, 0);
-      const lunasCount = payments.filter(p => p.statuspembayaran.toLowerCase() === 'selesai').length;
-      const prosesCount = payments.filter(p => p.statuspembayaran.toLowerCase() === 'menunggu').length;
+      const totalBayar = payments.filter(p => p.statuspembayaran.toLowerCase() !== 'batal').reduce((acc, p) => acc + p.jumlahbayar, 0);
+      const lunasCount = payments.filter(p => p.statuspembayaran.toLowerCase() === 'selesai' || p.statuspembayaran.toLowerCase() === 'lunas').length;
+      const prosesCount = payments.filter(p => p.statuspembayaran.toLowerCase() === 'menunggu' || p.statuspembayaran.toLowerCase() === 'proses').length;
 
       document.getElementById('totalBayarDisplay').textContent = `Rp ${totalBayar.toLocaleString('id-ID')}`;
-      document.getElementById('lunasCountDisplay').textContent = `${lunasCount} Pembayaran`;
-      document.getElementById('prosesCountDisplay').textContent = `${prosesCount} Pembayaran`;
+      document.getElementById('lunasCountDisplay').textContent = `${lunasCount} Transaksi`;
+      document.getElementById('prosesCountDisplay').textContent = `${prosesCount} Transaksi`;
     }
 
     function updateChart(payments) {
@@ -513,9 +650,15 @@ require_once 'auth_check.php';
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
       const monthlyTotals = new Array(12).fill(0);
       payments.forEach(p => {
-        const monthIndex = new Date(p.tanggal).getMonth();
-        monthlyTotals[monthIndex] += p.jumlahbayar;
+        if (p.statuspembayaran.toLowerCase() !== 'batal') {
+          const date = new Date(p.tanggal);
+          if (!isNaN(date)) {
+            const monthIndex = date.getMonth();
+            monthlyTotals[monthIndex] += p.jumlahbayar;
+          }
+        }
       });
+
       if (window.paymentsChartInstance) window.paymentsChartInstance.destroy();
       window.paymentsChartInstance = new Chart(ctx, {
         type: 'line',
@@ -533,6 +676,7 @@ require_once 'auth_check.php';
         },
         options: {
           responsive: true,
+          maintainAspectRatio: true,
           plugins: {
             legend: {
               labels: {
@@ -575,14 +719,28 @@ require_once 'auth_check.php';
       document.getElementById('detail_metode').textContent = payment.metode;
       document.getElementById('detail_jumlahbayar').textContent = 'Rp ' + payment.jumlahbayar.toLocaleString('id-ID');
       document.getElementById('subtotal_bayar').textContent = 'Rp ' + payment.jumlahbayar.toLocaleString('id-ID');
-      document.getElementById('jumlah_total').textContent = 'Rp ' + payment.jumlahbayar.toLocaleString('id-ID');
+      document.getElementById('jumlah_total').textContent = 'Rp ' + (payment.jumlahbayar + payment.sisabayar).toLocaleString('id-ID');
       document.getElementById('detail_sisabayar').textContent = 'Rp ' + payment.sisabayar.toLocaleString('id-ID');
+
+      let statusClass = 'text-secondary';
+      if (payment.statuspembayaran.toLowerCase() === 'selesai' || payment.statuspembayaran.toLowerCase() === 'lunas') {
+        statusClass = 'text-success';
+      } else if (payment.statuspembayaran.toLowerCase() === 'menunggu' || payment.statuspembayaran.toLowerCase() === 'proses') {
+        statusClass = 'text-warning';
+      } else if (payment.statuspembayaran.toLowerCase() === 'batal') {
+        statusClass = 'text-danger';
+      }
+
+      document.getElementById('detail_statuspembayaran').className = `fw-bold ${statusClass}`;
       document.getElementById('detail_statuspembayaran').textContent = payment.statuspembayaran;
 
       const myModal = new bootstrap.Modal(document.getElementById('detailPaymentModal'));
       myModal.show();
     }
+
+    // Panggil fungsi saat halaman dimuat
     loadPayments();
   </script>
 </body>
+
 </html>

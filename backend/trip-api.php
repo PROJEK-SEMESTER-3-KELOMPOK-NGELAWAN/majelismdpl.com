@@ -4,22 +4,42 @@ require_once 'koneksi.php';
 
 $action = $_GET['action'] ?? '';
 
+// Array of field names to track and their human-readable labels
+$fieldsToTrack = [
+    'nama_gunung' => 'Nama Gunung', 
+    'tanggal' => 'Tanggal Trip', 
+    'slot' => 'Slot', 
+    'durasi' => 'Durasi', 
+    'jenis_trip' => 'Jenis Trip', 
+    'harga' => 'Harga', 
+    'via_gunung' => 'Via', 
+    'status' => 'Status'
+    // 'gambar' tidak dimasukkan karena log update gambar biasanya terpisah
+];
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
+    // Pastikan session dimulai untuk semua POST action yang memerlukan id_user
+    if (!isset($_SESSION)) {
+        session_start();
+    }
+    $id_user = $_SESSION['id_user'] ?? null; // Fallback jika session hilang
+
     // DeleteTrip
     if ($action === 'deleteTrip' && isset($_POST['id_trip'])) {
-        session_start(); // Pastikan session dibuka jika file ini belum otomatis memulai session
-        $id_user = $_SESSION['id_user']; // Ambil user pelaku dari session
+        // ... (Kode DeleteTrip tidak diubah) ...
+        $id_trip_del = $_POST['id_trip'];
 
         // Dapatkan nama gunung untuk keterangan aktivitas
         $q = $conn->prepare("SELECT nama_gunung FROM paket_trips WHERE id_trip=?");
-        $q->bind_param("i", $_POST['id_trip']);
+        $q->bind_param("i", $id_trip_del);
         $q->execute();
         $q->bind_result($nama_gunung_del);
         $q->fetch();
         $q->close();
 
         $stmt = $conn->prepare("DELETE FROM paket_trips WHERE id_trip=?");
-        $stmt->bind_param("i", $_POST['id_trip']);
+        $stmt->bind_param("i", $id_trip_del);
         $success = $stmt->execute();
         $stmt->close();
 
@@ -27,12 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
         if ($success) {
             $aktivitas = "Trip \"{$nama_gunung_del}\" dihapus";
             $statusLog = "Delete";
-            $logStmt = $conn->prepare(
-                "INSERT INTO activity_logs (aktivitas, waktu, status, id_user) VALUES (?, NOW(), ?, ?)"
-            );
-            $logStmt->bind_param("ssi", $aktivitas, $statusLog, $id_user);
-            $logStmt->execute();
-            $logStmt->close();
+            if ($id_user) {
+                $logStmt = $conn->prepare(
+                    "INSERT INTO activity_logs (aktivitas, waktu, status, id_user) VALUES (?, NOW(), ?, ?)"
+                );
+                $logStmt->bind_param("ssi", $aktivitas, $statusLog, $id_user);
+                $logStmt->execute();
+                $logStmt->close();
+            }
         }
 
         echo json_encode(['success' => $success]);
@@ -63,12 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
 
     // AddTrip
     if ($action === 'addTrip') {
-        session_start(); // aktifkan session (jika belum di awal file)
-        $id_user = $_SESSION['id_user']; // ambil dari session login admin
-
+        // ... (Kode AddTrip tidak diubah) ...
+        
         $stmt = $conn->prepare(
             "INSERT INTO paket_trips (nama_gunung, tanggal, slot, durasi, jenis_trip, harga, via_gunung, status, gambar)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
             "ssissssss",
@@ -94,13 +115,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
         // Tambahkan ke activity_logs jika proses insert trip berhasil
         if ($success) {
             $aktivitas = "Trip \"{$nama_gunung}\" ditambahkan";
-            $statusLog = "Publish";
-            $logStmt = $conn->prepare(
-                "INSERT INTO activity_logs (aktivitas, waktu, status, id_user) VALUES (?, NOW(), ?, ?)"
-            );
-            $logStmt->bind_param("ssi", $aktivitas, $statusLog, $id_user);
-            $logStmt->execute();
-            $logStmt->close();
+            $statusLog = "Create"; // Ganti Publish jadi Create untuk konsistensi filter
+            if ($id_user) {
+                $logStmt = $conn->prepare(
+                    "INSERT INTO activity_logs (aktivitas, waktu, status, id_user) VALUES (?, NOW(), ?, ?)"
+                );
+                $logStmt->bind_param("ssi", $aktivitas, $statusLog, $id_user);
+                $logStmt->execute();
+                $logStmt->close();
+            }
         }
 
         // Ambil data trip terbaru
@@ -118,22 +141,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
 
     // UpdateTrip
     if ($action === 'updateTrip' && isset($_POST['id_trip'])) {
-        session_start(); // pastikan session dibuka
-        $id_user = $_SESSION['id_user']; // ambil dari session admin login
+        $id_trip_update = $_POST['id_trip'];
 
+        // ==========================================================
+        // LANGKAH 1: AMBIL DATA LAMA SEBELUM UPDATE
+        // ==========================================================
+        $qOld = $conn->prepare("SELECT * FROM paket_trips WHERE id_trip = ?");
+        $qOld->bind_param("i", $id_trip_update);
+        $qOld->execute();
+        $resultOld = $qOld->get_result();
+        $oldData = $resultOld->fetch_assoc();
+        $qOld->close();
+
+        if (!$oldData) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'msg' => 'Trip tidak ditemukan.']);
+            exit;
+        }
+        // ==========================================================
+        
+        // Cek gambar lama jika tidak ada upload baru
         if ($gambarPath === '') {
-            $q = $conn->prepare("SELECT gambar FROM paket_trips WHERE id_trip=?");
-            $q->bind_param("i", $_POST['id_trip']);
-            $q->execute();
-            $q->bind_result($gambar_old);
-            $q->fetch();
-            $q->close();
-            $gambarPath = $gambar_old;
+            $gambarPath = $oldData['gambar'];
         }
 
         $stmt = $conn->prepare(
             "UPDATE paket_trips SET nama_gunung=?, tanggal=?, slot=?, durasi=?, jenis_trip=?, harga=?, via_gunung=?, status=?, gambar=?
-         WHERE id_trip=?"
+            WHERE id_trip=?"
         );
         $stmt->bind_param(
             "ssissssssi",
@@ -146,37 +180,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
             $via_gunung,
             $status,
             $gambarPath,
-            $_POST['id_trip']
+            $id_trip_update
         );
         $success = $stmt->execute();
+        
         if (!$success) {
             echo json_encode(['success' => false, 'msg' => $stmt->error]);
             $stmt->close();
             exit;
         }
         $stmt->close();
+        
+        // ==========================================================
+        // LANGKAH 2 & 3: BANDINGKAN DATA DAN BUAT LOG DETAIL
+        // ==========================================================
+        $changedDetails = [];
+        
+        // Data baru dari POST untuk perbandingan
+        $newDataFromPost = [
+            'nama_gunung' => $nama_gunung,
+            'tanggal' => $tanggal,
+            'slot' => $slot,
+            'durasi' => $durasi,
+            'jenis_trip' => $jenis_trip,
+            'harga' => $harga,
+            'via_gunung' => $via_gunung,
+            'status' => $status,
+            'gambar' => $gambarPath // Termasuk gambar jika diupload/dipertahankan
+        ];
 
-        // Ambil data nama trip yg baru diupdate untuk log aktivitas
-        $q = $conn->prepare("SELECT nama_gunung FROM paket_trips WHERE id_trip = ?");
-        $q->bind_param("i", $_POST['id_trip']);
-        $q->execute();
-        $q->bind_result($nama_gunung_log);
-        $q->fetch();
-        $q->close();
-
-        // Tambah log aktivitas jika update berhasil
-        if ($success) {
-            $aktivitas = "Trip \"{$nama_gunung_log}\" diupdate";
-            $statusLog = "Update";
-            $logStmt = $conn->prepare("INSERT INTO activity_logs (aktivitas, waktu, status, id_user) VALUES (?, NOW(), ?, ?)");
-            $logStmt->bind_param("ssi", $aktivitas, $statusLog, $id_user);
-            $logStmt->execute();
-            $logStmt->close();
+        foreach ($fieldsToTrack as $fieldKey => $fieldLabel) {
+            $oldValue = (string)($oldData[$fieldKey] ?? '');
+            $newValue = (string)($newDataFromPost[$fieldKey] ?? '');
+            
+            // Perbandingan: Cek apakah nilai lama berbeda dengan nilai baru
+            if ($oldValue !== $newValue) {
+                // Log perubahan. Ganti label 'status' jika diperlukan.
+                $label = ($fieldKey === 'status') ? 'Status Trip' : $fieldLabel;
+                
+                // Format: Label: NilaiLama -> NilaiBaru
+                $changedDetails[] = "{$label}: {$oldValue} -> {$newValue}";
+            }
         }
+
+        // Tambah log aktivitas jika ada perubahan (termasuk jika hanya gambar yang berubah)
+        if (!empty($changedDetails)) {
+            $detailsString = implode(', ', $changedDetails);
+            
+            // Format Log Akhir: Trip "NamaTrip" diupdate: [Detail Perubahan]
+            $aktivitas = "Trip \"{$nama_gunung}\" diupdate: {$detailsString}";
+            $statusLog = "Update";
+
+            if ($id_user) {
+                $logStmt = $conn->prepare("INSERT INTO activity_logs (aktivitas, waktu, status, id_user) VALUES (?, NOW(), ?, ?)");
+                $logStmt->bind_param("ssi", $aktivitas, $statusLog, $id_user);
+                $logStmt->execute();
+                $logStmt->close();
+            }
+        }
+        // ==========================================================
 
         // Ambil data trip terbaru yang diupdate
         $q = $conn->prepare("SELECT * FROM paket_trips WHERE id_trip = ?");
-        $q->bind_param("i", $_POST['id_trip']);
+        $q->bind_param("i", $id_trip_update);
         $q->execute();
         $result = $q->get_result();
         $updatedTrip = $result->fetch_assoc();
@@ -193,6 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
     exit;
 }
 
+// ... (GET methods di bawahnya tidak diubah) ...
 // GET trip list
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'getTrips') {
     $result = $conn->query("SELECT * FROM paket_trips ORDER BY id_trip DESC");

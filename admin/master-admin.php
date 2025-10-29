@@ -10,6 +10,7 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,22 +24,25 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.0/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
 
     <style>
+        body {
+            background: #f6f0e8;
+            color: #232323;
+            font-family: "Poppins", Arial, sans-serif;
+            min-height: 100vh;
+            letter-spacing: 0.3px;
+            margin: 0;
+        }
+
         .main {
             margin-left: 280px;
             min-height: 100vh;
             padding: 20px 25px;
             background: #f6f0e8;
             transition: margin-left 0.3s ease;
-        }
-
-        body.sidebar-collapsed .main {
-            margin-left: 70px;
-        }
-
-        .content-wrapper {
-            padding: 30px;
         }
 
         .card {
@@ -238,7 +242,7 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             transition: transform 0.3s ease;
         }
 
-        .custom-select:focus + .select-arrow {
+        .custom-select:focus+.select-arrow {
             transform: translateY(-50%) rotate(180deg);
             color: #a97c50;
         }
@@ -285,7 +289,7 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             padding-left: 40px;
         }
 
-        .input-with-icon .form-control:focus + .input-icon {
+        .input-with-icon .form-control:focus+.input-icon {
             color: #a97c50;
         }
 
@@ -504,7 +508,7 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
                 <div>
                     <h2>Master Administrator</h2>
                     <small class="text-muted">
-                        <i class="bi bi-shield-check"></i> 
+                        <i class="bi bi-shield-check"></i>
                         Kelola Admin & Super Admin
                         <span class="permission-badge">
                             <?= RoleHelper::getRoleDisplayName($user_role) ?>
@@ -706,7 +710,7 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             const roleSelect = document.getElementById('role');
             const roleInfo = document.getElementById('roleInfo');
             const roleInfoContent = document.getElementById('roleInfoContent');
-            
+
             if (roleSelect.value === 'admin') {
                 roleInfo.className = 'role-info-card role-admin-info';
                 roleInfo.style.display = 'block';
@@ -744,4 +748,5 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
         });
     </script>
 </body>
+
 </html>
