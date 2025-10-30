@@ -94,127 +94,174 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
             padding: 20px 15px;
         }
 
-        /* Header Compact */
+        /* Header Enhanced */
         .header {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(169, 124, 80, 0.15);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            backdrop-filter: blur(20px);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid rgba(169, 124, 80, 0.2);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
         }
 
         .title {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.6rem;
+            font-weight: 800;
             background: linear-gradient(135deg, #3D2F21 0%, #a97c50 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .title i {
             background: linear-gradient(135deg, #ffb800 0%, #a97c50 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-size: 1.8rem;
         }
 
         .subtitle {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #6B5847;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-weight: 500;
         }
 
-        /* Stats Mini */
+        /* Stats Enhanced with Better Borders */
         .stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 12px;
         }
 
         .stat {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.8) 100%);
-            border-radius: 10px;
-            padding: 12px 8px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.95) 100%);
+            border-radius: 12px;
+            padding: 16px 12px;
             text-align: center;
-            border: 1px solid rgba(169, 124, 80, 0.1);
-            transition: all 0.3s ease;
+            border: 2px solid rgba(169, 124, 80, 0.25);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat:hover::before {
+            left: 100%;
         }
 
         .stat:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(169, 124, 80, 0.12);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(169, 124, 80, 0.2);
+            border-color: rgba(169, 124, 80, 0.4);
         }
 
         .stat-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
-            margin: 0 auto 8px;
+            font-size: 1.3rem;
+            margin: 0 auto 10px;
+            transition: all 0.3s ease;
+        }
+
+        .stat:hover .stat-icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .stat.total {
+            border-color: rgba(169, 124, 80, 0.3);
         }
 
         .stat.total .stat-icon {
-            background: rgba(169, 124, 80, 0.1);
+            background: linear-gradient(135deg, rgba(169, 124, 80, 0.15) 0%, rgba(212, 165, 116, 0.2) 100%);
             color: #a97c50;
+            box-shadow: 0 3px 10px rgba(169, 124, 80, 0.2);
+        }
+
+        .stat.pending {
+            border-color: rgba(255, 193, 7, 0.3);
         }
 
         .stat.pending .stat-icon {
-            background: rgba(255, 193, 7, 0.1);
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 193, 7, 0.2) 100%);
             color: #ffc107;
+            box-shadow: 0 3px 10px rgba(255, 193, 7, 0.2);
+        }
+
+        .stat.paid {
+            border-color: rgba(40, 167, 69, 0.3);
         }
 
         .stat.paid .stat-icon {
-            background: rgba(40, 167, 69, 0.1);
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.15) 0%, rgba(40, 167, 69, 0.2) 100%);
             color: #28a745;
+            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.2);
+        }
+
+        .stat.finished {
+            border-color: rgba(108, 117, 125, 0.3);
         }
 
         .stat.finished .stat-icon {
-            background: rgba(108, 117, 125, 0.1);
+            background: linear-gradient(135deg, rgba(108, 117, 125, 0.15) 0%, rgba(108, 117, 125, 0.2) 100%);
             color: #6c757d;
+            box-shadow: 0 3px 10px rgba(108, 117, 125, 0.2);
         }
 
         .stat-value {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: 800;
             color: #3D2F21;
             line-height: 1;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
         .stat-label {
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             color: #6B5847;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
         }
 
-        /* Trips Grid Mini */
+        /* Section Title */
         .section-title {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #3D2F21;
-            margin: 20px 0 12px;
+            margin: 25px 0 15px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .section-title::after {
             content: '';
             flex: 1;
             height: 2px;
-            background: linear-gradient(90deg, rgba(169, 124, 80, 0.2), transparent);
+            background: linear-gradient(90deg, rgba(169, 124, 80, 0.3), transparent);
         }
 
+        /* Trip Cards */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -223,21 +270,22 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
 
         .card {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            border-radius: 12px;
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
             overflow: hidden;
-            border: 1px solid rgba(169, 124, 80, 0.12);
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-            transition: all 0.3s ease;
+            border: 1px solid rgba(169, 124, 80, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-color: rgba(169, 124, 80, 0.3);
         }
 
         .card-img {
-            height: 140px;
+            height: 150px;
             background-size: cover;
             background-position: center;
             position: relative;
@@ -247,33 +295,33 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
         }
 
         .badge {
             position: absolute;
-            top: 8px;
-            padding: 4px 10px;
-            border-radius: 12px;
+            top: 10px;
+            padding: 5px 12px;
+            border-radius: 15px;
             font-weight: 700;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+            letter-spacing: 0.5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
             z-index: 1;
         }
 
         .badge-type {
-            left: 8px;
+            left: 10px;
             background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
             color: #fff;
         }
 
         .badge-status {
-            right: 8px;
+            right: 10px;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
 
         .status-pending {
@@ -297,32 +345,33 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
         }
 
         .card-body {
-            padding: 15px;
+            padding: 16px;
         }
 
         .card-title {
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: #3D2F21;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             line-height: 1.3;
         }
 
         .card-via {
             color: #6B5847;
             font-size: 0.75rem;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-weight: 500;
         }
 
         .card-meta {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            margin-bottom: 12px;
-            padding: 10px;
-            background: rgba(169, 124, 80, 0.04);
-            border-radius: 8px;
+            gap: 7px;
+            margin-bottom: 14px;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(169, 124, 80, 0.05) 0%, rgba(212, 165, 116, 0.08) 100%);
+            border-radius: 10px;
+            border: 1px solid rgba(169, 124, 80, 0.1);
         }
 
         .meta-item {
@@ -334,13 +383,13 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
         }
 
         .meta-item i {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 4px;
-            background: rgba(169, 124, 80, 0.08);
+            border-radius: 6px;
+            background: rgba(169, 124, 80, 0.12);
             color: #a97c50;
             font-size: 0.7rem;
         }
@@ -357,8 +406,8 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
 
         .btn {
             flex: 1;
-            padding: 8px 14px;
-            border-radius: 8px;
+            padding: 9px 16px;
+            border-radius: 10px;
             font-size: 0.75rem;
             font-weight: 700;
             text-decoration: none;
@@ -370,141 +419,160 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
             justify-content: center;
             gap: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
             transition: all 0.3s ease;
         }
 
         .btn-detail {
             background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
             color: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
         }
 
         .btn-detail:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.3);
         }
 
         .btn-payment {
             background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
             color: #fff;
-            box-shadow: 0 2px 10px rgba(169, 124, 80, 0.25);
+            box-shadow: 0 3px 12px rgba(169, 124, 80, 0.3);
         }
 
         .btn-payment:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(169, 124, 80, 0.4);
+            box-shadow: 0 5px 18px rgba(169, 124, 80, 0.5);
         }
 
         /* Empty State */
         .empty {
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 40px 30px;
+            border-radius: 18px;
+            padding: 50px 40px;
             text-align: center;
-            border: 2px dashed rgba(169, 124, 80, 0.2);
+            border: 2px dashed rgba(169, 124, 80, 0.25);
         }
 
         .empty i {
-            font-size: 3rem;
+            font-size: 3.5rem;
             background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
         }
 
         .empty h2 {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             color: #3D2F21;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 700;
         }
 
         .empty p {
             color: #6B5847;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
         }
 
         .btn-explore {
-            padding: 10px 28px;
+            padding: 12px 35px;
             background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
             color: #fff;
-            border-radius: 20px;
+            border-radius: 25px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(169, 124, 80, 0.25);
+            gap: 10px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 6px 20px rgba(169, 124, 80, 0.3);
             text-transform: uppercase;
         }
 
         .btn-explore:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(169, 124, 80, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(169, 124, 80, 0.5);
         }
 
-        /* Modal Compact */
+        /* SweetAlert */
         .swal2-popup {
             font-size: 0.85rem !important;
             padding: 0 !important;
             max-width: 700px !important;
             width: 90% !important;
-            border-radius: 15px !important;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2) !important;
+            border-radius: 18px !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25) !important;
         }
 
         .swal2-title {
             background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
             color: #fff !important;
-            padding: 18px 25px !important;
+            padding: 22px 30px !important;
             margin: 0 !important;
-            font-size: 1.2rem !important;
-            font-weight: 700 !important;
-            border-radius: 15px 15px 0 0 !important;
+            font-size: 1.3rem !important;
+            font-weight: 800 !important;
+            border-radius: 18px 18px 0 0 !important;
         }
 
         .swal2-html-container {
-            max-height: 60vh !important;
+            max-height: 62vh !important;
             overflow-y: auto !important;
             margin: 0 !important;
-            padding: 20px 25px !important;
+            padding: 25px 30px !important;
         }
 
         .swal2-close {
-            font-size: 1.8rem !important;
+            font-size: 2rem !important;
             color: rgba(255, 255, 255, 0.8) !important;
         }
 
         .info-group {
-            margin-bottom: 15px;
-            border: 1px solid rgba(169, 124, 80, 0.12);
+            margin-bottom: 18px;
+            border: 2px solid rgba(169, 124, 80, 0.15);
             border-radius: 12px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.4);
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.5) 100%);
+            transition: all 0.3s;
+        }
+
+        .info-group:hover {
+            box-shadow: 0 6px 20px rgba(169, 124, 80, 0.12);
+            transform: translateY(-2px);
         }
 
         .info-group h4 {
             color: #3D2F21;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             font-weight: 700;
-            font-size: 0.95rem;
-            border-bottom: 2px solid rgba(169, 124, 80, 0.12);
-            padding-bottom: 8px;
+            font-size: 1rem;
+            border-bottom: 2px solid rgba(169, 124, 80, 0.2);
+            padding-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
-            font-size: 0.8rem;
-            border-bottom: 1px dashed rgba(169, 124, 80, 0.08);
+            padding: 7px 0;
+            font-size: 0.85rem;
+            border-bottom: 1px dashed rgba(169, 124, 80, 0.1);
         }
 
         .info-row:last-child {
@@ -521,7 +589,7 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
         }
 
         .price-total {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             background: linear-gradient(135deg, #ffb800 0%, #a97c50 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -529,25 +597,26 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
         }
 
         .btn-map {
-            margin-top: 12px;
+            margin-top: 15px;
             background: linear-gradient(135deg, #333 0%, #000 100%);
             color: #fff;
-            padding: 8px 18px;
+            padding: 10px 20px;
             border-radius: 10px;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             font-weight: 700;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             transition: all 0.3s ease;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             text-transform: uppercase;
         }
 
         .btn-map:hover {
             background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(169, 124, 80, 0.5);
         }
 
         /* Responsive */
@@ -561,12 +630,12 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
             }
 
             .header {
-                padding: 15px;
-                border-radius: 12px;
+                padding: 20px 18px;
+                border-radius: 15px;
             }
 
             .title {
-                font-size: 1.3rem;
+                font-size: 1.4rem;
                 flex-wrap: wrap;
                 justify-content: center;
                 text-align: center;
@@ -574,12 +643,12 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
 
             .subtitle {
                 text-align: center;
-                font-size: 0.75rem;
+                font-size: 0.8rem;
             }
 
             .stats {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
+                gap: 10px;
             }
 
             .grid {
@@ -622,7 +691,7 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
     <div class="container">
         <div class="header">
             <h1 class="title"><i class="fa-solid fa-mountain-sun"></i><span>My Trips</span></h1>
-            <p class="subtitle">Kelola reservasi pendakian Anda</p>
+            <p class="subtitle">Manage your mountain adventure bookings</p>
             <div class="stats">
                 <div class="stat total">
                     <div class="stat-icon"><i class="fa-solid fa-mountain"></i></div>
@@ -650,14 +719,14 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
         <?php if (empty($myTrips)): ?>
             <div class="empty">
                 <i class="fa-solid fa-mountain"></i>
-                <h2>Belum Ada Trip</h2>
-                <p>Mulai petualangan Anda!</p>
+                <h2>No Trips Yet</h2>
+                <p>Start your mountain adventure today!</p>
                 <a href="<?= $navbarPath; ?>index.php#paketTrips" class="btn-explore">
-                    <i class="fa-solid fa-compass"></i> Jelajahi
+                    <i class="fa-solid fa-compass"></i> Explore Trips
                 </a>
             </div>
         <?php else: ?>
-            <h2 class="section-title"><i class="fa-solid fa-list"></i> Trip Anda</h2>
+            <h2 class="section-title"><i class="fa-solid fa-list"></i> Your Trips</h2>
             <div class="grid">
                 <?php foreach ($myTrips as $trip): ?>
                     <div class="card">
@@ -679,7 +748,7 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
                             <div class="card-meta">
                                 <div class="meta-item"><i class="fa-solid fa-calendar-alt"></i><span><strong><?= date('d M Y', strtotime($trip['tanggal_trip'])); ?></strong></span></div>
                                 <div class="meta-item"><i class="fa-solid fa-clock"></i><span><?= htmlspecialchars($trip['durasi']); ?></span></div>
-                                <div class="meta-item"><i class="fa-solid fa-users"></i><span><?= $trip['jumlah_orang']; ?> Orang</span></div>
+                                <div class="meta-item"><i class="fa-solid fa-users"></i><span><?= $trip['jumlah_orang']; ?> People</span></div>
                                 <div class="meta-item"><i class="fa-solid fa-tag"></i><span><strong>Rp <?= number_format($trip['total_harga'], 0, ',', '.'); ?></strong></span></div>
                             </div>
                             <div class="actions">
@@ -688,7 +757,7 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
                                 </button>
                                 <?php if ($trip['status_booking'] == 'pending'): ?>
                                     <a href="<?= $navbarPath; ?>user/payment-status.php?booking_id=<?= $trip['id_booking']; ?>" class="btn btn-payment">
-                                        <i class="fa-solid fa-credit-card"></i> Bayar
+                                        <i class="fa-solid fa-credit-card"></i> Pay
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -706,7 +775,7 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
         function openDetail(d) {
             const fmt = s => {
                 if (s === 'pending') return '<span style="color:#ffc107;font-weight:700">⏳ Pending</span>';
-                if (s === 'paid') return '<span style="color:#28a745;font-weight:700">✅ Lunas</span>';
+                if (s === 'paid') return '<span style="color:#28a745;font-weight:700">✅ Paid</span>';
                 return s;
             };
             const tBook = new Date(d.tanggal_booking).toLocaleDateString('id-ID', {
@@ -719,34 +788,34 @@ $finishedCount = count(array_filter($myTrips, fn($t) => $t['status_booking'] ===
                 month: 'long',
                 year: 'numeric'
             });
-            const maps = d.link_map && d.link_map !== '#' ? `<a href="${d.link_map}" target="_blank" class="btn-map"><i class="fa-solid fa-map-location-dot"></i> Maps</a>` : '';
+            const maps = d.link_map && d.link_map !== '#' ? `<a href="${d.link_map}" target="_blank" class="btn-map"><i class="fa-solid fa-map-location-dot"></i> Buka Maps</a>` : '';
 
             Swal.fire({
                 title: `<i class="fa-solid fa-info-circle"></i> ${d.nama_gunung}`,
                 html: `<div style="text-align:left">
                     <div class="info-group">
-                        <h4><i class="fa-solid fa-receipt"></i> Ringkasan</h4>
-                        <div class="info-row"><span>ID:</span><strong>#${d.id_booking}</strong></div>
-                        <div class="info-row"><span>Tanggal:</span><strong>${tBook}</strong></div>
+                        <h4><i class="fa-solid fa-receipt"></i> Summary</h4>
+                        <div class="info-row"><span>Booking ID:</span><strong>#${d.id_booking}</strong></div>
+                        <div class="info-row"><span>Date:</span><strong>${tBook}</strong></div>
                         <div class="info-row"><span>Status:</span>${fmt(d.status_booking)}</div>
-                        <div class="info-row"><span>Peserta:</span><strong>${d.jumlah_orang} Orang</strong></div>
+                        <div class="info-row"><span>Participants:</span><strong>${d.jumlah_orang} People</strong></div>
                         <div class="info-row"><span>Total:</span><strong class="price-total">Rp ${parseInt(d.total_harga).toLocaleString('id-ID')}</strong></div>
                     </div>
                     <div class="info-group">
-                        <h4><i class="fa-solid fa-mountain"></i> Detail Trip</h4>
-                        <div class="info-row"><span>Gunung:</span><strong>${d.nama_gunung}</strong></div>
+                        <h4><i class="fa-solid fa-mountain"></i> Trip Details</h4>
+                        <div class="info-row"><span>Mountain:</span><strong>${d.nama_gunung}</strong></div>
                         <div class="info-row"><span>Via:</span><strong>${d.via_gunung}</strong></div>
-                        <div class="info-row"><span>Tanggal:</span><strong>${tTrip}</strong></div>
-                        <div class="info-row"><span>Durasi:</span><strong>${d.durasi}</strong></div>
-                        <div class="info-row"><span>Kumpul:</span><strong>${d.waktu_kumpul.substring(0,5)} WIB</strong></div>
-                        <div class="info-row"><span>Lokasi:</span><strong>${d.nama_lokasi}</strong></div>
+                        <div class="info-row"><span>Date:</span><strong>${tTrip}</strong></div>
+                        <div class="info-row"><span>Duration:</span><strong>${d.durasi}</strong></div>
+                        <div class="info-row"><span>Meeting Time:</span><strong>${d.waktu_kumpul.substring(0,5)} WIB</strong></div>
+                        <div class="info-row"><span>Location:</span><strong>${d.nama_lokasi}</strong></div>
                         ${maps}
                     </div>
                     <div class="info-group">
-                        <h4><i class="fa-solid fa-clipboard-list"></i> Info</h4>
-                        <div style="padding:6px 0"><strong>Include:</strong><br><small style="margin-left:10px;display:block;margin-top:4px;color:#6B5847">${d.include}</small></div>
-                        <div style="padding:6px 0"><strong>Exclude:</strong><br><small style="margin-left:10px;display:block;margin-top:4px;color:#6B5847">${d.exclude}</small></div>
-                        <div style="padding:6px 0"><strong>S&K:</strong><br><small style="margin-left:10px;display:block;margin-top:4px;color:#6B5847">${d.syaratKetentuan}</small></div>
+                        <h4><i class="fa-solid fa-clipboard-list"></i> Important Info</h4>
+                        <div style="padding:8px 0"><strong>Included:</strong><br><small style="margin-left:12px;display:block;margin-top:5px;color:#6B5847;line-height:1.5">${d.include}</small></div>
+                        <div style="padding:8px 0"><strong>Excluded:</strong><br><small style="margin-left:12px;display:block;margin-top:5px;color:#6B5847;line-height:1.5">${d.exclude}</small></div>
+                        <div style="padding:8px 0"><strong>Terms:</strong><br><small style="margin-left:12px;display:block;margin-top:5px;color:#6B5847;line-height:1.5">${d.syaratKetentuan}</small></div>
                     </div>
                 </div>`,
                 width: '700px',
