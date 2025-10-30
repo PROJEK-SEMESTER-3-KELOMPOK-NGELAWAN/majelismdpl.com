@@ -1,5 +1,16 @@
 <?php
 require_once 'auth_check.php';
+// Asumsi RoleHelper sudah dimuat di auth_check.php atau file lain yang diperlukan.
+if (!class_exists('RoleHelper')) {
+    class RoleHelper
+    {
+        public static function getRoleDisplayName($role)
+        {
+            return ucwords(str_replace('_', ' ', $role));
+        }
+    }
+}
+$user_role = $user_role ?? 'user';
 ?>
 
 <!DOCTYPE html>
@@ -15,6 +26,7 @@ require_once 'auth_check.php';
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
 
     <style>
+        /* --- CSS KONSISTENSI UTAMA DARI MASTER ADMIN --- */
         body {
             background: #f6f0e8;
             color: #232323;
@@ -24,6 +36,16 @@ require_once 'auth_check.php';
             margin: 0;
         }
 
+        .text-brown {
+            color: #a97c50 !important;
+        }
+
+        .bg-brown {
+            background-color: #a97c50 !important;
+            color: white;
+        }
+
+        /* --- Sidebar Styling (Dipertahankan) --- */
         .sidebar {
             background: #a97c50;
             min-height: 100vh;
@@ -41,154 +63,103 @@ require_once 'auth_check.php';
             transition: width 0.25s;
         }
 
-        .sidebar img {
-            width: 43px;
-            height: 43px;
-            border-radius: 11px;
-            background: #fff7eb;
-            border: 2px solid #d9b680;
-            margin-bottom: 13px;
-        }
-
-        .logo-text {
-            font-size: 1.13em;
-            font-weight: 700;
-            color: #fffbe4;
-            margin-bottom: 30px;
-            letter-spacing: 1.5px;
-        }
-
-        .sidebar-nav {
-            flex: 1 1 auto;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
         .nav-link {
-            width: 90%;
-            color: #fff;
-            font-weight: 500;
-            border-radius: 0.7rem;
-            margin-bottom: 5px;
-            padding: 13px 22px;
-            display: flex;
-            align-items: center;
-            font-size: 16px;
-            gap: 11px;
-            letter-spacing: 0.7px;
-            text-decoration: none;
-            transition: background 0.22s, color 0.22s;
+            /* ... */
         }
 
-        .nav-link.active,
-        .nav-link:hover {
-            background: #432f17;
-            color: #ffd49c;
-        }
-
-        .logout {
-            color: #fff;
-            background: #c19c72;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .logout:hover {
-            background: #432f17;
-            color: #fffbe4;
-        }
-
-        @media (max-width: 800px) {
-            .sidebar {
-                width: 100vw;
-                height: 70px;
-                flex-direction: row;
-                padding-top: 0;
-                padding-bottom: 0;
-                bottom: unset;
-                top: 0;
-                justify-content: center;
-                align-items: center;
-                position: fixed;
-                z-index: 100;
-            }
-
-            .sidebar img,
-            .logo-text {
-                display: none;
-            }
-
-            .sidebar-nav {
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-                width: 100vw;
-                height: 70px;
-                margin: 0;
-                padding: 0;
-            }
-
-            .nav-link,
-            .logout {
-                width: auto;
-                min-width: 70px;
-                font-size: 15px;
-                margin: 0 3px;
-                border-radius: 14px;
-                padding: 8px 10px;
-                justify-content: center;
-            }
-
-            .logout {
-                order: 99;
-                margin-left: 8px;
-                margin-bottom: 0;
-            }
-        }
-
+        /* --- Main Content & Header KONSISTENSI --- */
         .main {
             margin-left: 240px;
             min-height: 100vh;
             padding: 20px 25px;
             background: #f6f0e8;
+            transition: margin-left 0.25s;
         }
 
-        @media (max-width: 800px) {
-            .main {
-                margin-left: 0;
-                padding-top: 90px;
-                padding-left: 15px;
-                padding-right: 15px;
-            }
+        .main-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 32px;
+            padding-bottom: 28px;
         }
 
-        h1.daftar-heading {
-            color: #a97c50;
+        .main-header h2 {
+            font-size: 1.4rem;
             font-weight: 700;
-            font-size: 1.5rem;
-            margin: 32px 0 18px 0;
-            margin-bottom: 20px;
+            color: #a97c50;
+            margin-bottom: 0;
             letter-spacing: 1px;
         }
 
+        .permission-badge {
+            background-color: #28a745;
+            color: white;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+
+        /* --- CARD & BUTTON KONSISTENSI --- */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-bottom: 2px solid #a97c50;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px;
+        }
+
+        .btn-primary,
+        .btn-upload {
+            background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%) !important;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: white !important;
+        }
+
+        .btn-primary:hover,
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(169, 124, 80, 0.4);
+        }
+
+        /* Form Control KONSISTENSI */
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            height: 42px;
+        }
+
+        /* --- END KONSISTENSI MASTER ADMIN --- */
+
+
+        /* --- GALERI SECTION STYLING --- */
         .upload-section {
             margin-bottom: 25px;
             background: #fff;
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-upload {
-            background-color: #a97c50;
-            color: white;
-            font-weight: 600;
-        }
-
-        .btn-upload:hover {
-            background-color: #805d31;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         .gallery-grid {
@@ -197,7 +168,6 @@ require_once 'auth_check.php';
             gap: 15px;
         }
 
-        /* Updated Gallery Item Styling */
         .gallery-item {
             border-radius: 16px;
             overflow: hidden;
@@ -205,11 +175,12 @@ require_once 'auth_check.php';
             cursor: pointer;
             transition: transform 0.3s ease;
             background: white;
+            padding: 0; 
         }
 
         .gallery-item img {
             width: 100%;
-            height: 200px;
+            height: 200px; 
             object-fit: cover;
             display: block;
         }
@@ -219,10 +190,7 @@ require_once 'auth_check.php';
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
-        .gallery-item .position-relative {
-            position: relative;
-        }
-
+        /* --- GALLERY OVERLAY DAN TOMBOL AKSI REVISI --- */
         .gallery-overlay {
             position: absolute;
             top: 0;
@@ -233,7 +201,7 @@ require_once 'auth_check.php';
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -244,19 +212,23 @@ require_once 'auth_check.php';
 
         .gallery-overlay .btn {
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 16px;
+            font-size: 1.5rem;
+            color: white;
+            opacity: 0.9;
+            transition: opacity 0.2s, transform 0.2s;
         }
 
-        .gallery-info {
-            padding: 12px;
-            text-align: center;
+        .gallery-overlay .btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
         }
 
+        /* WARNA TOMBOL KONSISTENSI MASTER ADMIN */
         .btn-delete {
             background-color: #dc3545 !important;
             border-color: #dc3545 !important;
@@ -264,173 +236,65 @@ require_once 'auth_check.php';
 
         .btn-delete:hover {
             background-color: #c82333 !important;
-            border-color: #bd2130 !important;
         }
+        
+        /* Dihapus: Styles untuk .btn-view dan .btn-view:hover */
 
-        .btn-view {
-            background-color: #007bff !important;
-            border-color: #007bff !important;
-        }
+        /* Dihapus: Styles untuk .modal-body img.img-fluid karena modal detail dihilangkan */
 
-        .btn-view:hover {
-            background-color: #0056b3 !important;
-            border-color: #004085 !important;
-        }
-
-        /* Toast Container */
-        .toast-container {
-            z-index: 9999;
-        }
-
-        /* Loading State */
-        .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
-        }
-
-        /* Responsive untuk mobile */
-        @media (max-width: 768px) {
-            .gallery-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 10px;
-            }
-
-            .gallery-item img {
-                height: 150px;
-            }
-
-            .gallery-overlay .btn {
-                width: 35px;
-                height: 35px;
-                font-size: 14px;
-            }
-        }
-
-        /* Alert Styling */
-        .alert-custom {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            margin-bottom: 20px;
-        }
-
-        .alert-success-custom {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-
-        .alert-danger-custom {
-            background: linear-gradient(135deg, #f8d7da 0%, #f1b0b7 100%);
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-
-        /* Custom Modal Delete Styles */
-        .modal-delete {
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-delete .modal-content {
-            border-radius: 20px;
-            border: none;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-delete .modal-header {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-            border-radius: 20px 20px 0 0;
-            padding: 20px 30px;
-        }
-
-        .modal-delete .modal-body {
-            padding: 30px;
-            text-align: center;
-        }
-
-        .modal-delete .image-preview {
-            width: 150px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 15px;
-            margin: 20px auto;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-delete .btn-confirm-delete {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            border: none;
-            border-radius: 25px;
-            padding: 12px 30px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .modal-delete .btn-confirm-delete:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(220, 53, 69, 0.4);
-        }
-
-        .modal-delete .btn-cancel {
-            background: #6c757d;
-            border: none;
-            border-radius: 25px;
-            padding: 12px 30px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .modal-delete .btn-cancel:hover {
-            background: #545b62;
-            transform: translateY(-2px);
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: scale(0.7) translateY(-50px);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .modal-delete.show .modal-content {
-            animation: modalSlideIn 0.3s ease-out;
-        }
     </style>
 </head>
 
 <body>
-    <!-- Include Sidebar -->
     <?php include 'sidebar.php'; ?>
 
     <main class="main">
-        <h1 class="daftar-heading">Galeri</h1>
 
-        <!-- Alert Container -->
-        <div id="alertContainer"></div>
+        <div class="main-header">
+            <div>
+                <h2>Galeri Foto</h2>
+                <small class="text-muted">
+                    <i class="bi bi-images"></i> Kelola koleksi gambar pendakian.
+                    <span class="permission-badge">
+                        <?= RoleHelper::getRoleDisplayName($user_role) ?>
+                    </span>
+                </small>
+            </div>
+        </div>
 
         <section class="upload-section">
             <form id="formUpload" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="fileInput" class="form-label fw-bold">Upload Gambar</label>
-                    <input type="file" id="fileInput" name="fileInput" accept="image/*" class="form-control" required />
-                    <img id="imagePreview" style="display:none; max-width: 300px; margin-top: 10px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);" />
+                <div class="row align-items-end">
+                    <div class="col-md-9 mb-3 mb-md-0">
+                        <label for="fileInput" class="form-label fw-bold">Pilih Gambar untuk Diunggah</label>
+                        <input type="file" id="fileInput" name="fileInput" accept="image/*" class="form-control" required />
+                    </div>
+                    <div class="col-md-3 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-upload w-100" style="height: 42px;">
+                            <i class="bi bi-cloud-arrow-up me-1"></i> Unggah
+                        </button>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-upload">Upload</button>
+
             </form>
         </section>
 
-        <section class="gallery-grid" id="galleryGrid">
-            <!-- Gambar akan dimunculkan disini -->
-        </section>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0 text-brown">
+                    <i class="bi bi-grid-3x3-gap-fill"></i> Koleksi Unggahan
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="alertContainer"></div>
+                <section class="gallery-grid" id="galleryGrid">
+                    <div class="col-12 text-center text-muted" style="justify-content: center">Memuat galeri...</div>
+                </section>
+            </div>
+        </div>
+        
     </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../frontend/galeri.js"></script>
 </body>

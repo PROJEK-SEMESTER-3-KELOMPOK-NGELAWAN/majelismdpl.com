@@ -3,15 +3,62 @@ class PesertaAPI {
     this.baseURL = "../backend/peserta-api.php";
     this.participants = [];
     this.currentEditParticipantId = null;
+    this.currentTripFilterId = ""; // Menyimpan ID trip yang sedang difilter
+    this.currentSearchTerm = ""; // Menyimpan istilah pencarian
     this.init();
   }
 
   async init() {
-    await this.loadParticipants();
+    await this.loadTripsForFilter(); // <-- BARU: Load daftar trip dulu
+    await this.loadParticipants(); // Load participants dengan filter default
     this.setupEventListeners();
-  } // Load all participants from API
+  }
 
+  // BARU: Method untuk memuat daftar trip dan mengisi dropdown filter
+  async loadTripsForFilter() {
+    const filterGunung = document.getElementById("filterGunung");
+    if (!filterGunung) return;
+
+    try {
+      const response = await fetch(`${this.baseURL}?action=trips`);
+      const result = await response.json();
+
+      if (result.status === 200) {
+        // Kosongkan semua kecuali opsi default
+        filterGunung.innerHTML =
+          '<option value="">Semua Gunung / Trip</option>';
+
+        // Tambahkan opsi dari data
+        result.data.forEach((trip) => {
+          const option = document.createElement("option");
+          option.value = this.escapeHtml(trip.id_trip);
+          option.textContent = this.escapeHtml(trip.nama_gunung);
+          filterGunung.appendChild(option);
+        });
+      } else {
+        console.error("Gagal memuat daftar trip:", result.message);
+      }
+    } catch (error) {
+      console.error("Error loading trip list:", error);
+    }
+  }
+
+  // Load all participants from API - DIMODIFIKASI
   async loadParticipants() {
+    // Tentukan parameter filter untuk API
+    let url = `${this.baseURL}?action=all`;
+
+    // Tambahkan filter ID Trip (Gunung)
+    if (this.currentTripFilterId) {
+      url += `&id_trip=${this.currentTripFilterId}`;
+    }
+
+    // Tambahkan filter Pencarian (searchInput di backend)
+    // NOTE: Karena API backend sudah diubah untuk menghandle search di getAllParticipants
+    if (this.currentSearchTerm.trim()) {
+      url += `&search=${encodeURIComponent(this.currentSearchTerm.trim())}`;
+    }
+
     // Show loading indicator
     const tableBody = document.getElementById("participantsTableBody");
     if (tableBody) {
@@ -19,8 +66,9 @@ class PesertaAPI {
     }
 
     try {
-      const response = await fetch(`${this.baseURL}?action=all`);
+      const response = await fetch(url);
       const result = await response.json();
+
       if (result.status === 200) {
         this.participants = result.data || [];
         this.renderParticipants();
@@ -43,29 +91,32 @@ class PesertaAPI {
     if (tableBody) {
       tableBody.innerHTML = `<tr><td colspan="13" class="text-center opacity-50 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>${message}</td></tr>`;
     }
-  } // Method untuk handle path gambar dengan benar
+  }
 
+  // Method untuk handle path gambar dengan benar
   getImagePath(imagePath) {
-    if (!imagePath) return ""; // Jika sudah http/https, return langsung
+    if (!imagePath) return "";
 
     if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
       return imagePath;
-    } // Jika sudah dimulai dengan '../', return langsung
+    }
 
     if (imagePath.startsWith("../")) {
       return imagePath;
-    } // Jika dimulai dengan 'uploads/', tambahkan '../'
+    }
 
     if (imagePath.startsWith("uploads/")) {
       return "../" + imagePath;
-    } // Jika hanya nama file, asumsikan di uploads/ktp/ // !!! PASTIKAN JALUR INI BENAR SESUAI STRUKTUR FOLDER ANDA !!!
+    }
 
     return "../uploads/ktp/" + imagePath;
-  } // Render participants table dengan path handling
+  }
 
+  // Render participants table dengan path handling - DIMODIFIKASI
   renderParticipants(participantsToRender = null) {
     const tableBody = document.getElementById("participantsTableBody");
-    const participants = participantsToRender || this.participants;
+    // Gunakan data dari this.participants (yang sudah difilter/dicari oleh backend)
+    const participants = this.participants;
 
     if (!tableBody) {
       console.error("Table body element not found");
@@ -74,65 +125,77 @@ class PesertaAPI {
 
     if (participants.length === 0) {
       tableBody.innerHTML = `
- <tr>
- <td colspan="13" class="text-center opacity-50">Belum ada peserta</td>
- </tr>
- `;
+        <tr>
+          <td colspan="13" class="text-center opacity-50">Tidak ada peserta yang ditemukan.</td>
+        </tr>
+      `;
       return;
     }
 
     tableBody.innerHTML = participants
       .map(
         (p) => `
- <tr>
- <td>${this.escapeHtml(p.id_participant || "")}</td>
- <td>${this.escapeHtml(p.nama || "")}</td>
- <td>${this.escapeHtml(p.email || "")}</td>
- <td>${this.escapeHtml(p.no_wa || "")}</td>
- <td>${this.escapeHtml(p.alamat || "")}</td>
- <td>${this.escapeHtml(p.riwayat_penyakit || "")}</td>
- <td>${this.escapeHtml(p.no_wa_darurat || "")}</td>
- <td>${this.escapeHtml(p.tanggal_lahir || "")}</td>
- <td>${this.escapeHtml(p.tempat_lahir || "")}</td>
- <td>${this.escapeHtml(p.nik || "")}</td>
- <td>
- ${
-   p.foto_ktp
-     ? `<img src="${this.getImagePath(
-         p.foto_ktp
-       )}" alt="KTP" class="participant-photo" 
-data-participant-id="${p.id_participant}"
-data-participant-name="${this.escapeHtml(p.nama || "")}"
-data-participant-nik="${this.escapeHtml(p.nik || "")}"
-title="Klik untuk melihat gambar lebih besar"
-onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
-<span class="opacity-50" style="display:none;">Gambar error</span>`
-     : '<span class="opacity-50">Tidak ada</span>'
- }
- </td>
- <td>${this.escapeHtml(p.id_booking || "Belum booking")}</td>
- <td>
- <div class="btn-action-group">
-                     <button class="btn-edit" data-id="${
-                       p.id_participant
-                     }" onclick="pesertaAPI.showEditModal(${p.id_participant})">
-                        <i class="bi bi-pencil-square"></i>
- </button>
- <button class="btn-delete" onclick="pesertaAPI.deleteParticipant(${
-   p.id_participant
- })">
-                        <i class="bi bi-trash"></i>
- </button>
- </div>
- </td>
- </tr>
- `
+          <tr>
+            <td>${this.escapeHtml(p.id_participant || "")}</td>
+            <td>${this.escapeHtml(p.nama || "")}</td>
+            <td>${this.escapeHtml(p.email || "")}</td>
+            <td>${this.escapeHtml(p.no_wa || "")}</td>
+            <td class="hide-col">${this.escapeHtml(p.alamat || "")}</td>
+            <td class="hide-col">${this.escapeHtml(
+              p.riwayat_penyakit || ""
+            )}</td>
+            <td class="hide-col">${this.escapeHtml(p.no_wa_darurat || "")}</td>
+            <td class="hide-col">${this.escapeHtml(p.tanggal_lahir || "")}</td>
+            <td class="hide-col">${this.escapeHtml(p.tempat_lahir || "")}</td>
+            <td class="hide-col">${this.escapeHtml(p.nik || "")}</td>
+            <td>
+              ${
+                p.foto_ktp
+                  ? `<img src="${this.getImagePath(
+                      p.foto_ktp
+                    )}" alt="KTP" class="participant-photo" 
+                      data-participant-id="${p.id_participant}"
+                      data-participant-name="${this.escapeHtml(p.nama || "")}"
+                      data-participant-nik="${this.escapeHtml(p.nik || "")}"
+                      title="Klik untuk melihat gambar lebih besar"
+                      onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
+                      <span class="opacity-50" style="display:none;">Gambar error</span>`
+                  : '<span class="opacity-50">Tidak ada</span>'
+              }
+            </td>
+            <td>
+              ${this.escapeHtml(p.id_booking || "Belum booking")}
+              ${
+                p.nama_gunung
+                  ? `<br><small class="text-brown">(${this.escapeHtml(
+                      p.nama_gunung
+                    )})</small>`
+                  : ""
+              }
+            </td>
+            <td>
+              <div class="btn-action-group">
+                <button class="btn-edit" data-id="${
+                  p.id_participant
+                }" onclick="pesertaAPI.showEditModal(${p.id_participant})">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button class="btn-delete" onclick="pesertaAPI.deleteParticipant(${
+                  p.id_participant
+                })">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `
       )
       .join("");
 
     this.setupImagePreview();
-  } // Setup event handlers untuk preview gambar
+  }
 
+  // Setup event handlers untuk preview gambar
   setupImagePreview() {
     document.querySelectorAll(".participant-photo").forEach((img) => {
       img.addEventListener("click", (e) => {
@@ -149,8 +212,9 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
         );
       });
     });
-  } // Method untuk menampilkan preview gambar dalam modal
+  }
 
+  // Method untuk menampilkan preview gambar dalam modal
   showImagePreview(imagePath, participantName, participantNik, participantId) {
     // Ambil elemen modal dan komponennya
     const modal = document.getElementById("previewImageModal");
@@ -164,20 +228,20 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
     if (!modal || !previewImage) {
       console.error("Preview modal elements not found");
       return;
-    } // Reset state
-
+    }
+    // Reset state
     previewImage.style.display = "none";
     loadingSpinner.style.display = "block";
-    errorMessage.style.display = "none"; // Set participant info
-
+    errorMessage.style.display = "none";
+    // Set participant info
     nameElement.textContent = participantName || "Tidak diketahui";
-    nikElement.textContent = participantNik || "Tidak diketahui"; // Set download link
-
+    nikElement.textContent = participantNik || "Tidak diketahui";
+    // Set download link
     downloadBtn.href = imagePath;
     downloadBtn.download = `KTP_${participantName || participantId}_${
       participantNik || "unknown"
-    }.jpg`; // Load image
-
+    }.jpg`;
+    // Load image
     previewImage.onload = () => {
       loadingSpinner.style.display = "none";
       previewImage.style.display = "block";
@@ -188,14 +252,15 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
       loadingSpinner.style.display = "none";
       errorMessage.style.display = "block";
       console.error("Failed to load image:", imagePath);
-    }; // Set image source
-
-    previewImage.src = imagePath; // Show modal
-
+    };
+    // Set image source
+    previewImage.src = imagePath;
+    // Show modal
     const bootstrapModal = new bootstrap.Modal(modal);
     bootstrapModal.show();
 
-    console.log("Opening image preview for:", participantName, participantNik); // Keyboard navigation untuk modal
+    console.log("Opening image preview for:", participantName, participantNik);
+    // Keyboard navigation untuk modal
     document.addEventListener("keydown", (e) => {
       const modal = document.getElementById("previewImageModal");
       if (modal && modal.classList.contains("show")) {
@@ -206,20 +271,34 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
         }
       }
     });
-  } // Setup event listeners
+  }
 
+  // Setup event listeners - DIMODIFIKASI
   setupEventListeners() {
     const searchInput = document.getElementById("searchInput");
+    const filterGunung = document.getElementById("filterGunung");
+
+    // 1. Event Listener untuk Search Input
     if (searchInput) {
       searchInput.addEventListener("input", (e) => {
-        this.searchParticipants(e.target.value);
+        this.currentSearchTerm = e.target.value; // Simpan istilah pencarian
+        this.loadParticipants(); // Muat ulang data (biarkan backend yang filter)
+      });
+    }
+
+    // 2. Event Listener untuk Filter Gunung (Dropdown)
+    if (filterGunung) {
+      filterGunung.addEventListener("change", (e) => {
+        this.currentTripFilterId = e.target.value; // Simpan ID trip yang dipilih
+        this.loadParticipants(); // Muat ulang data
       });
     }
 
     this.setupEditFormHandler();
     this.setupFilePreview();
-  } // Setup form edit handler
+  }
 
+  // Setup form edit handler
   setupEditFormHandler() {
     const form = document.getElementById("formEditPeserta");
     if (form) {
@@ -228,8 +307,9 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
         await this.handleEditSubmit(e);
       });
     }
-  } // Setup file preview untuk foto KTP
+  }
 
+  // Setup file preview untuk foto KTP
   setupFilePreview() {
     const fileInput = document.getElementById("edit_foto_ktp");
     const preview = document.getElementById("edit_preview_ktp");
@@ -263,31 +343,14 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
         }
       });
     }
-  } // Search participants
+  }
 
-  searchParticipants(searchTerm) {
-    if (!searchTerm.trim()) {
-      this.renderParticipants();
-      return;
-    }
+  // Search participants (Tidak diperlukan lagi karena filtering dilakukan di backend)
+  // SearchParticipants(searchTerm) {
+  //   // Logika search ini dihapus karena sudah dipindahkan ke backend/peserta-api.php
+  // }
 
-    const filteredParticipants = this.participants.filter((participant) => {
-      const searchFields = [
-        participant.nama,
-        participant.email,
-        participant.id_participant,
-        participant.alamat,
-        participant.id_booking,
-      ].map((field) => (field || "").toString().toLowerCase());
-
-      return searchFields.some((field) =>
-        field.includes(searchTerm.toLowerCase())
-      );
-    });
-
-    this.renderParticipants(filteredParticipants);
-  } // Get participant detail
-
+  // Get participant detail
   async getParticipantDetail(id) {
     try {
       const response = await fetch(`${this.baseURL}?action=detail&id=${id}`);
@@ -304,8 +367,9 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
       this.showError("Terjadi kesalahan saat memuat detail peserta");
       return null;
     }
-  } // Update participant dengan file upload
+  }
 
+  // Update participant dengan file upload
   async updateParticipant(id, formData) {
     try {
       const response = await fetch(`${this.baseURL}?action=update&id=${id}`, {
@@ -328,8 +392,9 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
       this.showError("Terjadi kesalahan saat update peserta");
       return false;
     }
-  } // Delete participant
+  }
 
+  // Delete participant
   async deleteParticipant(id) {
     const result = await Swal.fire({
       title: "Konfirmasi Hapus",
@@ -361,8 +426,9 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
       console.error("Error deleting participant:", error);
       this.showError("Terjadi kesalahan saat menghapus peserta");
     }
-  } // Show edit modal dengan data terisi
+  }
 
+  // Show edit modal dengan data terisi
   async showEditModal(id) {
     const participant = await this.getParticipantDetail(id);
     if (!participant) return; // Error handled inside getParticipantDetail
@@ -373,8 +439,8 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
     if (!form) {
       this.showError("Form edit tidak ditemukan");
       return;
-    } // Isi semua field form dengan data peserta
-
+    }
+    // Isi semua field form dengan data peserta
     form.id_participant.value = participant.id_participant;
     form.nama.value = participant.nama || "";
     form.email.value = participant.email || "";
@@ -384,15 +450,15 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
     form.no_wa_darurat.value = participant.no_wa_darurat || "";
     form.tanggal_lahir.value = participant.tanggal_lahir || "";
     form.tempat_lahir.value = participant.tempat_lahir || "";
-    form.nik.value = participant.nik || ""; // Setup preview foto KTP jika ada
-
+    form.nik.value = participant.nik || "";
+    // Setup preview foto KTP jika ada
     const preview = document.getElementById("edit_preview_ktp");
     if (preview) {
       if (participant.foto_ktp) {
         const imagePath = this.getImagePath(participant.foto_ktp);
         preview.src = imagePath;
-        preview.style.display = "block"; // Add error handler untuk preview
-
+        preview.style.display = "block";
+        // Add error handler untuk preview
         preview.onerror = () => {
           console.error("Error loading preview image:", imagePath);
           preview.style.display = "none";
@@ -400,35 +466,36 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
       } else {
         preview.style.display = "none";
       }
-    } // Reset file input
-
+    }
+    // Reset file input
     const fileInput = document.getElementById("edit_foto_ktp");
     if (fileInput) {
       fileInput.value = "";
-    } // Tampilkan modal
-
+    }
+    // Tampilkan modal
     const modal = new bootstrap.Modal(
       document.getElementById("editPesertaModal")
     );
     modal.show();
-  } // Handle form edit submit dengan file upload
+  }
 
+  // Handle form edit submit dengan file upload
   async handleEditSubmit(event) {
     event.preventDefault();
 
     if (!this.currentEditParticipantId) {
       this.showError("ID peserta tidak ditemukan");
       return;
-    } // Tampilkan loading
-
+    }
+    // Tampilkan loading
     const submitBtn = event.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Menyimpan...';
     submitBtn.disabled = true;
 
     const form = event.target;
-    const formData = new FormData(form); // Tambahkan ID untuk update
-
+    const formData = new FormData(form);
+    // Tambahkan ID untuk update
     formData.append("id_participant", this.currentEditParticipantId);
 
     try {
@@ -444,8 +511,8 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
         );
         if (modal) {
           modal.hide();
-        } // Reset current edit ID
-
+        }
+        // Reset current edit ID
         this.currentEditParticipantId = null;
       }
     } catch (error) {
@@ -456,15 +523,17 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
       submitBtn.innerHTML = originalText;
       submitBtn.disabled = false;
     }
-  } // UTILITY FUNCTIONS // Escape HTML untuk mencegah XSS
+  }
 
+  // UTILITY FUNCTIONS // Escape HTML untuk mencegah XSS
   escapeHtml(text) {
     if (text === null || text === undefined) return "";
     const div = document.createElement("div");
     div.textContent = text.toString();
     return div.innerHTML;
-  } // Show success message
+  }
 
+  // Show success message
   showSuccess(message) {
     if (typeof Swal !== "undefined") {
       Swal.fire({
@@ -477,8 +546,9 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
     } else {
       alert("Success: " + message);
     }
-  } // Show error message
+  }
 
+  // Show error message
   showError(message) {
     if (typeof Swal !== "undefined") {
       Swal.fire({
@@ -490,12 +560,14 @@ onerror="this.style.display='none'; this.nextElementSibling.style.display='inlin
     } else {
       alert("Error: " + message);
     }
-  } // Refresh data
+  }
 
+  // Refresh data
   async refresh() {
     await this.loadParticipants();
-  } // Debug method
+  }
 
+  // Debug method
   debugParticipants() {
     console.log("=== DEBUG PARTICIPANTS ===");
     this.participants.forEach((p, index) => {

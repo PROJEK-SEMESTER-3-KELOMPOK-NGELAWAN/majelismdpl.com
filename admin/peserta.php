@@ -254,7 +254,6 @@ $user_role = $user_role ?? 'user';
     /* --- SEARCH INPUT KONSISTENSI --- */
     .search-container {
       max-width: 450px;
-      margin-bottom: 20px;
       position: relative;
     }
 
@@ -295,7 +294,8 @@ $user_role = $user_role ?? 'user';
       font-size: 0.9rem;
     }
 
-    .form-control {
+    .form-control,
+    .form-select {
       border: 2px solid #e9ecef;
       border-radius: 8px;
       padding: 10px 12px;
@@ -304,7 +304,8 @@ $user_role = $user_role ?? 'user';
       height: 42px;
     }
 
-    .form-control:focus {
+    .form-control:focus,
+    .form-select:focus {
       border-color: #a97c50;
       box-shadow: 0 0 0 0.2rem rgba(169, 124, 80, 0.15);
       transform: translateY(-1px);
@@ -380,11 +381,19 @@ $user_role = $user_role ?? 'user';
       </div>
 
       <div class="card-body p-4">
-        <div class="search-container position-relative">
-          <input type="text" id="searchInput" class="search-input" placeholder="Cari nama, email, atau ID Booking..." />
-          <i class="bi bi-search search-icon"></i>
-        </div>
+        <div class="d-flex flex-wrap gap-3 mb-3">
+          <div class="search-container position-relative flex-grow-1">
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari nama, email, atau ID Booking..." />
+            <i class="bi bi-search search-icon"></i>
+          </div>
 
+          <div style="min-width: 250px;">
+            <label for="filterGunung" class="form-label visually-hidden">Filter Gunung</label>
+            <select id="filterGunung" class="form-select search-input">
+              <option value="">Semua Gunung / Trip</option>
+            </select>
+          </div>
+        </div>
         <div class="table-responsive-custom">
           <table>
             <thead>

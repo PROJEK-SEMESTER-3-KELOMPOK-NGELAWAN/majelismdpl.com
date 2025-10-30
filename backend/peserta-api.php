@@ -35,9 +35,14 @@ try {
     switch ($method) {
         case 'GET':
             if ($action === 'all') {
-                getAllParticipants($conn);
+                // Ambil parameter filter
+                $id_trip_filter = $_GET['id_trip'] ?? null;
+                $search_query = $_GET['search'] ?? null;
+                getAllParticipants($conn, $id_trip_filter, $search_query);
             } elseif ($action === 'detail' && isset($_GET['id'])) {
                 getParticipantDetail($conn, $_GET['id']);
+            } elseif ($action === 'trips') { // <-- ENDPOINT BARU UNTUK LIST TRIP
+                getTripList($conn);
             } else {
                 sendResponse(400, 'Invalid action or missing parameters');
             }
@@ -76,18 +81,97 @@ try {
     sendResponse(500, 'Server error: ' . $e->getMessage());
 }
 
-// Function to get all participants (with booking info)
-function getAllParticipants($conn)
+// Function BARU: Mendapatkan daftar trip untuk dropdown filter
+function getTripList($conn)
 {
-    $query = "SELECT participants.*, bookings.id_booking, bookings.id_trip, bookings.jumlah_orang, bookings.total_harga, bookings.tanggal_booking, bookings.status
-              FROM participants
-              LEFT JOIN bookings ON participants.id_booking = bookings.id_booking
-              ORDER BY participants.id_participant DESC";
+    $query = "SELECT id_trip, nama_gunung FROM paket_trips ORDER BY nama_gunung ASC";
     $result = $conn->query($query);
     if (!$result) {
         sendResponse(500, 'Database query error: ' . $conn->error);
         return;
     }
+    $trips = [];
+    while ($row = $result->fetch_assoc()) {
+        $trips[] = $row;
+    }
+    sendResponse(200, 'Success', $trips);
+}
+
+
+// Function to get all participants (with booking info) - DIMODIFIKASI
+function getAllParticipants($conn, $id_trip_filter = null, $search_query = null)
+{
+    $conditions = [];
+    $params = [];
+    $types = '';
+
+    // Join participants dengan bookings dan paket_trips
+    $query = "SELECT 
+                p.*, 
+                b.id_booking, b.id_trip, b.jumlah_orang, b.total_harga, b.tanggal_booking, b.status AS booking_status,
+                pt.nama_gunung, pt.via_gunung
+              FROM participants p
+              LEFT JOIN bookings b ON p.id_booking = b.id_booking
+              LEFT JOIN paket_trips pt ON b.id_trip = pt.id_trip";
+
+    // 1. Filter berdasarkan ID Trip (Gunung)
+    if ($id_trip_filter && is_numeric($id_trip_filter)) {
+        $conditions[] = "b.id_trip = ?";
+        $params[] = (int)$id_trip_filter;
+        $types .= 'i';
+    }
+
+    // 2. Filter berdasarkan Pencarian (nama, email, atau ID Booking)
+    if ($search_query) {
+        $search = "%" . $search_query . "%";
+        // Mencari di nama peserta, email peserta, atau ID Booking
+        $conditions[] = "(p.nama LIKE ? OR p.email LIKE ? OR b.id_booking LIKE ?)";
+        $params[] = $search;
+        $params[] = $search;
+        $params[] = $search;
+        $types .= 'sss';
+    }
+
+    // Gabungkan kondisi WHERE
+    if (!empty($conditions)) {
+        $query .= " WHERE " . implode(' AND ', $conditions);
+    }
+
+    $query .= " ORDER BY p.id_participant DESC";
+
+    // Persiapkan dan Eksekusi Query
+    if (!empty($params)) {
+        $stmt = $conn->prepare($query);
+        if (!$stmt) {
+            sendResponse(500, 'Database prepare error: ' . $conn->error);
+            return;
+        }
+
+        // Dynamic binding using call_user_func_array
+        $bind_names[] = $types;
+        for ($i = 0; $i < count($params); $i++) {
+            $bind_name = 'bind' . $i;
+            $$bind_name = $params[$i];
+            $bind_names[] = &$$bind_name;
+        }
+        // Periksa apakah bind_param berhasil (ini hanya untuk debugging/error check)
+        if (!call_user_func_array([$stmt, 'bind_param'], $bind_names)) {
+            sendResponse(500, 'Database bind_param error: ' . $stmt->error);
+            return;
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+    } else {
+        $result = $conn->query($query);
+    }
+
+    if (!$result) {
+        sendResponse(500, 'Database query error: ' . $conn->error);
+        return;
+    }
+
     $participants = [];
     while ($row = $result->fetch_assoc()) {
         $participants[] = $row;
@@ -95,7 +179,8 @@ function getAllParticipants($conn)
     sendResponse(200, 'Success', $participants);
 }
 
-// Function to get participant detail
+
+// Function to get participant detail (Tambahan JOIN untuk info booking)
 function getParticipantDetail($conn, $id)
 {
     $stmt = $conn->prepare("
@@ -198,7 +283,16 @@ function updateParticipantWithFile($conn, $id, $id_user)
     $types .= 'i';
     $query = "UPDATE participants SET " . implode(', ', $updateFields) . " WHERE id_participant = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param($types, ...$values);
+
+    // Dynamic binding using call_user_func_array
+    $bind_names[] = $types;
+    for ($i = 0; $i < count($values); $i++) {
+        $bind_name = 'bind' . $i;
+        $$bind_name = $values[$i];
+        $bind_names[] = &$$bind_name;
+    }
+    call_user_func_array([$stmt, 'bind_param'], $bind_names);
+
 
     if ($stmt->execute()) {
         if ($id_user) {
@@ -233,7 +327,7 @@ function createParticipant($conn, $id_user)
     }
 
     $stmt = $conn->prepare("INSERT INTO participants (nama, email, no_wa, alamat, riwayat_penyakit, no_wa_darurat, tanggal_lahir, tempat_lahir, nik, foto_ktp, id_booking)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssssssssi", $data['nama'], $data['email'], $data['no_wa'], $data['alamat'], $data['riwayat_penyakit'] ?? null, $data['no_wa_darurat'] ?? null, $data['tanggal_lahir'], $data['tempat_lahir'], $data['nik'], $data['foto_ktp'] ?? null, $data['id_booking']);
     if ($stmt->execute()) {
         $newId = $conn->insert_id;
@@ -279,7 +373,16 @@ function updateParticipant($conn, $id, $id_user)
     $types .= 'i';
     $query = "UPDATE participants SET " . implode(', ', $updateFields) . " WHERE id_participant = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param($types, ...$values);
+
+    // Dynamic binding using call_user_func_array
+    $bind_names[] = $types;
+    for ($i = 0; $i < count($values); $i++) {
+        $bind_name = 'bind' . $i;
+        $$bind_name = $values[$i];
+        $bind_names[] = &$$bind_name;
+    }
+    call_user_func_array([$stmt, 'bind_param'], $bind_names);
+
     if ($stmt->execute()) {
         if ($id_user) {
             $aktivitas = "Mengupdate data peserta (ID: $id, Nama: " . $participant['nama'] . ")";
@@ -337,4 +440,3 @@ function sendResponse($status, $message, $data = null)
     echo json_encode($response, JSON_PRETTY_PRINT);
     exit();
 }
-?>
