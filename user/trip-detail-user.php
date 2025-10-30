@@ -1297,6 +1297,435 @@ function createIconList($text, $iconClass)
                 padding: 13px;
             }
         }
+
+        /* ========== WHATSAPP BUTTON - CUTE & ANIMATED ========== */
+        .whatsapp-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
+        .whatsapp-button {
+            background: linear-gradient(135deg, #25d366 0%, #1ebe5b 100%);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            font-family: "Poppins", Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4),
+                0 0 0 0 rgba(37, 211, 102, 0.7);
+
+            position: relative;
+            overflow: hidden;
+            order: 2;
+            /* Button di bawah */
+        }
+
+        /* Shimmer Effect */
+        .whatsapp-button::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+                    transparent 30%,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    transparent 70%);
+            transform: rotate(45deg);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            50% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        /* Pulse Ring Animation */
+        .whatsapp-button::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50px;
+            border: 2px solid #25d366;
+            transform: translate(-50%, -50%);
+            animation: pulseRing 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            opacity: 0;
+        }
+
+        @keyframes pulseRing {
+            0% {
+                width: 100%;
+                height: 100%;
+                opacity: 0.8;
+            }
+
+            100% {
+                width: 140%;
+                height: 180%;
+                opacity: 0;
+            }
+        }
+
+        /* Icon Wrapper with Ping Dot */
+        .whatsapp-icon-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            z-index: 1;
+        }
+
+        .whatsapp-button i {
+            font-size: 28px;
+            animation: wobble 2s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Cute Wobble Animation */
+        @keyframes wobble {
+
+            0%,
+            100% {
+                transform: rotate(0deg) scale(1);
+            }
+
+            15% {
+                transform: rotate(-15deg) scale(1.1);
+            }
+
+            30% {
+                transform: rotate(10deg) scale(1.05);
+            }
+
+            45% {
+                transform: rotate(-10deg) scale(1.1);
+            }
+
+            60% {
+                transform: rotate(5deg) scale(1);
+            }
+
+            75% {
+                transform: rotate(-5deg) scale(1.05);
+            }
+        }
+
+        /* Ping Dot (Online Indicator) */
+        .ping-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: #ff4444;
+            border: 2px solid white;
+            border-radius: 50%;
+            animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+            z-index: 3;
+        }
+
+        @keyframes ping {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 0.8;
+            }
+        }
+
+        /* WhatsApp Text */
+        .whatsapp-text {
+            position: relative;
+            z-index: 1;
+            white-space: nowrap;
+        }
+
+        /* Hover Effects */
+        .whatsapp-button:hover {
+            background: linear-gradient(135deg, #1ebe5b 0%, #128c42 100%);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(37, 211, 102, 0.6),
+                0 0 0 8px rgba(37, 211, 102, 0.2);
+        }
+
+        .whatsapp-button:hover i {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* Shake Animation on Hover */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0) rotate(0deg);
+            }
+
+            25% {
+                transform: translateX(-8px) rotate(-10deg);
+            }
+
+            75% {
+                transform: translateX(8px) rotate(10deg);
+            }
+        }
+
+        .whatsapp-button:active {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        /* ========== TOOLTIP - SEKARANG DI ATAS ========== */
+        .whatsapp-tooltip {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            color: #333;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: "Poppins", Arial, sans-serif;
+
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.8);
+
+            border: 1px solid rgba(37, 211, 102, 0.2);
+
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.9);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+            position: relative;
+            white-space: nowrap;
+            order: 1;
+            /* Tooltip di atas */
+        }
+
+        /* Tooltip Arrow - SEKARANG MENUNJUK KE BAWAH */
+        .whatsapp-tooltip::after {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            /* Arrow di bawah tooltip */
+            right: 40px;
+            /* Posisi arrow */
+            width: 12px;
+            height: 12px;
+            background: white;
+            transform: rotate(45deg);
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+            border-right: 1px solid rgba(37, 211, 102, 0.2);
+            border-bottom: 1px solid rgba(37, 211, 102, 0.2);
+        }
+
+        /* Show tooltip on container hover */
+        .whatsapp-container:hover .whatsapp-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Bounce animation untuk tooltip */
+        @keyframes tooltipBounce {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-5px) scale(1.02);
+            }
+        }
+
+        .whatsapp-container:hover .whatsapp-tooltip {
+            animation: tooltipBounce 0.6s ease-in-out;
+        }
+
+        /* ========== RESPONSIVE - TABLET ========== */
+        @media (max-width: 1024px) {
+            .whatsapp-container {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .whatsapp-button {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            .whatsapp-button i {
+                font-size: 26px;
+            }
+
+            .whatsapp-tooltip {
+                font-size: 12px;
+                padding: 9px 14px;
+            }
+
+            .whatsapp-tooltip::after {
+                right: 35px;
+            }
+        }
+
+        /* ========== RESPONSIVE - MOBILE ========== */
+        @media (max-width: 768px) {
+            .whatsapp-container {
+                bottom: 15px;
+                right: 15px;
+            }
+
+            /* Compact button on mobile - hide text initially */
+            .whatsapp-button {
+                padding: 12px;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                justify-content: center;
+            }
+
+            .whatsapp-text {
+                display: none;
+            }
+
+            .whatsapp-icon-wrapper {
+                width: 28px;
+                height: 28px;
+            }
+
+            .whatsapp-button i {
+                font-size: 32px;
+            }
+
+            /* Expanded state when tapped */
+            .whatsapp-button.expanded {
+                width: auto;
+                padding: 12px 18px;
+                border-radius: 50px;
+                gap: 10px;
+            }
+
+            .whatsapp-button.expanded .whatsapp-text {
+                display: inline;
+                animation: slideIn 0.3s ease;
+            }
+
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            /* Hide tooltip on mobile */
+            .whatsapp-tooltip {
+                display: none;
+            }
+
+            /* Adjust ping dot size */
+            .ping-dot {
+                width: 8px;
+                height: 8px;
+                top: -1px;
+                right: -1px;
+            }
+        }
+
+        /* ========== RESPONSIVE - SMALL MOBILE ========== */
+        @media (max-width: 480px) {
+            .whatsapp-container {
+                bottom: 12px;
+                right: 12px;
+            }
+
+            .whatsapp-button {
+                width: 52px;
+                height: 52px;
+                padding: 10px;
+            }
+
+            .whatsapp-icon-wrapper {
+                width: 26px;
+                height: 26px;
+            }
+
+            .whatsapp-button i {
+                font-size: 28px;
+            }
+
+            .whatsapp-button.expanded {
+                padding: 10px 16px;
+            }
+        }
+
+        /* ========== ACCESSIBILITY ========== */
+        @media (prefers-reduced-motion: reduce) {
+
+            .whatsapp-button,
+            .whatsapp-button i,
+            .whatsapp-button::before,
+            .whatsapp-button::after,
+            .ping-dot,
+            .whatsapp-tooltip {
+                animation: none !important;
+                transition: opacity 0.2s ease !important;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .whatsapp-tooltip {
+                background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+                color: #ffffff;
+                border-color: rgba(37, 211, 102, 0.3);
+            }
+
+            .whatsapp-tooltip::after {
+                background: #2d2d2d;
+                border-right-color: rgba(37, 211, 102, 0.3);
+                border-bottom-color: rgba(37, 211, 102, 0.3);
+            }
+        }
     </style>
 
 </head>
@@ -1512,6 +1941,18 @@ function createIconList($text, $iconClass)
             <button onclick="closePayment()"><i class="bi bi-x-lg"></i></button>
             <div id="hasil-pembayaran"></div>
         </div>
+    </div>
+
+    <!-- whatsapp -->
+    <div class="whatsapp-container" data-aos="zoom-in" data-aos-delay="500">
+        <button class="whatsapp-button" id="whatsappBtn" onclick="bukaWhatsapp()">
+            <div class="whatsapp-icon-wrapper">
+                <i class="fab fa-whatsapp"></i>
+                <span class="ping-dot"></span>
+            </div>
+            <span class="whatsapp-text">Chat WhatsApp</span>
+        </button>
+        <div class="whatsapp-tooltip">Ada yang bisa kami bantu? 💬</div>
     </div>
 
     <?php include '../footer.php'; ?>
