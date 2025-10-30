@@ -72,8 +72,7 @@ try {
             // Get status dari Midtrans API
             $status = \Midtrans\Transaction::status($order_id);
 
-            $transaction_status = $status->transaction_status;
-            $fraud_status = $status->fraud_status ?? 'accept';
+             
 
             // Tentukan status pembayaran
             $status_pembayaran = 'pending';

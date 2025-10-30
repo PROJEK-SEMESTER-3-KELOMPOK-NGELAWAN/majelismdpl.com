@@ -26,7 +26,6 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
 
-
     <style>
         body {
             background: #f6f0e8;
