@@ -38,10 +38,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const price = Number(trip.harga);
         const formattedPrice = price.toLocaleString("id-ID");
 
-        // DURASI: Langsung ambil dari database (trip.durasi)
-        // trip.durasi berisi: "3 hari 2 malam", "2 Hari 1 Malam", dll
-        const displayDuration = trip.durasi || "1 hari";
-
         const card = document.createElement("div");
         card.className = "destination-card";
         card.style.cursor = "pointer";
@@ -80,7 +76,11 @@ document.addEventListener("DOMContentLoaded", function () {
                   <i class="bi bi-calendar"></i> ${formattedDate}
                 </span>
                 <span class="card-duration">
-                  <i class="bi bi-clock"></i> ${displayDuration}
+                  <i class="bi bi-clock"></i> ${
+                    trip.jenis_trip === "camp"
+                      ? trip.durasi || "1 hari"
+                      : "1 hari"
+                  }
                 </span>
               </div>
               <h3 class="card-title">${trip.nama_gunung}</h3>
@@ -126,11 +126,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Re-check on window resize
       window.addEventListener("resize", handleCarouselLayout);
-
-      // Update hero section dengan trip pertama
-      if (trips.length > 0) {
-        updateHeroSection(trips[0]);
-      }
     })
     .catch((err) => {
       const carousel = document.querySelector(
@@ -145,45 +140,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 });
-
-/**
- * Update hero section dengan data trip dari database
- */
-function updateHeroSection(trip) {
-  // Update title - dari database
-  const heroTitle = document.getElementById("hero-title");
-  if (heroTitle) {
-    heroTitle.textContent = trip.nama_gunung.toUpperCase();
-  }
-
-  // Update durasi - LANGSUNG DARI DATABASE (trip.durasi)
-  const heroDays = document.getElementById("hero-days");
-  if (heroDays) {
-    const displayDuration = trip.durasi || "1 hari";
-    heroDays.textContent = displayDuration.toUpperCase();
-  }
-
-  // Update deskripsi
-  const heroDesc = document.getElementById("hero-desc");
-  if (heroDesc) {
-    heroDesc.textContent = `Rasakan keindahan ${trip.nama_gunung} dengan durasi ${trip.durasi || '1 hari'}`;
-  }
-
-  // Update background image - dari database
-  const heroBg = document.getElementById("hero-bg");
-  if (heroBg && trip.gambar && trip.gambar.trim() !== "") {
-    let imagePath = trip.gambar.startsWith("img/") 
-      ? trip.gambar 
-      : `img/${trip.gambar}`;
-    heroBg.src = imagePath;
-  }
-
-  // Update button link
-  const heroBtn = document.querySelector(".hero-btn");
-  if (heroBtn) {
-    heroBtn.href = `user/trip-detail-user.php?id=${trip.id_trip}`;
-  }
-}
 
 /**
  * Setup carousel navigation buttons
@@ -210,6 +166,12 @@ function setupCarouselNavigation() {
   }
 }
 
+/**
+ * Handle carousel layout untuk centering dan visibility buttons
+ */
+/**
+ * Handle carousel layout untuk centering dan visibility buttons
+ */
 /**
  * Handle carousel layout untuk centering dan visibility buttons
  */

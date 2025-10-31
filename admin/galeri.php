@@ -63,10 +63,6 @@ $user_role = $user_role ?? 'user';
             transition: width 0.25s;
         }
 
-        .nav-link {
-            /* ... */
-        }
-
         /* --- Main Content & Header KONSISTENSI --- */
         .main {
             margin-left: 240px;
