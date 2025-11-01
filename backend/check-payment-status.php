@@ -1,6 +1,10 @@
 <?php
 require_once dirname(__FILE__, 2) . '/vendor/autoload.php';
 require_once 'koneksi.php';
+require_once __DIR__ . '/helpers/Mailer.php';
+
+use App\Helpers\Mailer;
+
 ini_set('display_errors', 0);
 error_reporting(0);
 header('Content-Type: application/json; charset=utf-8');
@@ -34,11 +38,35 @@ $mapStatus = function ($transaction_status, $fraud_status) {
     return 'pending';
 };
 
+function base_app_url(): string
+{
+    return 'http://localhost/majelismdpl.com';
+}
+
+function getOrderMetaByOrder(mysqli $conn, string $order_id): array
+{
+    $sql = "SELECT u.username, u.email, b.id_booking, b.tanggal_booking, b.total_harga, t.nama_gunung, p.id_payment
+            FROM payments p
+            JOIN bookings b ON p.id_booking=b.id_booking
+            JOIN users u ON b.id_user=u.id_user
+            JOIN paket_trips t ON b.id_trip=t.id_trip
+            WHERE p.order_id=?";
+    $meta = [];
+    if ($st = $conn->prepare($sql)) {
+        $st->bind_param("s", $order_id);
+        $st->execute();
+        $res = $st->get_result();
+        $meta = $res->fetch_assoc() ?: [];
+        $st->close();
+    }
+    return $meta;
+}
+
 try {
     $order_id = $_GET['order_id'] ?? '';
     if ($order_id === '') $respond(400, ['error' => 'Order ID required']);
 
-    $statusResponse = \Midtrans\Transaction::status($order_id); // [web:124][web:126]
+    $statusResponse = \Midtrans\Transaction::status($order_id);
     $transaction_status = $statusResponse->transaction_status ?? 'pending';
     $fraud_status = $statusResponse->fraud_status ?? 'accept';
     $gross_amount = $statusResponse->gross_amount ?? null;
@@ -65,6 +93,27 @@ try {
         }
     }
     $conn->commit();
+
+    // Email kustom
+    $meta = getOrderMetaByOrder($conn, $order_id);
+    if (!empty($meta) && !empty($meta['email'])) {
+        $payload = [
+            'order_id'        => $order_id,
+            'nama_user'       => $meta['username'] ?? '',
+            'nama_gunung'     => $meta['nama_gunung'] ?? '',
+            'tanggal_booking' => isset($meta['tanggal_booking']) ? date('d-m-Y', strtotime($meta['tanggal_booking'])) : '-',
+            'total_harga'     => $meta['total_harga'] ?? 0,
+            'invoice_url'     => base_app_url() . '/user/view-invoice.php?payment_id=' . ((int)($meta['id_payment'] ?? 0)),
+            'payment_status_url' => base_app_url() . '/user/payment-status.php'
+        ];
+        if ($status_pembayaran === 'paid') {
+            $html = Mailer::buildPaidTemplate($payload);
+            Mailer::send($meta['email'], $meta['username'] ?? '', 'Pembayaran Berhasil - Majelis MDPL', $html, 'Pembayaran berhasil');
+        } elseif (in_array($status_pembayaran, ['failed'])) {
+            $html = Mailer::buildFailedTemplate($payload);
+            Mailer::send($meta['email'], $meta['username'] ?? '', 'Pembayaran Tidak Berhasil - Majelis MDPL', $html, 'Pembayaran gagal');
+        }
+    }
 
     $respond(200, [
         'success' => true,
