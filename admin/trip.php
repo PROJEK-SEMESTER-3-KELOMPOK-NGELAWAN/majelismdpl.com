@@ -1,6 +1,5 @@
 <?php
 require_once 'auth_check.php';
-// Asumsi RoleHelper sudah dimuat di auth_check.php atau file lain yang diperlukan.
 if (!class_exists('RoleHelper')) {
     class RoleHelper
     {
@@ -12,7 +11,6 @@ if (!class_exists('RoleHelper')) {
 }
 $user_role = $user_role ?? 'user';
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 
@@ -24,9 +22,7 @@ $user_role = $user_role ?? 'user';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
-
     <style>
-        /* --- CSS KONSISTENSI UTAMA DARI MASTER ADMIN --- */
         body {
             background: #f6f0e8;
             color: #232323;
@@ -49,20 +45,16 @@ $user_role = $user_role ?? 'user';
             margin-left: 240px;
             min-height: 100vh;
             padding: 20px 25px;
-            /* KONSISTEN */
             background: #f6f0e8;
             transition: margin-left 0.25s;
         }
 
-        /* Header Page KONSISTENSI */
         .main-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding-top: 32px;
-            /* KONSISTEN */
             padding-bottom: 28px;
-            /* KONSISTEN */
         }
 
         .main-header h2 {
@@ -82,7 +74,6 @@ $user_role = $user_role ?? 'user';
             margin-left: 8px;
         }
 
-        /* --- Button & Modal KONSISTENSI (Dari Master Admin) --- */
         .btn-primary,
         .btn-success {
             background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%) !important;
@@ -101,7 +92,6 @@ $user_role = $user_role ?? 'user';
             background: linear-gradient(135deg, #8b6332 0%, #a97c50 100%) !important;
         }
 
-        /* Modal Header KONSISTENSI */
         .modal-header {
             background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
             color: white;
@@ -120,7 +110,6 @@ $user_role = $user_role ?? 'user';
             opacity: 0.8;
         }
 
-        /* Form Control KONSISTENSI */
         .form-label {
             font-weight: 600;
             color: #495057;
@@ -145,9 +134,6 @@ $user_role = $user_role ?? 'user';
             outline: none;
         }
 
-        /* --- END KONSISTENSI MASTER ADMIN --- */
-
-        /* --- Trip Card List Styling --- */
         .trip-card-list {
             display: flex;
             flex-wrap: wrap;
@@ -203,12 +189,14 @@ $user_role = $user_role ?? 'user';
 
         .trip-status.available {
             background: rgba(99, 196, 148, 0.8);
-            /* Dibuat lebih solid */
         }
 
         .trip-status.sold {
             background: rgba(212, 141, 154, 0.8);
-            /* Dibuat lebih solid */
+        }
+
+        .trip-status.done {
+            background: rgba(108, 117, 125, 0.85);
         }
 
         .trip-status .bi {
@@ -218,12 +206,11 @@ $user_role = $user_role ?? 'user';
         }
 
         .trip-card-body {
-            padding: 18px 22px 18px 22px;
+            padding: 18px 22px;
             position: relative;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
         }
 
         .trip-meta {
@@ -258,7 +245,7 @@ $user_role = $user_role ?? 'user';
             font-weight: 700;
             display: inline-flex;
             padding: 4px 16px;
-            margin: 0 auto 12px auto;
+            margin: 0 auto 12px;
             justify-content: center;
             align-items: center;
             max-width: max-content;
@@ -273,7 +260,6 @@ $user_role = $user_role ?? 'user';
             color: #ffbf47;
             font-weight: 600;
             justify-content: center;
-            flex-grow: 0;
         }
 
         .trip-rating i {
@@ -354,24 +340,23 @@ $user_role = $user_role ?? 'user';
             background-color: #1a6e2a;
         }
 
-        /* [Media Queries dipertahankan] */
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            margin-top: 24px;
+        }
     </style>
 </head>
 
 <body>
-
     <?php include 'sidebar.php'; ?>
-
     <main class="main">
-
         <div class="main-header">
             <div>
                 <h2>Kelola Trip</h2>
                 <small class="text-muted">
                     <i class="bi bi-signpost-2"></i> Kelola data perjalanan pendakian.
-                    <span class="permission-badge">
-                        <?= RoleHelper::getRoleDisplayName($user_role) ?>
-                    </span>
+                    <span class="permission-badge"><?= RoleHelper::getRoleDisplayName($user_role) ?></span>
                 </small>
             </div>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahTripModal">
@@ -379,21 +364,15 @@ $user_role = $user_role ?? 'user';
             </button>
         </div>
 
-        <div id="tripList" class="trip-card-list">
-        </div>
-
-        <div id="emptyState" class="empty-state">
-            Belum ada trip.<br>Silakan tambahkan trip baru!
-        </div>
+        <div id="tripList" class="trip-card-list"></div>
+        <div id="emptyState" class="empty-state">Belum ada trip.<br>Silakan tambahkan trip baru!</div>
     </main>
 
     <div class="modal fade" id="tambahTripModal" tabindex="-1" aria-labelledby="tambahTripModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <form class="modal-content" id="formTambahTrip" enctype="multipart/form-data">
-
                 <input type="hidden" id="tripIdInput" name="id_trip">
                 <input type="hidden" id="actionType" name="action" value="addTrip">
-
                 <div class="modal-header">
                     <h5 class="modal-title" id="tambahTripModalLabel">
                         <i class="bi bi-compass me-2"></i>
@@ -403,21 +382,16 @@ $user_role = $user_role ?? 'user';
                 </div>
 
                 <div class="modal-body">
-
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="nama_gunung" class="form-label">
-                                    <i class="bi bi-mountain me-1"></i> Nama Gunung
-                                </label>
+                                <label for="nama_gunung" class="form-label"><i class="bi bi-mountain me-1"></i> Nama Gunung</label>
                                 <input type="text" class="form-control" id="nama_gunung" name="nama_gunung" required placeholder="Cth: Gunung Bromo" />
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="tanggal" class="form-label">
-                                    <i class="bi bi-calendar-event me-1"></i> Tanggal Trip
-                                </label>
+                                <label for="tanggal" class="form-label"><i class="bi bi-calendar-event me-1"></i> Tanggal Trip</label>
                                 <input type="date" class="form-control" id="tanggal" name="tanggal" required />
                             </div>
                         </div>
@@ -426,17 +400,13 @@ $user_role = $user_role ?? 'user';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="slot" class="form-label">
-                                    <i class="bi bi-person-check-fill me-1"></i> Slot
-                                </label>
+                                <label for="slot" class="form-label"><i class="bi bi-person-check-fill me-1"></i> Slot</label>
                                 <input type="number" class="form-control" id="slot" name="slot" required min="1" placeholder="Kuota" />
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="durasi" class="form-label">
-                                    <i class="bi bi-clock-fill me-1"></i> Durasi
-                                </label>
+                                <label for="durasi" class="form-label"><i class="bi bi-clock-fill me-1"></i> Durasi</label>
                                 <input type="text" class="form-control" id="durasi" name="durasi" placeholder="misal: 2 Hari 1 Malam" required />
                             </div>
                         </div>
@@ -445,9 +415,7 @@ $user_role = $user_role ?? 'user';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="jenis_trip" class="form-label">
-                                    <i class="bi bi-bag-fill me-1"></i> Jenis Trip
-                                </label>
+                                <label for="jenis_trip" class="form-label"><i class="bi bi-bag-fill me-1"></i> Jenis Trip</label>
                                 <select class="form-select" id="jenis_trip" name="jenis_trip" required>
                                     <option value="" selected disabled>Pilih...</option>
                                     <option value="Tektok">Tektok</option>
@@ -457,9 +425,7 @@ $user_role = $user_role ?? 'user';
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="harga" class="form-label">
-                                    <i class="bi bi-currency-dollar me-1"></i> Harga (Rp)
-                                </label>
+                                <label for="harga" class="form-label"><i class="bi bi-currency-dollar me-1"></i> Harga (Rp)</label>
                                 <input type="number" class="form-control" id="harga" name="harga" required min="0" placeholder="Biaya per orang" />
                             </div>
                         </div>
@@ -468,20 +434,17 @@ $user_role = $user_role ?? 'user';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="via_gunung" class="form-label">
-                                    <i class="bi bi-signpost me-1"></i> Jalur / Via
-                                </label>
+                                <label for="via_gunung" class="form-label"><i class="bi bi-signpost me-1"></i> Jalur / Via</label>
                                 <input type="text" class="form-control" id="via_gunung" name="via_gunung" required placeholder="Cth: Via Sembalun" />
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="status" class="form-label">
-                                    <i class="bi bi-info-circle-fill me-1"></i> Status
-                                </label>
+                                <label for="status" class="form-label"><i class="bi bi-info-circle-fill me-1"></i> Status</label>
                                 <select class="form-select" id="status" name="status" required>
                                     <option value="available">Available</option>
                                     <option value="sold">Sold</option>
+                                    <option value="done">Done</option>
                                 </select>
                             </div>
                         </div>
@@ -490,24 +453,17 @@ $user_role = $user_role ?? 'user';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="gambar" class="form-label">
-                                    <i class="bi bi-image-fill me-1"></i> Upload Gambar
-                                </label>
+                                <label for="gambar" class="form-label"><i class="bi bi-image-fill me-1"></i> Upload Gambar</label>
                                 <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*" />
                             </div>
                         </div>
                         <div class="col-md-6"></div>
                     </div>
-
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle me-1"></i> Tutup
-                    </button>
-                    <button type="submit" class="btn btn-primary" id="saveButton">
-                        <i class="bi bi-save me-1"></i> Simpan
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i> Tutup</button>
+                    <button type="submit" class="btn btn-primary" id="saveButton"><i class="bi bi-save me-1"></i> Simpan</button>
                 </div>
             </form>
         </div>
@@ -516,7 +472,6 @@ $user_role = $user_role ?? 'user';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../frontend/trip.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 </body>
 
 </html>

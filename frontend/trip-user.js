@@ -14,28 +14,43 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
+      // Bersihkan isi awal (spinner)
       carousel.innerHTML = "";
 
-      if (trips.length === 0) {
+      // Filter: tampilkan hanya 'available' dan 'sold' (sembunyikan 'done')
+      const visibleTrips = Array.isArray(trips)
+        ? trips.filter((t) => {
+            const s = (t.status || "").toString().toLowerCase();
+            return s === "available" || s === "sold";
+          })
+        : [];
+
+      if (visibleTrips.length === 0) {
         carousel.innerHTML = `
           <div class="no-trips">
             <p>🚫 Belum ada jadwal trip.</p>
           </div>
         `;
+        // Tetap set navigasi dan layout agar tombol tersembunyi
+        setupCarouselNavigation();
+        handleCarouselLayout();
+        window.addEventListener("resize", handleCarouselLayout);
         return;
       }
 
-      trips.forEach((trip) => {
+      visibleTrips.forEach((trip) => {
         // Format tanggal
         const date = new Date(trip.tanggal);
-        const formattedDate = date.toLocaleDateString("id-ID", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        });
+        const formattedDate = isNaN(date.getTime())
+          ? trip.tanggal || ""
+          : date.toLocaleDateString("id-ID", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            });
 
         // Format harga
-        const price = Number(trip.harga);
+        const price = Number(trip.harga || 0);
         const formattedPrice = price.toLocaleString("id-ID");
 
         const card = document.createElement("div");
@@ -54,16 +69,18 @@ document.addEventListener("DOMContentLoaded", function () {
           imagePath = "img/default-mountain.jpg";
         }
 
+        // Status badge logic (done sudah difilter, jadi hanya available/sold)
+        const rawStatus = (trip.status || "available").toString().toLowerCase();
+        const isSold = rawStatus === "sold";
+        const statusBadgeClass = isSold ? "sold" : "available";
+        const statusBadgeHTML = isSold
+          ? '<i class="bi bi-x-circle"></i> Sold'
+          : '<i class="bi bi-check-circle"></i> Available';
+
         card.innerHTML = `
           <div class="card-custom">
-            <span class="status-badge ${
-              trip.status === "sold" ? "sold" : "available"
-            }">
-              ${
-                trip.status === "sold"
-                  ? '<i class="bi bi-x-circle"></i> Sold'
-                  : '<i class="bi bi-check-circle"></i> available'
-              }
+            <span class="status-badge ${statusBadgeClass}">
+              ${statusBadgeHTML}
             </span>
             <div class="card-image-container">
               <img src="${imagePath}" alt="${
@@ -76,11 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   <i class="bi bi-calendar"></i> ${formattedDate}
                 </span>
                 <span class="card-duration">
-                  <i class="bi bi-clock"></i> ${
-                    trip.jenis_trip === "camp"
-                      ? trip.durasi || "1 hari"
-                      : "1 hari"
-                  }
+                  <i class="bi bi-clock"></i> ${trip.durasi || "1 hari"}
                 </span>
               </div>
               <h3 class="card-title">${trip.nama_gunung}</h3>
@@ -88,8 +101,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 <span class="badge trip-type-badge bg-light text-dark">
                   <i class="bi bi-flag-fill"></i>
                   ${
-                    trip.jenis_trip.charAt(0).toUpperCase() +
-                    trip.jenis_trip.slice(1)
+                    trip.jenis_trip
+                      ? trip.jenis_trip.charAt(0).toUpperCase() +
+                        trip.jenis_trip.slice(1)
+                      : ""
                   }
                 </span>
               </div>
@@ -151,27 +166,15 @@ function setupCarouselNavigation() {
 
   if (prevBtn && nextBtn && track) {
     prevBtn.addEventListener("click", () => {
-      track.scrollBy({
-        left: -360,
-        behavior: "smooth",
-      });
+      track.scrollBy({ left: -360, behavior: "smooth" });
     });
 
     nextBtn.addEventListener("click", () => {
-      track.scrollBy({
-        left: 360,
-        behavior: "smooth",
-      });
+      track.scrollBy({ left: 360, behavior: "smooth" });
     });
   }
 }
 
-/**
- * Handle carousel layout untuk centering dan visibility buttons
- */
-/**
- * Handle carousel layout untuk centering dan visibility buttons
- */
 /**
  * Handle carousel layout untuk centering dan visibility buttons
  */
@@ -187,21 +190,19 @@ function handleCarouselLayout() {
   const cardCount = cards.length;
 
   // Skip jika tidak ada cards
-  if (cardCount === 0) return;
+  if (cardCount === 0) {
+    if (scrollIndicators) scrollIndicators.style.display = "none";
+    return;
+  }
 
   const isMobile = window.innerWidth <= 768;
 
-  // ========== MOBILE LAYOUT ==========
+  // MOBILE
   if (isMobile) {
-    // ALWAYS left-aligned di mobile (untuk swipe)
     carouselTrack.style.justifyContent = "flex-start";
-
-    // Hide scroll indicators
     if (scrollIndicators) {
       scrollIndicators.style.display = "none";
     }
-
-    // Set card sizes - SAMA untuk single atau multiple
     cards.forEach((card) => {
       if (window.innerWidth > 480) {
         card.style.minWidth = "320px";
@@ -211,42 +212,27 @@ function handleCarouselLayout() {
         card.style.maxWidth = "290px";
       }
     });
-
-    return; // Exit untuk mobile
-  }
-
-  // ========== DESKTOP LAYOUT ==========
-
-  // Single card - centered dan besar
-  if (cardCount === 1) {
-    carouselTrack.style.justifyContent = "center";
-
-    // Hide scroll indicators
-    if (scrollIndicators) {
-      scrollIndicators.style.display = "none";
-    }
-
-    // Resize single card - lebih besar di desktop
-    const singleCard = cards[0];
-    singleCard.style.minWidth = "400px";
-    singleCard.style.maxWidth = "400px";
-
     return;
   }
 
-  // Multiple cards - centering untuk 2-3 cards
-  if (cardCount <= 3) {
+  // DESKTOP
+  if (cardCount === 1) {
     carouselTrack.style.justifyContent = "center";
-  } else {
-    carouselTrack.style.justifyContent = "flex-start";
+    if (scrollIndicators) {
+      scrollIndicators.style.display = "none";
+    }
+    const singleCard = cards[0];
+    singleCard.style.minWidth = "400px";
+    singleCard.style.maxWidth = "400px";
+    return;
   }
 
-  // Show scroll indicators
+  carouselTrack.style.justifyContent = cardCount <= 3 ? "center" : "flex-start";
+
   if (scrollIndicators) {
     scrollIndicators.style.display = "flex";
   }
 
-  // Check overflow untuk hide/show buttons
   const hasOverflow = carouselTrack.scrollWidth > carouselTrack.clientWidth;
 
   if (!hasOverflow) {
@@ -257,7 +243,6 @@ function handleCarouselLayout() {
     if (nextBtn) nextBtn.style.display = "flex";
   }
 
-  // Reset card sizes untuk multiple cards
   cards.forEach((card) => {
     card.style.minWidth = "350px";
     card.style.maxWidth = "350px";

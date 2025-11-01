@@ -3,63 +3,66 @@ class PesertaAPI {
     this.baseURL = "../backend/peserta-api.php";
     this.participants = [];
     this.currentEditParticipantId = null;
-    this.currentTripFilterId = ""; // Menyimpan ID trip yang sedang difilter
-    this.currentSearchTerm = ""; // Menyimpan istilah pencarian
+    this.currentTripFilterId = "";
+    this.currentSearchTerm = "";
     this.init();
   }
 
   async init() {
-    await this.loadTripsForFilter(); // <-- BARU: Load daftar trip dulu
-    await this.loadParticipants(); // Load participants dengan filter default
+    await this.loadTripsForFilter();
+    await this.loadParticipants();
     this.setupEventListeners();
+    this.setupPrintHandler();
   }
 
-  // BARU: Method untuk memuat daftar trip dan mengisi dropdown filter
+  setupPrintHandler() {
+    const btn = document.getElementById("printPdfBtn");
+    const filterGunung = document.getElementById("filterGunung");
+    const searchInput = document.getElementById("searchInput");
+    if (!btn || !filterGunung) return;
+    btn.addEventListener("click", () => {
+      const idTrip = filterGunung.value || "";
+      const search = ((searchInput && searchInput.value) || "").trim();
+      const params = new URLSearchParams();
+      params.set("action", "print_pdf");
+      if (idTrip) params.set("id_trip", idTrip);
+      if (search) params.set("search", search);
+      window.open(`${this.baseURL}?${params.toString()}`, "_blank");
+    });
+  }
+
   async loadTripsForFilter() {
     const filterGunung = document.getElementById("filterGunung");
     if (!filterGunung) return;
-
     try {
       const response = await fetch(`${this.baseURL}?action=trips`);
-      const result = await response.json();
-
-      if (result.status === 200) {
-        // Kosongkan semua kecuali opsi default
+      const result = await response.json().catch(() => null);
+      if (result && result.status === 200) {
         filterGunung.innerHTML =
           '<option value="">Semua Gunung / Trip</option>';
-
-        // Tambahkan opsi dari data
-        result.data.forEach((trip) => {
+        (result.data || []).forEach((trip) => {
           const option = document.createElement("option");
           option.value = this.escapeHtml(trip.id_trip);
           option.textContent = this.escapeHtml(trip.nama_gunung);
           filterGunung.appendChild(option);
         });
       } else {
-        console.error("Gagal memuat daftar trip:", result.message);
+        this.showError(
+          "Gagal memuat daftar trip" +
+            (result && result.message ? ": " + result.message : "")
+        );
       }
-    } catch (error) {
-      console.error("Error loading trip list:", error);
+    } catch (e) {
+      this.showError("Terjadi kesalahan saat memuat daftar trip");
     }
   }
 
-  // Load all participants from API - DIMODIFIKASI
   async loadParticipants() {
-    // Tentukan parameter filter untuk API
     let url = `${this.baseURL}?action=all`;
-
-    // Tambahkan filter ID Trip (Gunung)
-    if (this.currentTripFilterId) {
-      url += `&id_trip=${this.currentTripFilterId}`;
-    }
-
-    // Tambahkan filter Pencarian (searchInput di backend)
-    // NOTE: Karena API backend sudah diubah untuk menghandle search di getAllParticipants
-    if (this.currentSearchTerm.trim()) {
+    if (this.currentTripFilterId) url += `&id_trip=${this.currentTripFilterId}`;
+    if (this.currentSearchTerm.trim())
       url += `&search=${encodeURIComponent(this.currentSearchTerm.trim())}`;
-    }
 
-    // Show loading indicator
     const tableBody = document.getElementById("participantsTableBody");
     if (tableBody) {
       tableBody.innerHTML = `<tr><td colspan="13" class="text-center opacity-50"><i class="bi bi-arrow-clockwise spinner-border spinner-border-sm me-2"></i>Memuat data peserta...</td></tr>`;
@@ -67,25 +70,22 @@ class PesertaAPI {
 
     try {
       const response = await fetch(url);
-      const result = await response.json();
-
-      if (result.status === 200) {
+      const result = await response.json().catch(() => null);
+      if (result && result.status === 200) {
         this.participants = result.data || [];
         this.renderParticipants();
       } else {
-        this.showError("Gagal memuat data peserta: " + result.message);
+        const msg =
+          result && result.message ? result.message : "Respons tidak valid";
+        this.showError("Gagal memuat data peserta: " + msg);
         this.renderErrorState("Gagal memuat data");
       }
     } catch (error) {
-      console.error("Error loading participants:", error);
-      this.showError(
-        "Terjadi kesalahan saat memuat data peserta: " + error.message
-      );
+      this.showError("Terjadi kesalahan saat memuat data peserta");
       this.renderErrorState("Koneksi gagal");
     }
   }
 
-  // Render status error di tabel
   renderErrorState(message) {
     const tableBody = document.getElementById("participantsTableBody");
     if (tableBody) {
@@ -93,117 +93,85 @@ class PesertaAPI {
     }
   }
 
-  // Method untuk handle path gambar dengan benar
   getImagePath(imagePath) {
     if (!imagePath) return "";
-
-    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://"))
       return imagePath;
-    }
-
-    if (imagePath.startsWith("../")) {
-      return imagePath;
-    }
-
-    if (imagePath.startsWith("uploads/")) {
-      return "../" + imagePath;
-    }
-
+    if (imagePath.startsWith("../")) return imagePath;
+    if (imagePath.startsWith("uploads/")) return "../" + imagePath;
     return "../uploads/ktp/" + imagePath;
   }
 
-  // Render participants table dengan path handling - DIMODIFIKASI
-  renderParticipants(participantsToRender = null) {
+  renderParticipants() {
     const tableBody = document.getElementById("participantsTableBody");
-    // Gunakan data dari this.participants (yang sudah difilter/dicari oleh backend)
     const participants = this.participants;
+    if (!tableBody) return;
 
-    if (!tableBody) {
-      console.error("Table body element not found");
-      return;
-    }
-
-    if (participants.length === 0) {
-      tableBody.innerHTML = `
-        <tr>
-          <td colspan="13" class="text-center opacity-50">Tidak ada peserta yang ditemukan.</td>
-        </tr>
-      `;
+    if (!participants.length) {
+      tableBody.innerHTML = `<tr><td colspan="13" class="text-center opacity-50">Tidak ada peserta yang ditemukan.</td></tr>`;
       return;
     }
 
     tableBody.innerHTML = participants
       .map(
         (p) => `
-          <tr>
-            <td>${this.escapeHtml(p.id_participant || "")}</td>
-            <td>${this.escapeHtml(p.nama || "")}</td>
-            <td>${this.escapeHtml(p.email || "")}</td>
-            <td>${this.escapeHtml(p.no_wa || "")}</td>
-            <td class="hide-col">${this.escapeHtml(p.alamat || "")}</td>
-            <td class="hide-col">${this.escapeHtml(
-              p.riwayat_penyakit || ""
-            )}</td>
-            <td class="hide-col">${this.escapeHtml(p.no_wa_darurat || "")}</td>
-            <td class="hide-col">${this.escapeHtml(p.tanggal_lahir || "")}</td>
-            <td class="hide-col">${this.escapeHtml(p.tempat_lahir || "")}</td>
-            <td class="hide-col">${this.escapeHtml(p.nik || "")}</td>
-            <td>
-              ${
+      <tr>
+        <td>${this.escapeHtml(p.id_participant || "")}</td>
+        <td>${this.escapeHtml(p.nama || "")}</td>
+        <td>${this.escapeHtml(p.email || "")}</td>
+        <td>${this.escapeHtml(p.no_wa || "")}</td>
+        <td class="hide-col">${this.escapeHtml(p.alamat || "")}</td>
+        <td class="hide-col">${this.escapeHtml(p.riwayat_penyakit || "")}</td>
+        <td class="hide-col">${this.escapeHtml(p.no_wa_darurat || "")}</td>
+        <td class="hide-col">${this.escapeHtml(p.tanggal_lahir || "")}</td>
+        <td class="hide-col">${this.escapeHtml(p.tempat_lahir || "")}</td>
+        <td class="hide-col">${this.escapeHtml(p.nik || "")}</td>
+        <td>${
+          p.foto_ktp
+            ? `<img src="${this.getImagePath(
                 p.foto_ktp
-                  ? `<img src="${this.getImagePath(
-                      p.foto_ktp
-                    )}" alt="KTP" class="participant-photo" 
-                      data-participant-id="${p.id_participant}"
-                      data-participant-name="${this.escapeHtml(p.nama || "")}"
-                      data-participant-nik="${this.escapeHtml(p.nik || "")}"
-                      title="Klik untuk melihat gambar lebih besar"
-                      onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
-                      <span class="opacity-50" style="display:none;">Gambar error</span>`
-                  : '<span class="opacity-50">Tidak ada</span>'
-              }
-            </td>
-            <td>
-              ${this.escapeHtml(p.id_booking || "Belum booking")}
-              ${
-                p.nama_gunung
-                  ? `<br><small class="text-brown">(${this.escapeHtml(
-                      p.nama_gunung
-                    )})</small>`
-                  : ""
-              }
-            </td>
-            <td>
-              <div class="btn-action-group">
-                <button class="btn-edit" data-id="${
-                  p.id_participant
-                }" onclick="pesertaAPI.showEditModal(${p.id_participant})">
-                  <i class="bi bi-pencil-square"></i>
-                </button>
-                <button class="btn-delete" onclick="pesertaAPI.deleteParticipant(${
-                  p.id_participant
-                })">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        `
+              )}" alt="KTP" class="participant-photo"
+                  data-participant-id="${p.id_participant}"
+                  data-participant-name="${this.escapeHtml(p.nama || "")}"
+                  data-participant-nik="${this.escapeHtml(p.nik || "")}"
+                  title="Klik untuk melihat gambar lebih besar"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
+                  <span class="opacity-50" style="display:none;">Gambar error</span>`
+            : '<span class="opacity-50">Tidak ada</span>'
+        }</td>
+        <td>${this.escapeHtml(p.id_booking || "Belum booking")}
+          ${
+            p.nama_gunung
+              ? `<br><small class="text-brown">(${this.escapeHtml(
+                  p.nama_gunung
+                )})</small>`
+              : ""
+          }</td>
+        <td>
+          <div class="btn-action-group">
+            <button class="btn-edit" onclick="pesertaAPI.showEditModal(${
+              p.id_participant
+            })"><i class="bi bi-pencil-square"></i></button>
+            <button class="btn-delete" onclick="pesertaAPI.deleteParticipant(${
+              p.id_participant
+            })"><i class="bi bi-trash"></i></button>
+          </div>
+        </td>
+      </tr>
+    `
       )
       .join("");
 
     this.setupImagePreview();
   }
 
-  // Setup event handlers untuk preview gambar
   setupImagePreview() {
     document.querySelectorAll(".participant-photo").forEach((img) => {
       img.addEventListener("click", (e) => {
-        const participantId = e.target.dataset.participantId;
         const participantName = e.target.dataset.participantName;
         const participantNik = e.target.dataset.participantNik;
+        const participantId = e.target.dataset.participantId;
         const imagePath = e.target.src;
-
         this.showImagePreview(
           imagePath,
           participantName,
@@ -214,9 +182,7 @@ class PesertaAPI {
     });
   }
 
-  // Method untuk menampilkan preview gambar dalam modal
   showImagePreview(imagePath, participantName, participantNik, participantId) {
-    // Ambil elemen modal dan komponennya
     const modal = document.getElementById("previewImageModal");
     const previewImage = document.getElementById("previewImageFull");
     const loadingSpinner = document.getElementById("imageLoadingSpinner");
@@ -224,179 +190,136 @@ class PesertaAPI {
     const nameElement = document.getElementById("previewParticipantName");
     const nikElement = document.getElementById("previewParticipantNIK");
     const downloadBtn = document.getElementById("previewDownloadBtn");
+    if (!modal || !previewImage) return;
 
-    if (!modal || !previewImage) {
-      console.error("Preview modal elements not found");
-      return;
-    }
-    // Reset state
     previewImage.style.display = "none";
     loadingSpinner.style.display = "block";
     errorMessage.style.display = "none";
-    // Set participant info
     nameElement.textContent = participantName || "Tidak diketahui";
     nikElement.textContent = participantNik || "Tidak diketahui";
-    // Set download link
     downloadBtn.href = imagePath;
     downloadBtn.download = `KTP_${participantName || participantId}_${
       participantNik || "unknown"
     }.jpg`;
-    // Load image
+
     previewImage.onload = () => {
       loadingSpinner.style.display = "none";
       previewImage.style.display = "block";
-      console.log("Image loaded successfully:", imagePath);
     };
-
     previewImage.onerror = () => {
       loadingSpinner.style.display = "none";
       errorMessage.style.display = "block";
-      console.error("Failed to load image:", imagePath);
     };
-    // Set image source
     previewImage.src = imagePath;
-    // Show modal
+
     const bootstrapModal = new bootstrap.Modal(modal);
     bootstrapModal.show();
 
-    console.log("Opening image preview for:", participantName, participantNik);
-    // Keyboard navigation untuk modal
     document.addEventListener("keydown", (e) => {
-      const modal = document.getElementById("previewImageModal");
-      if (modal && modal.classList.contains("show")) {
-        if (e.key === "Escape") {
-          // Cek apakah modal bootstrap masih ada instance-nya sebelum hide
-          const modalInstance = bootstrap.Modal.getInstance(modal);
-          if (modalInstance) modalInstance.hide();
-        }
+      const m = document.getElementById("previewImageModal");
+      if (m && m.classList.contains("show") && e.key === "Escape") {
+        const inst = bootstrap.Modal.getInstance(m);
+        if (inst) inst.hide();
       }
     });
   }
 
-  // Setup event listeners - DIMODIFIKASI
   setupEventListeners() {
     const searchInput = document.getElementById("searchInput");
     const filterGunung = document.getElementById("filterGunung");
-
-    // 1. Event Listener untuk Search Input
-    if (searchInput) {
+    if (searchInput)
       searchInput.addEventListener("input", (e) => {
-        this.currentSearchTerm = e.target.value; // Simpan istilah pencarian
-        this.loadParticipants(); // Muat ulang data (biarkan backend yang filter)
+        this.currentSearchTerm = e.target.value;
+        this.loadParticipants();
       });
-    }
-
-    // 2. Event Listener untuk Filter Gunung (Dropdown)
-    if (filterGunung) {
+    if (filterGunung)
       filterGunung.addEventListener("change", (e) => {
-        this.currentTripFilterId = e.target.value; // Simpan ID trip yang dipilih
-        this.loadParticipants(); // Muat ulang data
+        this.currentTripFilterId = e.target.value;
+        this.loadParticipants();
       });
-    }
-
     this.setupEditFormHandler();
     this.setupFilePreview();
   }
 
-  // Setup form edit handler
   setupEditFormHandler() {
     const form = document.getElementById("formEditPeserta");
-    if (form) {
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        await this.handleEditSubmit(e);
-      });
-    }
+    if (!form) return;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await this.handleEditSubmit(e);
+    });
   }
 
-  // Setup file preview untuk foto KTP
   setupFilePreview() {
     const fileInput = document.getElementById("edit_foto_ktp");
     const preview = document.getElementById("edit_preview_ktp");
-
-    if (fileInput && preview) {
-      fileInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          // VALIDASI FILE
-          if (!file.type.startsWith("image/")) {
-            this.showError("File harus berupa gambar");
-            fileInput.value = "";
-            return;
-          }
-
-          if (file.size > 5 * 1024 * 1024) {
-            // Max 5MB
-            this.showError("Ukuran file maksimal 5MB");
-            fileInput.value = "";
-            return;
-          }
-
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            preview.src = e.target.result;
-            preview.style.display = "block";
-          };
-          reader.readAsDataURL(file);
-        } else {
-          preview.style.display = "none";
+    if (!fileInput || !preview) return;
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (!file.type.startsWith("image/")) {
+          this.showError("File harus berupa gambar");
+          fileInput.value = "";
+          return;
         }
-      });
-    }
+        if (file.size > 5 * 1024 * 1024) {
+          this.showError("Ukuran file maksimal 5MB");
+          fileInput.value = "";
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          preview.src = ev.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = "none";
+      }
+    });
   }
 
-  // Search participants (Tidak diperlukan lagi karena filtering dilakukan di backend)
-  // SearchParticipants(searchTerm) {
-  //   // Logika search ini dihapus karena sudah dipindahkan ke backend/peserta-api.php
-  // }
-
-  // Get participant detail
   async getParticipantDetail(id) {
     try {
-      const response = await fetch(`${this.baseURL}?action=detail&id=${id}`);
-      const result = await response.json();
-
-      if (result.status === 200) {
-        return result.data;
-      } else {
-        this.showError("Gagal memuat detail peserta: " + result.message);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error getting participant detail:", error);
+      const res = await fetch(`${this.baseURL}?action=detail&id=${id}`);
+      const result = await res.json().catch(() => null);
+      if (result && result.status === 200) return result.data;
+      this.showError(
+        "Gagal memuat detail peserta" +
+          (result && result.message ? ": " + result.message : "")
+      );
+      return null;
+    } catch (e) {
       this.showError("Terjadi kesalahan saat memuat detail peserta");
       return null;
     }
   }
 
-  // Update participant dengan file upload
   async updateParticipant(id, formData) {
     try {
       const response = await fetch(`${this.baseURL}?action=update&id=${id}`, {
         method: "POST",
         body: formData,
       });
-
-      const result = await response.json();
-
-      if (result.status === 200) {
+      const result = await response.json().catch(() => null);
+      if (result && result.status === 200) {
         await this.loadParticipants();
         this.showSuccess("Peserta berhasil diupdate");
         return true;
       } else {
-        this.showError("Gagal update peserta: " + result.message);
+        const msg =
+          result && result.message ? result.message : "Respons tidak valid";
+        this.showError("Gagal update peserta: " + msg);
         return false;
       }
     } catch (error) {
-      console.error("Error updating participant:", error);
       this.showError("Terjadi kesalahan saat update peserta");
       return false;
     }
   }
 
-  // Delete participant
   async deleteParticipant(id) {
-    const result = await Swal.fire({
+    const confirm = await Swal.fire({
       title: "Konfirmasi Hapus",
       text: "Apakah Anda yakin ingin menghapus peserta ini?",
       icon: "warning",
@@ -406,32 +329,29 @@ class PesertaAPI {
       confirmButtonText: "Ya, Hapus",
       cancelButtonText: "Batal",
     });
-
-    if (!result.isConfirmed) return;
+    if (!confirm.isConfirmed) return;
 
     try {
       const response = await fetch(`${this.baseURL}?action=delete&id=${id}`, {
         method: "DELETE",
       });
-
-      const result = await response.json();
-
-      if (result.status === 200) {
+      const result = await response.json().catch(() => null);
+      if (result && result.status === 200) {
         await this.loadParticipants();
         this.showSuccess("Peserta berhasil dihapus");
       } else {
-        this.showError("Gagal menghapus peserta: " + result.message);
+        const msg =
+          result && result.message ? result.message : "Respons tidak valid";
+        this.showError("Gagal menghapus peserta: " + msg);
       }
     } catch (error) {
-      console.error("Error deleting participant:", error);
       this.showError("Terjadi kesalahan saat menghapus peserta");
     }
   }
 
-  // Show edit modal dengan data terisi
   async showEditModal(id) {
     const participant = await this.getParticipantDetail(id);
-    if (!participant) return; // Error handled inside getParticipantDetail
+    if (!participant) return;
 
     this.currentEditParticipantId = participant.id_participant;
 
@@ -440,7 +360,7 @@ class PesertaAPI {
       this.showError("Form edit tidak ditemukan");
       return;
     }
-    // Isi semua field form dengan data peserta
+
     form.id_participant.value = participant.id_participant;
     form.nama.value = participant.nama || "";
     form.email.value = participant.email || "";
@@ -451,43 +371,37 @@ class PesertaAPI {
     form.tanggal_lahir.value = participant.tanggal_lahir || "";
     form.tempat_lahir.value = participant.tempat_lahir || "";
     form.nik.value = participant.nik || "";
-    // Setup preview foto KTP jika ada
+
     const preview = document.getElementById("edit_preview_ktp");
     if (preview) {
       if (participant.foto_ktp) {
         const imagePath = this.getImagePath(participant.foto_ktp);
         preview.src = imagePath;
         preview.style.display = "block";
-        // Add error handler untuk preview
         preview.onerror = () => {
-          console.error("Error loading preview image:", imagePath);
           preview.style.display = "none";
         };
       } else {
         preview.style.display = "none";
       }
     }
-    // Reset file input
+
     const fileInput = document.getElementById("edit_foto_ktp");
-    if (fileInput) {
-      fileInput.value = "";
-    }
-    // Tampilkan modal
+    if (fileInput) fileInput.value = "";
+
     const modal = new bootstrap.Modal(
       document.getElementById("editPesertaModal")
     );
     modal.show();
   }
 
-  // Handle form edit submit dengan file upload
   async handleEditSubmit(event) {
     event.preventDefault();
-
     if (!this.currentEditParticipantId) {
       this.showError("ID peserta tidak ditemukan");
       return;
     }
-    // Tampilkan loading
+
     const submitBtn = event.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Menyimpan...';
@@ -495,7 +409,6 @@ class PesertaAPI {
 
     const form = event.target;
     const formData = new FormData(form);
-    // Tambahkan ID untuk update
     formData.append("id_participant", this.currentEditParticipantId);
 
     try {
@@ -503,29 +416,21 @@ class PesertaAPI {
         this.currentEditParticipantId,
         formData
       );
-
       if (success) {
-        // Tutup modal
         const modal = bootstrap.Modal.getInstance(
           document.getElementById("editPesertaModal")
         );
-        if (modal) {
-          modal.hide();
-        }
-        // Reset current edit ID
+        if (modal) modal.hide();
         this.currentEditParticipantId = null;
       }
     } catch (error) {
-      console.error("Error in handleEditSubmit:", error);
       this.showError("Terjadi kesalahan saat menyimpan data");
     } finally {
-      // Kembalikan tombol
       submitBtn.innerHTML = originalText;
       submitBtn.disabled = false;
     }
   }
 
-  // UTILITY FUNCTIONS // Escape HTML untuk mencegah XSS
   escapeHtml(text) {
     if (text === null || text === undefined) return "";
     const div = document.createElement("div");
@@ -533,7 +438,6 @@ class PesertaAPI {
     return div.innerHTML;
   }
 
-  // Show success message
   showSuccess(message) {
     if (typeof Swal !== "undefined") {
       Swal.fire({
@@ -548,7 +452,6 @@ class PesertaAPI {
     }
   }
 
-  // Show error message
   showError(message) {
     if (typeof Swal !== "undefined") {
       Swal.fire({
@@ -562,12 +465,10 @@ class PesertaAPI {
     }
   }
 
-  // Refresh data
   async refresh() {
     await this.loadParticipants();
   }
 
-  // Debug method
   debugParticipants() {
     console.log("=== DEBUG PARTICIPANTS ===");
     this.participants.forEach((p, index) => {
@@ -582,7 +483,6 @@ class PesertaAPI {
   }
 }
 
-// Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   window.pesertaAPI = new PesertaAPI();
 });

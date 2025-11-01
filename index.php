@@ -207,6 +207,7 @@ session_start();
 
 
 
+
   <!-- Gallery Section -->
   <section class="gallery-cardstyle" id="gallerys">
     <!-- Particles.js Background (reduced) -->

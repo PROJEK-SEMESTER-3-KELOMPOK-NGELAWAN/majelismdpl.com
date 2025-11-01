@@ -4,19 +4,15 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-// Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// Include database connection
 require_once 'koneksi.php';
 
-// Get action parameter
 $action = $_GET['action'] ?? '';
 
-// Only allow GET requests for dashboard data
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     echo json_encode([
@@ -31,31 +27,28 @@ try {
         case 'getDashboardStats':
             getDashboardStats($conn);
             break;
-            
         case 'getTripCountByStatus':
             getTripCountByStatus($conn);
             break;
-            
         case 'getTripsOverview':
             getTripsOverview($conn);
             break;
-            
         case 'getParticipantsStats':
             getParticipantsStats($conn);
             break;
-            
         case 'getBookingsStats':
             getBookingsStats($conn);
             break;
-            
+        case 'getParticipantsMonthly':
+            getParticipantsMonthly($conn);
+            break;
         default:
             http_response_code(400);
             echo json_encode([
                 'success' => false,
-                'error' => 'Invalid action. Available actions: getDashboardStats, getTripCountByStatus, getTripsOverview, getParticipantsStats, getBookingsStats'
+                'error' => 'Invalid action. Available: getDashboardStats, getTripCountByStatus, getTripsOverview, getParticipantsStats, getBookingsStats, getParticipantsMonthly'
             ]);
     }
-    
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
@@ -64,60 +57,54 @@ try {
     ]);
 }
 
-// FUNCTION: Get complete dashboard statistics
-function getDashboardStats($conn) {
+/**
+ * Dashboard stats ringkas.
+ * trip_aktif  = paket_trips.status = 'available'
+ * trip_selesai= paket_trips.status = 'done'
+ * total_peserta = jumlah baris di participants
+ */
+function getDashboardStats($conn)
+{
     try {
         $stats = [];
-        
-        // Count trip aktif (available)
-        $result = $conn->query("SELECT COUNT(*) as count FROM paket_trips WHERE status = 'available'");
-        $row = $result->fetch_assoc();
+
+        // Trip aktif (available)
+        $row = $conn->query("SELECT COUNT(*) AS count FROM paket_trips WHERE status='available'")->fetch_assoc();
         $stats['trip_aktif'] = (int)$row['count'];
-        
-        // Count trip selesai (sold)
-        $result = $conn->query("SELECT COUNT(*) as count FROM paket_trips WHERE status = 'sold'");
-        $row = $result->fetch_assoc();
+
+        // Trip selesai (DONE)
+        $row = $conn->query("SELECT COUNT(*) AS count FROM paket_trips WHERE status='done'")->fetch_assoc();
         $stats['trip_selesai'] = (int)$row['count'];
-        
-        // Count total trips
-        $result = $conn->query("SELECT COUNT(*) as count FROM paket_trips");
-        $row = $result->fetch_assoc();
+
+        // Total trips
+        $row = $conn->query("SELECT COUNT(*) AS count FROM paket_trips")->fetch_assoc();
         $stats['total_trips'] = (int)$row['count'];
-        
-        // Count total peserta (jika ada tabel participants)
-        $checkTable = $conn->query("SHOW TABLES LIKE 'participants'");
-        if ($checkTable->num_rows > 0) {
-            $result = $conn->query("SELECT COUNT(*) as count FROM participants");
-            $row = $result->fetch_assoc();
+
+        // Total peserta dari tabel participants
+        $checkParticipants = $conn->query("SHOW TABLES LIKE 'participants'");
+        if ($checkParticipants->num_rows > 0) {
+            $row = $conn->query("SELECT COUNT(*) AS count FROM participants")->fetch_assoc();
             $stats['total_peserta'] = (int)$row['count'];
         } else {
             $stats['total_peserta'] = 0;
         }
-        
-        // Count pembayaran pending (jika ada tabel bookings)
+
+        // Pembayaran pending (bookings.status='pending')
         $checkBookings = $conn->query("SHOW TABLES LIKE 'bookings'");
         if ($checkBookings->num_rows > 0) {
-            $result = $conn->query("SELECT COUNT(*) as count FROM bookings WHERE status = 'pending'");
-            $row = $result->fetch_assoc();
+            $row = $conn->query("SELECT COUNT(*) AS count FROM bookings WHERE status='pending'")->fetch_assoc();
             $stats['pembayaran_pending'] = (int)$row['count'];
-            
-            // Count total bookings
-            $result = $conn->query("SELECT COUNT(*) as count FROM bookings");
-            $row = $result->fetch_assoc();
+
+            $row = $conn->query("SELECT COUNT(*) AS count FROM bookings")->fetch_assoc();
             $stats['total_bookings'] = (int)$row['count'];
         } else {
             $stats['pembayaran_pending'] = 0;
             $stats['total_bookings'] = 0;
         }
-        
-        // Add timestamp
+
         $stats['last_updated'] = date('Y-m-d H:i:s');
-        
-        echo json_encode([
-            'success' => true,
-            'data' => $stats
-        ]);
-        
+
+        echo json_encode(['success' => true, 'data' => $stats]);
     } catch (Exception $e) {
         echo json_encode([
             'success' => false,
@@ -135,203 +122,157 @@ function getDashboardStats($conn) {
     }
 }
 
-// FUNCTION: Get trip count by specific status
-function getTripCountByStatus($conn) {
+function getTripCountByStatus($conn)
+{
     $status = $_GET['status'] ?? '';
-    
-    if (empty($status)) {
-        echo json_encode([
-            'success' => false, 
-            'count' => 0, 
-            'error' => 'Status parameter is required'
-        ]);
+    if ($status === '') {
+        echo json_encode(['success' => false, 'count' => 0, 'error' => 'Status parameter is required']);
         return;
     }
-    
     try {
-        $stmt = $conn->prepare("SELECT COUNT(*) as count FROM paket_trips WHERE status = ?");
+        $stmt = $conn->prepare("SELECT COUNT(*) AS count FROM paket_trips WHERE status=?");
         $stmt->bind_param("s", $status);
         $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
+        $row = $stmt->get_result()->fetch_assoc();
         $stmt->close();
-        
-        echo json_encode([
-            'success' => true,
-            'count' => (int)$row['count'],
-            'status' => $status,
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
-        
+        echo json_encode(['success' => true, 'count' => (int)$row['count'], 'status' => $status, 'timestamp' => date('Y-m-d H:i:s')]);
     } catch (Exception $e) {
-        echo json_encode([
-            'success' => false,
-            'count' => 0,
-            'status' => $status,
-            'error' => $e->getMessage()
-        ]);
+        echo json_encode(['success' => false, 'count' => 0, 'status' => $status, 'error' => $e->getMessage()]);
     }
 }
 
-// FUNCTION: Get detailed trips overview
-function getTripsOverview($conn) {
+function getTripsOverview($conn)
+{
     try {
         $overview = [];
-        
-        // Group trips by status
-        $result = $conn->query("
-            SELECT 
-                status, 
-                COUNT(*) as count,
-                AVG(harga) as avg_price,
-                SUM(slot) as total_slots
-            FROM paket_trips 
-            GROUP BY status
-        ");
-        
-        while ($row = $result->fetch_assoc()) {
+        $res = $conn->query("SELECT status, COUNT(*) AS count, AVG(harga) AS avg_price, SUM(slot) AS total_slots FROM paket_trips GROUP BY status");
+        while ($row = $res->fetch_assoc()) {
             $overview[$row['status']] = [
                 'count' => (int)$row['count'],
                 'avg_price' => round((float)$row['avg_price'], 2),
                 'total_slots' => (int)$row['total_slots']
             ];
         }
-        
-        // Get recent trips (last 5)
-        $result = $conn->query("
-            SELECT id_trip, nama_gunung, status, tanggal, harga 
-            FROM paket_trips 
-            ORDER BY id_trip DESC 
-            LIMIT 5
-        ");
-        
-        $recent_trips = [];
-        while ($row = $result->fetch_assoc()) {
-            $recent_trips[] = $row;
+        $recent = [];
+        $res2 = $conn->query("SELECT id_trip, nama_gunung, status, tanggal, harga FROM paket_trips ORDER BY id_trip DESC LIMIT 5");
+        while ($row = $res2->fetch_assoc()) {
+            $recent[] = $row;
         }
-        
-        echo json_encode([
-            'success' => true,
-            'data' => [
-                'overview' => $overview,
-                'recent_trips' => $recent_trips,
-                'timestamp' => date('Y-m-d H:i:s')
-            ]
-        ]);
-        
+
+        echo json_encode(['success' => true, 'data' => ['overview' => $overview, 'recent_trips' => $recent, 'timestamp' => date('Y-m-d H:i:s')]]);
     } catch (Exception $e) {
-        echo json_encode([
-            'success' => false,
-            'data' => [],
-            'error' => $e->getMessage()
-        ]);
+        echo json_encode(['success' => false, 'data' => [], 'error' => $e->getMessage()]);
     }
 }
 
-// FUNCTION: Get participants statistics
-function getParticipantsStats($conn) {
+function getParticipantsStats($conn)
+{
     try {
-        $stats = [];
-        
-        // Check if participants table exists
-        $checkTable = $conn->query("SHOW TABLES LIKE 'participants'");
-        if ($checkTable->num_rows === 0) {
-            echo json_encode([
-                'success' => false,
-                'data' => [],
-                'error' => 'Participants table not found'
-            ]);
+        $check = $conn->query("SHOW TABLES LIKE 'participants'");
+        if ($check->num_rows === 0) {
+            echo json_encode(['success' => false, 'data' => [], 'error' => 'Participants table not found']);
             return;
         }
-        
-        // Total participants
-        $result = $conn->query("SELECT COUNT(*) as count FROM participants");
-        $row = $result->fetch_assoc();
+        $stats = [];
+        $row = $conn->query("SELECT COUNT(*) AS count FROM participants")->fetch_assoc();
         $stats['total'] = (int)$row['count'];
-        
-        // Participants with bookings
-        $result = $conn->query("
-            SELECT COUNT(DISTINCT p.id_participant) as count 
-            FROM participants p 
-            INNER JOIN bookings b ON p.id_participant = b.id_participant
-        ");
-        $row = $result->fetch_assoc();
-        $stats['with_bookings'] = (int)$row['count'];
-        
-        // Recent participants (last 7 days)
-        $result = $conn->query("
-            SELECT COUNT(*) as count 
-            FROM participants 
-            WHERE tanggal_lahir >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-        ");
-        $row = $result->fetch_assoc();
-        $stats['recent'] = (int)$row['count'];
-        
-        echo json_encode([
-            'success' => true,
-            'data' => $stats,
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
-        
+
+        // Jika ada relasi id_participant ke bookings, hitung yang punya bookings
+        $checkCol = $conn->query("SHOW COLUMNS FROM participants LIKE 'id_booking'");
+        if ($checkCol->num_rows > 0) {
+            $row = $conn->query("SELECT COUNT(*) AS count FROM participants WHERE id_booking IS NOT NULL")->fetch_assoc();
+            $stats['with_bookings'] = (int)$row['count'];
+        } else {
+            $stats['with_bookings'] = 0;
+        }
+
+        echo json_encode(['success' => true, 'data' => $stats, 'timestamp' => date('Y-m-d H:i:s')]);
     } catch (Exception $e) {
-        echo json_encode([
-            'success' => false,
-            'data' => [],
-            'error' => $e->getMessage()
-        ]);
+        echo json_encode(['success' => false, 'data' => [], 'error' => $e->getMessage()]);
     }
 }
 
-// FUNCTION: Get bookings statistics
-function getBookingsStats($conn) {
+function getBookingsStats($conn)
+{
     try {
         $stats = [];
-        
-        // Check if bookings table exists
-        $checkTable = $conn->query("SHOW TABLES LIKE 'bookings'");
-        if ($checkTable->num_rows === 0) {
-            echo json_encode([
-                'success' => false,
-                'data' => [],
-                'error' => 'Bookings table not found'
-            ]);
+        $check = $conn->query("SHOW TABLES LIKE 'bookings'");
+        if ($check->num_rows === 0) {
+            echo json_encode(['success' => false, 'data' => [], 'error' => 'Bookings table not found']);
             return;
         }
-        
-        // Group bookings by status
-        $result = $conn->query("
-            SELECT 
-                status, 
-                COUNT(*) as count,
-                SUM(total_harga) as total_revenue
-            FROM bookings 
-            GROUP BY status
-        ");
-        
-        while ($row = $result->fetch_assoc()) {
+        $res = $conn->query("SELECT status, COUNT(*) AS count, SUM(total_harga) AS total_revenue FROM bookings GROUP BY status");
+        while ($row = $res->fetch_assoc()) {
             $stats[$row['status']] = [
                 'count' => (int)$row['count'],
                 'revenue' => (float)$row['total_revenue']
             ];
         }
-        
-        // Total revenue
-        $result = $conn->query("SELECT SUM(total_harga) as total FROM bookings");
-        $row = $result->fetch_assoc();
+        $row = $conn->query("SELECT SUM(total_harga) AS total FROM bookings")->fetch_assoc();
         $stats['total_revenue'] = (float)$row['total'];
-        
-        echo json_encode([
-            'success' => true,
-            'data' => $stats,
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
-        
+
+        echo json_encode(['success' => true, 'data' => $stats, 'timestamp' => date('Y-m-d H:i:s')]);
     } catch (Exception $e) {
-        echo json_encode([
-            'success' => false,
-            'data' => [],
-            'error' => $e->getMessage()
-        ]);
+        echo json_encode(['success' => false, 'data' => [], 'error' => $e->getMessage()]);
     }
 }
-?>
+
+/**
+ * Participants Monthly Chart Data (12 bulan terakhir)
+ * Menggunakan tabel participants (relasi ke bookings via id_booking), kelompokkan berdasarkan bookings.tanggal_booking.
+ */
+function getParticipantsMonthly($conn)
+{
+    try {
+        // Pastikan tabel participants dan bookings ada
+        $hasParticipants = $conn->query("SHOW TABLES LIKE 'participants'")->num_rows > 0;
+        $hasBookings = $conn->query("SHOW TABLES LIKE 'bookings'")->num_rows > 0;
+
+        if (!$hasParticipants || !$hasBookings) {
+            echo json_encode(['success' => false, 'labels' => [], 'data' => [], 'error' => 'Required tables not found']);
+            return;
+        }
+
+        // Ambil jumlah peserta per bulan dari tanggal_booking di bookings
+        $sql = "
+            SELECT 
+                DATE_FORMAT(b.tanggal_booking, '%Y-%m') AS ym,
+                YEAR(b.tanggal_booking) AS y,
+                MONTH(b.tanggal_booking) AS m,
+                COUNT(p.id_participant) AS total_peserta
+            FROM participants p
+            INNER JOIN bookings b ON p.id_booking = b.id_booking
+            WHERE b.tanggal_booking >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+            GROUP BY DATE_FORMAT(b.tanggal_booking, '%Y-%m'), YEAR(b.tanggal_booking), MONTH(b.tanggal_booking)
+            ORDER BY y ASC, m ASC
+        ";
+        $res = $conn->query($sql);
+        $map = [];
+        while ($r = $res->fetch_assoc()) {
+            $map[$r['ym']] = (int)$r['total_peserta'];
+        }
+
+        // Build 12 months series (0 jika tidak ada data)
+        $labels = [];
+        $data = [];
+        $cursor = new DateTime(date('Y-m-01'));
+        $cursor->modify('-11 months');
+
+        for ($i = 0; $i < 12; $i++) {
+            $key = $cursor->format('Y-m');
+            $labels[] = bulanIndo((int)$cursor->format('n'));
+            $data[] = $map[$key] ?? 0;
+            $cursor->modify('+1 month');
+        }
+
+        echo json_encode(['success' => true, 'labels' => $labels, 'data' => $data, 'timestamp' => date('Y-m-d H:i:s')]);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'labels' => [], 'data' => [], 'error' => $e->getMessage()]);
+    }
+}
+
+function bulanIndo($n)
+{
+    $arr = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    return $arr[max(1, min(12, $n)) - 1];
+}
