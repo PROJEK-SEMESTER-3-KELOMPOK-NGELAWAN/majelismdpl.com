@@ -87,11 +87,12 @@ $companyDetails = [
     'name' => 'Majelis MDPL',
     'address' => 'Jl. Pendaki No. 12, Puncak Sejati',
     'email' => 'admin@majelismdpl.com',
-    'logo_path' => '../img/majelis.png'
+    'logo_path' => '../assets/majelis.png'
 ];
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -106,48 +107,210 @@ $companyDetails = [
             --color-success: #2e7d32;
             --color-primary-btn: #4a90e2;
         }
-        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background-color: #f0f0f0; color: #333; line-height: 1.6; }
-        .invoice-wrapper {
-            max-width: 900px; margin: 30px auto; padding: 40px; background: #fff; box-shadow: 0 0 30px rgba(0, 0, 0, 0.15); border-radius: 12px; position: relative; overflow: hidden; z-index: 1;
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333;
+            line-height: 1.6;
         }
-        .action-bar { text-align: center; max-width: 900px; margin: 20px auto; display: flex; justify-content: flex-end; gap: 15px; }
-        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn-primary { background: var(--color-primary-btn); color: white; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+
+        .invoice-wrapper {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 40px;
+            background: #fff;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .action-bar {
+            text-align: center;
+            max-width: 900px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--color-primary-btn);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
 
         /* Tanda Air PAID */
-        .paid-stamp-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 10; pointer-events: none; }
-        .paid-stamp-overlay::before { content: "PAID"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 15em; color: var(--color-success); opacity: 0.1; font-weight: 800; white-space: nowrap; }
+        .paid-stamp-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .paid-stamp-overlay::before {
+            content: "PAID";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 15em;
+            color: var(--color-success);
+            opacity: 0.1;
+            font-weight: 800;
+            white-space: nowrap;
+        }
 
         /* Header */
-        .invoice-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--color-mdpl-dark); padding-bottom: 20px; margin-bottom: 30px; }
-        .logo-box { display: flex; align-items: center; }
-        .logo-box img { height: 60px; margin-right: 15px; }
-        .logo-box div h2 { font-size: 2em; margin: 0; font-weight: 800; color: var(--color-mdpl-dark); }
-        .logo-box div p { margin: 0; font-size: 0.8em; color: #777; }
-        .invoice-meta { text-align: right; }
-        .invoice-meta h1 { color: #333; font-size: 3em; margin: 0; font-weight: 700; }
-        .invoice-meta strong { color: var(--color-mdpl-dark); font-weight: 700; }
-        
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 5px solid var(--color-mdpl-dark);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-box img {
+            height: 60px;
+            margin-right: 15px;
+        }
+
+        .logo-box div h2 {
+            font-size: 2em;
+            margin: 0;
+            font-weight: 800;
+            color: var(--color-mdpl-dark);
+        }
+
+        .logo-box div p {
+            margin: 0;
+            font-size: 0.8em;
+            color: #777;
+        }
+
+        .invoice-meta {
+            text-align: right;
+        }
+
+        .invoice-meta h1 {
+            color: #333;
+            font-size: 3em;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .invoice-meta strong {
+            color: var(--color-mdpl-dark);
+            font-weight: 700;
+        }
+
         /* Info Grid */
-        .info-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-        .info-box { padding: 20px; background: #fcfcfc; border-left: 5px solid var(--color-mdpl-light); border-radius: 5px; }
-        .info-box h4 { color: var(--color-mdpl-dark); font-size: 1.1em; margin-bottom: 10px; font-weight: 700; }
-        .info-row { display: flex; padding: 3px 0; font-size: 0.9em; }
-        .info-row span:first-child { width: 45%; color: #777; }
-        .info-row strong { width: 55%; color: #333; }
+        .info-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .info-box {
+            padding: 20px;
+            background: #fcfcfc;
+            border-left: 5px solid var(--color-mdpl-light);
+            border-radius: 5px;
+        }
+
+        .info-box h4 {
+            color: var(--color-mdpl-dark);
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 3px 0;
+            font-size: 0.9em;
+        }
+
+        .info-row span:first-child {
+            width: 45%;
+            color: #777;
+        }
+
+        .info-row strong {
+            width: 55%;
+            color: #333;
+        }
 
         /* Section Title */
         .section-title-table {
-            font-size: 1.4em; color: var(--color-mdpl-dark); margin-bottom: 15px; font-weight: 700; border-bottom: 2px solid var(--color-mdpl-light); padding-bottom: 5px;
+            font-size: 1.4em;
+            color: var(--color-mdpl-dark);
+            margin-bottom: 15px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--color-mdpl-light);
+            padding-bottom: 5px;
         }
 
         /* Table */
-        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .data-table th { background-color: #f4f4f4; color: #555; padding: 12px 15px; text-align: left; font-weight: 600; border-bottom: 2px solid #ddd; }
-        .data-table td { padding: 8px 15px; border-bottom: 1px dashed #eee; font-size: 0.9em; }
-        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .data-table th {
+            background-color: #f4f4f4;
+            color: #555;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .data-table td {
+            padding: 8px 15px;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.9em;
+        }
+
         /* Total Summary */
         .total-summary {
             float: right;
@@ -159,7 +322,12 @@ $companyDetails = [
             background-color: #fcfcfc;
             margin-bottom: 20px;
         }
-        .total-summary .info-row { padding: 8px 20px; border-bottom: 1px dashed #eee; }
+
+        .total-summary .info-row {
+            padding: 8px 20px;
+            border-bottom: 1px dashed #eee;
+        }
+
         .grand-total-row {
             font-size: 1.4em !important;
             font-weight: 800 !important;
@@ -169,21 +337,39 @@ $companyDetails = [
         }
 
         /* Footer */
-        .invoice-footer { clear: both; border-top: 1px dashed #ddd; padding-top: 20px; margin-top: 40px; text-align: center; }
-        .invoice-footer p { font-size: 0.8em; color: #555; }
-        
+        .invoice-footer {
+            clear: both;
+            border-top: 1px dashed #ddd;
+            padding-top: 20px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .invoice-footer p {
+            font-size: 0.8em;
+            color: #555;
+        }
+
         @media print {
-            .action-bar { display: none; }
-            .invoice-wrapper { box-shadow: none; margin: 0; border-radius: 0; }
+            .action-bar {
+                display: none;
+            }
+
+            .invoice-wrapper {
+                box-shadow: none;
+                margin: 0;
+                border-radius: 0;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="action-bar">
         <a href="payment-status.php" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
         <a href="download-invoice-pdf.php?payment_id=<?php echo $payment_id; ?>" class="btn btn-primary"><i class="fa-solid fa-download"></i> Unduh PDF</a>
     </div>
-    
+
     <div class="invoice-wrapper">
         <div class="paid-stamp-overlay"></div>
 
@@ -195,7 +381,7 @@ $companyDetails = [
                     <p>E-Invoice & Tiket Pendakian</p>
                 </div>
             </div>
-            
+
             <div class="invoice-meta">
                 <h1>INVOICE</h1>
                 <p>No. Invoice: <strong><?php echo $invoiceNumber; ?></strong></p>
@@ -210,7 +396,7 @@ $companyDetails = [
                 <div class="info-row"><span>Tgl. Pembayaran:</span> <strong><?php echo $formatDate($invoiceData['tanggal']); ?></strong></div>
                 <div class="info-row"><span>Metode Bayar:</span> <strong><?php echo $invoiceData['metode']; ?></strong></div>
             </div>
-            
+
             <div class="info-box">
                 <h4><i class="fa-solid fa-user"></i> Pemesan</h4>
                 <div class="info-row"><span>Nama:</span> <strong><?php echo $invoiceData['username']; ?></strong></div>
@@ -284,12 +470,12 @@ $companyDetails = [
             <tbody>
                 <?php $no = 1; ?>
                 <?php foreach ($participants as $p): ?>
-                <tr>
-                    <td><?php echo $no++; ?></td>
-                    <td><?php echo htmlspecialchars($p['nama']); ?></td>
-                    <td><?php echo $p['tempat_lahir'] . ', ' . date('d M Y', strtotime($p['tanggal_lahir'])); ?></td>
-                    <td><?php echo $p['nik']; ?></td>
-                </tr>
+                    <tr>
+                        <td><?php echo $no++; ?></td>
+                        <td><?php echo htmlspecialchars($p['nama']); ?></td>
+                        <td><?php echo $p['tempat_lahir'] . ', ' . date('d M Y', strtotime($p['tanggal_lahir'])); ?></td>
+                        <td><?php echo $p['nik']; ?></td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
@@ -305,4 +491,5 @@ $companyDetails = [
         </div>
     </div>
 </body>
+
 </html>

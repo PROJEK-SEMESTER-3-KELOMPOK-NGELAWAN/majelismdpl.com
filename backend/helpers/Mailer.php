@@ -7,116 +7,111 @@ use PHPMailer\PHPMailer\Exception;
 
 class Mailer
 {
-    // ====== KONFIGURASI SMTP (ganti sesuai akun Anda) ======
-    private static string $SMTP_HOST = 'smtp.gmail.com';
-    private static int    $SMTP_PORT = 587; // TLS
-    private static string $SMTP_USER = 'dimasdwinugroho15@gmail.com';
-    private static string $SMTP_PASS = 'ptut xpxs tajt nikm';
-    private static string $FROM_EMAIL = 'majelismdpl@gmail.com';
-    private static string $FROM_NAME  = 'Majelis MDPL';
+  // ====== KONFIGURASI SMTP ======
+  private static string $SMTP_HOST = 'smtp.gmail.com';
+  private static int    $SMTP_PORT = 587;
+  private static string $SMTP_USER = 'dimasdwinugroho15@gmail.com';
+  private static string $SMTP_PASS = 'ptut xpxs tajt nikm';
+  private static string $FROM_EMAIL = 'majelismdpl@gmail.com';
+  private static string $FROM_NAME  = 'Majelis MDPL';
 
-    // Lokasi logo (path absolut file server), dan URL fallback jika embed gagal
-    // Sesuaikan path agar menunjuk file logo Anda, misal: /var/www/html/img/logo-majelis.png
-    private static string $LOGO_PATH_ABS = __DIR__ . '/../../assets/logo_majelis_noBg.png';
-    private static string $LOGO_FALLBACK_URL = 'http://localhost/majelismdpl.com/assets/logo_majelis_noBg.png';
+  // Base URL website (ubah sesuai domain production Anda)
+  private static string $BASE_URL = 'http://localhost/majelismdpl.com';
 
-    private static bool   $USE_TLS    = true;
+  private static string $LOGO_PATH_ABS = __DIR__ . '/../../assets/logo_majelis_noBg.png';
+  private static string $LOGO_FALLBACK_URL = 'http://localhost/majelismdpl.com/assets/logo_majelis_noBg.png';
 
-    // ====== KIRIM EMAIL UMUM ======
-    public static function send(string $toEmail, string $toName, string $subject, string $htmlBody, string $altText = '', array $attachments = []): array
-    {
-        $mail = new PHPMailer(true);
-        try {
-            // SMTP
-            $mail->isSMTP();
-            $mail->Host       = self::$SMTP_HOST;
-            $mail->SMTPAuth   = true;
-            $mail->Username   = self::$SMTP_USER;
-            $mail->Password   = self::$SMTP_PASS;
-            if (self::$USE_TLS) {
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            }
-            $mail->Port       = self::$SMTP_PORT;
+  private static bool   $USE_TLS    = true;
 
-            // Pengirim & Penerima
-            $mail->setFrom(self::$FROM_EMAIL, self::$FROM_NAME);
-            $mail->addAddress($toEmail, $toName ?: $toEmail);
-            $mail->addReplyTo(self::$FROM_EMAIL, self::$FROM_NAME);
+  // ====== KIRIM EMAIL UMUM ======
+  public static function send(string $toEmail, string $toName, string $subject, string $htmlBody, string $altText = '', array $attachments = []): array
+  {
+    $mail = new PHPMailer(true);
+    try {
+      // SMTP
+      $mail->isSMTP();
+      $mail->Host       = self::$SMTP_HOST;
+      $mail->SMTPAuth   = true;
+      $mail->Username   = self::$SMTP_USER;
+      $mail->Password   = self::$SMTP_PASS;
+      if (self::$USE_TLS) {
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+      }
+      $mail->Port       = self::$SMTP_PORT;
 
-            // Lampiran (opsional)
-            foreach ($attachments as $att) {
-                if (is_array($att) && isset($att['path'])) {
-                    if (is_file($att['path'])) $mail->addAttachment($att['path'], $att['name'] ?? '');
-                } else {
-                    if (is_file($att)) $mail->addAttachment($att);
-                }
-            }
+      // Pengirim & Penerima
+      $mail->setFrom(self::$FROM_EMAIL, self::$FROM_NAME);
+      $mail->addAddress($toEmail, $toName ?: $toEmail);
+      $mail->addReplyTo(self::$FROM_EMAIL, self::$FROM_NAME);
 
-            // Embed logo sebagai CID agar aman di email client
-            $logoCid = null;
-            if (is_file(self::$LOGO_PATH_ABS)) {
-                // Pastikan tipe MIME benar (umumnya image/png)
-                $mail->addEmbeddedImage(self::$LOGO_PATH_ABS, 'mdpl_logo', 'logo.png', 'base64', 'image/png'); // [web:153][web:231]
-                $logoCid = 'cid:mdpl_logo';
-            }
-
-            $mail->isHTML(true);
-            $mail->Subject = $subject;
-
-            // Sisipkan CID logo jika tersedia, jika tidak gunakan URL fallback
-            $logoHtml = $logoCid ? "<img src=\"{$logoCid}\" width=\"44\" height=\"44\" style=\"display:block;border:0;outline:none;text-decoration:none;border-radius:9px\" alt=\"Majelis MDPL\" />"
-                : "<img src=\"" . htmlspecialchars(self::$LOGO_FALLBACK_URL) . "\" width=\"44\" height=\"44\" style=\"display:block;border:0;outline:none;text-decoration:none;border-radius:9px\" alt=\"Majelis MDPL\" />";
-
-            // Bungkus body ke dalam frame agar konsisten gaya
-            $mail->Body    = self::frame($htmlBody, $logoHtml);
-            $mail->AltBody = $altText ?: strip_tags($htmlBody);
-
-            $mail->send();
-            return ['ok' => true];
-        } catch (Exception $e) {
-            return ['ok' => false, 'error' => $e->getMessage()];
+      // Lampiran
+      foreach ($attachments as $att) {
+        if (is_array($att) && isset($att['path'])) {
+          if (is_file($att['path'])) $mail->addAttachment($att['path'], $att['name'] ?? '');
+        } else {
+          if (is_file($att)) $mail->addAttachment($att);
         }
+      }
+
+      // Embed logo
+      $logoCid = null;
+      if (is_file(self::$LOGO_PATH_ABS)) {
+        $mail->addEmbeddedImage(self::$LOGO_PATH_ABS, 'mdpl_logo', 'logo.png', 'base64', 'image/png');
+        $logoCid = 'cid:mdpl_logo';
+      }
+
+      $mail->isHTML(true);
+      $mail->Subject = $subject;
+
+      $logoHtml = $logoCid ? "<img src=\"{$logoCid}\" width=\"44\" height=\"44\" style=\"display:block;border:0;outline:none;text-decoration:none;border-radius:9px\" alt=\"Majelis MDPL\" />"
+        : "<img src=\"" . htmlspecialchars(self::$LOGO_FALLBACK_URL) . "\" width=\"44\" height=\"44\" style=\"display:block;border:0;outline:none;text-decoration:none;border-radius:9px\" alt=\"Majelis MDPL\" />";
+
+      $mail->Body    = self::frame($htmlBody, $logoHtml);
+      $mail->AltBody = $altText ?: strip_tags($htmlBody);
+
+      $mail->send();
+      return ['ok' => true];
+    } catch (Exception $e) {
+      return ['ok' => false, 'error' => $e->getMessage()];
     }
+  }
 
-    // ====== GAYA DASAR (table-based untuk kompatibilitas email) ======
-    private static function styles(): array
-    {
-        // Warna utama mengikuti tema situs (cokelat keemasan)
-        $brand = '#a97c50';
-        $brandDark = '#8b5e3c';
+  // ====== GAYA DASAR ======
+  private static function styles(): array
+  {
+    $brand = '#a97c50';
+    $brandDark = '#8b5e3c';
 
-        return [
-            'brand'      => $brand,
-            'brandDark'  => $brandDark,
-            'bg'         => '#f5f3ef',
-            'fg'         => '#333333',
-            'muted'      => '#777777',
-            'success'    => '#28a745',
-            'warning'    => '#e65100',
-            'danger'     => '#c82333',
-            // Inline CSS (hindari margin, gunakan padding; gunakan tabel untuk layout) [web:233][web:228]
-            'outer'      => 'width:100%;background:#f5f3ef;padding:18px 10px',
-            'container'  => 'max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #ece8e2;border-radius:14px;overflow:hidden',
-            'header'     => 'background:#ffffff;padding:16px 22px;border-bottom:1px solid #f0ebe4',
-            'title'      => 'font-family:Arial,Helvetica,sans-serif;color:#3D2F21;font-size:18px;font-weight:800;letter-spacing:.2px',
-            'subtitle'   => 'font-family:Arial,Helvetica,sans-serif;color:#6B5847;font-size:12px',
-            'body'       => 'padding:18px 22px;background:#ffffff',
-            'box'        => 'padding:14px;border:1px solid #eee;border-radius:10px;background:#fbfbfb',
-            'footer'     => 'padding:14px 22px;background:#fafafa;border-top:1px solid #eee;color:#777;font-size:12px',
-            'cta'        => 'display:inline-block;background:#a97c50;color:#ffffff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:700',
-            'badge'      => 'display:inline-block;padding:4px 10px;border-radius:999px;color:#fff;font-size:11px;font-weight:700',
-            'money'      => 'font-size:22px;font-weight:800;color:#3D2F21',
-            'code'       => 'font-family:Menlo,Consolas,monospace;font-size:18px;letter-spacing:1px;color:#1b2b5a'
-        ];
-    }
+    return [
+      'brand'      => $brand,
+      'brandDark'  => $brandDark,
+      'bg'         => '#f5f3ef',
+      'fg'         => '#333333',
+      'muted'      => '#777777',
+      'success'    => '#28a745',
+      'warning'    => '#e65100',
+      'danger'     => '#c82333',
+      'outer'      => 'width:100%;background:#f5f3ef;padding:18px 10px',
+      'container'  => 'max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #ece8e2;border-radius:14px;overflow:hidden',
+      'header'     => 'background:#ffffff;padding:16px 22px;border-bottom:1px solid #f0ebe4',
+      'title'      => 'font-family:Arial,Helvetica,sans-serif;color:#3D2F21;font-size:18px;font-weight:800;letter-spacing:.2px',
+      'subtitle'   => 'font-family:Arial,Helvetica,sans-serif;color:#6B5847;font-size:12px',
+      'body'       => 'padding:18px 22px;background:#ffffff',
+      'box'        => 'padding:14px;border:1px solid #eee;border-radius:10px;background:#fbfbfb',
+      'footer'     => 'padding:14px 22px;background:#fafafa;border-top:1px solid #eee;color:#777;font-size:12px',
+      'cta'        => 'display:inline-block;background:#a97c50;color:#ffffff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:700',
+      'badge'      => 'display:inline-block;padding:4px 10px;border-radius:999px;color:#fff;font-size:11px;font-weight:700',
+      'money'      => 'font-size:22px;font-weight:800;color:#3D2F21',
+      'code'       => 'font-family:Menlo,Consolas,monospace;font-size:18px;letter-spacing:1px;color:#1b2b5a'
+    ];
+  }
 
-    // ====== FRAME EMAIL UMUM (header + body + footer) ======
-    private static function frame(string $contentHtml, string $logoHtml): string
-    {
-        $s = self::styles();
+  // ====== FRAME EMAIL ======
+  private static function frame(string $contentHtml, string $logoHtml): string
+  {
+    $s = self::styles();
 
-        // Header dengan logo & judul
-        $header = "
+    $header = "
         <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"{$s['header']}\">
           <tr>
             <td style=\"vertical-align:middle;width:48px\">{$logoHtml}</td>
@@ -130,14 +125,14 @@ class Mailer
           </tr>
         </table>";
 
-        $footer = "
+    $footer = "
         <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"{$s['footer']}\">
           <tr>
             <td>Anda menerima email ini karena melakukan transaksi di Majelis MDPL. Butuh bantuan? Balas email ini.</td>
           </tr>
         </table>";
 
-        return "
+    return "
         <div style=\"{$s['outer']}\">
           <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" align=\"center\" style=\"{$s['container']}\">
             <tr><td>{$header}</td></tr>
@@ -145,15 +140,15 @@ class Mailer
             <tr><td>{$footer}</td></tr>
           </table>
         </div>";
-    }
+  }
 
-    // ====== BLOK RINGKASAN UMUM ======
-    private static function orderSummary(array $d): string
-    {
-        $s = self::styles();
-        $harga = number_format((int)($d['total_harga'] ?? 0), 0, ',', '.');
+  // ====== BLOK RINGKASAN ======
+  private static function orderSummary(array $d): string
+  {
+    $s = self::styles();
+    $harga = number_format((int)($d['total_harga'] ?? 0), 0, ',', '.');
 
-        return "
+    return "
         <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"{$s['box']}\">
           <tr>
             <td style=\"font-family:Arial,Helvetica,sans-serif;color:#6B5847;font-size:12px\">ID Pesanan</td>
@@ -175,17 +170,20 @@ class Mailer
             <td align=\"right\" style=\"{$s['money']}\">Rp {$harga}</td>
           </tr>
         </table>";
-    }
+  }
 
-    // ====== TEMPLATE: PAID ======
-    public static function buildPaidTemplate(array $d): string
-    {
-        $s = self::styles();
-        $badge = "<span style=\"{$s['badge']};background:{$s['success']}\">BERHASIL</span>";
-        $summary = self::orderSummary($d);
-        $ctaUrl = htmlspecialchars($d['invoice_url'] ?? '#');
+  // ====== TEMPLATE: PAID ======
+  public static function buildPaidTemplate(array $d): string
+  {
+    $s = self::styles();
+    $badge = "<span style=\"{$s['badge']};background:{$s['success']}\">BERHASIL</span>";
+    $summary = self::orderSummary($d);
 
-        $html = "
+    // Gunakan URL absolut dengan payment_id
+    $paymentId = $d['payment_id'] ?? '';
+    $ctaUrl = self::$BASE_URL . '/user/view-invoice.php?payment_id=' . urlencode($paymentId);
+
+    $html = "
         <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">
           <tr>
             <td style=\"font-family:Arial,Helvetica,sans-serif;color:#3D2F21;font-size:18px;font-weight:800\">Pembayaran Selesai {$badge}</td>
@@ -201,17 +199,17 @@ class Mailer
             <td><a href=\"{$ctaUrl}\" target=\"_blank\" style=\"{$s['cta']}\">Lihat Invoice</a></td>
           </tr>
         </table>";
-        return $html;
-    }
+    return $html;
+  }
 
-    // ====== TEMPLATE: FAILED ======
-    public static function buildFailedTemplate(array $d): string
-    {
-        $s = self::styles();
-        $badge = "<span style=\"{$s['badge']};background:{$s['danger']}\">GAGAL</span>";
-        $summary = self::orderSummary($d);
+  // ====== TEMPLATE: FAILED ======
+  public static function buildFailedTemplate(array $d): string
+  {
+    $s = self::styles();
+    $badge = "<span style=\"{$s['badge']};background:{$s['danger']}\">GAGAL</span>";
+    $summary = self::orderSummary($d);
 
-        $html = "
+    $html = "
         <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">
           <tr>
             <td style=\"font-family:Arial,Helvetica,sans-serif;color:#c82333;font-size:18px;font-weight:800\">Pembayaran Tidak Berhasil {$badge}</td>
@@ -227,21 +225,22 @@ class Mailer
             <td style=\"font-family:Arial,Helvetica,sans-serif;color:#6B5847;font-size:12px\">Silakan lakukan pembayaran ulang dari halaman status pembayaran Anda.</td>
           </tr>
         </table>";
-        return $html;
-    }
+    return $html;
+  }
 
-    // ====== TEMPLATE: PENDING (Reminder) ======
-    public static function buildPendingTemplate(array $d): string
-    {
-        $s = self::styles();
-        $badge = "<span style=\"{$s['badge']};background:{$s['warning']}\">MENUNGGU</span>";
-        $summary = self::orderSummary($d);
-        $ctaUrl = htmlspecialchars($d['payment_status_url'] ?? '#');
+  // ====== TEMPLATE: PENDING ======
+  public static function buildPendingTemplate(array $d): string
+  {
+    $s = self::styles();
+    $badge = "<span style=\"{$s['badge']};background:{$s['warning']}\">MENUNGGU</span>";
+    $summary = self::orderSummary($d);
 
-        // Bila tersedia kode bayar (contoh VA/alfamart), kirimkan di blok khusus
-        $kodeBayar = '';
-        if (!empty($d['payment_code'])) {
-            $kodeBayar = "
+    // URL absolut ke halaman payment status
+    $ctaUrl = self::$BASE_URL . '/user/payment-status.php';
+
+    $kodeBayar = '';
+    if (!empty($d['payment_code'])) {
+      $kodeBayar = "
             <tr><td height=\"12\"></td></tr>
             <tr>
               <td style=\"font-family:Arial,Helvetica,sans-serif;color:#3D2F21\">Kode pembayaran:</td>
@@ -251,9 +250,9 @@ class Mailer
                 <div style=\"{$s['code']}\">" . htmlspecialchars($d['payment_code']) . "</div>
               </td>
             </tr>";
-        }
+    }
 
-        $html = "
+    $html = "
         <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\">
           <tr>
             <td style=\"font-family:Arial,Helvetica,sans-serif;color:#e65100;font-size:18px;font-weight:800\">Tindakan Diperlukan {$badge}</td>
@@ -274,6 +273,6 @@ class Mailer
             <td style=\"font-family:Arial,Helvetica,sans-serif;color:#6B5847;font-size:12px\">Apabila Anda telah membayar tetapi status belum berubah, mohon tunggu beberapa saat lalu muat ulang halaman.</td>
           </tr>
         </table>";
-        return $html;
-    }
+    return $html;
+  }
 }

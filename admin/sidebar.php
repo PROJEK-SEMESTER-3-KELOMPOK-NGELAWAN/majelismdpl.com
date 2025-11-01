@@ -12,7 +12,7 @@ require_once 'auth_check.php';
     </div>
     
     <div class="sidebar-header">
-        <img src="../img/majelis.png" alt="Majelis MDPL" class="sidebar-logo" />
+        <img src="../assets/majelis.png" alt="Majelis MDPL" class="sidebar-logo" />
         <div class="sidebar-title">Majelis MDPL</div>
     </div>
     

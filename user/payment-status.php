@@ -11,6 +11,16 @@ if (!isset($_SESSION['id_user']) || empty($_SESSION['id_user'])) {
 
 $id_user = $_SESSION['id_user'];
 
+// Auto-expire pending >24 jam (non-blocking ping)
+$expire_url = '../backend/payment-api.php?expire_stale=1';
+$chx = curl_init();
+curl_setopt($chx, CURLOPT_URL, $expire_url);
+curl_setopt($chx, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($chx, CURLOPT_TIMEOUT, 3);
+curl_setopt($chx, CURLOPT_SSL_VERIFYPEER, false);
+curl_exec($chx);
+curl_close($chx);
+
 // Auto-check pending payments (server-side) agar status segera tersinkron saat page load
 $pendingStmt = $conn->prepare("SELECT DISTINCT p.order_id FROM payments p
   JOIN bookings b ON p.id_booking = b.id_booking
@@ -51,18 +61,19 @@ $stmt->close();
 
 function get_status_class($status)
 {
-    $s = strtolower($status);
+    $s = strtolower($status ?? '');
     if ($s === 'pending') return 'pending';
     if ($s === 'paid' || $s === 'settlement') return 'paid';
     return 'cancelled';
 }
 function format_status($status)
 {
-    $s = strtolower($status);
+    $s = strtolower($status ?? '');
     if ($s === 'pending') return '<i class="fa-solid fa-hourglass-half"></i> Pending';
     if ($s === 'paid' || $s === 'settlement') return '<i class="fa-solid fa-check-circle"></i> Paid';
     if ($s === 'expire') return '<i class="fa-solid fa-clock-rotate-left"></i> Expired';
     if ($s === 'failed') return '<i class="fa-solid fa-times-circle"></i> Failed';
+    if ($s === 'cancel') return '<i class="fa-solid fa-ban"></i> Cancelled';
     return '<i class="fa-solid fa-ban"></i> Cancelled';
 }
 ?>
@@ -78,6 +89,7 @@ function format_status($status)
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-KFnuwUuiq_i1OUJf"></script>
+
     <style>
         /* CSS sama persis seperti yang Anda kirim (dipertahankan) */
         * {
@@ -646,17 +658,17 @@ function format_status($status)
 
     <div class="container">
         <div class="header">
-            <h1 class="title"><i class="fa-solid fa-credit-card"></i><span>Payment Status</span></h1>
-            <p class="subtitle">Track your booking transactions</p>
+            <h1 class="title"><i class="fa-solid fa-credit-card"></i><span>Status Pembayaran</span></h1>
+            <p class="subtitle">Lacak transaksi pemesanan Anda</p>
         </div>
 
         <?php if (empty($booking_list)): ?>
             <div class="empty">
                 <i class="fa-solid fa-receipt"></i>
-                <h2>No Transactions</h2>
-                <p>You don't have any booking history yet</p>
+                <h2>Belum Ada Transaksi</h2>
+                <p>Anda belum memiliki riwayat pemesanan</p>
                 <a href="<?= $navbarPath; ?>index.php#paketTrips" class="btn-explore">
-                    <i class="fa-solid fa-compass"></i> Explore Trips
+                    <i class="fa-solid fa-compass"></i> Jelajahi Trips
                 </a>
             </div>
         <?php else: ?>
@@ -694,6 +706,9 @@ function format_status($status)
                                     <button class="btn btn-pay" onclick="pay(<?= $b['id_booking']; ?>)">
                                         <i class="fa-solid fa-credit-card"></i> Bayar
                                     </button>
+                                    <button class="btn btn-detail" style="background:linear-gradient(135deg,#b02a37 0%,#dc3545 100%);" onclick="cancelPayment(<?= $b['id_booking']; ?>)">
+                                        <i class="fa-solid fa-ban"></i> Cancel
+                                    </button>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -714,6 +729,9 @@ function format_status($status)
     <script src="../frontend/login.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // 0) Trigger auto-expire di backend (sudah dipanggil server-side juga)
+            fetch('../backend/payment-api.php?expire_stale=1').catch(() => {});
+
             // 1) Cek status untuk setiap kartu pending saat halaman selesai load
             document.querySelectorAll('.card[data-order-id]').forEach(card => {
                 const orderId = card.getAttribute('data-order-id');
@@ -742,15 +760,18 @@ function format_status($status)
             fetch('../backend/payment-api.php?check_status=' + encodeURIComponent(orderId))
                 .then(r => r.json())
                 .then(resp => {
-                    if (resp && resp.success && resp.status === 'paid') {
-                        showRefresh();
-                        setTimeout(() => window.location.reload(), 800);
-                    } else if (!quiet && resp && resp.error) {
-                        console.log('Status check error:', resp.error);
+                    if (resp && resp.success) {
+                        if (['paid', 'failed', 'expire', 'cancel'].includes(resp.status)) {
+                            showRefresh();
+                            setTimeout(() => window.location.reload(), 800);
+                        }
+                    } else if (!quiet) {
+                        console.log('Status check info:', resp);
                     }
                 })
                 .catch(err => console.log('Check error:', err));
         }
+
 
         function showRefresh() {
             const ind = document.getElementById('refresh-indicator');
@@ -802,17 +823,66 @@ function format_status($status)
                                 onClose: () => setTimeout(() => window.location.reload(), 1000)
                             });
                         }, 500);
-                    } else throw new Error(resp.error || 'Failed to get token');
+                    } else {
+                        throw new Error(resp.detail || resp.message || resp.error || 'Failed to get token');
+                    }
                 })
                 .catch(err => {
                     closeModal();
                     Swal.fire({
-                        title: 'Payment Error',
+                        title: 'Error Pembayaran',
                         text: err.message,
                         icon: 'error',
                         confirmButtonColor: '#a97c50'
                     });
                 });
+        }
+
+        function cancelPayment(bookingId) {
+            Swal.fire({
+                title: 'Batalkan Pembayaran?',
+                text: 'Peserta pada booking ini akan dihapus dan transaksi dibatalkan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, batalkan',
+                cancelButtonText: 'Tidak',
+                confirmButtonColor: '#dc3545'
+            }).then(res => {
+                if (res.isConfirmed) {
+                    const form = new FormData();
+                    form.append('cancel_booking', bookingId);
+                    fetch('../backend/payment-api.php', {
+                            method: 'POST',
+                            body: form
+                        })
+                        .then(r => r.json())
+                        .then(j => {
+                            if (j.success) {
+                                Swal.fire({
+                                    title: 'Dibatalkan',
+                                    text: 'Transaksi telah dibatalkan.',
+                                    icon: 'success',
+                                    confirmButtonColor: '#a97c50'
+                                }).then(() => window.location.reload());
+                            } else {
+                                Swal.fire({
+                                    title: 'Gagal',
+                                    text: j.error || 'Gagal membatalkan.',
+                                    icon: 'error',
+                                    confirmButtonColor: '#a97c50'
+                                });
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire({
+                                title: 'Error',
+                                text: err.message,
+                                icon: 'error',
+                                confirmButtonColor: '#a97c50'
+                            });
+                        });
+                }
+            });
         }
 
         function closeModal() {
@@ -862,6 +932,8 @@ function format_status($status)
                     const fmt = s => {
                         if (s === 'paid' || s === 'settlement') return '<span style="color:#2e7d32">✅ Paid</span>';
                         if (s === 'pending') return '<span style="color:#e65100">⏳ Pending</span>';
+                        if (s === 'expire') return '<span style="color:#6a1b9a">⌛ Expired</span>';
+                        if (s === 'cancel') return '<span style="color:#ad1457">⛔ Cancelled</span>';
                         return '<span style="color:#c62828">❌ ' + s + '</span>';
                     };
 

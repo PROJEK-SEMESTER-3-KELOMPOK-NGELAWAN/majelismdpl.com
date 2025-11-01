@@ -1,57 +1,52 @@
 <?php
 require_once 'koneksi.php';
+header('Content-Type: application/json');
+
 ini_set('display_errors', 0);
 error_reporting(0);
-header('Content-Type: application/json; charset=utf-8');
 
-$respond = function (int $code, array $data) {
-    if (ob_get_length()) {
-        ob_clean();
-    }
-    header_remove();
-    header('Content-Type: application/json; charset=utf-8');
-    http_response_code($code);
-    echo json_encode($data);
+set_error_handler(function ($errno, $errstr) {
+    echo json_encode(['error' => 'PHP Error: ' . $errstr]);
     exit;
-};
-
-set_error_handler(function ($errno, $errstr) use ($respond) {
-    $respond(500, ['error' => 'PHP Error: ' . $errstr]);
 });
 
 try {
     $id_booking = intval($_GET['id'] ?? 0);
-    if ($id_booking <= 0) $respond(400, ['error' => 'Invalid booking ID']);
+    if ($id_booking <= 0) {
+        echo json_encode(['error' => 'Invalid booking ID']);
+        exit;
+    }
 
-    $stmt = $conn->prepare("SELECT 
-      p.status_pembayaran, 
-      p.order_id,
-      b.status as booking_status,
-      b.total_harga,
-      b.jumlah_orang
-    FROM bookings b
-    LEFT JOIN payments p ON p.id_booking = b.id_booking
-    WHERE b.id_booking = ?");
-    if (!$stmt) $respond(500, ['error' => 'Database error: ' . $conn->error]);
-
+    $stmt = $conn->prepare("
+        SELECT p.status_pembayaran, p.order_id, p.tanggal,
+               b.status as booking_status, b.total_harga, b.jumlah_orang
+        FROM bookings b
+        LEFT JOIN payments p ON p.id_booking=b.id_booking
+        WHERE b.id_booking=? LIMIT 1
+    ");
+    if (!$stmt) {
+        echo json_encode(['error' => 'Database error: ' . $conn->error]);
+        exit;
+    }
     $stmt->bind_param("i", $id_booking);
     $stmt->execute();
-    $result = $stmt->get_result();
-    $data = $result->fetch_assoc();
+    $data = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
     if ($data) {
-        $respond(200, [
+        $age_hours = !empty($data['tanggal']) ? (int)floor((time() - strtotime($data['tanggal'] . ' 00:00:00')) / 3600) : null;
+        echo json_encode([
             'success' => true,
             'status' => $data['status_pembayaran'] ?? 'no_payment',
             'booking_status' => $data['booking_status'],
             'order_id' => $data['order_id'] ?? null,
             'total_harga' => $data['total_harga'],
-            'jumlah_orang' => $data['jumlah_orang']
+            'jumlah_orang' => $data['jumlah_orang'],
+            'age_hours' => $age_hours
         ]);
     } else {
-        $respond(404, ['error' => 'Booking not found', 'status' => 'unknown']);
+        echo json_encode(['error' => 'Booking not found', 'status' => 'unknown']);
     }
 } catch (Exception $e) {
-    $respond(500, ['error' => $e->getMessage()]);
+    echo json_encode(['error' => $e->getMessage()]);
 }

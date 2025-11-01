@@ -31,7 +31,7 @@ session_start();
   <!-- Hero -->
   <section class="hero-home" id="home">
     <div class="hero-bg-container">
-      <img src="img/profil_foto.jpeg" alt="Gunung Bromo" class="hero-bg" id="hero-bg">
+      <img src="assets/profil_foto.jpeg" alt="Gunung Bromo" class="hero-bg" id="hero-bg">
       <div class="hero-overlay"></div>
     </div>
     <div class="hero-content">
@@ -44,9 +44,9 @@ session_start();
       <a href="#paketTrips" class="hero-btn" style="text-decoration: none; ">DETAIL</a>
 
       <div class="hero-carousel" id="hero-carousel">
-        <img src="img/herooo.jpg" alt="Gunung Bromo" class="carousel-item active" data-index="0">
-        <img src="img/ijen.jpg" alt="Sunrise" class="carousel-item" data-index="1">
-        <img src="img/rinjani.jpg" alt="Forest" class="carousel-item" data-index="2">
+        <img src="assets/herooo.jpg" alt="Gunung Bromo" class="carousel-item active" data-index="0">
+        <img src="assets/ijen.jpg" alt="Sunrise" class="carousel-item" data-index="1">
+        <img src="assets/rinjani.jpg" alt="Forest" class="carousel-item" data-index="2">
       </div>
     </div>
 
@@ -107,7 +107,7 @@ session_start();
 
         <!-- Image Preview (Not Video) -->
         <div class="image-preview">
-          <img src="img/profil_foto.jpeg" alt="Adventure">
+          <img src="assets/profil_foto.jpeg" alt="Adventure">
         </div>
       </div>
 
@@ -229,7 +229,7 @@ session_start();
     <div class="card-grid">
       <div class="card">
         <div class="card-overlay"></div>
-        <img src="img/gambar3.jpg" alt="Gunung Bromo" />
+        <img src="assets/gambar3.jpg" alt="Gunung Bromo" />
         <div class="caption">
           <i class="fas fa-mountain"></i>
           Gunung Bromo Sunrise
@@ -238,7 +238,7 @@ session_start();
 
       <div class="card">
         <div class="card-overlay"></div>
-        <img src="img/gambar2.jpg" alt="Camping" />
+        <img src="assets/gambar2.jpg" alt="Camping" />
         <div class="caption">
           <i class="fas fa-campground"></i>
           Camping Savana
@@ -247,7 +247,7 @@ session_start();
 
       <div class="card">
         <div class="card-overlay"></div>
-        <img src="img/gambar1.jpg" alt="Trip Bersama" />
+        <img src="assets/gambar1.jpg" alt="Trip Bersama" />
         <div class="caption">
           <i class="fas fa-users"></i>
           Trip Seru Bersama
@@ -532,21 +532,21 @@ session_start();
     // ========== SECTION HERO HOME ==========
     document.addEventListener('DOMContentLoaded', () => {
       const heroSlides = [{
-          image: "img/herooo.jpg",
+          image: "assets/herooo.jpg",
           title: "GUNUNG BROMO",
           offer: "BEST OFFERS",
           days: "1 HARI",
           desc: "Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan"
         },
         {
-          image: "img/ijen.jpg",
+          image: "assets/ijen.jpg",
           title: "GUNUNG IJEN",
           offer: "IJEN ADVENTURE",
           days: "2 HARI",
           desc: "Nikmati mendaki gunung berapi biru di Jawa Timur."
         },
         {
-          image: "img/rinjani.jpg",
+          image: "assets/rinjani.jpg",
           title: "GUNUNG RINJANI",
           offer: "RINJANI EXPEDITION",
           days: "3 HARI",

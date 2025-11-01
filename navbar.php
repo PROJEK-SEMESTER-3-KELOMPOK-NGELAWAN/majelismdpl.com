@@ -64,7 +64,7 @@ $cacheBuster = '?' . time();
 <nav class="navbar" role="navigation" aria-label="Main Navigation">
   <div class="navbar-logo">
     <a href="<?php echo $navbarPath; ?>index.php">
-      <img src="<?php echo $navbarPath; ?>img/majelis.png" alt="Logo Majelis MDPL" class="logo-img" />
+      <img src="<?php echo $navbarPath; ?>assets/majelis.png" alt="Logo Majelis MDPL" class="logo-img" />
     </a>
   </div>
 
