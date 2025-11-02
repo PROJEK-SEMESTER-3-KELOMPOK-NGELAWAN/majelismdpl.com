@@ -23,8 +23,54 @@ class Mailer
 
   private static bool   $USE_TLS    = true;
 
+  // ====== MAPPING TIMEZONE ======
+  // Tentukan lokasi/provinsi dengan timezone yang sesuai
+  private static array $TIMEZONE_MAP = [
+    // WIB (UTC+7) - Indonesia Barat
+    'jakarta'       => 'Asia/Jakarta',
+    'bandung'       => 'Asia/Jakarta',
+    'yogyakarta'    => 'Asia/Jakarta',
+    'surabaya'      => 'Asia/Jakarta',
+    'semarang'      => 'Asia/Jakarta',
+    'medan'         => 'Asia/Jakarta',
+    'palembang'     => 'Asia/Jakarta',
+    'lampung'       => 'Asia/Jakarta',
+    'jambi'         => 'Asia/Jakarta',
+    'riau'          => 'Asia/Jakarta',
+    'aceh'          => 'Asia/Jakarta',
+    'sumut'         => 'Asia/Jakarta',
+    'sumbar'        => 'Asia/Jakarta',
+    'bengkulu'      => 'Asia/Jakarta',
+    'banten'        => 'Asia/Jakarta',
+    'jawa barat'    => 'Asia/Jakarta',
+    'jawa tengah'   => 'Asia/Jakarta',
+    'jawa timur'    => 'Asia/Jakarta',
+    'sulawesi utara' => 'Asia/Jakarta',
+
+    // WITA (UTC+8) - Indonesia Tengah
+    'makassar'      => 'Asia/Makassar',
+    'sulawesi'      => 'Asia/Makassar',
+    'sulsel'        => 'Asia/Makassar',
+    'sultenggara'   => 'Asia/Makassar',
+    'nusa tenggara' => 'Asia/Makassar',
+    'bali'          => 'Asia/Makassar',
+    'kalimantan'    => 'Asia/Makassar',
+    'kalbar'        => 'Asia/Makassar',
+    'kalteng'       => 'Asia/Makassar',
+    'kalsel'        => 'Asia/Makassar',
+    'kaltim'        => 'Asia/Makassar',
+    'kaltara'       => 'Asia/Makassar',
+    'sulbara'       => 'Asia/Makassar',
+
+    // WIT (UTC+9) - Indonesia Timur
+    'jayapura'      => 'Asia/Jayapura',
+    'papua'         => 'Asia/Jayapura',
+    'papua barat'   => 'Asia/Jayapura',
+    'maluku'        => 'Asia/Jayapura',
+  ];
+
   // ====== KIRIM EMAIL UMUM ======
-  public static function send(string $toEmail, string $toName, string $subject, string $htmlBody, string $altText = '', array $attachments = []): array
+  public static function send(string $toEmail, string $toName, string $subject, string $htmlBody, string $altText = '', array $attachments = [], string $userRegion = 'jakarta'): array
   {
     $mail = new PHPMailer(true);
     try {
@@ -66,7 +112,7 @@ class Mailer
       $logoHtml = $logoCid ? "<img src=\"{$logoCid}\" width=\"44\" height=\"44\" style=\"display:block;border:0;outline:none;text-decoration:none;border-radius:9px\" alt=\"Majelis MDPL\" />"
         : "<img src=\"" . htmlspecialchars(self::$LOGO_FALLBACK_URL) . "\" width=\"44\" height=\"44\" style=\"display:block;border:0;outline:none;text-decoration:none;border-radius:9px\" alt=\"Majelis MDPL\" />";
 
-      $mail->Body    = self::frame($htmlBody, $logoHtml);
+      $mail->Body    = self::frame($htmlBody, $logoHtml, $userRegion);
       $mail->AltBody = $altText ?: strip_tags($htmlBody);
 
       $mail->send();
@@ -74,6 +120,56 @@ class Mailer
     } catch (Exception $e) {
       return ['ok' => false, 'error' => $e->getMessage()];
     }
+  }
+
+  // ====== HELPER: DAPATKAN TIMEZONE DARI REGION ======
+  private static function getTimezoneFromRegion(string $region): string
+  {
+    $region = strtolower(trim($region));
+
+    // Cek exact match terlebih dahulu
+    if (isset(self::$TIMEZONE_MAP[$region])) {
+      return self::$TIMEZONE_MAP[$region];
+    }
+
+    // Jika tidak ditemukan exact match, cari partial match
+    foreach (self::$TIMEZONE_MAP as $key => $timezone) {
+      if (strpos($region, $key) !== false || strpos($key, $region) !== false) {
+        return $timezone;
+      }
+    }
+
+    // Default ke WIB (Jakarta) jika tidak ditemukan
+    return 'Asia/Jakarta';
+  }
+
+  // ====== HELPER: FORMAT TANGGAL DENGAN TIMEZONE ======
+  private static function formatDateWithTimezone(string $timezone): array
+  {
+    $originalTz = date_default_timezone_get();
+    date_default_timezone_set($timezone);
+
+    $dateFormatted = date('d M Y - H:i');
+    $tzLabel = self::getTimezoneLabel($timezone);
+
+    date_default_timezone_set($originalTz);
+
+    return [
+      'date'  => $dateFormatted,
+      'label' => $tzLabel,
+      'full'  => $dateFormatted . ' ' . $tzLabel
+    ];
+  }
+
+  // ====== HELPER: LABEL TIMEZONE ======
+  private static function getTimezoneLabel(string $timezone): string
+  {
+    return match ($timezone) {
+      'Asia/Jakarta'   => 'WIB',
+      'Asia/Makassar'  => 'WITA',
+      'Asia/Jayapura'  => 'WIT',
+      default          => 'WIB'
+    };
   }
 
   // ====== GAYA DASAR ======
@@ -107,9 +203,13 @@ class Mailer
   }
 
   // ====== FRAME EMAIL ======
-  private static function frame(string $contentHtml, string $logoHtml): string
+  private static function frame(string $contentHtml, string $logoHtml, string $userRegion = 'jakarta'): string
   {
     $s = self::styles();
+
+    // Dapatkan timezone berdasarkan region user
+    $timezone = self::getTimezoneFromRegion($userRegion);
+    $dateInfo = self::formatDateWithTimezone($timezone);
 
     $header = "
         <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"{$s['header']}\">
@@ -120,7 +220,7 @@ class Mailer
               <div style=\"{$s['subtitle']}\">Transaksi • Informasi otomatis</div>
             </td>
             <td style=\"vertical-align:middle\" align=\"right\">
-              <span style=\"font-family:Arial,Helvetica,sans-serif;color:#999;font-size:11px\">" . date('d M Y - H:i') . " WIB</span>
+              <span style=\"font-family:Arial,Helvetica,sans-serif;color:#999;font-size:11px\">" . $dateInfo['full'] . "</span>
             </td>
           </tr>
         </table>";
@@ -173,7 +273,7 @@ class Mailer
   }
 
   // ====== TEMPLATE: PAID ======
-  public static function buildPaidTemplate(array $d): string
+  public static function buildPaidTemplate(array $d, string $userRegion = 'jakarta'): string
   {
     $s = self::styles();
     $badge = "<span style=\"{$s['badge']};background:{$s['success']}\">BERHASIL</span>";
@@ -203,7 +303,7 @@ class Mailer
   }
 
   // ====== TEMPLATE: FAILED ======
-  public static function buildFailedTemplate(array $d): string
+  public static function buildFailedTemplate(array $d, string $userRegion = 'jakarta'): string
   {
     $s = self::styles();
     $badge = "<span style=\"{$s['badge']};background:{$s['danger']}\">GAGAL</span>";
@@ -229,7 +329,7 @@ class Mailer
   }
 
   // ====== TEMPLATE: PENDING ======
-  public static function buildPendingTemplate(array $d): string
+  public static function buildPendingTemplate(array $d, string $userRegion = 'jakarta'): string
   {
     $s = self::styles();
     $badge = "<span style=\"{$s['badge']};background:{$s['warning']}\">MENUNGGU</span>";
