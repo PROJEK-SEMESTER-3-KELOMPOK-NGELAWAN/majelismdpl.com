@@ -966,9 +966,9 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
                     class="profile-icon-large"
                     style="border-radius: 50%;">
 
-                  <button type="button" class="remove-photo-btn" id="removeAdminPhoto">
+                  <!-- <button type="button" class="remove-photo-btn" id="removeAdminPhoto">
                     <i class="bi bi-trash-fill"></i> Hapus
-                  </button>
+                  </button> -->
                 <?php else: ?>
                   <i class="bi bi-person-circle profile-icon-large" id="modalProfileIcon"></i>
                 <?php endif; ?>

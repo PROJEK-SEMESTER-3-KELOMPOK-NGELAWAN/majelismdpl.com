@@ -1,3 +1,10 @@
+/**
+ * ============================================
+ * FILE: frontend/trip.js
+ * FUNGSI: Handle UI Trip management
+ * ============================================
+ */
+
 let currentEditTripId = null;
 let tripsData = [];
 const FORM_ID = "formTambahTrip";
@@ -53,9 +60,8 @@ function displayTrips(trips) {
         : "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80";
       const formattedPrice = parseInt(trip.harga, 10).toLocaleString("id-ID");
 
-      // Badge status text untuk available/sold
       const showStatusBadge = rawStatus === "available" || rawStatus === "sold";
-      const statusClass = rawStatus; // available | sold | done
+      const statusClass = rawStatus;
       const iconClass =
         rawStatus === "available"
           ? "check-circle"
@@ -63,7 +69,6 @@ function displayTrips(trips) {
           ? "x-circle"
           : "flag";
 
-      // Jika done, gunakan overlay gambar stempel, jangan tampilkan teks status.
       const doneOverlay =
         rawStatus === "done"
           ? `<img src="../assets/completed-stamp.png" alt="Completed Stamp" class="done-stamp" />`
@@ -153,7 +158,6 @@ function injectStampStylesOnce() {
       pointer-events: none;
       filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
     }
-    /* Responsif */
     @media (max-width: 768px){
       .trip-thumb-wrapper{ height: 190px; }
       .done-stamp{ width: min(78%, 320px); top: 54%; }
@@ -166,11 +170,11 @@ function injectStampStylesOnce() {
   document.head.appendChild(style);
 }
 
-/* ===== Actions ===== */
+/* ===== DELETE TRIP + FILE GAMBAR ===== */
 async function handleDelete(id_trip) {
   const { isConfirmed } = await Swal.fire({
     title: "Hapus Trip?",
-    text: "Data akan dihapus permanen.",
+    html: '<p>Data trip akan dihapus permanen.</p>',
     icon: "warning",
     showCancelButton: true,
     confirmButtonText: "Ya, Hapus",
@@ -179,27 +183,66 @@ async function handleDelete(id_trip) {
   });
 
   if (isConfirmed) {
-    try {
-      const formData = new FormData();
-      formData.append("id_trip", id_trip);
-      const res = await fetch(`${API_URL}?action=deleteTrip`, {
-        method: "POST",
-        body: formData,
-      });
-      const result = await res.json();
-      if (result.success) {
-        showToast("success", "Trip berhasil dihapus");
-        loadTrips();
-      } else {
-        showToast("error", result.msg || "Gagal menghapus trip");
-      }
-    } catch (e) {
-      showToast("error", "Kesalahan koneksi saat menghapus trip");
-      console.error("Kesalahan Hapus:", e);
-    }
+    Swal.fire({
+      title: "Menghapus...",
+      html: '<div class="spinner-border spinner-border-sm text-danger" role="status"><span class="visually-hidden">Loading...</span></div><p>Sedang menghapus trip dan file gambar...</p>',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: async () => {
+        Swal.showLoading();
+
+        try {
+          const formData = new FormData();
+          formData.append("id_trip", id_trip);
+
+          const res = await fetch(`${API_URL}?action=deleteTrip`, {
+            method: "POST",
+            body: formData,
+          });
+
+          const result = await res.json();
+
+          if (result.success) {
+            showToast("success", "Trip dan file gambar berhasil dihapus");
+            loadTrips();
+
+            Swal.fire({
+              title: "Berhasil!",
+              html:
+                "<p>Trip berhasil dihapus</p>" +
+                (result.fileDeleteInfo
+                  ? '<small style="color: #666;">File: ' +
+                    result.fileDeleteInfo.message +
+                    "</small>"
+                  : ""),
+              icon: "success",
+              confirmButtonText: "OK",
+            });
+          } else {
+            showToast("error", result.msg || "Gagal menghapus trip");
+            Swal.fire({
+              title: "Error!",
+              text: result.msg || "Gagal menghapus trip",
+              icon: "error",
+              confirmButtonText: "OK",
+            });
+          }
+        } catch (e) {
+          showToast("error", "Kesalahan koneksi saat menghapus trip");
+          Swal.fire({
+            title: "Error!",
+            text: "Kesalahan koneksi: " + e.message,
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+          console.error("Kesalahan Hapus:", e);
+        }
+      },
+    });
   }
 }
 
+/* ===== EDIT TRIP ===== */
 function handleEdit(id_trip) {
   const trip = tripsData.find((t) => t.id_trip == id_trip);
   if (trip) {
@@ -226,10 +269,12 @@ function handleEdit(id_trip) {
   }
 }
 
+/* ===== DETAIL TRIP ===== */
 function handleDetail(id_trip) {
   window.location.href = `detailTrip.php?id=${id_trip}`;
 }
 
+/* ===== Attach Event Listeners ===== */
 function attachEventListeners() {
   document.querySelectorAll(".btn-delete").forEach((btn) => {
     btn.onclick = () => handleDelete(btn.dataset.id);
@@ -270,6 +315,7 @@ document.getElementById(FORM_ID).onsubmit = async function (e) {
   }
 };
 
+/* ===== Reset Form & Modal State ===== */
 function resetFormAndModalState() {
   const form = document.getElementById(FORM_ID);
   currentEditTripId = null;
