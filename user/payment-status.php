@@ -23,8 +23,8 @@ curl_close($chx);
 
 // Auto-check pending payments (server-side) agar status segera tersinkron saat page load
 $pendingStmt = $conn->prepare("SELECT DISTINCT p.order_id FROM payments p
-  JOIN bookings b ON p.id_booking = b.id_booking
-  WHERE b.id_user = ? AND p.status_pembayaran = 'pending' AND p.order_id IS NOT NULL AND p.order_id != ''");
+    JOIN bookings b ON p.id_booking = b.id_booking
+    WHERE b.id_user = ? AND p.status_pembayaran = 'pending' AND p.order_id IS NOT NULL AND p.order_id != ''");
 
 if ($pendingStmt) {
     $pendingStmt->bind_param("i", $id_user);
@@ -66,15 +66,68 @@ function get_status_class($status)
     if ($s === 'paid' || $s === 'settlement') return 'paid';
     return 'cancelled';
 }
-function format_status($status)
+
+/**
+ * REVISI: Fungsi untuk tampilan status di kartu (ikon di atas, teks 2 baris)
+ */
+function format_status_card($status)
 {
     $s = strtolower($status ?? '');
-    if ($s === 'pending') return '<i class="fa-solid fa-hourglass-half"></i> Pending';
-    if ($s === 'paid' || $s === 'settlement') return '<i class="fa-solid fa-check-circle"></i> Paid';
-    if ($s === 'expire') return '<i class="fa-solid fa-clock-rotate-left"></i> Expired';
-    if ($s === 'failed') return '<i class="fa-solid fa-times-circle"></i> Failed';
-    if ($s === 'cancel') return '<i class="fa-solid fa-ban"></i> Cancelled';
-    return '<i class="fa-solid fa-ban"></i> Cancelled';
+    $icon = '';
+    $text = '';
+
+    if ($s === 'pending') {
+        $icon = 'fa-solid fa-hourglass-half';
+        $text = 'MENUNGGU<br>PEMBAYARAN';
+    } elseif ($s === 'paid' || $s === 'settlement') {
+        $icon = 'fa-solid fa-circle-check';
+        $text = 'PEMBAYARAN<br>DITERIMA';
+    } elseif ($s === 'expire') {
+        $icon = 'fa-solid fa-clock-rotate-left';
+        $text = 'SUDAH<br>KEDALUWARSA';
+    } else { // 'failed', 'cancel', default
+        $icon = 'fa-solid fa-ban';
+        $text = 'DIBATALKAN';
+    }
+    
+    return [
+        'icon' => $icon,
+        'text' => $text
+    ];
+}
+
+/**
+ * REVISI: Fungsi untuk tampilan status detail di modal (ikon di samping teks, 1 baris)
+ */
+function format_status_detail($status)
+{
+    $s = strtolower($status ?? '');
+    
+    $status_data = [
+        'text' => 'DIBATALKAN',
+        'color' => '#c62828',
+        'icon' => '<i class="fa-solid fa-times-circle"></i>'
+    ];
+
+    if ($s === 'paid' || $s === 'settlement') {
+        $status_data['text'] = 'PEMBAYARAN DITERIMA'; 
+        $status_data['color'] = '#2e7d32';
+        $status_data['icon'] = '<i class="fa-solid fa-check-circle"></i>';
+    } elseif ($s === 'pending') {
+        $status_data['text'] = 'MENUNGGU PEMBAYARAN'; 
+        $status_data['color'] = '#e65100';
+        $status_data['icon'] = '<i class="fa-solid fa-hourglass-half"></i>';
+    } elseif ($s === 'expire') {
+        $status_data['text'] = 'SUDAH KEDALUWARSA'; 
+        $status_data['color'] = '#ad1457';
+        $status_data['icon'] = '<i class="fa-solid fa-clock-rotate-left"></i>';
+    } elseif ($s === 'cancel' || $s === 'failed') {
+        $status_data['text'] = 'DIBATALKAN'; 
+        $status_data['color'] = '#dc3545'; 
+        $status_data['icon'] = '<i class="fa-solid fa-ban"></i>';
+    }
+    
+    return "<span style='color:{$status_data['color']};font-weight:700;'>{$status_data['icon']} {$status_data['text']}</span>";
 }
 ?>
 <!DOCTYPE html>
@@ -83,7 +136,7 @@ function format_status($status)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Status - Majelis MDPL</title>
+    <title>Status Pembayaran - Majelis MDPL</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
@@ -91,7 +144,7 @@ function format_status($status)
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-KFnuwUuiq_i1OUJf"></script>
 
     <style>
-        /* CSS sama persis seperti yang Anda kirim (dipertahankan) */
+        /* CSS DEFAULT DARI AWAL (DIUBAH HANYA BAGIAN STATUS CARD & SIDEBAR) */
         * {
             margin: 0;
             padding: 0;
@@ -245,36 +298,68 @@ function format_status($status)
             border-left: 1px solid rgba(169, 124, 80, 0.1);
             background: rgba(169, 124, 80, 0.02);
             gap: 10px;
-            min-width: 140px;
+            min-width: 170px;
         }
 
+        /* CSS untuk tampilan status card (ikon di atas teks, 2 baris) */
         .status-badge {
-            padding: 6px 12px;
+            padding: 0;
             border-radius: 15px;
             font-weight: 700;
-            font-size: 0.7rem;
+            font-size: 0.85rem; 
             text-transform: uppercase;
             letter-spacing: 0.3px;
             display: flex;
+            flex-direction: column; 
             align-items: center;
-            gap: 5px;
-            white-space: nowrap;
+            gap: 2px;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.1; 
+        }
+        
+        .status-badge i {
+            font-size: 1.8rem; 
+            margin-bottom: 5px; 
+        }
+
+        .status-badge span {
+             font-weight: 800; 
         }
 
         .status-badge.pending {
-            background: linear-gradient(135deg, #ffc107 0%, #ffb800 100%);
-            color: #333;
+            color: #ffb800; 
+        }
+        .status-badge.pending i {
+             background: linear-gradient(135deg, #ffc107 0%, #ffb800 100%);
+             -webkit-background-clip: text;
+             -webkit-text-fill-color: transparent;
+             background-clip: text;
+             color: transparent;
         }
 
         .status-badge.paid {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: #fff;
+            color: #28a745; 
+        }
+        .status-badge.paid i {
+             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+             -webkit-background-clip: text;
+             -webkit-text-fill-color: transparent;
+             background-clip: text;
+             color: transparent;
         }
 
         .status-badge.cancelled {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: #fff;
+            color: #dc3545; 
         }
+        .status-badge.cancelled i {
+             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+             -webkit-background-clip: text;
+             -webkit-text-fill-color: transparent;
+             background-clip: text;
+             color: transparent;
+        }
+        /* Akhir CSS Status Card */
 
         .actions {
             display: flex;
@@ -623,9 +708,21 @@ function format_status($status)
             .card-sidebar {
                 border-left: none;
                 border-top: 1px solid rgba(169, 124, 80, .1);
+                /* REVISI: Kembali ke flex-direction: row di mobile agar tidak terlalu lebar */
                 flex-direction: row;
                 min-width: auto;
                 justify-content: space-between;
+            }
+            
+            .card-sidebar .status-badge {
+                flex-direction: row; 
+                gap: 5px;
+                padding: 0;
+                font-size: 0.8rem; /* Ukuran font disesuaikan untuk mobile */
+            }
+            .card-sidebar .status-badge i {
+                font-size: 1.0rem; 
+                margin-bottom: 0;
             }
 
             .actions {
@@ -653,7 +750,7 @@ function format_status($status)
 
     <div id="refresh-indicator" class="refresh-indicator">
         <i class="fa-solid fa-sync"></i>
-        <span>Updating...</span>
+        <span>Memperbarui...</span>
     </div>
 
     <div class="container">
@@ -676,7 +773,9 @@ function format_status($status)
                 <?php foreach ($booking_list as $b):
                     $status = strtolower($b['status_pembayaran'] ?? 'pending');
                     $status_class = get_status_class($status);
-                    $status_text = format_status($status);
+                    
+                    // Menggunakan fungsi format_status_card
+                    $card_status_data = format_status_card($status); 
                 ?>
                     <div class="card" data-booking-id="<?= $b['id_booking']; ?>" data-order-id="<?= htmlspecialchars($b['order_id'] ?? ''); ?>">
                         <div class="card-body">
@@ -687,7 +786,7 @@ function format_status($status)
                             <p class="card-id">Booking ID: #<?= $b['id_booking']; ?></p>
                             <div class="card-info">
                                 <div class="info-item">
-                                    <p class="info-label"><i class="fa-solid fa-calendar-alt"></i> Date</p>
+                                    <p class="info-label"><i class="fa-solid fa-calendar-alt"></i> Tanggal</p>
                                     <p class="info-value"><?= date("d M Y", strtotime($b['tanggal_booking'])); ?></p>
                                 </div>
                                 <div class="info-item">
@@ -697,17 +796,20 @@ function format_status($status)
                             </div>
                         </div>
                         <div class="card-sidebar">
-                            <div class="status-badge <?= $status_class; ?>"><?= $status_text; ?></div>
+                            <div class="status-badge <?= $status_class; ?>">
+                                <i class="<?= $card_status_data['icon']; ?>"></i>
+                                <span><?= $card_status_data['text']; ?></span>
+                            </div>
                             <div class="actions">
                                 <button class="btn btn-detail" onclick="showDetail(<?= $b['id_booking']; ?>)">
                                     <i class="fa-solid fa-search"></i> Detail
                                 </button>
                                 <?php if ($status === 'pending' && !empty($b['order_id'])): ?>
                                     <button class="btn btn-pay" onclick="pay(<?= $b['id_booking']; ?>)">
-                                        <i class="fa-solid fa-credit-card"></i> Bayar
+                                        <i class="fa-solid fa-credit-card"></i> Lanjut Bayar
                                     </button>
                                     <button class="btn btn-detail" style="background:linear-gradient(135deg,#b02a37 0%,#dc3545 100%);" onclick="cancelPayment(<?= $b['id_booking']; ?>)">
-                                        <i class="fa-solid fa-ban"></i> Cancel
+                                        <i class="fa-solid fa-ban"></i> Batalkan
                                     </button>
                                 <?php endif; ?>
                             </div>
@@ -720,30 +822,16 @@ function format_status($status)
 
     <div id="modal-payment" class="modal">
         <div class="modal-content">
-            <p id="modal-text" class="modal-text">Preparing payment...</p>
-            <button onclick="closeModal()" class="modal-btn">Close</button>
+            <p id="modal-text" class="modal-text">Menyiapkan pembayaran...</p>
+            <button onclick="closeModal()" class="modal-btn">Tutup</button>
         </div>
     </div>
 
     <script src="../frontend/registrasi.js"></script>
     <script src="../frontend/login.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 0) Trigger auto-expire di backend (sudah dipanggil server-side juga)
-            fetch('../backend/payment-api.php?expire_stale=1').catch(() => {});
-
-            // 1) Cek status untuk setiap kartu pending saat halaman selesai load
-            document.querySelectorAll('.card[data-order-id]').forEach(card => {
-                const orderId = card.getAttribute('data-order-id');
-                const badge = card.querySelector('.status-badge');
-                if (orderId && orderId.trim() !== '' && badge && badge.classList.contains('pending')) {
-                    checkStatus(orderId);
-                }
-            });
-            // 2) Polling ringan setiap 12 detik untuk kartu pending
-            setInterval(periodicRefresh, 12000);
-        });
-
+        // Memindahkan semua fungsi JS ke konteks global untuk mengatasi ReferenceError
+        
         function periodicRefresh() {
             const cards = Array.from(document.querySelectorAll('.card[data-order-id]'));
             const pendings = cards.filter(c => {
@@ -781,13 +869,13 @@ function format_status($status)
         function pay(bookingId) {
             const modal = document.getElementById('modal-payment');
             modal.classList.add('active');
-            document.getElementById('modal-text').textContent = "Requesting payment token...";
+            document.getElementById('modal-text').textContent = "Meminta token pembayaran...";
 
             fetch('../backend/payment-api.php?booking=' + bookingId)
                 .then(r => r.json())
                 .then(resp => {
                     if (resp.snap_token) {
-                        document.getElementById('modal-text').textContent = "Opening payment...";
+                        document.getElementById('modal-text').textContent = "Membuka halaman pembayaran...";
                         setTimeout(() => {
                             closeModal();
                             window.snap.pay(resp.snap_token, {
@@ -797,8 +885,8 @@ function format_status($status)
                                         .then(r => r.json())
                                         .then(s => {
                                             Swal.fire({
-                                                title: s.status === 'paid' ? 'Payment Success!' : 'Payment Processed',
-                                                text: s.status === 'paid' ? 'Booking confirmed' : 'Waiting confirmation',
+                                                title: s.status === 'paid' ? 'Pembayaran Berhasil!' : 'Pembayaran Diproses',
+                                                text: s.status === 'paid' ? 'Pemesanan dikonfirmasi' : 'Menunggu konfirmasi',
                                                 icon: s.status === 'paid' ? 'success' : 'info',
                                                 confirmButtonColor: '#a97c50'
                                             }).then(() => window.location.reload());
@@ -806,16 +894,16 @@ function format_status($status)
                                 },
                                 onPending: () => {
                                     Swal.fire({
-                                        title: 'Payment Pending',
-                                        text: 'Please complete your payment',
+                                        title: 'Pembayaran Menunggu',
+                                        text: 'Mohon selesaikan pembayaran Anda',
                                         icon: 'info',
                                         confirmButtonColor: '#a97c50'
                                     }).then(() => window.location.reload());
                                 },
                                 onError: (r) => {
                                     Swal.fire({
-                                        title: 'Payment Failed',
-                                        text: r.status_message || 'Error occurred',
+                                        title: 'Pembayaran Gagal',
+                                        text: r.status_message || 'Terjadi kesalahan',
                                         icon: 'error',
                                         confirmButtonColor: '#a97c50'
                                     });
@@ -824,13 +912,13 @@ function format_status($status)
                             });
                         }, 500);
                     } else {
-                        throw new Error(resp.detail || resp.message || resp.error || 'Failed to get token');
+                        throw new Error(resp.detail || resp.message || resp.error || 'Gagal mendapatkan token');
                     }
                 })
                 .catch(err => {
                     closeModal();
                     Swal.fire({
-                        title: 'Error Pembayaran',
+                        title: 'Kesalahan Pembayaran',
                         text: err.message,
                         icon: 'error',
                         confirmButtonColor: '#a97c50'
@@ -852,9 +940,9 @@ function format_status($status)
                     const form = new FormData();
                     form.append('cancel_booking', bookingId);
                     fetch('../backend/payment-api.php', {
-                            method: 'POST',
-                            body: form
-                        })
+                                method: 'POST',
+                                body: form
+                            })
                         .then(r => r.json())
                         .then(j => {
                             if (j.success) {
@@ -891,7 +979,7 @@ function format_status($status)
 
         function showDetail(bookingId) {
             Swal.fire({
-                title: 'Loading...',
+                title: 'Memuat...',
                 html: '<i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:#a97c50;"></i>',
                 showConfirmButton: false,
                 allowOutsideClick: false
@@ -902,7 +990,7 @@ function format_status($status)
                 .then(d => {
                     if (d.error) {
                         Swal.fire({
-                            title: 'Error',
+                            title: 'Kesalahan',
                             text: d.error,
                             icon: 'error',
                             confirmButtonColor: '#a97c50'
@@ -918,48 +1006,68 @@ function format_status($status)
                 <small>📧 ${p.email}</small><br>
                 <small>📱 ${p.no_wa}</small> | <small>🆔 ${p.nik}</small></div>`;
                         });
-                    } else parts += '<p style="color:#999">No participant data</p>';
+                    } else parts += '<p style="color:#999">Tidak ada data peserta</p>';
                     parts += '</div>';
 
                     const invBtn = isPaid ?
                         `<a href="view-invoice.php?payment_id=${d.id_payment}" class="btn-invoice">
-               <i class="fa-solid fa-file-invoice"></i> View Invoice
+               <i class="fa-solid fa-file-invoice"></i> Lihat Invoice
              </a>` :
                         `<button disabled class="btn-invoice">
-               <i class="fa-solid fa-times-circle"></i> Invoice N/A
+               <i class="fa-solid fa-times-circle"></i> Invoice T/A
              </button>`;
+                    
+                    // Fungsi JS untuk memformat status di modal (menggantikan fungsi PHP di sini)
+                    const formatStatusDetailJs = (s) => {
+                        let status_text_detail = 'DIBATALKAN';
+                        let status_color = '#c62828';
+                        let status_icon = '<i class="fa-solid fa-times-circle"></i>';
 
-                    const fmt = s => {
-                        if (s === 'paid' || s === 'settlement') return '<span style="color:#2e7d32">✅ Paid</span>';
-                        if (s === 'pending') return '<span style="color:#e65100">⏳ Pending</span>';
-                        if (s === 'expire') return '<span style="color:#6a1b9a">⌛ Expired</span>';
-                        if (s === 'cancel') return '<span style="color:#ad1457">⛔ Cancelled</span>';
-                        return '<span style="color:#c62828">❌ ' + s + '</span>';
+                        if (s === 'paid' || s === 'settlement') {
+                            status_text_detail = 'PEMBAYARAN DITERIMA'; 
+                            status_color = '#2e7d32';
+                            status_icon = '<i class="fa-solid fa-check-circle"></i>';
+                        } else if (s === 'pending') {
+                            status_text_detail = 'MENUNGGU PEMBAYARAN'; 
+                            status_color = '#e65100';
+                            status_icon = '<i class="fa-solid fa-hourglass-half"></i>';
+                        } else if (s === 'expire') {
+                            status_text_detail = 'SUDAH KEDALUWARSA'; 
+                            status_color = '#ad1457';
+                            status_icon = '<i class="fa-solid fa-clock-rotate-left"></i>';
+                        } else if (s === 'cancel' || s === 'failed') {
+                            status_text_detail = 'DIBATALKAN'; 
+                            status_color = '#dc3545'; 
+                            status_icon = '<i class="fa-solid fa-ban"></i>';
+                        }
+                        return `<span style="color:${status_color};font-weight:700;">${status_icon} ${status_text_detail}</span>`;
                     };
 
+                    const fmt = formatStatusDetailJs(d.status_pembayaran);
+
                     Swal.fire({
-                        title: `Transaction #${d.id_booking}`,
+                        title: `Transaksi #${d.id_booking}`,
                         html: `<div style="text-align:left">
               <div class="info-group">
-                <h4><i class="fa-solid fa-receipt"></i> Summary</h4>
+                <h4><i class="fa-solid fa-receipt"></i> Ringkasan</h4>
                 <div class="info-row"><span>Invoice:</span><strong>${inv}</strong></div>
-                <div class="info-row"><span>Booking:</span><strong>#${d.id_booking}</strong></div>
-                <div class="info-row"><span>Date:</span><strong>${d.tanggal_booking_formatted}</strong></div>
-                <div class="info-row"><span>Status:</span>${fmt(d.status_pembayaran)}</div>
-                <div class="info-row"><span>Participants:</span><strong>${d.jumlah_orang} People</strong></div>
-                <div class="info-row"><span>Total:</span><strong class="price-total">Rp ${parseInt(d.total_harga).toLocaleString('id-ID')}</strong></div>
+                <div class="info-row"><span>Pemesanan:</span><strong>#${d.id_booking}</strong></div>
+                <div class="info-row"><span>Tanggal Transaksi:</span><strong>${d.tanggal_booking_formatted}</strong></div>
+                <div class="info-row"><span>Status:</span>${fmt}</div>
+                <div class="info-row"><span>Jumlah Peserta:</span><strong>${d.jumlah_orang} Orang</strong></div>
+                <div class="info-row"><span>Total Harga:</span><strong class="price-total">Rp ${parseInt(d.total_harga).toLocaleString('id-ID')}</strong></div>
               </div>
               <div class="info-group">
-                <h4><i class="fa-solid fa-mountain"></i> Trip Details</h4>
-                <div class="info-row"><span>Mountain:</span><strong>${d.nama_gunung}</strong></div>
-                <div class="info-row"><span>Type:</span><strong>${d.jenis_trip||'N/A'}</strong></div>
-                <div class="info-row"><span>Date:</span><strong>${d.tanggal_trip_formatted}</strong></div>
-                <div class="info-row"><span>Duration:</span><strong>${d.durasi||'N/A'}</strong></div>
-                <div class="info-row"><span>Time:</span><strong>${d.waktu_kumpul||'N/A'} WIB</strong></div>
-                <div class="info-row"><span>Location:</span><strong>${d.nama_lokasi||'N/A'}</strong></div>
+                <h4><i class="fa-solid fa-mountain"></i> Detail Trip</h4>
+                <div class="info-row"><span>Gunung:</span><strong>${d.nama_gunung}</strong></div>
+                <div class="info-row"><span>Tipe:</span><strong>${d.jenis_trip||'N/A'}</strong></div>
+                <div class="info-row"><span>Tanggal Trip:</span><strong>${d.tanggal_trip_formatted}</strong></div>
+                <div class="info-row"><span>Durasi:</span><strong>${d.durasi||'N/A'}</strong></div>
+                <div class="info-row"><span>Waktu Kumpul:</span><strong>${d.waktu_kumpul||'N/A'} WIB</strong></div>
+                <div class="info-row"><span>Lokasi Kumpul:</span><strong>${d.nama_lokasi||'N/A'}</strong></div>
               </div>
               <div class="info-group">
-                <h4><i class="fa-solid fa-users"></i> Participants (${d.jumlah_orang})</h4>
+                <h4><i class="fa-solid fa-users"></i> Peserta (${d.jumlah_orang})</h4>
                 ${parts}
               </div>
               <div style="text-align:center;padding-top:10px;border-top:1px solid #ddd">${invBtn}</div>
@@ -971,13 +1079,29 @@ function format_status($status)
                 })
                 .catch(err => {
                     Swal.fire({
-                        title: 'Error',
+                        title: 'Kesalahan',
                         text: err.message,
                         icon: 'error',
                         confirmButtonColor: '#a97c50'
                     });
                 });
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 0) Trigger auto-expire di backend (sudah dipanggil server-side juga)
+            fetch('../backend/payment-api.php?expire_stale=1').catch(() => {});
+
+            // 1) Cek status untuk setiap kartu pending saat halaman selesai load
+            document.querySelectorAll('.card[data-order-id]').forEach(card => {
+                const orderId = card.getAttribute('data-order-id');
+                const badge = card.querySelector('.status-badge');
+                if (orderId && orderId.trim() !== '' && badge && badge.classList.contains('pending')) {
+                    checkStatus(orderId);
+                }
+            });
+            // 2) Polling ringan setiap 12 detik untuk kartu pending
+            setInterval(periodicRefresh, 12000);
+        });
     </script>
 </body>
 

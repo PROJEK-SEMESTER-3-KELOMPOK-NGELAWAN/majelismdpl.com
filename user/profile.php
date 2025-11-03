@@ -205,16 +205,6 @@ $initials = strtoupper(substr($userData['username'], 0, 1));
             box-shadow: 0 10px 40px rgba(169, 124, 80, 0.3);
         }
 
-        @keyframes rotateBorder {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
         .profile-avatar,
         .profile-initials-circle {
             width: 170px;
