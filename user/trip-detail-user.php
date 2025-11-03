@@ -1985,75 +1985,76 @@ function createIconList($text, $iconClass)
             <div class="booking-form-container">
                 <div class="form-slide-wrapper" id="formSlideWrapper">
                     <!-- FORM UTAMA (Peserta 1) -->
+                    <!-- FORM UTAMA Peserta 1 -->
                     <div class="form-slide">
                         <form class="booking-form" id="form-book-trip" enctype="multipart/form-data" style="display: none;">
-                            <input type="hidden" name="id_trip" value="<?= $trip['id_trip'] ?>" />
-                            <input type="hidden" name="jumlah_peserta" id="jumlah-peserta" value="1" />
+                            <input type="hidden" name="id_trip" value="<?= $trip['id_trip'] ?>">
+                            <input type="hidden" name="jumlah_peserta" id="jumlah-peserta" value="1">
                         </form>
 
                         <div class="group-title">Data Diri Anda</div>
-
                         <div class="form-row">
                             <div class="form-control">
                                 <label>Nama Lengkap</label>
-                                <input type="text" name="nama[]" required value="<?= htmlspecialchars($userLogin['username'] ?? '') ?>" />
+                                <input type="text" name="nama[]" required value="<?= htmlspecialchars($userLogin['username'] ?? '', ENT_QUOTES) ?>">
                             </div>
                             <div class="form-control">
                                 <label>Email</label>
-                                <input type="email" name="email[]" required value="<?= htmlspecialchars($userLogin['email'] ?? '') ?>" />
+                                <input type="email" name="email[]" required value="<?= htmlspecialchars($userLogin['email'] ?? '', ENT_QUOTES) ?>">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-control">
                                 <label>Tanggal Lahir</label>
-                                <input type="date" name="tanggal_lahir[]" required />
+                                <input type="date" name="tanggal_lahir[]" required>
                             </div>
                             <div class="form-control">
                                 <label>Tempat Lahir</label>
-                                <input type="text" name="tempat_lahir[]" />
+                                <input type="text" name="tempat_lahir[]">
                             </div>
                         </div>
 
                         <div class="form-row full">
                             <div class="form-control">
                                 <label>NIK</label>
-                                <input type="text" name="nik[]" maxlength="20" />
+                                <input type="text" name="nik[]" maxlength="20">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-control">
                                 <label>No. WA</label>
-                                <input type="text" name="no_wa[]" required value="<?= htmlspecialchars($userLogin['no_wa'] ?? '') ?>" />
+                                <input type="text" name="no_wa[]" required value="<?= htmlspecialchars($userLogin['no_wa'] ?? '', ENT_QUOTES) ?>">
                             </div>
                             <div class="form-control">
                                 <label>No. Darurat</label>
-                                <input type="text" name="no_wa_darurat[]" />
+                                <input type="text" name="no_wa_darurat[]">
                             </div>
                         </div>
 
                         <div class="form-row full">
                             <div class="form-control">
                                 <label>Alamat</label>
-                                <textarea name="alamat[]" required><?= htmlspecialchars($userLogin['alamat'] ?? '') ?></textarea>
+                                <textarea name="alamat[]" required><?= htmlspecialchars($userLogin['alamat'] ?? '', ENT_QUOTES) ?></textarea>
                             </div>
                         </div>
 
                         <div class="form-row full">
                             <div class="form-control">
                                 <label>Riwayat Penyakit</label>
-                                <input type="text" name="riwayat_penyakit[]" maxlength="60" />
+                                <input type="text" name="riwayat_penyakit[]" maxlength="60">
                             </div>
                         </div>
 
                         <div class="form-row full">
                             <div class="form-control">
                                 <label>Foto KTP</label>
-                                <input type="file" name="foto_ktp[]" accept="image/*" />
+                                <input type="file" name="foto_ktp[]" accept="image/*">
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -2142,6 +2143,7 @@ function createIconList($text, $iconClass)
                 showLoginWarning();
                 return;
             <?php endif; ?>
+
             document.getElementById('modal-booking').classList.add('active');
             currentSlide = 0;
             totalPeserta = 1;
@@ -2162,6 +2164,30 @@ function createIconList($text, $iconClass)
             while (wrapper.children.length > 1) {
                 wrapper.removeChild(wrapper.lastChild);
             }
+
+            // Reset form pertama
+            const firstSlide = wrapper.firstElementChild;
+            if (firstSlide) {
+                const inputs = firstSlide.querySelectorAll('input:not([type="hidden"]), textarea');
+                inputs.forEach(input => {
+                    if (input.type !== 'file') {
+                        if (input.name === 'nama[]') {
+                            input.value = '<?= htmlspecialchars($userLogin['username'] ?? '', ENT_QUOTES) ?>';
+                        } else if (input.name === 'email[]') {
+                            input.value = '<?= htmlspecialchars($userLogin['email'] ?? '', ENT_QUOTES) ?>';
+                        } else if (input.name === 'no_wa[]') {
+                            input.value = '<?= htmlspecialchars($userLogin['no_wa'] ?? '', ENT_QUOTES) ?>';
+                        } else if (input.name === 'alamat[]') {
+                            input.value = '<?= htmlspecialchars($userLogin['alamat'] ?? '', ENT_QUOTES) ?>';
+                        } else {
+                            input.value = '';
+                        }
+                    } else {
+                        input.value = '';
+                    }
+                });
+            }
+
             totalPeserta = 1;
             currentSlide = 0;
             document.getElementById('jumlah-peserta').value = 1;
@@ -2173,7 +2199,7 @@ function createIconList($text, $iconClass)
 
             document.getElementById('prevBtn').disabled = currentSlide === 0;
             document.getElementById('nextBtn').disabled = currentSlide === totalPeserta - 1;
-            document.getElementById('btnRemovePeserta').disabled = totalPeserta <= 1;
+            document.getElementById('btnRemovePeserta').disabled = totalPeserta === 1;
 
             document.getElementById('slideCounter').textContent = currentSlide + 1;
             document.getElementById('totalSlides').textContent = totalPeserta;
@@ -2191,9 +2217,10 @@ function createIconList($text, $iconClass)
         function updateSlideDots() {
             const dotsContainer = document.getElementById('slideDots');
             dotsContainer.innerHTML = '';
+
             for (let i = 0; i < totalPeserta; i++) {
                 const dot = document.createElement('div');
-                dot.className = `slide-dot ${i === currentSlide ? 'active' : ''}`;
+                dot.className = 'slide-dot' + (i === currentSlide ? ' active' : '');
                 dot.onclick = () => goToSlide(i);
                 dotsContainer.appendChild(dot);
             }
@@ -2224,7 +2251,7 @@ function createIconList($text, $iconClass)
             if (totalPeserta >= slotTersedia) {
                 Swal.fire({
                     title: 'Slot Terbatas',
-                    text: `Hanya tersisa ${slotTersedia} slot untuk trip ini`,
+                    text: `Hanya tersedia ${slotTersedia} slot untuk trip ini`,
                     icon: 'warning',
                     background: 'rgba(255, 255, 255, 0.95)',
                     color: '#3D2F21',
@@ -2238,71 +2265,63 @@ function createIconList($text, $iconClass)
             newSlide.className = 'form-slide';
 
             const pesertaNum = totalPeserta + 1;
-
             newSlide.innerHTML = `
-                <div class="group-title">Peserta #${pesertaNum}</div>
-
-                <div class="form-row">
-                    <div class="form-control">
-                        <label>Nama Lengkap</label>
-                        <input type="text" name="nama[]" required />
-                    </div>
-                    <div class="form-control">
-                        <label>Email</label>
-                        <input type="email" name="email[]" required />
-                    </div>
+            <div class="group-title">Peserta ${pesertaNum}</div>
+            <div class="form-row">
+                <div class="form-control">
+                    <label>Nama Lengkap</label>
+                    <input type="text" name="nama[]" required>
                 </div>
-
-                <div class="form-row">
-                    <div class="form-control">
-                        <label>Tanggal Lahir</label>
-                        <input type="date" name="tanggal_lahir[]" required />
-                    </div>
-                    <div class="form-control">
-                        <label>Tempat Lahir</label>
-                        <input type="text" name="tempat_lahir[]" />
-                    </div>
+                <div class="form-control">
+                    <label>Email</label>
+                    <input type="email" name="email[]" required>
                 </div>
-
-                <div class="form-row full">
-                    <div class="form-control">
-                        <label>NIK</label>
-                        <input type="text" name="nik[]" maxlength="20" />
-                    </div>
+            </div>
+            <div class="form-row">
+                <div class="form-control">
+                    <label>Tanggal Lahir</label>
+                    <input type="date" name="tanggal_lahir[]" required>
                 </div>
-
-                <div class="form-row">
-                    <div class="form-control">
-                        <label>No. WA</label>
-                        <input type="text" name="no_wa[]" required />
-                    </div>
-                    <div class="form-control">
-                        <label>No. Darurat</label>
-                        <input type="text" name="no_wa_darurat[]" />
-                    </div>
+                <div class="form-control">
+                    <label>Tempat Lahir</label>
+                    <input type="text" name="tempat_lahir[]">
                 </div>
-
-                <div class="form-row full">
-                    <div class="form-control">
-                        <label>Alamat</label>
-                        <textarea name="alamat[]" required></textarea>
-                    </div>
+            </div>
+            <div class="form-row full">
+                <div class="form-control">
+                    <label>NIK</label>
+                    <input type="text" name="nik[]" maxlength="20">
                 </div>
-
-                <div class="form-row full">
-                    <div class="form-control">
-                        <label>Riwayat Penyakit</label>
-                        <input type="text" name="riwayat_penyakit[]" maxlength="60" />
-                    </div>
+            </div>
+            <div class="form-row">
+                <div class="form-control">
+                    <label>No. WA</label>
+                    <input type="text" name="no_wa[]" required>
                 </div>
-
-                <div class="form-row full">
-                    <div class="form-control">
-                        <label>Foto KTP</label>
-                        <input type="file" name="foto_ktp[]" accept="image/*" />
-                    </div>
+                <div class="form-control">
+                    <label>No. Darurat</label>
+                    <input type="text" name="no_wa_darurat[]">
                 </div>
-            `;
+            </div>
+            <div class="form-row full">
+                <div class="form-control">
+                    <label>Alamat</label>
+                    <textarea name="alamat[]" required></textarea>
+                </div>
+            </div>
+            <div class="form-row full">
+                <div class="form-control">
+                    <label>Riwayat Penyakit</label>
+                    <input type="text" name="riwayat_penyakit[]" maxlength="60">
+                </div>
+            </div>
+            <div class="form-row full">
+                <div class="form-control">
+                    <label>Foto KTP</label>
+                    <input type="file" name="foto_ktp[]" accept="image/*">
+                </div>
+            </div>
+        `;
 
             wrapper.appendChild(newSlide);
             totalPeserta++;
@@ -2317,6 +2336,7 @@ function createIconList($text, $iconClass)
                 wrapper.removeChild(wrapper.lastChild);
                 totalPeserta--;
                 document.getElementById('jumlah-peserta').value = totalPeserta;
+
                 if (currentSlide >= totalPeserta) {
                     currentSlide = totalPeserta - 1;
                 }
@@ -2324,36 +2344,61 @@ function createIconList($text, $iconClass)
             }
         }
 
+        // ✅ FUNGSI SUBMIT YANG SUDAH DIPERBAIKI
         function submitForm() {
-            const form = document.getElementById('form-book-trip');
-            const formElements = document.querySelectorAll('.form-slide input, .form-slide textarea');
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Memproses...';
 
-            formElements.forEach(el => {
-                if (el.name && el.name !== 'id_trip' && el.name !== 'jumlah_peserta') {
-                    const clone = el.cloneNode();
-                    clone.value = el.value;
-                    if (el.type === 'file' && el.files.length > 0) {
-                        const dataTransfer = new DataTransfer();
-                        for (let file of el.files) {
-                            dataTransfer.items.add(file);
-                        }
-                        clone.files = dataTransfer.files;
+            // Ambil semua data dari form slides
+            const formData = new FormData();
+
+            // Tambahkan hidden fields
+            formData.append('id_trip', document.querySelector('input[name="id_trip"]').value);
+            formData.append('jumlah_peserta', document.querySelector('input[name="jumlah_peserta"]').value);
+
+            // Ambil semua input dari semua slide
+            const allSlides = document.querySelectorAll('.form-slide');
+
+            allSlides.forEach((slide, index) => {
+                // Ambil semua input text, textarea, email, date
+                const textInputs = slide.querySelectorAll('input[type="text"], input[type="email"], input[type="date"], textarea');
+                textInputs.forEach(input => {
+                    if (input.name && input.name.includes('[]')) {
+                        formData.append(input.name, input.value || '');
                     }
-                    form.appendChild(clone);
+                });
+
+                // Ambil file input secara khusus
+                const fileInput = slide.querySelector('input[type="file"]');
+                if (fileInput && fileInput.files.length > 0) {
+                    formData.append('foto_ktp[]', fileInput.files[0]);
+                } else {
+                    // Kirim file kosong jika tidak ada
+                    formData.append('foto_ktp[]', new Blob(), '');
                 }
             });
 
-            form.onsubmit = async function(e) {
-                e.preventDefault();
-                const data = new FormData(form);
+            // Kirim data dengan fetch
+            fetch('../backend/booking-api.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(async res => {
+                    const contentType = res.headers.get('content-type');
 
-                try {
-                    let res = await fetch('../backend/booking-api.php', {
-                        method: 'POST',
-                        body: data
-                    });
+                    // Check if response is JSON
+                    if (!contentType || !contentType.includes('application/json')) {
+                        const htmlText = await res.text();
+                        console.error('Server returned HTML:', htmlText);
+                        throw new Error('Server mengembalikan HTML alih-alih JSON. Cek console untuk detail.');
+                    }
 
-                    let json = await res.json();
+                    return res.json();
+                })
+                .then(json => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Daftar & Booking';
 
                     if (json.success && json.id_booking) {
                         Swal.fire({
@@ -2376,8 +2421,13 @@ function createIconList($text, $iconClass)
                             confirmButtonColor: '#FFB800'
                         });
                     }
-                } catch (err) {
+                })
+                .catch(err => {
                     console.error('Error:', err);
+
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Daftar & Booking';
+
                     Swal.fire({
                         title: 'Error',
                         text: 'Terjadi kesalahan sistem: ' + err.message,
@@ -2386,17 +2436,14 @@ function createIconList($text, $iconClass)
                         color: '#3D2F21',
                         confirmButtonColor: '#FFB800'
                     });
-                }
-            };
-
-            form.dispatchEvent(new Event('submit'));
+                });
         }
 
         function openPayment(id) {
             document.getElementById('modal-payment').style.display = 'flex';
-            document.getElementById('hasil-pembayaran').innerHTML = "⏳ Memproses pembayaran...";
+            document.getElementById('hasil-pembayaran').innerHTML = 'Memproses pembayaran...';
 
-            fetch('../backend/payment-api.php?booking=' + id)
+            fetch(`../backend/payment-api.php?booking=${id}`)
                 .then(r => {
                     const contentType = r.headers.get('content-type');
                     if (!contentType || !contentType.includes('application/json')) {
@@ -2408,7 +2455,7 @@ function createIconList($text, $iconClass)
                     if (resp.snap_token) {
                         window.snap.pay(resp.snap_token, {
                             onSuccess: (result) => {
-                                document.getElementById('hasil-pembayaran').innerHTML = "✅ Pembayaran Berhasil!";
+                                document.getElementById('hasil-pembayaran').innerHTML = 'Pembayaran Berhasil!';
                                 setTimeout(() => {
                                     closePayment();
                                     Swal.fire({
@@ -2418,13 +2465,11 @@ function createIconList($text, $iconClass)
                                         background: 'rgba(255, 255, 255, 0.95)',
                                         color: '#3D2F21',
                                         confirmButtonColor: '#FFB800'
-                                    }).then(() => {
-                                        window.location.reload();
-                                    });
+                                    }).then(() => window.location.reload());
                                 }, 1000);
                             },
                             onPending: (result) => {
-                                document.getElementById('hasil-pembayaran').innerHTML = "⏳ Menunggu Pembayaran...";
+                                document.getElementById('hasil-pembayaran').innerHTML = 'Menunggu Pembayaran...';
                                 setTimeout(() => {
                                     closePayment();
                                     Swal.fire({
@@ -2438,7 +2483,7 @@ function createIconList($text, $iconClass)
                                 }, 2000);
                             },
                             onError: (result) => {
-                                document.getElementById('hasil-pembayaran').innerHTML = "❌ Pembayaran Gagal!";
+                                document.getElementById('hasil-pembayaran').innerHTML = 'Pembayaran Gagal!';
                                 setTimeout(() => {
                                     closePayment();
                                     Swal.fire({
@@ -2452,10 +2497,8 @@ function createIconList($text, $iconClass)
                                 }, 2000);
                             },
                             onClose: () => {
-                                document.getElementById('hasil-pembayaran').innerHTML = "⚠️ Popup Ditutup";
-                                setTimeout(() => {
-                                    closePayment();
-                                }, 1500);
+                                document.getElementById('hasil-pembayaran').innerHTML = 'Popup Ditutup';
+                                setTimeout(closePayment, 1500);
                             }
                         });
                     } else {
@@ -2464,7 +2507,7 @@ function createIconList($text, $iconClass)
                 })
                 .catch(err => {
                     console.error('Payment error:', err);
-                    document.getElementById('hasil-pembayaran').innerHTML = '❌ Error: ' + err.message;
+                    document.getElementById('hasil-pembayaran').innerHTML = 'Error: ' + err.message;
                     setTimeout(() => {
                         closePayment();
                         Swal.fire({
@@ -2483,9 +2526,9 @@ function createIconList($text, $iconClass)
             document.getElementById('modal-payment').style.display = 'none';
         }
 
+        // WhatsApp Button
         (function() {
             const whatsappBtn = document.getElementById('whatsappBtn');
-
             if (whatsappBtn) {
                 let expandTimeout;
                 let isExpanded = false;
@@ -2495,7 +2538,6 @@ function createIconList($text, $iconClass)
                         if (!isExpanded) {
                             e.preventDefault();
                             e.stopPropagation();
-
                             this.classList.add('expanded');
                             isExpanded = true;
 
@@ -2530,13 +2572,11 @@ function createIconList($text, $iconClass)
             }
         })();
 
-        // ========== BUKA WHATSAPP FUNCTION ==========
         function bukaWhatsapp() {
-            const nomor = "6285233463360";
-            const pesan = encodeURIComponent("Halo! Saya ingin bertanya tentang paket trip Majelis MDPL.");
+            const nomor = '6285233463360';
+            const pesan = encodeURIComponent('Halo! Saya ingin bertanya tentang paket trip Majelis MDPL.');
             const url = `https://wa.me/${nomor}?text=${pesan}`;
-
-            window.open(url, "_blank");
+            window.open(url, '_blank');
 
             const whatsappBtn = document.getElementById('whatsappBtn');
             if (whatsappBtn) {
@@ -2547,6 +2587,7 @@ function createIconList($text, $iconClass)
             }
         }
     </script>
+
 </body>
 
 </html>
