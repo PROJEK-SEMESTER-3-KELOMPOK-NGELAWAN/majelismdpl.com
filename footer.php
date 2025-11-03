@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="copyright">
-      <p>Copyright © 2025 Majelis Mdpl. All rights reserved. Developed with ❤ by Dimasdw15</p>
+      <p>Copyright © 2025 Majelis Mdpl. All rights reserved. Developed with ❤ by Ngelawans Gang</p>
     </div>
   </footer>
 

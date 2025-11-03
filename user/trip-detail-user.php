@@ -2,7 +2,6 @@
 require_once '../backend/koneksi.php';
 session_start();
 
-// ✅ Set navbar path untuk file di folder user/
 $navbarPath = '../';
 
 $isLogin = isset($_SESSION['id_user']);
@@ -73,10 +72,9 @@ function createIconList($text, $iconClass)
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
     <title><?= htmlspecialchars($trip['nama_gunung']) ?> | Majelis MDPL</title>
 
-    <!-- ✅ WAJIB: Load Font Poppins (SAMA dengan navbar.php) -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -84,11 +82,6 @@ function createIconList($text, $iconClass)
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-KFnuwUuiq_i1OUJf"></script>
 
     <style>
-        /* ============================================
-           ENHANCED LIQUID GLASS THEME 2025
-           Color: #D0B28C + Strong Glass Effect
-           ============================================ */
-
         * {
             margin: 0;
             padding: 0;
@@ -96,7 +89,6 @@ function createIconList($text, $iconClass)
         }
 
         :root {
-            /* Main Color Palette - D0B28C Base */
             --primary-tan: #D0B28C;
             --tan-dark: #B89968;
             --tan-darker: #A08456;
@@ -104,28 +96,18 @@ function createIconList($text, $iconClass)
             --tan-light: #E0C9A8;
             --tan-lighter: #EBD9BD;
             --tan-pale: #F5EAD8;
-
-            /* Card Colors */
             --card-white: #F8F4EE;
             --card-cream: #F2EDE5;
-
-            /* Accent */
             --accent-gold: #FFB800;
             --accent-gold-hover: #E6A600;
-
-            /* Neutral */
             --white: #FFFFFF;
             --text-dark: #3D2F21;
             --text-medium: #6B5847;
             --text-light: #9B8A76;
-
-            /* Enhanced Liquid Glass - More Visible */
             --glass-strong: rgba(255, 255, 255, 0.35);
             --glass-medium: rgba(255, 255, 255, 0.25);
             --glass-light: rgba(255, 255, 255, 0.15);
             --glass-border: rgba(255, 255, 255, 0.4);
-
-            /* Shadows */
             --shadow-sm: 0 2px 8px rgba(61, 47, 33, 0.08);
             --shadow-md: 0 4px 16px rgba(61, 47, 33, 0.12);
             --shadow-lg: 0 8px 32px rgba(61, 47, 33, 0.16);
@@ -156,14 +138,10 @@ function createIconList($text, $iconClass)
         .container {
             max-width: 1280px;
             margin: 80px auto 0;
-            padding: 0 32px;
+            padding: 0 1rem;
             position: relative;
             z-index: 1;
         }
-
-        /* ============================================
-           HERO SECTION - FULL SCREEN
-           ============================================ */
 
         .hero {
             position: relative;
@@ -205,7 +183,7 @@ function createIconList($text, $iconClass)
             color: var(--white);
             max-width: 900px;
             text-align: center;
-            padding: 0 5%;
+            padding: 0 2rem;
             animation: heroFadeIn 1.5s cubic-bezier(0.33, 1, 0.68, 1);
         }
 
@@ -222,21 +200,21 @@ function createIconList($text, $iconClass)
         }
 
         .hero-subtitle {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             font-weight: 600;
             letter-spacing: 0.2em;
             text-transform: uppercase;
             color: var(--accent-gold);
-            margin-bottom: 20px;
+            margin-bottom: 1rem;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .hero-text {
-            font-size: clamp(3rem, 10vw, 6.5rem);
+            font-size: clamp(2rem, 8vw, 5.5rem);
             font-weight: 900;
             letter-spacing: -0.03em;
             line-height: 0.95;
-            margin-bottom: 32px;
+            margin-bottom: 2rem;
             color: var(--white);
             text-shadow:
                 0 4px 16px rgba(0, 0, 0, 0.5),
@@ -244,9 +222,9 @@ function createIconList($text, $iconClass)
         }
 
         .btn-hero-wrapper {
-            margin-top: 40px;
+            margin-top: 2rem;
             display: flex;
-            gap: 16px;
+            gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -255,10 +233,10 @@ function createIconList($text, $iconClass)
             position: relative;
             background: var(--accent-gold);
             color: var(--tan-darkest);
-            padding: 18px 48px;
+            padding: 1rem 2rem;
             font-weight: 800;
-            font-size: 1rem;
-            border-radius: 16px;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.33, 1, 0.68, 1);
             border: none;
@@ -284,9 +262,9 @@ function createIconList($text, $iconClass)
         }
 
         .btn-hero:hover {
-            transform: translateY(-4px);
+            transform: translateY(-3px);
             box-shadow:
-                0 16px 48px rgba(255, 184, 0, 0.5),
+                0 12px 40px rgba(255, 184, 0, 0.5),
                 inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
 
@@ -298,22 +276,18 @@ function createIconList($text, $iconClass)
         }
 
         .btn-hero i {
-            margin-right: 10px;
+            margin-right: 0.5rem;
         }
-
-        /* ============================================
-           INFO BAR - Enhanced Glass Effect
-           ============================================ */
 
         .info-bar {
             background: var(--card-white);
             border: 2px solid rgba(208, 178, 140, 0.3);
-            border-radius: 24px;
-            padding: 40px 36px;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 32px;
-            margin-bottom: 48px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
             box-shadow: var(--shadow-lg);
             transition: all 0.5s cubic-bezier(0.33, 1, 0.68, 1);
             animation: cardSlideUp 1s cubic-bezier(0.33, 1, 0.68, 1) 0.2s backwards;
@@ -332,7 +306,7 @@ function createIconList($text, $iconClass)
         }
 
         .info-bar:hover {
-            transform: translateY(-6px);
+            transform: translateY(-4px);
             box-shadow: var(--shadow-xl);
         }
 
@@ -340,10 +314,10 @@ function createIconList($text, $iconClass)
             display: flex;
             align-items: center;
             flex-direction: column;
-            gap: 14px;
+            gap: 0.75rem;
             text-align: center;
-            padding: 20px 16px;
-            border-radius: 16px;
+            padding: 1rem;
+            border-radius: 12px;
             transition: all 0.4s cubic-bezier(0.33, 1, 0.68, 1);
             background: var(--glass-strong);
             backdrop-filter: blur(30px) saturate(200%);
@@ -356,26 +330,26 @@ function createIconList($text, $iconClass)
 
         .info-item:hover {
             background: rgba(255, 255, 255, 0.45);
-            transform: scale(1.05);
+            transform: scale(1.03);
             box-shadow:
                 0 8px 24px rgba(208, 178, 140, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
 
         .info-item i {
-            font-size: 2.8rem;
+            font-size: 1.75rem;
             color: var(--accent-gold);
             filter: drop-shadow(0 4px 12px rgba(255, 184, 0, 0.4));
             transition: all 0.4s cubic-bezier(0.33, 1, 0.68, 1);
         }
 
         .info-item:hover i {
-            transform: scale(1.15) rotate(-5deg);
+            transform: scale(1.1) rotate(-5deg);
             filter: drop-shadow(0 8px 20px rgba(255, 184, 0, 0.6));
         }
 
         .info-item span:first-of-type {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.15em;
             color: var(--text-medium);
@@ -384,21 +358,17 @@ function createIconList($text, $iconClass)
 
         .info-item span:last-child {
             font-weight: 800;
-            font-size: 1.35rem;
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
             color: var(--text-dark);
         }
 
-        /* ============================================
-           CONTENT AREA - Enhanced Glass Items
-           ============================================ */
-
         .content-area {
             background: var(--card-white);
-            padding: 56px 48px;
-            border-radius: 24px;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
             border: 2px solid rgba(208, 178, 140, 0.3);
             box-shadow: var(--shadow-lg);
-            margin-bottom: 48px;
+            margin-bottom: 2rem;
             animation: cardSlideUp 1s cubic-bezier(0.33, 1, 0.68, 1) 0.4s backwards;
             transition: all 0.5s cubic-bezier(0.33, 1, 0.68, 1);
         }
@@ -408,19 +378,20 @@ function createIconList($text, $iconClass)
         }
 
         section.detail-section {
-            padding: 40px 0;
-            margin-bottom: 32px;
+            padding: 1.5rem 0;
+            margin-bottom: 1.5rem;
             border-bottom: 2px solid rgba(208, 178, 140, 0.2);
         }
 
         section.detail-section:last-child {
             border-bottom: none;
+            margin-bottom: 0;
         }
 
         section.detail-section h2 {
-            font-size: 1.85rem;
+            font-size: clamp(1.2rem, 4vw, 1.75rem);
             font-weight: 900;
-            margin-bottom: 32px;
+            margin-bottom: 1rem;
             color: var(--tan-darkest);
             position: relative;
             display: inline-block;
@@ -430,19 +401,19 @@ function createIconList($text, $iconClass)
         section.detail-section h2::after {
             content: '';
             position: absolute;
-            bottom: -14px;
+            bottom: -10px;
             left: 0;
-            width: 60px;
-            height: 4px;
+            width: 50px;
+            height: 3px;
             background: var(--accent-gold);
             border-radius: 2px;
         }
 
         section.detail-section p {
-            line-height: 1.8;
+            line-height: 1.7;
             color: var(--text-medium);
-            font-size: 1.05rem;
-            margin-bottom: 14px;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            margin-bottom: 1rem;
         }
 
         section.detail-section p strong {
@@ -457,14 +428,14 @@ function createIconList($text, $iconClass)
         }
 
         .icon-list li {
-            margin-bottom: 18px;
-            padding: 18px 22px 18px 60px;
+            margin-bottom: 1rem;
+            padding: 0.85rem 1rem 0.85rem 2.75rem;
             position: relative;
-            font-size: 1.02rem;
-            line-height: 1.7;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            line-height: 1.6;
             color: var(--text-medium);
             transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
-            border-radius: 14px;
+            border-radius: 12px;
             background: var(--glass-strong);
             backdrop-filter: blur(30px) saturate(200%);
             -webkit-backdrop-filter: blur(30px) saturate(200%);
@@ -477,7 +448,7 @@ function createIconList($text, $iconClass)
         .icon-list li:hover {
             color: var(--text-dark);
             background: rgba(255, 255, 255, 0.45);
-            padding-left: 66px;
+            padding-left: 3.25rem;
             box-shadow:
                 0 4px 16px rgba(208, 178, 140, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.7);
@@ -485,21 +456,22 @@ function createIconList($text, $iconClass)
 
         .icon-list li i {
             position: absolute;
-            left: 22px;
-            top: 20px;
-            font-size: 1.3rem;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
             color: var(--accent-gold);
             transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
         }
 
         .icon-list li:hover i {
-            transform: scale(1.2) rotate(-8deg);
+            transform: translateY(-50%) scale(1.15) rotate(-8deg);
             filter: drop-shadow(0 2px 8px rgba(255, 184, 0, 0.5));
         }
 
         .map-container {
-            margin-top: 36px;
-            border-radius: 18px;
+            margin-top: 1rem;
+            border-radius: 12px;
             overflow: hidden;
             border: 2px solid rgba(208, 178, 140, 0.3);
             box-shadow: var(--shadow-md);
@@ -507,14 +479,12 @@ function createIconList($text, $iconClass)
 
         .map-container iframe {
             width: 100%;
-            height: 420px;
+            height: clamp(250px, 50vw, 350px);
             border: 0;
             display: block;
         }
 
-        /* ============================================
-           LOGIN WARNING MODAL - Enhanced Blur
-           ============================================ */
+        /* LOGIN WARNING MODAL */
 
         #loginWarningModal {
             display: none;
@@ -527,6 +497,7 @@ function createIconList($text, $iconClass)
             align-items: center;
             justify-content: center;
             animation: modalBackdrop 0.4s ease-out;
+            padding: 1rem;
         }
 
         @keyframes modalBackdrop {
@@ -548,10 +519,10 @@ function createIconList($text, $iconClass)
             backdrop-filter: blur(40px) saturate(200%);
             -webkit-backdrop-filter: blur(40px) saturate(200%);
             border: 2px solid rgba(255, 255, 255, 0.6);
-            border-radius: 28px;
-            max-width: 500px;
-            width: 90%;
-            padding: 56px 48px;
+            border-radius: 1.5rem;
+            max-width: 450px;
+            width: 100%;
+            padding: clamp(1.5rem, 5vw, 2.5rem);
             text-align: center;
             box-shadow:
                 0 20px 60px rgba(0, 0, 0, 0.18),
@@ -573,9 +544,9 @@ function createIconList($text, $iconClass)
         }
 
         .login-warning-icon {
-            width: 92px;
-            height: 92px;
-            margin: 0 auto 32px;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
             background: rgba(255, 184, 0, 0.12);
             border: 3px solid var(--accent-gold);
             border-radius: 50%;
@@ -601,38 +572,40 @@ function createIconList($text, $iconClass)
         }
 
         .login-warning-icon i {
-            font-size: 3.2rem;
+            font-size: 2.5rem;
             color: var(--accent-gold-hover);
         }
 
         .login-warning-title {
-            font-size: 1.85rem;
+            font-size: clamp(1.3rem, 4vw, 1.7rem);
             font-weight: 900;
             color: var(--tan-darkest);
-            margin-bottom: 18px;
+            margin-bottom: 1rem;
             letter-spacing: -0.02em;
         }
 
         .login-warning-text {
-            font-size: 1.08rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
             color: var(--text-medium);
-            margin-bottom: 40px;
-            line-height: 1.7;
+            margin-bottom: 2rem;
+            line-height: 1.6;
         }
 
         .login-warning-buttons {
             display: flex;
-            gap: 14px;
+            gap: 0.75rem;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .btn-warning-login,
         .btn-warning-cancel {
             flex: 1;
-            padding: 16px 32px;
-            font-size: 1rem;
+            min-width: 120px;
+            padding: 0.8rem 1.5rem;
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
             font-weight: 800;
-            border-radius: 14px;
+            border-radius: 10px;
             border: none;
             cursor: pointer;
             text-transform: uppercase;
@@ -662,9 +635,7 @@ function createIconList($text, $iconClass)
             border-color: rgba(208, 178, 140, 0.5);
         }
 
-        /* ============================================
-           BOOKING MODAL - Enhanced Blur
-           ============================================ */
+        /* BOOKING MODAL - FIXED HEIGHT UNTUK SEMUA DEVICE */
 
         #modal-booking {
             display: none;
@@ -676,9 +647,8 @@ function createIconList($text, $iconClass)
             -webkit-backdrop-filter: blur(12px) brightness(0.85);
             align-items: center;
             justify-content: center;
-            padding: 25px 20px;
+            padding: 1rem;
             animation: modalBackdrop 0.4s ease-out;
-            overflow-y: auto;
         }
 
         #modal-booking.active {
@@ -689,11 +659,9 @@ function createIconList($text, $iconClass)
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(40px) saturate(200%);
             -webkit-backdrop-filter: blur(40px) saturate(200%);
-            max-width: 680px;
-            width: 92%;
-            max-height: 92vh;
-            margin: auto;
-            border-radius: 28px;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 1.5rem;
             border: 2px solid rgba(255, 255, 255, 0.6);
             box-shadow:
                 0 20px 60px rgba(0, 0, 0, 0.18),
@@ -702,208 +670,327 @@ function createIconList($text, $iconClass)
             animation: modalSlideIn 0.6s cubic-bezier(0.33, 1, 0.68, 1);
             display: flex;
             flex-direction: column;
+            max-height: 85vh;
+            height: 85vh;
         }
 
-        .scroll-area-modal {
-            width: 100%;
-            max-height: calc(92vh - 60px);
-            overflow-y: auto;
-            padding: 56px 48px 48px;
-            flex: 1;
-        }
-
-        .scroll-area-modal::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .scroll-area-modal::-webkit-scrollbar-track {
-            background: rgba(208, 178, 140, 0.15);
-            border-radius: 10px;
-        }
-
-        .scroll-area-modal::-webkit-scrollbar-thumb {
-            background: var(--accent-gold);
-            border-radius: 10px;
-        }
-
-        .scroll-area-modal::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-gold-hover);
+        .booking-modal-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid rgba(208, 178, 140, 0.2);
+            flex-shrink: 0;
         }
 
         .booking-modal-box h3 {
-            margin: 0 0 40px;
-            font-size: 1.85rem;
+            margin: 0;
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
             font-weight: 900;
             color: var(--tan-darkest);
             text-align: center;
             letter-spacing: -0.02em;
         }
 
-        .booking-form label {
+        .booking-form-container {
+            width: 100%;
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .form-slide-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+        }
+
+        .form-slide {
+            width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+            padding: 1.5rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .form-slide::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .form-slide::-webkit-scrollbar-track {
+            background: rgba(208, 178, 140, 0.1);
+            border-radius: 10px;
+        }
+
+        .form-slide::-webkit-scrollbar-thumb {
+            background: rgba(208, 178, 140, 0.4);
+            border-radius: 10px;
+        }
+
+        .form-slide::-webkit-scrollbar-thumb:hover {
+            background: rgba(208, 178, 140, 0.6);
+        }
+
+        .group-title {
+            margin: 0 0 1.25rem 0;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            color: var(--tan-darkest);
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid rgba(208, 178, 140, 0.25);
+            text-transform: uppercase;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-control {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .form-control label {
             display: block;
             font-weight: 700;
-            margin: 20px 0 10px;
-            font-size: 0.88rem;
+            font-size: 0.65rem;
             color: var(--tan-darkest);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.06em;
         }
 
-        .booking-form input[type=text],
-        .booking-form input[type=email],
-        .booking-form input[type=date],
-        .booking-form textarea,
-        .booking-form input[type=file] {
+        .form-control input[type=text],
+        .form-control input[type=email],
+        .form-control input[type=date],
+        .form-control textarea,
+        .form-control input[type=file] {
             width: 100%;
-            padding: 14px 18px;
-            border: 2px solid rgba(208, 178, 140, 0.3);
-            background: rgba(255, 255, 255, 0.65);
+            padding: 0.65rem 0.8rem;
+            border: 2px solid rgba(208, 178, 140, 0.35);
+            background: rgba(255, 255, 255, 0.8);
             color: var(--text-dark);
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+            border-radius: 8px;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
             font-family: 'Poppins', sans-serif;
+            transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
         }
 
-        .booking-form input:focus,
-        .booking-form textarea:focus {
+        .form-control input:focus,
+        .form-control textarea:focus {
             outline: none;
             border-color: var(--accent-gold);
             background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 0 0 4px rgba(255, 184, 0, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 184, 0, 0.1);
         }
 
-        .booking-form textarea {
-            resize: vertical;
-            min-height: 100px;
+        .form-control textarea {
+            resize: none;
+            min-height: 60px;
         }
 
-        .booking-form .group-title {
-            margin: 40px 0 28px;
-            font-size: 1.3rem;
-            color: var(--tan-darkest);
-            font-weight: 900;
-            letter-spacing: -0.01em;
-            padding-bottom: 16px;
-            border-bottom: 2px solid rgba(208, 178, 140, 0.25);
-        }
-
-        .booking-form .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 12px;
-        }
-
-        .booking-form .row>div {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .booking-form .row label {
-            display: block;
-            font-weight: 700;
-            margin: 0 0 10px;
-            font-size: 0.88rem;
-            color: var(--tan-darkest);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        .booking-form .row input[type=text],
-        .booking-form .row input[type=email],
-        .booking-form .row input[type=date] {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid rgba(208, 178, 140, 0.3);
-            background: rgba(255, 255, 255, 0.65);
-            color: var(--text-dark);
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .booking-form .btn-add,
-        .booking-form .btn-rm {
-            margin: 28px 0 12px;
+        .form-control input[type=file] {
+            padding: 0.5rem 0.7rem;
             cursor: pointer;
-            text-decoration: none;
-            font-size: 0.95rem;
-            background: none;
-            border: none;
-            color: var(--accent-gold-hover);
+            font-size: 0.75rem;
+        }
+
+        /* SLIDE CONTROLS */
+
+        .slide-controls {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-top: 2px solid rgba(208, 178, 140, 0.2);
+            background: rgba(245, 234, 216, 0.5);
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .slide-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(208, 178, 140, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .slide-dot.active {
+            background: var(--accent-gold);
+            width: 24px;
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(255, 184, 0, 0.4);
+        }
+
+        .slide-nav-btn {
+            background: rgba(255, 184, 0, 0.15);
+            border: 2px solid rgba(255, 184, 0, 0.3);
+            color: var(--accent-gold);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .slide-nav-btn:hover:not(:disabled) {
+            background: rgba(255, 184, 0, 0.3);
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(255, 184, 0, 0.3);
+        }
+
+        .slide-nav-btn:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            font-size: 0.75rem;
+            color: var(--text-medium);
             font-weight: 700;
-            transition: all 0.25s cubic-bezier(0.33, 1, 0.68, 1);
-            text-align: left;
+            padding: 0.4rem 0.8rem;
+            background: rgba(208, 178, 140, 0.1);
+            border-radius: 5px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .peserta-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .btn-peserta-add,
+        .btn-peserta-remove {
+            background: rgba(255, 184, 0, 0.15);
+            border: 2px solid rgba(255, 184, 0, 0.3);
+            color: var(--accent-gold);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            font-size: 0.9rem;
             padding: 0;
         }
 
-        .booking-form .btn-add:hover,
-        .btn-rm:hover {
-            color: var(--accent-gold);
-            transform: translateX(6px);
+        .btn-peserta-add:hover {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: rgba(76, 175, 80, 0.5);
+            color: #4CAF50;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-peserta-remove:hover:not(:disabled) {
+            background: rgba(244, 67, 54, 0.2);
+            border-color: rgba(244, 67, 54, 0.5);
+            color: #f44336;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn-peserta-remove:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+
+        .peserta-label {
+            font-size: 0.7rem;
+            color: var(--text-medium);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        /* FORM BUTTONS */
+
+        .form-buttons {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            border-top: 2px solid rgba(208, 178, 140, 0.2);
+            background: rgba(245, 234, 216, 0.3);
+            flex-shrink: 0;
+            justify-content: center;
         }
 
         .btn-main {
-            margin-top: 36px;
-            background: var(--accent-gold);
-            color: var(--tan-darkest);
+            margin: 0;
             border: none;
-            border-radius: 14px;
-            padding: 18px;
-            width: 100%;
-            font-weight: 900;
-            font-size: 1.08rem;
+            border-radius: 8px;
+            padding: 0.9rem 1.8rem;
+            font-weight: 800;
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
             transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(255, 184, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            min-height: 42px;
+            background: var(--accent-gold);
+            color: var(--tan-darkest);
+            box-shadow: 0 4px 16px rgba(255, 184, 0, 0.3);
+            flex: 1;
         }
 
         .btn-main:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 28px rgba(255, 184, 0, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 184, 0, 0.4);
         }
 
         .btn-main:active {
-            transform: translateY(-1px);
+            transform: translateY(0);
         }
 
         .btn-main:disabled {
             background: rgba(155, 138, 118, 0.5);
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: 0.6;
             box-shadow: none;
         }
 
-        .btn-cancel {
-            margin-top: 16px;
-            background: rgba(208, 178, 140, 0.15);
-            color: var(--tan-darkest);
-            border: 2px solid rgba(208, 178, 140, 0.3);
-            border-radius: 14px;
-            padding: 16px;
-            width: 100%;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
-        }
-
-        .btn-cancel:hover {
-            background: rgba(208, 178, 140, 0.25);
-            border-color: rgba(208, 178, 140, 0.5);
+        .btn-main i {
+            font-size: 0.9rem;
         }
 
         .booking-modal-box .close-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 1.3rem;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1rem;
             background: rgba(208, 178, 140, 0.15);
-            width: 44px;
-            height: 44px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border: 2px solid rgba(208, 178, 140, 0.3);
             color: var(--tan-dark);
@@ -921,6 +1008,8 @@ function createIconList($text, $iconClass)
             transform: rotate(90deg);
         }
 
+        /* PAYMENT MODAL */
+
         #modal-payment {
             display: none;
             position: fixed;
@@ -931,16 +1020,17 @@ function createIconList($text, $iconClass)
             -webkit-backdrop-filter: blur(25px) brightness(0.92);
             align-items: center;
             justify-content: center;
+            padding: 1rem;
         }
 
         #modal-payment>div {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(40px) saturate(200%);
             -webkit-backdrop-filter: blur(40px) saturate(200%);
-            padding: 56px 48px;
-            max-width: 540px;
-            width: 95%;
-            border-radius: 28px;
+            padding: clamp(1.5rem, 4vw, 3rem);
+            max-width: 500px;
+            width: 100%;
+            border-radius: 1.5rem;
             border: 2px solid rgba(255, 255, 255, 0.6);
             box-shadow:
                 0 20px 60px rgba(0, 0, 0, 0.18),
@@ -951,16 +1041,16 @@ function createIconList($text, $iconClass)
 
         #modal-payment button {
             position: absolute;
-            top: 24px;
-            right: 24px;
+            top: 1rem;
+            right: 1rem;
             background: rgba(208, 178, 140, 0.15);
-            width: 42px;
-            height: 42px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border: 2px solid rgba(208, 178, 140, 0.3);
             color: var(--tan-dark);
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1rem;
             transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
         }
 
@@ -971,333 +1061,12 @@ function createIconList($text, $iconClass)
 
         #hasil-pembayaran {
             color: var(--text-dark);
-            padding: 24px;
-            font-size: 1.1rem;
+            padding: 1.5rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
         }
 
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
-
-        @media (max-width: 1024px) {
-            .container {
-                padding: 0 24px;
-            }
-
-            #modal-booking .booking-modal-box {
-                max-width: 90%;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 16px;
-            }
-
-            .hero {
-                height: 100vh;
-                min-height: 100vh;
-                min-height: -webkit-fill-available;
-            }
-
-            .hero-content {
-                padding: 0 6%;
-            }
-
-            .hero-text {
-                font-size: clamp(2.2rem, 8vw, 3.5rem);
-                margin-bottom: 24px;
-            }
-
-            .hero-subtitle {
-                font-size: 0.75rem;
-                margin-bottom: 16px;
-            }
-
-            .btn-hero-wrapper {
-                margin-top: 32px;
-                gap: 12px;
-            }
-
-            .btn-hero {
-                padding: 16px 40px;
-                font-size: 0.95rem;
-                border-radius: 14px;
-            }
-
-            .info-bar {
-                grid-template-columns: 1fr 1fr;
-                padding: 30px 20px;
-                gap: 20px;
-            }
-
-            .content-area {
-                padding: 36px 24px;
-            }
-
-            .btn-main,
-            .btn-hero {
-                width: 100%;
-            }
-
-            #modal-booking {
-                padding: 15px 10px;
-            }
-
-            #modal-booking .booking-modal-box {
-                max-width: 95%;
-                width: 95%;
-                max-height: 95vh;
-                border-radius: 20px;
-            }
-
-            .scroll-area-modal {
-                padding: 40px 20px 32px;
-                max-height: calc(95vh - 40px);
-            }
-
-            .booking-modal-box h3 {
-                font-size: 1.5rem;
-                margin-bottom: 28px;
-            }
-
-            .booking-form .group-title {
-                font-size: 1.1rem;
-                margin: 30px 0 20px;
-            }
-
-            .booking-form label {
-                font-size: 0.8rem;
-                margin: 15px 0 8px;
-            }
-
-            .booking-form input[type=text],
-            .booking-form input[type=email],
-            .booking-form input[type=date],
-            .booking-form textarea,
-            .booking-form input[type=file] {
-                padding: 12px 14px;
-                font-size: 0.95rem;
-            }
-
-            .booking-form .row {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-
-            .booking-modal-box .close-btn {
-                top: 15px;
-                right: 15px;
-                width: 38px;
-                height: 38px;
-                font-size: 1.1rem;
-            }
-
-            .btn-main,
-            .btn-cancel {
-                font-size: 0.95rem;
-                padding: 16px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 0 12px;
-            }
-
-            .hero {
-                height: 100vh;
-                min-height: 100vh;
-                min-height: -webkit-fill-available;
-            }
-
-            .hero-content {
-                padding: 0 5%;
-            }
-
-            .hero-text {
-                font-size: clamp(1.8rem, 7vw, 2.5rem);
-                margin-bottom: 20px;
-                line-height: 1.1;
-            }
-
-            .hero-subtitle {
-                font-size: 0.7rem;
-                letter-spacing: 0.15em;
-                margin-bottom: 14px;
-            }
-
-            .btn-hero-wrapper {
-                margin-top: 28px;
-                gap: 10px;
-            }
-
-            .btn-hero {
-                padding: 14px 32px;
-                font-size: 0.85rem;
-                border-radius: 12px;
-            }
-
-            .btn-hero i {
-                margin-right: 8px;
-                font-size: 0.9rem;
-            }
-
-            .info-bar {
-                gap: 16px;
-                padding: 24px 16px;
-                grid-template-columns: 1fr;
-            }
-
-            .content-area {
-                padding: 28px 20px;
-            }
-
-            #modal-booking {
-                padding: 10px 5px;
-            }
-
-            #modal-booking .booking-modal-box {
-                max-width: 98%;
-                width: 98%;
-                max-height: 97vh;
-                border-radius: 16px;
-            }
-
-            .scroll-area-modal {
-                padding: 35px 16px 28px;
-                max-height: calc(97vh - 30px);
-            }
-
-            .booking-modal-box h3 {
-                font-size: 1.3rem;
-                margin-bottom: 24px;
-            }
-
-            .booking-form .group-title {
-                font-size: 1rem;
-                margin: 25px 0 18px;
-                padding-bottom: 12px;
-            }
-
-            .booking-form label {
-                font-size: 0.75rem;
-                margin: 12px 0 6px;
-            }
-
-            .booking-form input[type=text],
-            .booking-form input[type=email],
-            .booking-form input[type=date],
-            .booking-form textarea,
-            .booking-form input[type=file] {
-                padding: 11px 12px;
-                font-size: 0.9rem;
-                border-radius: 10px;
-            }
-
-            .booking-form textarea {
-                min-height: 80px;
-            }
-
-            .booking-modal-box .close-btn {
-                top: 12px;
-                right: 12px;
-                width: 34px;
-                height: 34px;
-                font-size: 1rem;
-            }
-
-            .btn-main {
-                font-size: 0.9rem;
-                padding: 14px;
-                margin-top: 28px;
-            }
-
-            .btn-cancel {
-                font-size: 0.85rem;
-                padding: 13px;
-            }
-
-            .btn-add,
-            .btn-rm {
-                font-size: 0.85rem;
-            }
-
-            .login-warning-container {
-                max-width: 90%;
-                padding: 40px 28px;
-                border-radius: 20px;
-            }
-
-            .login-warning-icon {
-                width: 72px;
-                height: 72px;
-                margin-bottom: 24px;
-            }
-
-            .login-warning-icon i {
-                font-size: 2.5rem;
-            }
-
-            .login-warning-title {
-                font-size: 1.5rem;
-                margin-bottom: 14px;
-            }
-
-            .login-warning-text {
-                font-size: 0.95rem;
-                margin-bottom: 32px;
-            }
-
-            .login-warning-buttons {
-                flex-direction: column;
-            }
-
-            .btn-warning-login,
-            .btn-warning-cancel {
-                width: 100%;
-                padding: 14px;
-                font-size: 0.9rem;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .hero-text {
-                font-size: clamp(1.5rem, 6vw, 2rem);
-            }
-
-            .hero-subtitle {
-                font-size: 0.65rem;
-            }
-
-            .btn-hero {
-                padding: 13px 28px;
-                font-size: 0.8rem;
-            }
-
-            .booking-modal-box h3 {
-                font-size: 1.15rem;
-            }
-
-            .scroll-area-modal {
-                padding: 30px 12px 24px;
-            }
-
-            .booking-form input[type=text],
-            .booking-form input[type=email],
-            .booking-form input[type=date],
-            .booking-form textarea,
-            .booking-form input[type=file] {
-                padding: 10px 11px;
-                font-size: 0.85rem;
-            }
-
-            .btn-main {
-                font-size: 0.85rem;
-                padding: 13px;
-            }
-        }
-
+        /* === WHATSAPP BUTTON === */
+        /* === WHATSAPP BUTTON === */
         /* ========== WHATSAPP BUTTON - CUTE & ANIMATED ========== */
         .whatsapp-container {
             position: fixed;
@@ -1726,6 +1495,346 @@ function createIconList($text, $iconClass)
                 border-bottom-color: rgba(37, 211, 102, 0.3);
             }
         }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            50% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        @keyframes pulseRing {
+            0% {
+                width: 100%;
+                height: 100%;
+                opacity: 0.8;
+            }
+
+            100% {
+                width: 140%;
+                height: 180%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes wobble {
+
+            0%,
+            100% {
+                transform: rotate(0deg) scale(1);
+            }
+
+            15% {
+                transform: rotate(-15deg) scale(1.1);
+            }
+
+            30% {
+                transform: rotate(10deg) scale(1.05);
+            }
+
+            45% {
+                transform: rotate(-10deg) scale(1.1);
+            }
+
+            60% {
+                transform: rotate(5deg) scale(1);
+            }
+
+            75% {
+                transform: rotate(-5deg) scale(1.05);
+            }
+        }
+
+        .ping-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: #ff4444;
+            border: 2px solid white;
+            border-radius: 50%;
+            animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+            z-index: 3;
+        }
+
+        @keyframes ping {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 0.8;
+            }
+        }
+
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0) rotate(0deg);
+            }
+
+            25% {
+                transform: translateX(-6px) rotate(-10deg);
+            }
+
+            75% {
+                transform: translateX(6px) rotate(10deg);
+            }
+        }
+
+        @keyframes tooltipBounce {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-4px) scale(1.02);
+            }
+        }
+
+        /* ==================== RESPONSIVE BREAKPOINTS ==================== */
+
+        @media (max-width: 992px) {
+            .container {
+                margin-top: 70px;
+            }
+
+            .info-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 65px;
+                padding: 0 0.75rem;
+            }
+
+            .booking-modal-header {
+                padding: 1.25rem;
+            }
+
+            .booking-modal-box h3 {
+                font-size: 1.15rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+
+            .info-bar {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                padding: 1rem;
+            }
+
+            .info-item {
+                padding: 0.75rem;
+            }
+
+            .content-area {
+                padding: 1rem;
+            }
+
+            .map-container iframe {
+                height: 280px;
+            }
+
+            .form-slide {
+                padding: 1.25rem;
+            }
+
+            .slide-controls {
+                padding: 0.85rem 1rem;
+                gap: 0.6rem;
+            }
+
+            .form-buttons {
+                padding: 0.85rem 1rem;
+                gap: 0.6rem;
+            }
+
+            .peserta-controls {
+                margin-left: 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+
+            .hero-content {
+                padding: 0 1rem;
+            }
+
+            #modal-booking .booking-modal-box {
+                max-height: 90vh;
+                height: 90vh;
+            }
+
+            .booking-modal-header {
+                padding: 1rem;
+            }
+
+            .booking-modal-box h3 {
+                font-size: 1rem;
+            }
+
+            .form-slide {
+                padding: 1rem;
+            }
+
+            .form-row {
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .group-title {
+                font-size: 0.8rem;
+                margin-bottom: 1rem;
+            }
+
+            .form-control label {
+                font-size: 0.6rem;
+            }
+
+            .form-control input,
+            .form-control textarea {
+                font-size: 0.8rem;
+                padding: 0.6rem 0.7rem;
+            }
+
+            .form-control textarea {
+                min-height: 55px;
+            }
+
+            .slide-controls {
+                padding: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .form-buttons {
+                padding: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .btn-main {
+                padding: 0.8rem 1.5rem;
+            }
+
+            .slide-counter {
+                font-size: 0.7rem;
+                padding: 0.35rem 0.6rem;
+            }
+
+            .peserta-label {
+                font-size: 0.65rem;
+            }
+
+            .info-bar {
+                padding: 0.75rem;
+                gap: 0.6rem;
+                border-radius: 1rem;
+            }
+
+            .info-item {
+                padding: 0.6rem;
+            }
+
+            .info-item i {
+                font-size: 1.4rem;
+            }
+
+            .content-area {
+                padding: 0.75rem;
+                border-radius: 1rem;
+            }
+
+            section.detail-section {
+                padding: 1rem 0;
+                margin-bottom: 1rem;
+            }
+
+            section.detail-section h2 {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            section.detail-section h2::after {
+                width: 40px;
+                height: 2px;
+                bottom: -8px;
+            }
+
+            .icon-list li {
+                margin-bottom: 0.75rem;
+                padding: 0.7rem 0.85rem 0.7rem 2.3rem;
+                font-size: 0.8rem;
+            }
+
+            .icon-list li i {
+                font-size: 0.95rem;
+                left: 0.85rem;
+            }
+
+            .map-container iframe {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                padding: 0 0.4rem;
+            }
+
+            #modal-booking .booking-modal-box {
+                max-height: 92vh;
+            }
+
+            .form-slide {
+                padding: 0.85rem;
+            }
+
+            .form-row {
+                gap: 0.4rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .form-control input,
+            .form-control textarea {
+                font-size: 0.75rem;
+                padding: 0.55rem 0.65rem;
+            }
+
+            .btn-main {
+                font-size: 0.7rem;
+                padding: 0.7rem 1.2rem;
+            }
+
+            .info-bar {
+                grid-template-columns: 1fr;
+            }
+
+            .slide-dot.active {
+                width: 20px;
+            }
+        }
     </style>
 
 </head>
@@ -1846,6 +1955,7 @@ function createIconList($text, $iconClass)
         </div>
     </div>
 
+    <!-- LOGIN WARNING MODAL -->
     <div id="loginWarningModal">
         <div class="login-warning-container">
             <div class="login-warning-icon">
@@ -1864,78 +1974,119 @@ function createIconList($text, $iconClass)
         </div>
     </div>
 
+    <!-- BOOKING MODAL -->
     <div id="modal-booking">
         <div class="booking-modal-box">
             <button class="close-btn" onclick="closeBooking()"><i class="bi bi-x-lg"></i></button>
-            <div class="scroll-area-modal">
-                <?php if (!$isLogin): ?>
-                    <h3>Login Diperlukan</h3>
-                    <p>Silakan login untuk mendaftar.</p>
-                    <a href="login.php" class="btn-main">Login</a>
-                    <button class="btn-cancel" type="button" onclick="closeBooking()">Tutup</button>
-                <?php else: ?>
-                    <form class="booking-form" id="form-book-trip" enctype="multipart/form-data">
-                        <h3>Form Pendaftaran Trip</h3>
-                        <input type="hidden" name="id_trip" value="<?= $trip['id_trip'] ?>" />
-                        <input type="hidden" name="jumlah_peserta" id="jumlah-peserta" value="1" />
+            <div class="booking-modal-header">
+                <h3>Form Pendaftaran Trip</h3>
+            </div>
+
+            <div class="booking-form-container">
+                <div class="form-slide-wrapper" id="formSlideWrapper">
+                    <!-- FORM UTAMA (Peserta 1) -->
+                    <div class="form-slide">
+                        <form class="booking-form" id="form-book-trip" enctype="multipart/form-data" style="display: none;">
+                            <input type="hidden" name="id_trip" value="<?= $trip['id_trip'] ?>" />
+                            <input type="hidden" name="jumlah_peserta" id="jumlah-peserta" value="1" />
+                        </form>
 
                         <div class="group-title">Data Diri Anda</div>
-                        <div class="row">
-                            <div>
+
+                        <div class="form-row">
+                            <div class="form-control">
                                 <label>Nama Lengkap</label>
                                 <input type="text" name="nama[]" required value="<?= htmlspecialchars($userLogin['username'] ?? '') ?>" />
                             </div>
-                            <div>
+                            <div class="form-control">
                                 <label>Email</label>
                                 <input type="email" name="email[]" required value="<?= htmlspecialchars($userLogin['email'] ?? '') ?>" />
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div>
+                        <div class="form-row">
+                            <div class="form-control">
                                 <label>Tanggal Lahir</label>
                                 <input type="date" name="tanggal_lahir[]" required />
                             </div>
-                            <div>
+                            <div class="form-control">
                                 <label>Tempat Lahir</label>
                                 <input type="text" name="tempat_lahir[]" />
                             </div>
                         </div>
 
-                        <label>NIK</label>
-                        <input type="text" name="nik[]" maxlength="20" />
+                        <div class="form-row full">
+                            <div class="form-control">
+                                <label>NIK</label>
+                                <input type="text" name="nik[]" maxlength="20" />
+                            </div>
+                        </div>
 
-                        <div class="row">
-                            <div>
+                        <div class="form-row">
+                            <div class="form-control">
                                 <label>No. WA</label>
                                 <input type="text" name="no_wa[]" required value="<?= htmlspecialchars($userLogin['no_wa'] ?? '') ?>" />
                             </div>
-                            <div>
+                            <div class="form-control">
                                 <label>No. Darurat</label>
                                 <input type="text" name="no_wa_darurat[]" />
                             </div>
                         </div>
 
-                        <label>Alamat</label>
-                        <textarea name="alamat[]" required><?= htmlspecialchars($userLogin['alamat'] ?? '') ?></textarea>
+                        <div class="form-row full">
+                            <div class="form-control">
+                                <label>Alamat</label>
+                                <textarea name="alamat[]" required><?= htmlspecialchars($userLogin['alamat'] ?? '') ?></textarea>
+                            </div>
+                        </div>
 
-                        <label>Riwayat Penyakit</label>
-                        <input type="text" name="riwayat_penyakit[]" maxlength="60" />
+                        <div class="form-row full">
+                            <div class="form-control">
+                                <label>Riwayat Penyakit</label>
+                                <input type="text" name="riwayat_penyakit[]" maxlength="60" />
+                            </div>
+                        </div>
 
-                        <label>Foto KTP</label>
-                        <input type="file" name="foto_ktp[]" accept="image/*" />
+                        <div class="form-row full">
+                            <div class="form-control">
+                                <label>Foto KTP</label>
+                                <input type="file" name="foto_ktp[]" accept="image/*" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div id="extra-participants"></div>
-                        <button class="btn-add" type="button" onclick="addPeserta()">+ Tambah Peserta</button>
+            <div class="slide-controls">
+                <button class="slide-nav-btn" id="prevBtn" onclick="prevSlide()" disabled>
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <div id="slideDots" style="display: flex; gap: 5px;"></div>
+                <button class="slide-nav-btn" id="nextBtn" onclick="nextSlide()">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                <span class="slide-counter"><span id="slideCounter">1</span>/<span id="totalSlides">1</span></span>
 
-                        <button type="submit" class="btn-main">Daftar & Booking</button>
-                        <button type="button" class="btn-cancel" onclick="closeBooking()">Batal</button>
-                    </form>
-                <?php endif; ?>
+                <div class="peserta-controls">
+                    <button type="button" class="btn-peserta-remove" id="btnRemovePeserta" onclick="removePeserta()" disabled>
+                        <i class="bi bi-dash-lg"></i>
+                    </button>
+                    <span class="peserta-label">PESERTA</span>
+                    <button type="button" class="btn-peserta-add" onclick="addPeserta()">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button type="button" class="btn-main" id="submitBtn" onclick="if(currentSlide === totalPeserta - 1) submitForm(); else nextSlide();">
+                    <i class="bi bi-check-circle"></i> <span id="btnText">Daftar & Booking</span>
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- PAYMENT MODAL -->
     <div id="modal-payment">
         <div>
             <button onclick="closePayment()"><i class="bi bi-x-lg"></i></button>
@@ -1943,6 +2094,7 @@ function createIconList($text, $iconClass)
         </div>
     </div>
 
+    <!-- WHATSAPP BUTTON -->
     <div class="whatsapp-container" data-aos="zoom-in" data-aos-delay="500">
         <button class="whatsapp-button" id="whatsappBtn" onclick="bukaWhatsapp()">
             <div class="whatsapp-icon-wrapper">
@@ -1961,6 +2113,10 @@ function createIconList($text, $iconClass)
     <script src="../frontend/login.js"></script>
 
     <script>
+        let currentSlide = 0;
+        let totalPeserta = 1;
+        const slotTersedia = <?= intval($trip['slot']) ?>;
+
         function showLoginWarning() {
             document.getElementById('loginWarningModal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1987,21 +2143,209 @@ function createIconList($text, $iconClass)
                 return;
             <?php endif; ?>
             document.getElementById('modal-booking').classList.add('active');
-            document.querySelector('.scroll-area-modal').scrollTop = 0;
+            currentSlide = 0;
+            totalPeserta = 1;
+            updateSlideUI();
+            document.body.style.overflow = 'hidden';
         }
 
         function closeBooking() {
             document.getElementById('modal-booking').classList.remove('active');
+            currentSlide = 0;
+            totalPeserta = 1;
+            resetForm();
+            document.body.style.overflow = '';
         }
 
-        function updateJumlah() {
-            document.getElementById('jumlah-peserta').value = document.querySelectorAll('.peserta-baru').length + 1;
+        function resetForm() {
+            const wrapper = document.getElementById('formSlideWrapper');
+            while (wrapper.children.length > 1) {
+                wrapper.removeChild(wrapper.lastChild);
+            }
+            totalPeserta = 1;
+            currentSlide = 0;
+            document.getElementById('jumlah-peserta').value = 1;
         }
 
-        <?php if ($isLogin): ?>
-            document.getElementById('form-book-trip').onsubmit = async function(e) {
+        function updateSlideUI() {
+            const wrapper = document.getElementById('formSlideWrapper');
+            wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalPeserta - 1;
+            document.getElementById('btnRemovePeserta').disabled = totalPeserta <= 1;
+
+            document.getElementById('slideCounter').textContent = currentSlide + 1;
+            document.getElementById('totalSlides').textContent = totalPeserta;
+
+            const submitBtn = document.getElementById('submitBtn');
+            if (currentSlide === totalPeserta - 1) {
+                submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> <span id="btnText">Daftar & Booking</span>';
+            } else {
+                submitBtn.innerHTML = '<i class="bi bi-chevron-right"></i> <span id="btnText">Lanjut</span>';
+            }
+
+            updateSlideDots();
+        }
+
+        function updateSlideDots() {
+            const dotsContainer = document.getElementById('slideDots');
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < totalPeserta; i++) {
+                const dot = document.createElement('div');
+                dot.className = `slide-dot ${i === currentSlide ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(i);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function goToSlide(n) {
+            if (n >= 0 && n < totalPeserta) {
+                currentSlide = n;
+                updateSlideUI();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalPeserta - 1) {
+                currentSlide++;
+                updateSlideUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlideUI();
+            }
+        }
+
+        function addPeserta() {
+            if (totalPeserta >= slotTersedia) {
+                Swal.fire({
+                    title: 'Slot Terbatas',
+                    text: `Hanya tersisa ${slotTersedia} slot untuk trip ini`,
+                    icon: 'warning',
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    color: '#3D2F21',
+                    confirmButtonColor: '#FFB800'
+                });
+                return;
+            }
+
+            const wrapper = document.getElementById('formSlideWrapper');
+            const newSlide = document.createElement('div');
+            newSlide.className = 'form-slide';
+
+            const pesertaNum = totalPeserta + 1;
+
+            newSlide.innerHTML = `
+                <div class="group-title">Peserta #${pesertaNum}</div>
+
+                <div class="form-row">
+                    <div class="form-control">
+                        <label>Nama Lengkap</label>
+                        <input type="text" name="nama[]" required />
+                    </div>
+                    <div class="form-control">
+                        <label>Email</label>
+                        <input type="email" name="email[]" required />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-control">
+                        <label>Tanggal Lahir</label>
+                        <input type="date" name="tanggal_lahir[]" required />
+                    </div>
+                    <div class="form-control">
+                        <label>Tempat Lahir</label>
+                        <input type="text" name="tempat_lahir[]" />
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-control">
+                        <label>NIK</label>
+                        <input type="text" name="nik[]" maxlength="20" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-control">
+                        <label>No. WA</label>
+                        <input type="text" name="no_wa[]" required />
+                    </div>
+                    <div class="form-control">
+                        <label>No. Darurat</label>
+                        <input type="text" name="no_wa_darurat[]" />
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-control">
+                        <label>Alamat</label>
+                        <textarea name="alamat[]" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-control">
+                        <label>Riwayat Penyakit</label>
+                        <input type="text" name="riwayat_penyakit[]" maxlength="60" />
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-control">
+                        <label>Foto KTP</label>
+                        <input type="file" name="foto_ktp[]" accept="image/*" />
+                    </div>
+                </div>
+            `;
+
+            wrapper.appendChild(newSlide);
+            totalPeserta++;
+            document.getElementById('jumlah-peserta').value = totalPeserta;
+            currentSlide = totalPeserta - 1;
+            updateSlideUI();
+        }
+
+        function removePeserta() {
+            if (totalPeserta > 1) {
+                const wrapper = document.getElementById('formSlideWrapper');
+                wrapper.removeChild(wrapper.lastChild);
+                totalPeserta--;
+                document.getElementById('jumlah-peserta').value = totalPeserta;
+                if (currentSlide >= totalPeserta) {
+                    currentSlide = totalPeserta - 1;
+                }
+                updateSlideUI();
+            }
+        }
+
+        function submitForm() {
+            const form = document.getElementById('form-book-trip');
+            const formElements = document.querySelectorAll('.form-slide input, .form-slide textarea');
+
+            formElements.forEach(el => {
+                if (el.name && el.name !== 'id_trip' && el.name !== 'jumlah_peserta') {
+                    const clone = el.cloneNode();
+                    clone.value = el.value;
+                    if (el.type === 'file' && el.files.length > 0) {
+                        const dataTransfer = new DataTransfer();
+                        for (let file of el.files) {
+                            dataTransfer.items.add(file);
+                        }
+                        clone.files = dataTransfer.files;
+                    }
+                    form.appendChild(clone);
+                }
+            });
+
+            form.onsubmit = async function(e) {
                 e.preventDefault();
-                const data = new FormData(e.target);
+                const data = new FormData(form);
 
                 try {
                     let res = await fetch('../backend/booking-api.php', {
@@ -2044,7 +2388,9 @@ function createIconList($text, $iconClass)
                     });
                 }
             };
-        <?php endif; ?>
+
+            form.dispatchEvent(new Event('submit'));
+        }
 
         function openPayment(id) {
             document.getElementById('modal-payment').style.display = 'flex';
@@ -2054,7 +2400,7 @@ function createIconList($text, $iconClass)
                 .then(r => {
                     const contentType = r.headers.get('content-type');
                     if (!contentType || !contentType.includes('application/json')) {
-                        throw new Error('Server mengembalikan HTML bukan JSON. Periksa error di backend.');
+                        throw new Error('Server mengembalikan HTML bukan JSON');
                     }
                     return r.json();
                 })
@@ -2062,35 +2408,20 @@ function createIconList($text, $iconClass)
                     if (resp.snap_token) {
                         window.snap.pay(resp.snap_token, {
                             onSuccess: (result) => {
-                                document.getElementById('hasil-pembayaran').innerHTML = "✅ Pembayaran Berhasil! Mengecek status...";
-
-                                fetch('../backend/check-payment-status.php?order_id=' + resp.order_id)
-                                    .then(r => r.json())
-                                    .then(statusResp => {
-                                        if (statusResp.status === 'paid') {
-                                            setTimeout(() => {
-                                                closePayment();
-                                                Swal.fire({
-                                                    title: 'Pembayaran Berhasil!',
-                                                    text: 'Booking Anda telah dikonfirmasi.',
-                                                    icon: 'success',
-                                                    background: 'rgba(255, 255, 255, 0.95)',
-                                                    color: '#3D2F21',
-                                                    confirmButtonColor: '#FFB800'
-                                                }).then(() => {
-                                                    window.location.reload();
-                                                });
-                                            }, 1000);
-                                        } else {
-                                            document.getElementById('hasil-pembayaran').innerHTML = "⚠️ Status: " + statusResp.status;
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.error('Status check error:', err);
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 2000);
+                                document.getElementById('hasil-pembayaran').innerHTML = "✅ Pembayaran Berhasil!";
+                                setTimeout(() => {
+                                    closePayment();
+                                    Swal.fire({
+                                        title: 'Pembayaran Berhasil!',
+                                        text: 'Booking Anda telah dikonfirmasi.',
+                                        icon: 'success',
+                                        background: 'rgba(255, 255, 255, 0.95)',
+                                        color: '#3D2F21',
+                                        confirmButtonColor: '#FFB800'
+                                    }).then(() => {
+                                        window.location.reload();
                                     });
+                                }, 1000);
                             },
                             onPending: (result) => {
                                 document.getElementById('hasil-pembayaran').innerHTML = "⏳ Menunggu Pembayaran...";
@@ -2134,7 +2465,6 @@ function createIconList($text, $iconClass)
                 .catch(err => {
                     console.error('Payment error:', err);
                     document.getElementById('hasil-pembayaran').innerHTML = '❌ Error: ' + err.message;
-
                     setTimeout(() => {
                         closePayment();
                         Swal.fire({
@@ -2153,78 +2483,67 @@ function createIconList($text, $iconClass)
             document.getElementById('modal-payment').style.display = 'none';
         }
 
-        const slotTersedia = <?= intval($trip['slot']) ?>;
+        (function() {
+            const whatsappBtn = document.getElementById('whatsappBtn');
 
-        function addPeserta() {
-            const jumlahPesertaSaatIni = document.querySelectorAll('#extra-participants .peserta-baru').length + 1;
+            if (whatsappBtn) {
+                let expandTimeout;
+                let isExpanded = false;
 
-            if (jumlahPesertaSaatIni >= slotTersedia) {
-                const warningDiv = document.getElementById('slot-warning');
-                if (!warningDiv) {
-                    const warning = document.createElement('div');
-                    warning.id = 'slot-warning';
-                    warning.style.cssText = `
-                background: rgba(255, 71, 87, 0.15);
-                border: 2px solid rgba(255, 71, 87, 0.4);
-                border-radius: 12px;
-                padding: 16px 20px;
-                margin: 20px 0 12px;
-                color: #C92A2A;
-                font-weight: 700;
-                font-size: 0.95rem;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                animation: shake 0.5s ease;
-            `;
-                    warning.innerHTML = `
-                <i class="bi bi-exclamation-triangle-fill" style="font-size: 1.4rem; color: #FF4757;"></i>
-                <span>⚠️ Slot tidak cukup! Hanya tersisa <strong>${slotTersedia} slot</strong> untuk trip ini.</span>
-            `;
+                whatsappBtn.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768) {
+                        if (!isExpanded) {
+                            e.preventDefault();
+                            e.stopPropagation();
 
-                    const btnAdd = document.querySelector('.btn-add');
-                    btnAdd.parentNode.insertBefore(warning, btnAdd);
+                            this.classList.add('expanded');
+                            isExpanded = true;
 
-                    setTimeout(() => {
-                        warning.style.transition = 'all 0.3s ease-out';
-                        warning.style.opacity = '0';
-                        warning.style.transform = 'translateY(-10px)';
-                        setTimeout(() => warning.remove(), 300);
-                    }, 5000);
-                }
+                            clearTimeout(expandTimeout);
+                            expandTimeout = setTimeout(() => {
+                                whatsappBtn.classList.remove('expanded');
+                                isExpanded = false;
+                            }, 3000);
+                        } else {
+                            clearTimeout(expandTimeout);
+                        }
+                    }
+                });
 
-                return;
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768) {
+                        whatsappBtn.classList.remove('expanded');
+                        isExpanded = false;
+                        clearTimeout(expandTimeout);
+                    }
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768 && isExpanded) {
+                        if (!whatsappBtn.contains(e.target)) {
+                            whatsappBtn.classList.remove('expanded');
+                            isExpanded = false;
+                            clearTimeout(expandTimeout);
+                        }
+                    }
+                });
             }
+        })();
 
-            const id = jumlahPesertaSaatIni + 1;
-            const div = document.createElement('div');
-            div.className = 'peserta-baru';
-            div.innerHTML = `
-        <div class="group-title">Peserta #${id}</div>
-        <div class="row">
-            <div><label>Nama</label><input type="text" name="nama[]" required /></div>
-            <div><label>Email</label><input type="email" name="email[]" required /></div>
-        </div>
-        <div class="row">
-            <div><label>Tanggal Lahir</label><input type="date" name="tanggal_lahir[]" required /></div>
-            <div><label>Tempat Lahir</label><input type="text" name="tempat_lahir[]" /></div>
-        </div>
-        <label>NIK</label><input type="text" name="nik[]" />
-        <div class="row">
-            <div><label>No. WA</label><input type="text" name="no_wa[]" required /></div>
-            <div><label>No. Darurat</label><input type="text" name="no_wa_darurat[]" /></div>
-        </div>
-        <label>Alamat</label><textarea name="alamat[]" required></textarea>
-        <label>Riwayat Penyakit</label><input type="text" name="riwayat_penyakit[]" />
-        <label>Foto KTP</label><input type="file" name="foto_ktp[]" accept="image/*" />
-        <button class="btn-rm" type="button" onclick="this.parentElement.remove();updateJumlah();">Hapus</button>
-    `;
-            document.getElementById('extra-participants').appendChild(div);
-            updateJumlah();
+        // ========== BUKA WHATSAPP FUNCTION ==========
+        function bukaWhatsapp() {
+            const nomor = "6285233463360";
+            const pesan = encodeURIComponent("Halo! Saya ingin bertanya tentang paket trip Majelis MDPL.");
+            const url = `https://wa.me/${nomor}?text=${pesan}`;
 
-            const existingWarning = document.getElementById('slot-warning');
-            if (existingWarning) {
-                existingWarning.remove();
+            window.open(url, "_blank");
+
+            const whatsappBtn = document.getElementById('whatsappBtn');
+            if (whatsappBtn) {
+                whatsappBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    whatsappBtn.style.transform = '';
+                }, 150);
             }
         }
     </script>

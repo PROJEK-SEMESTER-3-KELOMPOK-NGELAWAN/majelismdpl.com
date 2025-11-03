@@ -343,6 +343,109 @@
         font-size: 12px;
         display: none;
     }
+
+    /* ========== LOGIN ERROR MODAL STYLES ========== */
+    .login-error-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .login-error-modal-overlay.show {
+        display: flex;
+    }
+
+    .login-error-modal-container {
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px 30px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: slideIn 0.3s ease;
+    }
+
+    .login-error-modal-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, #d9534f 0%, #c9302c 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(217, 83, 79, 0.3);
+    }
+
+    .login-error-modal-icon i {
+        font-size: 2.5em;
+        color: #fff;
+    }
+
+    .login-error-modal-title {
+        font-size: 1.5em;
+        font-weight: 700;
+        color: #d9534f;
+        margin-bottom: 10px;
+    }
+
+    .login-error-modal-text {
+        font-size: 1em;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+
+    .login-error-modal-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .login-error-btn-confirm,
+    .login-error-btn-cancel {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .login-error-btn-confirm {
+        background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(180, 150, 102, 0.3);
+    }
+
+    .login-error-btn-confirm:hover {
+        background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(180, 150, 102, 0.4);
+    }
+
+    .login-error-btn-cancel {
+        background: #6c757d;
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .login-error-btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+    }
 </style>
 
 <!-- POPUP LOGIN -->
@@ -486,6 +589,21 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- LOGIN ERROR MODAL -->
+<div id="login-error-modal" class="login-error-modal-overlay">
+    <div class="login-error-modal-container">
+        <div class="login-error-modal-icon">
+            <i class="fa-solid fa-exclamation"></i>
+        </div>
+        <h2 class="login-error-modal-title">Login Gagal</h2>
+        <p class="login-error-modal-text" id="login-error-message">Terjadi kesalahan. Silakan coba lagi.</p>
+        <div class="login-error-modal-buttons">
+            <button id="login-error-retry-btn" class="login-error-btn-confirm">Coba Lagi</button>
+            <button id="login-error-cancel-btn" class="login-error-btn-cancel">Batal</button>
         </div>
     </div>
 </div>

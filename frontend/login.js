@@ -12,6 +12,26 @@ function closeLoginModal() {
   }
 }
 
+// Fungsi untuk show error modal seperti logout confirmation
+function showLoginErrorModal(errorMessage) {
+  const errorModal = document.getElementById("login-error-modal");
+  const errorMessageEl = document.getElementById("login-error-message");
+
+  if (errorModal && errorMessageEl) {
+    errorMessageEl.textContent =
+      errorMessage || "Terjadi kesalahan. Silakan coba lagi.";
+    errorModal.classList.add("show");
+  }
+}
+
+// Fungsi untuk hide error modal
+function hideLoginErrorModal() {
+  const errorModal = document.getElementById("login-error-modal");
+  if (errorModal) {
+    errorModal.classList.remove("show");
+  }
+}
+
 // Fungsi untuk handle Google OAuth Login
 function handleGoogleLogin() {
   const basePath = getBasePath();
@@ -74,26 +94,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const result = await response.json();
 
         if (result.success) {
-          // ✅ CLOSE LOGIN MODAL FIRST
+          // ✅ LOGIN BERHASIL
           closeLoginModal();
 
-          // ✅ SHOW SUCCESS POPUP (Custom atau SweetAlert)
-          Swal.fire({
-            title: "Login berhasil!",
-            text:
-              "Selamat datang " + (result.username || formData.get("username")),
-            icon: "success",
-            confirmButtonText: "Lanjutkan",
-            confirmButtonColor: "#7971ea",
-            background: "#fff",
-            color: "#34495e",
-            showClass: {
-              popup: "animate__animated animate__fadeIn animate__faster",
-            },
-            hideClass: {
-              popup: "animate__animated animate__fadeOut animate__faster",
-            },
-          }).then(() => {
+          // Show success message using alert (simple approach)
+          // Or gunakan custom success modal jika ingin yang fancy
+          setTimeout(() => {
+            alert(
+              "✅ Login berhasil! Selamat datang " +
+                (result.username || formData.get("username"))
+            );
+
             // Redirect based on role
             if (["admin", "super_admin"].includes(result.role)) {
               setTimeout(() => {
@@ -102,26 +113,60 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
               window.location.href = basePath;
             }
-          });
+          }, 350);
         } else {
-          // ✅ SHOW ERROR (MODAL TETAP TERBUKA)
-          Swal.fire({
-            title: "Login gagal",
-            text: result.message,
-            icon: "error",
-            confirmButtonText: "Coba lagi",
-            confirmButtonColor: "#7971ea",
-          });
+          // ✅ LOGIN GAGAL - Close modal dulu, baru error muncul
+          closeLoginModal();
+
+          // Delay untuk smooth transition seperti logout confirmation
+          setTimeout(() => {
+            showLoginErrorModal(
+              result.message || "Terjadi kesalahan. Silakan coba lagi."
+            );
+          }, 350);
         }
       } catch (error) {
+        // ✅ ERROR SISTEM - Close modal dulu, baru error muncul
         closeLoginModal();
-        Swal.fire({
-          title: "Error",
-          text: "Terjadi kesalahan sistem. Silakan coba lagi.",
-          icon: "error",
-          confirmButtonText: "OK",
-          confirmButtonColor: "#7971ea",
-        });
+
+        setTimeout(() => {
+          showLoginErrorModal(
+            "Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator."
+          );
+        }, 350);
+      }
+    });
+  }
+
+  // ========== ERROR MODAL EVENT HANDLERS ==========
+  const errorModal = document.getElementById("login-error-modal");
+  const errorRetryBtn = document.getElementById("login-error-retry-btn");
+  const errorCancelBtn = document.getElementById("login-error-cancel-btn");
+
+  if (errorRetryBtn) {
+    errorRetryBtn.addEventListener("click", function () {
+      hideLoginErrorModal();
+      // Re-open login modal
+      setTimeout(() => {
+        const loginModal = document.getElementById("loginModal");
+        if (loginModal && typeof openModal === "function") {
+          openModal(loginModal);
+        }
+      }, 300);
+    });
+  }
+
+  if (errorCancelBtn) {
+    errorCancelBtn.addEventListener("click", function () {
+      hideLoginErrorModal();
+    });
+  }
+
+  // Close modal dengan klik backdrop
+  if (errorModal) {
+    errorModal.addEventListener("click", function (e) {
+      if (e.target === errorModal) {
+        hideLoginErrorModal();
       }
     });
   }
