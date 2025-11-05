@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../backend/koneksi.php';
+require_once '../config.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -423,7 +424,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_pw'])) {
       </form>
     <?php endif; ?>
 
-    <a href="/majelismdpl.com/index.php" class="login-link">← Kembali ke Login</a>
+    <a href="<?= getPageUrl('index.php') ?>" class="login-link">← Kembali ke Login</a>
   </div>
 
   <!-- ✅ SWEETALERT POPUP -->
@@ -441,7 +442,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_pw'])) {
           confirmButtonColor: '#a97c50'
         }).then((result) => {
           if (isSuccess && !isOtpSent) {
-            window.location.href = "/majelismdpl.com";
+            window.location.href = "<?= getPageUrl('index.php') ?>";
           }
         });
       });

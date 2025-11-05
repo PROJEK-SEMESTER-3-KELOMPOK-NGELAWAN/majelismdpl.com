@@ -1,5 +1,6 @@
 <?php
 require_once 'auth_check.php';
+require_once '../config.php';
 
 // Proteksi khusus untuk master admin - hanya super admin yang bisa akses
 if (!RoleHelper::canAccessMasterAdmin($user_role)) {
@@ -78,7 +79,6 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             background: linear-gradient(135deg, #8b6332 0%, #a97c50 100%);
         }
 
-        /* Compact Modal Styling */
         .modal-dialog {
             max-width: 650px;
             margin: 1.5rem auto;
@@ -126,7 +126,6 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             gap: 10px;
         }
 
-        /* Compact Form Styling */
         .form-group {
             margin-bottom: 1.2rem;
         }
@@ -169,7 +168,6 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
         }
 
-        /* Custom Select Dropdown Styling */
         .custom-select-wrapper {
             position: relative;
         }
@@ -257,19 +255,6 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             background: #f8f9fa;
         }
 
-        .custom-select option[value="admin"] {
-            background: linear-gradient(90deg, rgba(169, 124, 80, 0.1) 0%, transparent 100%);
-            color: #a97c50;
-            font-weight: 500;
-        }
-
-        .custom-select option[value="super_admin"] {
-            background: linear-gradient(90deg, rgba(220, 53, 69, 0.1) 0%, transparent 100%);
-            color: #dc3545;
-            font-weight: 500;
-        }
-
-        /* Input Icons */
         .input-with-icon {
             position: relative;
         }
@@ -292,7 +277,6 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             color: #a97c50;
         }
 
-        /* Role Info Card - Compact */
         .role-info-card {
             background: #f8f9fa;
             border: none;
@@ -324,7 +308,6 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             margin-top: 0.25rem;
         }
 
-        /* Table and other existing styles remain the same */
         .table {
             border-radius: 10px;
             overflow: hidden;
@@ -444,7 +427,6 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
         }
 
-        /* DataTables styling */
         .dataTables_wrapper .dataTables_filter input,
         .dataTables_wrapper .dataTables_length select {
             border: 2px solid #e9ecef;
@@ -474,7 +456,6 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             border-color: #a97c50;
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
             .main {
                 margin-left: 0 !important;
@@ -698,10 +679,16 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- LOAD CONFIG.JS TERLEBIH DAHULU (CRITICAL!) -->
+    <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
+
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../frontend/master-admin.js"></script>
+
+    <!-- BARU LOAD MASTER-ADMIN.JS -->
+    <script src="<?php echo getAssetsUrl('frontend/master-admin.js'); ?>"></script>
 
     <script>
         // Function untuk update role information

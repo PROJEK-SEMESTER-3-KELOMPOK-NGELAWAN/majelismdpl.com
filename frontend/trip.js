@@ -1,15 +1,26 @@
-/**
- * ============================================
- * FILE: frontend/trip.js
- * FUNGSI: Handle UI Trip management
- * ============================================
- */
+// ========== CONFIG CHECK (CRITICAL!) ==========
+if (typeof getApiUrl !== "function") {
+  console.error("FATAL ERROR: config.js is not loaded!");
+  console.error("Please ensure frontend/config.js is loaded BEFORE trip.js");
+
+  // Fallback untuk debugging
+  window.getApiUrl = function (endpoint) {
+    console.warn("Using fallback getApiUrl - config.js might not be loaded");
+    return "backend/" + endpoint;
+  };
+}
 
 let currentEditTripId = null;
 let tripsData = [];
 const FORM_ID = "formTambahTrip";
 const MODAL_ID = "tambahTripModal";
-const API_URL = "../backend/trip-api.php";
+
+// GUNAKAN getApiUrl yang sudah ada di config.js
+// JANGAN deklarasikan API_URL lagi karena sudah ada di config.js
+const TRIP_API_URL =
+  typeof getApiUrl === "function"
+    ? getApiUrl("trip-api.php")
+    : "backend/trip-api.php";
 
 /* ===== Util: Toast ===== */
 function showToast(type, message) {
@@ -28,7 +39,14 @@ function showToast(type, message) {
 /* ===== Load Trips ===== */
 async function loadTrips() {
   try {
-    const res = await fetch(`${API_URL}?action=getTrips`);
+    // Verify getApiUrl is available
+    if (typeof getApiUrl !== "function") {
+      console.error("getApiUrl function not available");
+      showToast("error", "Konfigurasi aplikasi tidak lengkap");
+      return;
+    }
+
+    const res = await fetch(`${TRIP_API_URL}?action=getTrips`);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const trips = await res.json();
     tripsData = trips;
@@ -55,9 +73,14 @@ function displayTrips(trips) {
     .map((trip) => {
       const ulasanCount = Math.floor(Math.random() * 900) + 100;
       const rawStatus = (trip.status || "available").toString().toLowerCase();
+
+      // GUNAKAN getAssetsUrl dari config.js
       const imageUrl = trip.gambar
-        ? `../${trip.gambar}`
+        ? typeof getAssetsUrl === "function"
+          ? getAssetsUrl(trip.gambar)
+          : trip.gambar
         : "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80";
+
       const formattedPrice = parseInt(trip.harga, 10).toLocaleString("id-ID");
 
       const showStatusBadge = rawStatus === "available" || rawStatus === "sold";
@@ -69,9 +92,14 @@ function displayTrips(trips) {
           ? "x-circle"
           : "flag";
 
+      const stampUrl =
+        typeof getAssetsUrl === "function"
+          ? getAssetsUrl("assets/completed-stamp.png")
+          : "assets/completed-stamp.png";
+
       const doneOverlay =
         rawStatus === "done"
-          ? `<img src="../assets/completed-stamp.png" alt="Completed Stamp" class="done-stamp" />`
+          ? `<img src="${stampUrl}" alt="Completed Stamp" class="done-stamp" />`
           : "";
 
       return `
@@ -174,7 +202,7 @@ function injectStampStylesOnce() {
 async function handleDelete(id_trip) {
   const { isConfirmed } = await Swal.fire({
     title: "Hapus Trip?",
-    html: '<p>Data trip akan dihapus permanen.</p>',
+    html: "<p>Data trip akan dihapus permanen.</p>",
     icon: "warning",
     showCancelButton: true,
     confirmButtonText: "Ya, Hapus",
@@ -195,7 +223,7 @@ async function handleDelete(id_trip) {
           const formData = new FormData();
           formData.append("id_trip", id_trip);
 
-          const res = await fetch(`${API_URL}?action=deleteTrip`, {
+          const res = await fetch(`${TRIP_API_URL}?action=deleteTrip`, {
             method: "POST",
             body: formData,
           });
@@ -271,7 +299,12 @@ function handleEdit(id_trip) {
 
 /* ===== DETAIL TRIP ===== */
 function handleDetail(id_trip) {
-  window.location.href = `detailTrip.php?id=${id_trip}`;
+  // GUNAKAN getPageUrl dari config.js
+  const detailUrl =
+    typeof getPageUrl === "function"
+      ? getPageUrl(`admin/detailTrip.php?id=${id_trip}`)
+      : `detailTrip.php?id=${id_trip}`;
+  window.location.href = detailUrl;
 }
 
 /* ===== Attach Event Listeners ===== */
@@ -293,7 +326,7 @@ document.getElementById(FORM_ID).onsubmit = async function (e) {
   const form = e.target;
   const formData = new FormData(form);
   const action = document.getElementById("actionType").value;
-  const url = `${API_URL}?action=${action}`;
+  const url = `${TRIP_API_URL}?action=${action}`;
 
   try {
     const res = await fetch(url, { method: "POST", body: formData });
@@ -332,6 +365,18 @@ function resetFormAndModalState() {
 
 /* ===== Init ===== */
 document.addEventListener("DOMContentLoaded", () => {
+  // Verify config loaded
+  if (typeof getApiUrl !== "function") {
+    console.error("getApiUrl function not available at DOMContentLoaded");
+    Swal.fire({
+      title: "Error!",
+      text: "Konfigurasi aplikasi tidak lengkap. Silakan refresh halaman.",
+      icon: "error",
+      confirmButtonColor: "#a97c50",
+    });
+    return;
+  }
+
   loadTrips();
   const modalElement = document.getElementById(MODAL_ID);
   if (modalElement) {

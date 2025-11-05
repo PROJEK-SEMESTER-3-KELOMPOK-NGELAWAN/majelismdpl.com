@@ -1,10 +1,10 @@
 <?php
-// profile.php
+require_once '../config.php';
 require_once '../backend/koneksi.php';
 session_start();
 
 if (!isset($_SESSION['id_user'])) {
-    header('Location: /login.php');
+    header('Location: ' . getPageUrl('index.php'));
     exit();
 }
 
@@ -898,7 +898,7 @@ $initials = strtoupper(substr($userData['username'], 0, 1));
         <!-- ACTION BUTTONS -->
         <div class="action-buttons">
             <!-- REDIRECT KE LUPA PASSWORD -->
-            <a href="lupa-password.php" class="action-btn password-btn" style="text-decoration: none;">
+            <a href="<?= getPageUrl('user/lupa-password.php') ?>" class="action-btn password-btn" style="text-decoration: none;">
                 <div class="action-icon-big">
                     <i class="fa-solid fa-lock"></i>
                 </div>

@@ -1,16 +1,17 @@
 <?php
 // backend/update-profile.php
 
+require_once '../config.php';
 require_once 'koneksi.php';
 session_start();
 
 // Redirect URL setelah proses selesai
-$redirect_url = '../user/profile.php';
+$redirect_url = getPageUrl('user/profile.php');
 
 // Cek apakah user sudah login
 if (!isset($_SESSION['id_user'])) {
     $_SESSION['pesan_error'] = "Silakan login untuk mengakses halaman ini.";
-    header('Location: ../login.php');
+    header('Location: ' . getPageUrl('index.php'));
     exit();
 }
 
@@ -49,7 +50,7 @@ switch ($field_to_update) {
         }
         $sql = "UPDATE users SET email = ? WHERE id_user = ?";
         break;
-        
+
     case 'no_wa':
         $value = trim($_POST['no_wa'] ?? '');
         // Hapus karakter non-digit dan pastikan diawali '0' atau '+62'
@@ -65,13 +66,13 @@ switch ($field_to_update) {
     case 'alamat':
         $value = trim($_POST['alamat'] ?? '');
         if (empty($value)) {
-             $_SESSION['pesan_error'] = "Alamat tidak boleh kosong.";
+            $_SESSION['pesan_error'] = "Alamat tidak boleh kosong.";
             header('Location: ' . $redirect_url);
             exit();
         }
         $sql = "UPDATE users SET alamat = ? WHERE id_user = ?";
         break;
-        
+
     default:
         $_SESSION['pesan_error'] = "Permintaan update tidak valid.";
         header('Location: ' . $redirect_url);
@@ -98,4 +99,3 @@ $conn->close();
 
 header('Location: ' . $redirect_url);
 exit();
-?>

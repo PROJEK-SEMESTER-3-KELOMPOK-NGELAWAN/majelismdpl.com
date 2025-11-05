@@ -1,42 +1,29 @@
 <?php
 session_start();
 require_once 'koneksi.php';
+require_once '../config.php';
 
 // ==================== CONFIGURATION ====================
-// 🟡 GANTI URL NGROK INI SETIAP KALI RESTART NGROK
-$NGROK_URL = 'https://567007e9f30d.ngrok-free.app'; // ← UBAH SESUAI NGROK URL KAMU
+// Gunakan BASE_URL dari config.php
+$base_url_from_config = BASE_URL;
 
 // 🔵 DEVELOPMENT CONFIGURATION
-$DEV_PROJECT_FOLDER = 'majelismdpl.com';
-$DEV_BACKEND_FOLDER = 'backend';
+$is_production = strpos($base_url_from_config, 'localhost') === false &&
+    strpos($base_url_from_config, 'ngrok') === false ? false : false;
 
-// 🟠 PRODUCTION CONFIGURATION
-$PROD_DOMAIN = 'yourdomain.com';
-$PROD_API_PATH = 'api';
 
 // OAuth Credentials
 $GOOGLE_CLIENT_ID = '330248433279-1dj4e4squfhatlfkcrqa149kobuftqq0.apps.googleusercontent.com';
 $GOOGLE_CLIENT_SECRET = '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';
 
 // ==================== ENVIRONMENT DETECTION ====================
-// Deteksi environment berdasarkan domain
-$is_production = strpos($_SERVER['HTTP_HOST'], $PROD_DOMAIN) !== false;
+// Gunakan config.php untuk semua URL handling
+$base_url = BASE_URL . '/backend';
+$redirect_uri = $base_url . '/google-oauth-android.php';
 
-// ⚠️ SELALU PAKAI NGROK UNTUK DEVELOPMENT/TESTING
-if ($is_production) {
-    // 🟠 PRODUCTION MODE
-    $base_url = "https://{$PROD_DOMAIN}/{$PROD_API_PATH}";
-    $redirect_uri = "{$base_url}/google-oauth-android.php";
+error_log("OAUTH: Using BASE_URL from config.php: " . BASE_URL);
+error_log("OAUTH: Redirect URI = " . $redirect_uri);
 
-    error_log("OAUTH: PRODUCTION mode - " . $_SERVER['HTTP_HOST']);
-} else {
-    // 🟢 DEVELOPMENT MODE - SELALU PAKAI NGROK
-    $base_url = "{$NGROK_URL}/{$DEV_PROJECT_FOLDER}/{$DEV_BACKEND_FOLDER}";
-    $redirect_uri = "{$base_url}/google-oauth-android.php";
-
-    error_log("OAUTH: DEVELOPMENT mode - ALWAYS using NGROK: " . $NGROK_URL);
-    error_log("OAUTH: Accessed from host: " . $_SERVER['HTTP_HOST'] . " but redirecting to NGROK");
-}
 
 $google_oauth_client_id = $GOOGLE_CLIENT_ID;
 $google_oauth_client_secret = $GOOGLE_CLIENT_SECRET;

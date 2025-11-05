@@ -1,11 +1,21 @@
 <?php
 session_start();
+require_once '../config.php';
 require_once 'koneksi.php';
 
-// Google OAuth Configuration
+// ========================================
+// GOOGLE OAUTH CONFIGURATION
+// ========================================
+
+// Google OAuth Credentials
 $google_oauth_client_id = '330248433279-1dj4e4squfhatlfkcrqa149kobuftqq0.apps.googleusercontent.com';
 $google_oauth_client_secret = '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';
-$google_oauth_redirect_uri = 'http://localhost/majelismdpl.com/backend/google-oauth.php';
+
+// ========== DYNAMIC REDIRECT URI (AUTO SYNC WITH config.php) ==========
+// Otomatis membaca dari config.php dan membuat redirect URI yang benar
+// Tidak perlu mengubah di sini, cukup ubah di config.php!
+
+$google_oauth_redirect_uri = getPageUrl('backend/google-oauth.php');
 
 // Determine if this is login or signup
 $auth_type = $_GET['type'] ?? 'signup'; // default to signup for backward compatibility
@@ -15,12 +25,14 @@ if (empty($google_oauth_client_id) || empty($google_oauth_client_secret)) {
     die("
     <script>
         alert('Google OAuth Configuration Error: Credentials not properly configured');
-        window.location.href = '/majelismdpl.com';
+        window.location.href = '" . getPageUrl('index.php') . "';
     </script>
     ");
 }
 
-// Step 1: Redirect to Google if no code
+// ========================================
+// STEP 1: REDIRECT TO GOOGLE
+// ========================================
 if (!isset($_GET['code'])) {
     $params = [
         'response_type' => 'code',
@@ -37,7 +49,9 @@ if (!isset($_GET['code'])) {
     exit;
 }
 
-// Step 2: Handle callback from Google
+// ========================================
+// STEP 2: HANDLE CALLBACK FROM GOOGLE
+// ========================================
 if (isset($_GET['code']) && !empty($_GET['code'])) {
     // Get auth type from state parameter
     $auth_type = $_GET['state'] ?? 'signup';
@@ -64,7 +78,7 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
         die("
         <script>
             alert('Error connecting to Google. Please try again.');
-            window.location.href = '/majelismdpl.com';
+            window.location.href = '" . getPageUrl('index.php') . "';
         </script>
         ");
     }
@@ -92,7 +106,9 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
             $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
-                // User exists - LOGIN
+                // ========================================
+                // USER EXISTS - LOGIN
+                // ========================================
                 $user = $result->fetch_assoc();
 
                 // Set session variables (consistent with login-api.php)
@@ -108,14 +124,11 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                     $_SESSION['admin_logged_in'] = true;
                 }
 
-                // Determine redirect based on role
-                // Redirect berdasarkan role - admin dan super_admin ke admin panel
-                $redirect_url = '/majelismdpl.com';
+                // Determine redirect based on role - DYNAMIC URL
+                $redirect_url = getPageUrl('index.php');
 
                 if (in_array($user['role'], ['admin', 'super_admin'])) {
-                    $redirect_url = '/majelismdpl.com/admin/index.php';
-                } else {
-                    $redirect_url = '/majelismdpl.com';
+                    $redirect_url = getPageUrl('admin/index.php');
                 }
 
                 echo "<!DOCTYPE html>
@@ -125,7 +138,7 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                         <meta charset='UTF-8'>
                         <style>
                             body {
-                                background-image: url('../assets/login-bg.jpg');
+                                background-image: url('" . getAssetsUrl('assets/login-bg.jpg') . "');
                                 background-size: cover;
                                 background-repeat: no-repeat;
                                 background-position: bottom center;
@@ -151,7 +164,9 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                     </body>
                     </html>";
             } else {
-                // User doesn't exist
+                // ========================================
+                // USER DOESN'T EXIST
+                // ========================================
                 if ($auth_type === 'login') {
                     // Login attempt but user doesn't exist
                     echo "<!DOCTYPE html>
@@ -169,13 +184,15 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                                 icon: 'warning',
                                 confirmButtonText: 'OK'
                             }).then(() => {
-                                window.location.href = '/majelismdpl.com';
+                                window.location.href = '" . getPageUrl('index.php') . "';
                             });
                         </script>
                     </body>
                     </html>";
                 } else {
-                    // Signup - create new user
+                    // ========================================
+                    // SIGNUP - CREATE NEW USER
+                    // ========================================
                     $username = $user_data['name'] ?? 'GoogleUser_' . time();
                     $email = $user_data['email'];
                     $password = password_hash('google_oauth_' . uniqid(), PASSWORD_DEFAULT);
@@ -211,7 +228,7 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                                     icon: 'success',
                                     confirmButtonText: 'Ke Beranda'
                                 }).then(() => {
-                                    window.location.href = '/majelismdpl.com';
+                                    window.location.href = '" . getPageUrl('index.php') . "';
                                 });
                             </script>
                         </body>
@@ -219,7 +236,7 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                     } else {
                         echo "<script>
                             alert('Terjadi kesalahan saat registrasi. Silakan coba lagi.');
-                            window.location.href = '/majelismdpl.com';
+                            window.location.href = '" . getPageUrl('index.php') . "';
                         </script>";
                     }
                 }
@@ -228,18 +245,18 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
         } else {
             echo "<script>
                 alert('Gagal mendapatkan informasi email dari Google. Silakan coba lagi.');
-                window.location.href = '/majelismdpl.com';
+                window.location.href = '" . getPageUrl('index.php') . "';
             </script>";
         }
     } else {
         echo "<script>
             alert('Gagal mendapatkan akses dari Google. Silakan coba lagi.');
-            window.location.href = '/majelismdpl.com';
+            window.location.href = '" . getPageUrl('index.php') . "';
         </script>";
     }
 } else {
     echo "<script>
         alert('Authorization code tidak ditemukan. Silakan coba lagi.');
-        window.location.href = '/majelismdpl.com';
+        window.location.href = '" . getPageUrl('index.php') . "';
     </script>";
 }

@@ -1,5 +1,5 @@
 <?php
-// user/view-invoice.php
+require_once '../config.php';
 require_once '../backend/koneksi.php';
 session_start();
 

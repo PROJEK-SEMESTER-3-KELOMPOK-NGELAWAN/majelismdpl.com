@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  fetch("backend/trip-api.php?action=getTrips")
+  fetch(getApiUrl("backend/trip-api.php") + "?action=getTrips")
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -127,7 +127,8 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
 
         card.addEventListener("click", function () {
-          window.location.href = `user/trip-detail-user.php?id=${trip.id_trip}`;
+          window.location.href =
+            getPageUrl("user/trip-detail-user.php") + `?id=${trip.id_trip}`;
         });
 
         carousel.appendChild(card);
@@ -253,7 +254,7 @@ function handleCarouselLayout() {
  * Autofill form dengan data user
  */
 async function autofillForm() {
-  let res = await fetch("backend/user-session-api.php");
+  let res = await fetch(getApiUrl("backend/user-session-api.php"));
   let json = await res.json();
   if (json.logged_in && document.querySelector("[name=nama]")) {
     document.querySelector("[name=nama]").value = json.user.nama || "";

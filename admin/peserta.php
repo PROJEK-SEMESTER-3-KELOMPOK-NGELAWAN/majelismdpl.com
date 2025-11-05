@@ -1,5 +1,7 @@
 <?php
 require_once 'auth_check.php';
+require_once '../config.php';
+
 if (!class_exists('RoleHelper')) {
   class RoleHelper
   {
@@ -388,7 +390,7 @@ $user_role = $user_role ?? 'user';
             </thead>
             <tbody id="participantsTableBody">
               <tr>
-                <td colspan="14" class="loading">Memuat data peserta...</td>
+                <td colspan="14" class="text-center">Memuat data peserta...</td>
               </tr>
             </tbody>
           </table>
@@ -396,8 +398,7 @@ $user_role = $user_role ?? 'user';
       </div>
     </div>
 
-    <!-- Modal edit & preview sama seperti sebelumnya -->
-    <?php /* modal blocks retained exactly as earlier to keep length reasonable */ ?>
+    <!-- Modal Edit Peserta -->
     <div class="modal fade" id="editPesertaModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -439,6 +440,7 @@ $user_role = $user_role ?? 'user';
       </div>
     </div>
 
+    <!-- Modal Preview Image -->
     <div class="modal fade" id="previewImageModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -468,26 +470,14 @@ $user_role = $user_role ?? 'user';
       </div>
     </div>
   </main>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../frontend/peserta.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const printBtn = document.getElementById('printPdfBtn');
-      const filterGunung = document.getElementById('filterGunung');
-      const searchInput = document.getElementById('searchInput');
-      if (printBtn && filterGunung) {
-        printBtn.addEventListener('click', () => {
-          const params = new URLSearchParams();
-          params.set('action', 'print_pdf');
-          const idTrip = filterGunung.value || '';
-          const search = (searchInput && searchInput.value || '').trim();
-          if (idTrip) params.set('id_trip', idTrip);
-          if (search) params.set('search', search);
-          window.open(`../backend/peserta-api.php?${params.toString()}`, '_blank');
-        });
-      }
-    });
-  </script>
+
+  <!-- LOAD CONFIG.JS TERLEBIH DAHULU (CRITICAL!) -->
+  <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
+
+  <!-- BARU LOAD PESERTA.JS -->
+  <script src="<?php echo getAssetsUrl('frontend/peserta.js'); ?>"></script>
 </body>
 
 </html>

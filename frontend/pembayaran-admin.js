@@ -1,309 +1,366 @@
-let allPayments = []; // Variabel global untuk menyimpan semua data pembayaran
+// ========== CONFIG CHECK (CRITICAL!) ==========
+if (typeof getApiUrl !== "function") {
+  console.error("FATAL ERROR: config.js is not loaded!");
+  console.error(
+    "Please ensure frontend/config.js is loaded BEFORE pembayaran-admin.js"
+  );
 
-async function loadPayments() {
-    try {
-        // Fetch data dari backend API
-        const response = await fetch('../backend/pembayaran-admin-api.php');
-        const result = await response.json();
-
-        if (!result.success) {
-            throw new Error(result.error || 'Gagal memuat data pembayaran');
-        }
-
-        allPayments = result.data;
-
-        populateGunungFilter(allPayments);
-        renderPayments(allPayments);
-        updateSummary(allPayments);
-        updateChart(allPayments);
-        setupFilterListeners();
-
-    } catch (error) {
-        console.error('Error loading payments:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Gagal memuat data pembayaran: ' + error.message,
-            confirmButtonColor: '#a97c50'
-        });
-
-        // Tampilkan pesan error di tabel
-        document.getElementById('paymentList').innerHTML = 
-            `<tr><td colspan="10" class="text-center text-danger p-4">
-                <i class="bi bi-exclamation-triangle me-2"></i>
-                Gagal memuat data pembayaran
-            </td></tr>`;
-    }
+  // Fallback untuk debugging
+  window.getApiUrl = function (endpoint) {
+    console.warn("Using fallback getApiUrl - config.js might not be loaded");
+    return "backend/" + endpoint;
+  };
 }
 
-function populateGunungFilter(payments) {
-    const select = document.getElementById('gunungFilter');
-    const uniqueGunungs = [...new Set(payments.map(p => p.gunung))].sort();
+/**
+ * ============================================
+ * FILE: frontend/pembayaran-admin.js
+ * FUNGSI: Handle UI Pembayaran management
+ * UPDATED: Config.js integration + Vanilla JS (NO jQuery)
+ * ============================================
+ */
 
-    select.innerHTML = '<option value="">Semua Gunung (Trip)</option>';
+let paymentsData = [];
+let chartInstance = null;
+const PEMBAYARAN_API_URL =
+  typeof getApiUrl === "function"
+    ? getApiUrl("pembayaran-admin-api.php")
+    : "backend/pembayaran-admin-api.php";
 
-    uniqueGunungs.forEach(gunung => {
-        const option = document.createElement('option');
-        option.value = gunung;
-        option.textContent = gunung;
-        select.appendChild(option);
+// ========== DOM SELECTORS ==========
+const dom = {
+  paymentList: document.getElementById("paymentList"),
+  paymentSearchInput: document.getElementById("paymentSearchInput"),
+  gunungFilter: document.getElementById("gunungFilter"),
+  totalBayarDisplay: document.getElementById("totalBayarDisplay"),
+  lunasCountDisplay: document.getElementById("lunasCountDisplay"),
+  prosesCountDisplay: document.getElementById("prosesCountDisplay"),
+  paymentsChart: document.getElementById("paymentsChart"),
+  detailPaymentModal: document.getElementById("detailPaymentModal"),
+};
+
+// ========== DOCUMENT READY ==========
+document.addEventListener("DOMContentLoaded", function () {
+  // Verify config loaded
+  if (typeof getApiUrl !== "function") {
+    console.error("getApiUrl function not available");
+    Swal.fire({
+      title: "Error!",
+      text: "Konfigurasi aplikasi tidak lengkap. Silakan refresh halaman.",
+      icon: "error",
+      confirmButtonColor: "#a97c50",
     });
-}
+    return;
+  }
 
-function setupFilterListeners() {
-    const searchInput = document.getElementById('paymentSearchInput');
-    const gunungFilter = document.getElementById('gunungFilter');
-
-    const applyFilters = () => {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        const selectedGunung = gunungFilter.value;
-
-        let filtered = allPayments.filter(p => {
-            const matchGunung = selectedGunung === '' || p.gunung === selectedGunung;
-
-            const searchFields = [
-                p.idpayment, 
-                p.idbooking, 
-                p.statuspembayaran, 
-                p.gunung,
-                p.username,
-                p.email
-            ];
-            const matchSearch = searchTerm === '' || searchFields.some(field =>
-                (field || '').toString().toLowerCase().includes(searchTerm)
-            );
-
-            return matchGunung && matchSearch;
-        });
-
-        renderPayments(filtered);
-    };
-
-    searchInput.addEventListener('input', applyFilters);
-    gunungFilter.addEventListener('change', applyFilters);
-}
-
-function renderPayments(payments) {
-    const tbody = document.getElementById('paymentList');
-    tbody.innerHTML = '';
-
-    if (payments.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center opacity-50 p-4">Tidak ada data pembayaran yang cocok dengan filter.</td></tr>`;
-        return;
-    }
-
-    payments.forEach((p, index) => {
-        const tr = document.createElement('tr');
-
-        let statusClass = 'bg-secondary';
-        let statusText = p.statuspembayaran;
-
-        // Mapping status dari database
-        if (p.statuspembayaran.toLowerCase() === 'paid' || 
-            p.statuspembayaran.toLowerCase() === 'settlement' || 
-            p.statuspembayaran.toLowerCase() === 'selesai' || 
-            p.statuspembayaran.toLowerCase() === 'lunas') {
-            statusClass = 'bg-success';
-            statusText = 'Lunas';
-        } else if (p.statuspembayaran.toLowerCase() === 'pending' || 
-                   p.statuspembayaran.toLowerCase() === 'menunggu' || 
-                   p.statuspembayaran.toLowerCase() === 'proses') {
-            statusClass = 'bg-warning text-dark';
-            statusText = 'Menunggu';
-        } else if (p.statuspembayaran.toLowerCase() === 'failed' || 
-                   p.statuspembayaran.toLowerCase() === 'cancelled' || 
-                   p.statuspembayaran.toLowerCase() === 'batal') {
-            statusClass = 'bg-danger';
-            statusText = 'Batal';
-        }
-
-        const statusBadge = `<span class="badge ${statusClass}">${statusText}</span>`;
-
-        tr.innerHTML = `
-            <td>${p.idpayment}</td>
-            <td>${p.idbooking}</td>
-            <td>${p.gunung || '-'}</td>
-            <td>${p.username || '-'}</td>
-            <td>Rp ${p.jumlahbayar.toLocaleString('id-ID')}</td>
-            <td>${formatTanggal(p.tanggal)}</td>
-            <td>${p.jenispembayaran || '-'}</td>
-            <td>${p.metode || '-'}</td>
-            <td>${statusBadge}</td>
-            <td>
-                <button class="btn-detail detail-btn" data-payment-id="${p.idpayment}">
-                    <i class="bi bi-eye"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    // Event listener untuk tombol detail
-    document.querySelectorAll('.detail-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const paymentId = e.currentTarget.getAttribute('data-payment-id');
-            const paymentDetail = allPayments.find(p => p.idpayment == paymentId);
-            if (paymentDetail) showPaymentDetail(paymentDetail);
-        });
-    });
-}
-
-function formatTanggal(dateString) {
-    if (!dateString) return '-';
-    
-    const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return date.toLocaleDateString('id-ID', options);
-}
-
-function updateSummary(payments) {
-    // Hitung total bayar (hanya yang tidak batal)
-    const totalBayar = payments.filter(p => {
-        const status = p.statuspembayaran.toLowerCase();
-        return status !== 'batal' && status !== 'cancelled' && status !== 'failed';
-    }).reduce((acc, p) => acc + p.jumlahbayar, 0);
-
-    // Hitung transaksi lunas
-    const lunasCount = payments.filter(p => {
-        const status = p.statuspembayaran.toLowerCase();
-        return status === 'selesai' || status === 'lunas' || status === 'paid' || status === 'settlement';
-    }).length;
-
-    // Hitung transaksi pending
-    const prosesCount = payments.filter(p => {
-        const status = p.statuspembayaran.toLowerCase();
-        return status === 'menunggu' || status === 'proses' || status === 'pending';
-    }).length;
-
-    document.getElementById('totalBayarDisplay').textContent = `Rp ${totalBayar.toLocaleString('id-ID')}`;
-    document.getElementById('lunasCountDisplay').textContent = `${lunasCount} Transaksi`;
-    document.getElementById('prosesCountDisplay').textContent = `${prosesCount} Transaksi`;
-}
-
-function updateChart(payments) {
-    const ctx = document.getElementById('paymentsChart').getContext('2d');
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-    const monthlyTotals = new Array(12).fill(0);
-
-    payments.forEach(p => {
-        const status = p.statuspembayaran.toLowerCase();
-        if (status !== 'batal' && status !== 'cancelled' && status !== 'failed') {
-            const date = new Date(p.tanggal);
-            if (!isNaN(date)) {
-                const monthIndex = date.getMonth();
-                monthlyTotals[monthIndex] += p.jumlahbayar;
-            }
-        }
-    });
-
-    if (window.paymentsChartInstance) {
-        window.paymentsChartInstance.destroy();
-    }
-
-    window.paymentsChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: months,
-            datasets: [{
-                label: 'Jumlah Pembayaran per Bulan',
-                data: monthlyTotals,
-                fill: true,
-                borderColor: '#a97c50',
-                backgroundColor: 'rgba(169,124,80,0.3)',
-                pointBackgroundColor: '#a97c50',
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    labels: {
-                        color: '#432f17',
-                        font: {
-                            family: 'Poppins',
-                            weight: 'bold'
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        color: '#432f17',
-                        callback: function(value) {
-                            return 'Rp ' + value.toLocaleString('id-ID');
-                        }
-                    },
-                    grid: {
-                        color: '#f5ede0'
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: '#a97c50'
-                    },
-                    grid: {
-                        color: '#f5ede0'
-                    }
-                }
-            }
-        }
-    });
-}
-
-function showPaymentDetail(payment) {
-    document.getElementById('detail_idpayment').textContent = payment.idpayment;
-    document.getElementById('detail_idbooking').textContent = payment.idbooking;
-    document.getElementById('detail_tanggal').textContent = formatTanggal(payment.tanggal);
-    document.getElementById('detail_jenispembayaran').textContent = payment.jenispembayaran || '-';
-    document.getElementById('detail_metode').textContent = payment.metode || '-';
-    document.getElementById('detail_jumlahbayar').textContent = 'Rp ' + payment.jumlahbayar.toLocaleString('id-ID');
-    document.getElementById('subtotal_bayar').textContent = 'Rp ' + payment.jumlahbayar.toLocaleString('id-ID');
-    document.getElementById('jumlah_total').textContent = 'Rp ' + payment.total_trip.toLocaleString('id-ID');
-
-    // Tambahkan info user
-    document.getElementById('detail_username').textContent = payment.username || '-';
-    document.getElementById('detail_email').textContent = payment.email || '-';
-    document.getElementById('detail_gunung').textContent = payment.gunung || '-';
-    document.getElementById('detail_jenis_trip').textContent = payment.jenis_trip || '-';
-
-    // Status styling
-    let statusClass = 'text-secondary';
-    let statusText = payment.statuspembayaran;
-
-    if (payment.statuspembayaran.toLowerCase() === 'paid' || 
-        payment.statuspembayaran.toLowerCase() === 'settlement' || 
-        payment.statuspembayaran.toLowerCase() === 'selesai' || 
-        payment.statuspembayaran.toLowerCase() === 'lunas') {
-        statusClass = 'text-success';
-        statusText = 'Lunas';
-    } else if (payment.statuspembayaran.toLowerCase() === 'pending' || 
-               payment.statuspembayaran.toLowerCase() === 'menunggu' || 
-               payment.statuspembayaran.toLowerCase() === 'proses') {
-        statusClass = 'text-warning';
-        statusText = 'Menunggu Verifikasi';
-    } else if (payment.statuspembayaran.toLowerCase() === 'failed' || 
-               payment.statuspembayaran.toLowerCase() === 'cancelled' || 
-               payment.statuspembayaran.toLowerCase() === 'batal') {
-        statusClass = 'text-danger';
-        statusText = 'Dibatalkan';
-    }
-
-    document.getElementById('detail_statuspembayaran').className = `fw-bold ${statusClass}`;
-    document.getElementById('detail_statuspembayaran').textContent = statusText;
-
-    // Sisa bayar
-    const sisaBayar = payment.total_trip - payment.jumlahbayar;
-    document.getElementById('detail_sisabayar').textContent = 'Rp ' + (sisaBayar > 0 ? sisaBayar : 0).toLocaleString('id-ID');
-
-    const myModal = new bootstrap.Modal(document.getElementById('detailPaymentModal'));
-    myModal.show();
-}
-
-// Panggil fungsi saat halaman dimuat
-document.addEventListener('DOMContentLoaded', function() {
-    loadPayments();
+  loadPayments();
+  setupEventListeners();
 });
+
+/**
+ * Load payments data from API
+ */
+function loadPayments() {
+  fetch(PEMBAYARAN_API_URL, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      return res.json();
+    })
+    .then((response) => {
+      if (response.success) {
+        paymentsData = response.data || [];
+        renderPaymentsTable(paymentsData);
+        updateSummary();
+        updateChart();
+        populateGunungFilter();
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: response.error || "Gagal memuat data pembayaran",
+          icon: "error",
+          confirmButtonColor: "#a97c50",
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error loading payments:", error);
+      let errorMessage = "Terjadi kesalahan saat memuat data pembayaran";
+      if (error.message.includes("timeout")) {
+        errorMessage = "Koneksi timeout. Silakan coba lagi.";
+      }
+      Swal.fire({
+        title: "Error Koneksi",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonColor: "#a97c50",
+      });
+    });
+}
+
+/**
+ * Render payments table
+ */
+function renderPaymentsTable(payments) {
+  if (!dom.paymentList) return;
+
+  dom.paymentList.innerHTML = "";
+
+  if (!payments || payments.length === 0) {
+    dom.paymentList.innerHTML =
+      '<tr><td colspan="10" class="text-center text-muted p-4">Tidak ada data pembayaran.</td></tr>';
+    return;
+  }
+
+  payments.forEach((payment, index) => {
+    const statusColor =
+      payment.statuspembayaran === "paid"
+        ? "success"
+        : payment.statuspembayaran === "pending"
+        ? "warning"
+        : "danger";
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${payment.idpayment}</td>
+      <td>${payment.idbooking}</td>
+      <td>${payment.gunung}</td>
+      <td>${payment.username}</td>
+      <td>Rp ${formatCurrency(payment.jumlahbayar)}</td>
+      <td>${payment.tanggal}</td>
+      <td>${payment.jenispembayaran}</td>
+      <td>${payment.metode}</td>
+      <td><span class="badge bg-${statusColor}">${formatStatus(
+      payment.statuspembayaran
+    )}</span></td>
+      <td>
+        <button class="btn-detail" onclick="showDetailModal(${index})" title="Lihat Detail">
+          <i class="bi bi-eye"></i>
+        </button>
+      </td>
+    `;
+
+    dom.paymentList.appendChild(row);
+  });
+}
+
+/**
+ * Update summary cards
+ */
+function updateSummary() {
+  let totalBayar = 0;
+  let lunasCount = 0;
+  let prosesCount = 0;
+
+  paymentsData.forEach((payment) => {
+    totalBayar += payment.jumlahbayar;
+    if (payment.statuspembayaran === "paid") {
+      lunasCount++;
+    } else if (payment.statuspembayaran === "pending") {
+      prosesCount++;
+    }
+  });
+
+  if (dom.totalBayarDisplay) {
+    dom.totalBayarDisplay.textContent = "Rp " + formatCurrency(totalBayar);
+  }
+  if (dom.lunasCountDisplay) {
+    dom.lunasCountDisplay.textContent = lunasCount + " Transaksi";
+  }
+  if (dom.prosesCountDisplay) {
+    dom.prosesCountDisplay.textContent = prosesCount + " Transaksi";
+  }
+}
+
+/**
+ * Update chart
+ */
+function updateChart() {
+  if (!dom.paymentsChart) return;
+
+  const monthlyData = {};
+  paymentsData.forEach((payment) => {
+    const month = payment.tanggal.substring(0, 7);
+    if (!monthlyData[month]) {
+      monthlyData[month] = 0;
+    }
+    monthlyData[month] += payment.jumlahbayar;
+  });
+
+  const months = Object.keys(monthlyData).sort();
+  const amounts = months.map((m) => monthlyData[m]);
+
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
+  const ctx = dom.paymentsChart.getContext("2d");
+  chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: "Total Pembayaran",
+          data: amounts,
+          backgroundColor: "#a97c50",
+          borderColor: "#8b6332",
+          borderWidth: 2,
+          borderRadius: 8,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: true,
+          labels: {
+            font: { size: 12, weight: "bold" },
+            color: "#495057",
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function (value) {
+              return "Rp " + formatCurrency(value);
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Populate gunung filter dropdown
+ */
+function populateGunungFilter() {
+  if (!dom.gunungFilter) return;
+
+  const gunungSet = new Set();
+  paymentsData.forEach((payment) => {
+    gunungSet.add(payment.gunung);
+  });
+
+  const existingOptions = Array.from(dom.gunungFilter.options).map(
+    (opt) => opt.value
+  );
+  gunungSet.forEach((gunung) => {
+    if (!existingOptions.includes(gunung)) {
+      const option = document.createElement("option");
+      option.value = gunung;
+      option.textContent = gunung;
+      dom.gunungFilter.appendChild(option);
+    }
+  });
+}
+
+/**
+ * Show detail modal
+ */
+function showDetailModal(index) {
+  const payment = paymentsData[index];
+  if (!payment) return;
+
+  // Update modal content
+  document.getElementById("detail_idpayment").textContent = payment.idpayment;
+  document.getElementById("detail_idbooking").textContent = payment.idbooking;
+  document.getElementById("detail_username").textContent = payment.username;
+  document.getElementById("detail_email").textContent = payment.email;
+  document.getElementById("detail_gunung").textContent = payment.gunung;
+  document.getElementById("detail_jenis_trip").textContent = payment.jenis_trip;
+  document.getElementById("detail_tanggal").textContent = payment.tanggal;
+  document.getElementById("detail_jenispembayaran").textContent =
+    payment.jenispembayaran;
+  document.getElementById("detail_metode").textContent = payment.metode;
+  document.getElementById("detail_jumlahbayar").textContent =
+    "Rp " + formatCurrency(payment.jumlahbayar);
+  document.getElementById("subtotal_bayar").textContent =
+    "Rp " + formatCurrency(payment.jumlahbayar);
+  document.getElementById("jumlah_total").textContent =
+    "Rp " + formatCurrency(payment.total_trip);
+  document.getElementById("detail_sisabayar").textContent =
+    "Rp " + formatCurrency(payment.sisabayar);
+  document.getElementById("detail_statuspembayaran").textContent = formatStatus(
+    payment.statuspembayaran
+  );
+
+  // Show modal
+  if (dom.detailPaymentModal) {
+    const modal = new bootstrap.Modal(dom.detailPaymentModal);
+    modal.show();
+  }
+}
+
+/**
+ * Setup event listeners for search and filter
+ */
+function setupEventListeners() {
+  if (dom.paymentSearchInput) {
+    dom.paymentSearchInput.addEventListener("input", function () {
+      applyFilters();
+    });
+  }
+
+  if (dom.gunungFilter) {
+    dom.gunungFilter.addEventListener("change", function () {
+      applyFilters();
+    });
+  }
+}
+
+/**
+ * Apply filters to table
+ */
+function applyFilters() {
+  const searchTerm = dom.paymentSearchInput
+    ? dom.paymentSearchInput.value.toLowerCase()
+    : "";
+  const gunungFilter = dom.gunungFilter ? dom.gunungFilter.value : "";
+
+  const filteredPayments = paymentsData.filter((payment) => {
+    const matchSearch =
+      payment.idpayment.toString().includes(searchTerm) ||
+      payment.idbooking.toString().includes(searchTerm) ||
+      payment.username.toLowerCase().includes(searchTerm) ||
+      payment.email.toLowerCase().includes(searchTerm) ||
+      payment.gunung.toLowerCase().includes(searchTerm) ||
+      formatStatus(payment.statuspembayaran).toLowerCase().includes(searchTerm);
+
+    const matchGunung = !gunungFilter || payment.gunung === gunungFilter;
+
+    return matchSearch && matchGunung;
+  });
+
+  renderPaymentsTable(filteredPayments);
+}
+
+/**
+ * Format currency
+ */
+function formatCurrency(value) {
+  return new Intl.NumberFormat("id-ID").format(value);
+}
+
+/**
+ * Format status
+ */
+function formatStatus(status) {
+  const statusMap = {
+    paid: "Lunas",
+    pending: "Menunggu",
+    failed: "Gagal",
+  };
+  return statusMap[status] || status;
+}

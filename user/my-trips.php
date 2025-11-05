@@ -1,7 +1,9 @@
 <?php
+require_once '../config.php';
+
 session_start();
 if (!isset($_SESSION['id_user'])) {
-    header('Location: ../index.php');
+    header('Location: ' . getPageUrl('index.php'));
     exit;
 }
 
@@ -77,7 +79,7 @@ while ($row = $result->fetch_assoc()) {
             ? $navbarPath . $row['gambar']
             : $navbarPath . 'img/' . $row['gambar'];
     }
-    
+
     // Tentukan status pembayaran untuk diparse di JavaScript
     $paymentStatusForJS = $row['status_pembayaran'] ?? ($finalBookingStatus === 'paid' ? 'settlement' : ($finalBookingStatus === 'cancelled' ? 'cancel' : 'pending'));
 
@@ -120,7 +122,7 @@ $finishedCount  = count(array_filter($myTrips, fn($t) => strtolower($t['status_t
 function format_status_detail($status)
 {
     $s = strtolower($status ?? '');
-    
+
     $status_data = [
         'text' => 'DIBATALKAN',
         'color' => '#c62828',
@@ -128,23 +130,23 @@ function format_status_detail($status)
     ];
 
     if ($s === 'paid' || $s === 'settlement' || $s === 'confirmed') {
-        $status_data['text'] = 'PEMBAYARAN DITERIMA'; 
+        $status_data['text'] = 'PEMBAYARAN DITERIMA';
         $status_data['color'] = '#2e7d32';
         $status_data['icon'] = '<i class="fa-solid fa-check-circle"></i>';
     } elseif ($s === 'pending') {
-        $status_data['text'] = 'MENUNGGU PEMBAYARAN'; 
+        $status_data['text'] = 'MENUNGGU PEMBAYARAN';
         $status_data['color'] = '#e65100';
         $status_data['icon'] = '<i class="fa-solid fa-hourglass-half"></i>';
     } elseif ($s === 'expire') {
-        $status_data['text'] = 'SUDAH KEDALUWARSA'; 
+        $status_data['text'] = 'SUDAH KEDALUWARSA';
         $status_data['color'] = '#ad1457';
         $status_data['icon'] = '<i class="fa-solid fa-clock-rotate-left"></i>';
     } elseif ($s === 'cancelled' || $s === 'cancel' || $s === 'failed') {
-        $status_data['text'] = 'DIBATALKAN'; 
-        $status_data['color'] = '#dc3545'; 
+        $status_data['text'] = 'DIBATALKAN';
+        $status_data['color'] = '#dc3545';
         $status_data['icon'] = '<i class="fa-solid fa-ban"></i>';
     }
-    
+
     return "<span style='color:{$status_data['color']};font-weight:700;'>{$status_data['icon']} {$status_data['text']}</span>";
 }
 ?>
@@ -385,10 +387,11 @@ function format_status_detail($status)
         .badge-status {
             right: 10px;
         }
-        
+
         .badge-status i {
             font-size: 0.8rem;
         }
+
         /* Akhir Kembali ke tampilan asal */
 
         .status-pending {
@@ -396,7 +399,8 @@ function format_status_detail($status)
             color: #333
         }
 
-        .status-paid, .status-confirmed {
+        .status-paid,
+        .status-confirmed {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: #fff
         }
@@ -427,7 +431,7 @@ function format_status_detail($status)
         .card-body {
             padding: 16px
         }
-        
+
         /* Tata Letak Judul & Tanggal */
         .card-header-flex {
             display: flex;
@@ -444,7 +448,7 @@ function format_status_detail($status)
             margin: 0;
             flex-grow: 1;
         }
-        
+
         .card-date {
             font-size: .8rem;
             font-weight: 600;
@@ -453,12 +457,12 @@ function format_status_detail($status)
             padding-left: 10px;
             text-align: right;
         }
-        
+
         .card-date i {
             margin-right: 4px;
             color: #d4a574;
         }
-        
+
         .card-via {
             color: #6B5847;
             font-size: .8rem;
@@ -501,7 +505,7 @@ function format_status_detail($status)
             color: #3D2F21;
             font-weight: 700
         }
-        
+
         .meta-item.type-badge strong {
             font-weight: 700;
             background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
@@ -559,7 +563,7 @@ function format_status_detail($status)
 
         /* ----------------------------------------------------- */
         /* CSS KHUSUS UNTUK TAMPILAN MODAL DETAIL (dari payment-status.php) */
-        
+
         .swal2-popup {
             font-size: 0.85rem !important;
             padding: 0 !important;
@@ -635,7 +639,7 @@ function format_status_detail($status)
             color: transparent;
             font-weight: 800;
         }
-        
+
         .btn-map-modal {
             background: linear-gradient(135deg, #000 0%, #4a4a4a 100%);
             color: #fff;
@@ -651,6 +655,7 @@ function format_status_detail($status)
             box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
             text-transform: uppercase;
         }
+
         /* ----------------------------------------------------- */
 
         /* Responsif */
@@ -740,7 +745,7 @@ function format_status_detail($status)
                 <i class="fa-solid fa-mountain"></i>
                 <h2>Belum Ada Trip</h2>
                 <p>Mulai petualangan gunung Anda hari ini!</p>
-                <a href="<?= $navbarPath; ?>index.php#paketTrips" class="btn-explore">
+                <a href="<?= getPageUrl('index.php') ?>#paketTrips" class="btn-explore">
                     <i class="fa-solid fa-compass"></i> Jelajahi Trip
                 </a>
             </div>
@@ -804,23 +809,23 @@ function format_status_detail($status)
             let status_icon = '<i class="fa-solid fa-ban"></i>';
 
             if (s === 'paid' || s === 'settlement' || s === 'confirmed') {
-                status_text_detail = 'PEMBAYARAN DITERIMA'; 
+                status_text_detail = 'PEMBAYARAN DITERIMA';
                 status_color = '#2e7d32';
                 status_icon = '<i class="fa-solid fa-check-circle"></i>';
             } else if (s === 'pending') {
-                status_text_detail = 'MENUNGGU PEMBAYARAN'; 
+                status_text_detail = 'MENUNGGU PEMBAYARAN';
                 status_color = '#e65100';
                 status_icon = '<i class="fa-solid fa-hourglass-half"></i>';
             } else if (s === 'expire') {
-                status_text_detail = 'SUDAH KEDALUWARSA'; 
+                status_text_detail = 'SUDAH KEDALUWARSA';
                 status_color = '#ad1457';
                 status_icon = '<i class="fa-solid fa-clock-rotate-left"></i>';
             } else if (s === 'cancelled' || s === 'cancel' || s === 'failed') {
-                status_text_detail = 'DIBATALKAN'; 
-                status_color = '#dc3545'; 
+                status_text_detail = 'DIBATALKAN';
+                status_color = '#dc3545';
                 status_icon = '<i class="fa-solid fa-ban"></i>';
             }
-            
+
             return `<span style="color:${status_color};font-weight:700;">${status_icon} ${status_text_detail}</span>`;
         };
 
@@ -839,7 +844,7 @@ function format_status_detail($status)
                 month: 'long',
                 year: 'numeric'
             });
-            
+
             const mapsButton = d.link_map && d.link_map !== '#' ?
                 `<div style="text-align:center;padding-top:10px;border-top:1px solid rgba(169, 124, 80, 0.08);">
                     <a href="${d.link_map}" target="_blank" class="btn-map-modal">

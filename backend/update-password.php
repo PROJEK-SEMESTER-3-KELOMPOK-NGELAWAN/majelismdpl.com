@@ -1,16 +1,17 @@
 <?php
 // backend/update-password.php
 
+require_once '../config.php';
 require_once 'koneksi.php';
 session_start();
 
 // Redirect URL setelah proses selesai
-$redirect_url = '../user/profile.php';
+$redirect_url = getPageUrl('user/profile.php');
 
 // Cek apakah user sudah login
 if (!isset($_SESSION['id_user'])) {
     $_SESSION['pesan_error'] = "Silakan login untuk mengakses halaman ini.";
-    header('Location: ../login.php');
+    header('Location: ' . getPageUrl('index.php'));
     exit();
 }
 
@@ -82,7 +83,7 @@ if ($stmt_update->execute()) {
     // Opsional: Hapus sesi agar user login lagi
     session_destroy(); 
     // Redirect ke halaman login setelah berhasil ubah password
-    header('Location: ../login.php'); 
+    header('Location: ' . getPageUrl('index.php')); 
     
 } else {
     $_SESSION['pesan_error'] = "Gagal mengubah kata sandi: " . $stmt_update->error;

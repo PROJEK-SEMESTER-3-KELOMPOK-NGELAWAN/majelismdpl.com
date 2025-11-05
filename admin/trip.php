@@ -1,5 +1,7 @@
 <?php
 require_once 'auth_check.php';
+require_once '../config.php';
+
 if (!class_exists('RoleHelper')) {
     class RoleHelper
     {
@@ -470,8 +472,14 @@ $user_role = $user_role ?? 'user';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../frontend/trip.js"></script>
+
+    <!-- LOAD CONFIG.JS TERLEBIH DAHULU (CRITICAL!) -->
+    <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- BARU LOAD TRIP.JS -->
+    <script src="<?php echo getAssetsUrl('frontend/trip.js'); ?>"></script>
 </body>
 
 </html>

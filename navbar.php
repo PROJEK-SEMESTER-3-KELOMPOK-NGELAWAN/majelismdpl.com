@@ -1,36 +1,18 @@
 <?php
-// navbar.php
+// navbar.php - UPDATED FOR DYNAMIC URL ROUTING
+require_once (isset($navbarPath) ? $navbarPath : '') . 'config.php';
+require_once (isset($navbarPath) ? $navbarPath : '') . 'backend/koneksi.php';
+
+// Set navbarPath jika belum didefinisikan
+if (!isset($navbarPath)) {
+  $navbarPath = '';
+}
+
 $isLoggedIn = isset($_SESSION['id_user']) && !empty($_SESSION['id_user']);
 $userName = 'User';
 $photoFileName = 'default.jpg';
 $isCustomPhoto = false;
 $initials = '';
-
-// PERBAIKAN: Deteksi path yang lebih akurat
-if (!isset($navbarPath)) {
-  $navbarPath = '';
-  $currentDir = dirname($_SERVER['PHP_SELF']);
-  if (strpos($currentDir, '/user') !== false || strpos($currentDir, '/admin') !== false) {
-    $navbarPath = '../';
-  }
-}
-
-// Pastikan koneksi database dengan error handling
-$koneksiPath = $navbarPath . 'backend/koneksi.php';
-if (file_exists($koneksiPath)) {
-  require_once $koneksiPath;
-} else {
-  // Fallback jika path tidak ditemukan
-  if (file_exists('../backend/koneksi.php')) {
-    require_once '../backend/koneksi.php';
-    $navbarPath = '../';
-  } elseif (file_exists('backend/koneksi.php')) {
-    require_once 'backend/koneksi.php';
-    $navbarPath = '';
-  } else {
-    die("Error: File koneksi database tidak ditemukan!");
-  }
-}
 
 if ($isLoggedIn) {
   $id_user = $_SESSION['id_user'];
@@ -60,20 +42,19 @@ $cacheBuster = '?' . time();
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
-
 <nav class="navbar" role="navigation" aria-label="Main Navigation">
   <div class="navbar-logo">
-    <a href="<?php echo $navbarPath; ?>index.php">
-      <img src="<?php echo $navbarPath; ?>assets/majelis.png" alt="Logo Majelis MDPL" class="logo-img" />
+    <a href="<?php echo getPageUrl('index.php'); ?>">
+      <img src="<?php echo getPageUrl('assets/majelis.png'); ?>" alt="Logo Majelis MDPL" class="logo-img" />
     </a>
   </div>
 
   <ul class="navbar-menu" id="navbarMenu" role="menu">
-    <li><a href="<?php echo $navbarPath; ?>index.php#home" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
-    <li><a href="<?php echo $navbarPath; ?>index.php#profile" role="menuitem"><i class="fa-solid fa-user"></i> Profile</a></li>
-    <li><a href="<?php echo $navbarPath; ?>index.php#paketTrips" role="menuitem"><i class="fa-solid fa-calendar-days"></i> Paket Trip</a></li>
-    <li><a href="<?php echo $navbarPath; ?>index.php#gallerys" role="menuitem"><i class="fa-solid fa-image"></i> Galeri</a></li>
-    <li><a href="<?php echo $navbarPath; ?>index.php#testimonials" role="menuitem"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
+    <li><a href="<?php echo getPageUrl('index.php'); ?>#home" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="<?php echo getPageUrl('index.php'); ?>#profile" role="menuitem"><i class="fa-solid fa-user"></i> Profile</a></li>
+    <li><a href="<?php echo getPageUrl('index.php'); ?>#paketTrips" role="menuitem"><i class="fa-solid fa-calendar-days"></i> Paket Trip</a></li>
+    <li><a href="<?php echo getPageUrl('index.php'); ?>#gallerys" role="menuitem"><i class="fa-solid fa-image"></i> Galeri</a></li>
+    <li><a href="<?php echo getPageUrl('index.php'); ?>#testimonials" role="menuitem"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
   </ul>
 
   <?php if (!$isLoggedIn): ?>
@@ -96,13 +77,13 @@ $cacheBuster = '?' . time();
       </button>
 
       <div class="user-dropdown" id="userDropdown">
-        <a href="<?php echo $navbarPath; ?>user/profile.php" class="dropdown-item">
+        <a href="<?php echo getPageUrl('user/profile.php'); ?>" class="dropdown-item">
           <i class="fa-solid fa-user"></i> Profil
         </a>
-        <a href="<?php echo $navbarPath; ?>user/my-trips.php" class="dropdown-item">
+        <a href="<?php echo getPageUrl('user/my-trips.php'); ?>" class="dropdown-item">
           <i class="fa-solid fa-mountain"></i> Paket Trip Saya
         </a>
-        <a href="<?php echo $navbarPath; ?>user/payment-status.php" class="dropdown-item">
+        <a href="<?php echo getPageUrl('user/payment-status.php'); ?>" class="dropdown-item">
           <i class="fa-solid fa-credit-card"></i> Status Pembayaran
         </a>
         <div class="dropdown-divider"></div>
@@ -120,7 +101,7 @@ $cacheBuster = '?' . time();
   </button>
 </nav>
 
-<form id="logout-form" method="POST" action="<?php echo $navbarPath; ?>user/logout.php" style="display: none;">
+<form id="logout-form" method="POST" action="<?php echo getPageUrl('user/logout.php'); ?>" style="display: none;">
   <input type="hidden" name="confirm_logout" value="1">
 </form>
 
@@ -852,7 +833,6 @@ $cacheBuster = '?' . time();
       order: 1;
     }
 
-    /* Auth buttons di tengah */
     .nav-btns {
       order: 2;
       margin-left: auto;
@@ -866,7 +846,6 @@ $cacheBuster = '?' . time();
       border-radius: 18px;
     }
 
-    /* User menu di tengah (untuk logged in) */
     .user-menu-container {
       order: 2;
       margin-left: auto;
@@ -891,13 +870,11 @@ $cacheBuster = '?' . time();
       font-size: 0.85em;
     }
 
-    /* Hamburger di paling kanan */
     .hamburger {
       display: flex !important;
       order: 3;
     }
 
-    /* Navbar menu dropdown */
     .navbar-menu {
       display: none;
       flex-direction: column;

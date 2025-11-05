@@ -1,5 +1,7 @@
 <?php
 require_once 'auth_check.php';
+require_once '../config.php';
+
 
 // Debug dan perbaiki session username
 if (!isset($_SESSION['username']) || empty($_SESSION['username']) || $_SESSION['username'] === 'root') {
@@ -16,14 +18,11 @@ if (!isset($_SESSION['username']) || empty($_SESSION['username']) || $_SESSION['
       $user = $result->fetch_assoc();
       $_SESSION['username'] = $user['username'];
       $_SESSION['role'] = $user['role'];
-      $_SESSION['email'] = $user['email'] ?? ''; // Ambil email juga
-      // SIMPAN JALUR FOTO KE SESSION
+      $_SESSION['email'] = $user['email'] ?? '';
       $_SESSION['foto_profil'] = $user['foto_profil'] ?? '';
 
-      // Update global variables dari auth_check.php
       $username = $user['username'];
       $user_role = $user['role'];
-      // ... (Kode RoleHelper lainnya) ...
     }
     $stmt->close();
   }
@@ -35,16 +34,15 @@ $display_role = $user_role ?? 'user';
 $display_email = $_SESSION['email'] ?? 'N/A';
 // AMBIL JALUR FOTO DARI SESSION
 $user_photo_path_db = $_SESSION['foto_profil'] ?? '';
-$default_photo = '../img/profile/default.png'; // Ganti dengan jalur foto default Anda yang benar
+$default_photo = getAssetsUrl('img/profile/default.png');
 $final_photo_path = (!empty($user_photo_path_db) && file_exists('../' . $user_photo_path_db))
-  ? '../' . $user_photo_path_db
+  ? getAssetsUrl(ltrim($user_photo_path_db, '/'))
   : $default_photo;
-
 
 // Handle error messages dari parameter URL
 $error_message = '';
 $error_type = '';
-$success_message = ''; // TAMBAHKAN VARIABEL SUKSES
+$success_message = '';
 
 if (isset($_GET['error'])) {
   // ... (blok switch untuk error yang sudah ada) ...
@@ -68,18 +66,22 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
   : RoleHelper::getRoleDisplayName($display_role);
 ?>
 
+
 <!DOCTYPE html>
 <html lang="id">
+
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin Dashboard | Majelis MDPL</title>
 
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.0/dist/sweetalert2.min.css" rel="stylesheet">
+
 
   <style>
     body {
@@ -91,11 +93,13 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       margin: 0;
     }
 
+
     .search-container {
       position: relative;
       margin: 0;
       width: 100%;
     }
+
 
     .search-input {
       width: 100%;
@@ -109,11 +113,13 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       transition: border-color 0.3s ease;
     }
 
+
     .search-input:focus {
       outline: none;
       border-color: #432f17;
       box-shadow: 0 0 8px rgba(67, 47, 23, 0.3);
     }
+
 
     .search-icon {
       position: absolute;
@@ -125,19 +131,20 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       font-size: 18px;
     }
 
+
     .main {
       margin-left: 280px;
-      /* Disesuaikan dengan sidebar baru */
       min-height: 100vh;
       padding: 20px 25px;
       background: #f6f0e8;
       transition: margin-left 0.3s ease;
     }
 
-    /* Responsive untuk sidebar collapsed */
+
     body.sidebar-collapsed .main {
       margin-left: 70px;
     }
+
 
     @media (max-width: 768px) {
       .main {
@@ -147,6 +154,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
         padding-right: 15px;
       }
     }
+
 
     .main-header {
       display: flex;
@@ -158,6 +166,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       gap: 15px;
     }
 
+
     .main-header h2 {
       font-size: 1.4rem;
       font-weight: 700;
@@ -165,6 +174,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       margin-bottom: 0;
       letter-spacing: 1px;
     }
+
 
     .admin-info {
       background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
@@ -181,16 +191,16 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       transition: all 0.3s ease;
       min-width: 200px;
       border: none;
-      /* Tambahkan agar konsisten seperti tombol */
       cursor: pointer;
-      /* Tambahkan cursor pointer */
     }
+
 
     .admin-info:hover {
       background: linear-gradient(135deg, #8b6332 0%, #a97c50 100%);
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(169, 124, 80, 0.3);
     }
+
 
     .admin-info .user-icon {
       border-radius: 50%;
@@ -202,6 +212,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       box-shadow: none;
     }
 
+
     .admin-info i.user-icon {
       font-size: 30px;
       color: #fff;
@@ -211,11 +222,13 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       height: 40px;
     }
 
+
     .admin-info img.user-icon {
       object-fit: cover;
       border: 2px solid #fff;
       background: none;
     }
+
 
     .admin-info .user-details {
       display: flex;
@@ -224,6 +237,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       flex: 1;
     }
 
+
     .admin-info .username {
       font-weight: 700;
       font-size: 15px;
@@ -231,6 +245,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       color: #fff;
       margin-bottom: 2px;
     }
+
 
     .admin-info .role-badge {
       font-size: 11px;
@@ -244,18 +259,19 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
-    /* Role-specific badge colors */
+
     .role-admin {
       background: rgba(255, 193, 7, 0.2) !important;
       border-color: rgba(255, 193, 7, 0.4) !important;
     }
+
 
     .role-super_admin {
       background: rgba(220, 53, 69, 0.2) !important;
       border-color: rgba(220, 53, 69, 0.4) !important;
     }
 
-    /* Responsive admin info */
+
     @media (max-width: 800px) {
       .admin-info {
         padding: 8px 15px;
@@ -263,25 +279,30 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
         min-width: 150px;
       }
 
+
       .admin-info .user-icon {
         width: 32px;
         height: 32px;
         font-size: 18px;
       }
 
+
       .admin-info .username {
         font-size: 13px;
       }
+
 
       .main-header {
         flex-direction: column;
         align-items: flex-start;
       }
 
+
       .main-header h2 {
         font-size: 1.2rem;
       }
     }
+
 
     @media (max-width: 600px) {
       .admin-info {
@@ -289,9 +310,11 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
         min-width: 120px;
       }
 
+
       .admin-info .user-details {
         display: none;
       }
+
 
       .admin-info::after {
         content: attr(data-username);
@@ -301,12 +324,14 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       }
     }
 
+
     .cards {
       display: flex;
       gap: 19px;
       margin-bottom: 32px;
       flex-wrap: wrap;
     }
+
 
     .card-stat {
       background: #fff;
@@ -321,11 +346,12 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       transition: all 0.3s ease;
     }
 
+
     .card-stat:hover {
-      /* KONSISTENSI DENGAN MASTER ADMIN: -2px translateY dan shadow */
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(120, 77, 37, 0.12);
     }
+
 
     .card-stat i {
       font-size: 2rem;
@@ -340,9 +366,11 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       justify-content: center;
     }
 
+
     .stat-info {
       flex: 1;
     }
+
 
     .stat-label {
       font-size: 13px;
@@ -352,12 +380,14 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       margin-bottom: 4px;
     }
 
+
     .stat-value {
       font-size: 24px;
       font-weight: 700;
       color: #432f17;
       line-height: 1;
     }
+
 
     .chart-section {
       max-width: 900px;
@@ -368,6 +398,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       box-shadow: 0 4px 15px rgba(120, 77, 37, 0.08);
     }
 
+
     .chart-section h3 {
       font-size: 1.2em;
       font-weight: 700;
@@ -377,6 +408,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       letter-spacing: 0.5px;
     }
 
+
     .data-table-section {
       background: #fff;
       border-radius: 1rem;
@@ -384,6 +416,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       padding: 25px;
       margin-bottom: 18px;
     }
+
 
     .data-table-section h3 {
       font-size: 1.2em;
@@ -393,32 +426,30 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       letter-spacing: 0.5px;
     }
 
+
     .activity-log-table {
-      /* KELAS KHUSUS UNTUK KONTROL FONT/PADDING */
       width: 100%;
       border-radius: 1rem;
       overflow: hidden;
       border-collapse: collapse;
       margin-top: 15px;
       font-size: 14px;
-      /* Ditingkatkan dari 13px */
     }
 
+
     .activity-log-table th {
-      /* KONSISTENSI DENGAN MASTER ADMIN */
       background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
       color: #fff;
       font-weight: 700;
       letter-spacing: 0.7px;
       font-size: 14px;
       padding: 15px;
-      /* Ditingkatkan dari 12px */
       border: none;
     }
 
+
     .activity-log-table td {
       padding: 15px;
-      /* Ditingkatkan dari 12px untuk jarak antar baris */
       text-align: left;
       font-weight: 500;
       color: #432f17;
@@ -426,34 +457,34 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       vertical-align: middle;
     }
 
+
     .activity-log-table tr:last-child td {
       border-bottom: none;
     }
+
 
     .activity-log-table tbody tr:hover td {
       background-color: #f9e8d0;
       color: #a97c50;
     }
 
-    /* ... di dalam blok <style> yang sudah ada ... */
 
-    /* Tata Letak Kontrol Tabel (Filter + Search) */
     .table-controls {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
       flex-wrap: wrap;
-      /* Agar responsif */
       gap: 15px;
     }
+
 
     .table-controls .control-group {
       display: flex;
       gap: 10px;
     }
 
-    /* Style untuk Filter Dropdown */
+
     .filter-select {
       border-radius: 50px;
       border: 1.5px solid #a97c50;
@@ -464,7 +495,6 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       background-color: #fff;
       transition: border-color 0.3s ease;
       appearance: none;
-      /* Menghilangkan panah default */
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a97c50' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
       background-repeat: no-repeat;
       background-position: right 10px center;
@@ -472,52 +502,58 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       cursor: pointer;
     }
 
+
     .filter-select:focus {
       outline: none;
       border-color: #432f17;
       box-shadow: 0 0 8px rgba(67, 47, 23, 0.3);
     }
 
-    /* Responsif */
+
     @media (max-width: 768px) {
       .table-controls {
         flex-direction: column;
         align-items: flex-start;
       }
 
+
       .table-controls .control-group {
         width: 100%;
         flex-wrap: wrap;
       }
+
 
       .table-controls .control-group>* {
         flex: 1 1 150px;
       }
     }
 
+
     #noActivityMessage td {
       background: #fff8f0;
-      /* Warna background lembut */
       border: 1px solid #f2dbc1;
       border-radius: 0 0 1rem 1rem;
       font-weight: 500;
     }
 
+
     .text-center {
       text-align: center !important;
     }
+
 
     .text-brown {
       color: #a97c50 !important;
     }
 
+
     .fs-4 {
       font-size: 1.5rem !important;
     }
 
+
     .badge {
       font-weight: 600;
-      /* KONSISTENSI DENGAN MASTER ADMIN */
       font-size: 0.75rem;
       padding: 0.4em 0.8em;
       border-radius: 20px;
@@ -527,32 +563,37 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       letter-spacing: 0.3px;
     }
 
+
     .badge-delete {
       background-color: #dc3545;
       color: white;
     }
+
 
     .badge-pending {
       background-color: #ffc107;
       color: #432f17;
     }
 
+
     .badge-success {
       background-color: #28a745;
       color: white;
     }
+
 
     .badge-info {
       background-color: #17a2b8;
       color: white;
     }
 
+
     .badge-update {
       background-color: #007bff;
       color: white;
     }
 
-    /* Welcome message enhancement */
+
     .welcome-section {
       background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
       color: white;
@@ -563,6 +604,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       position: relative;
       overflow: hidden;
     }
+
 
     .welcome-section::before {
       content: '';
@@ -576,6 +618,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       transform: translate(30px, -30px);
     }
 
+
     .welcome-section h3 {
       margin: 0;
       font-size: 1.4rem;
@@ -585,6 +628,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       z-index: 1;
     }
 
+
     .welcome-section p {
       margin: 8px 0 0 0;
       opacity: 0.9;
@@ -593,26 +637,29 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       z-index: 1;
     }
 
-    /* SweetAlert2 custom styling */
+
     .swal2-popup {
       border-radius: 15px !important;
     }
+
 
     .swal2-title {
       color: #a97c50 !important;
       font-family: "Poppins", Arial, sans-serif !important;
     }
 
+
     .swal2-confirm {
       background-color: #a97c50 !important;
       border-radius: 8px !important;
     }
 
+
     .swal2-confirm:hover {
       background-color: #8b6332 !important;
     }
 
-    /* ========== MODAL PROFIL ADMIN ========== */
+
     .profile-modal-overlay {
       display: none;
       position: fixed;
@@ -629,6 +676,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       animation: fadeIn 0.3s ease;
     }
 
+
     .profile-modal-content {
       background-color: #fff;
       margin: 10% auto;
@@ -640,6 +688,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       animation: slideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
+
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -649,6 +698,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
         opacity: 1;
       }
     }
+
 
     @keyframes slideIn {
       from {
@@ -662,6 +712,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       }
     }
 
+
     .profile-modal-header {
       display: flex;
       justify-content: space-between;
@@ -671,13 +722,14 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       margin-bottom: 20px;
     }
 
+
     .profile-modal-header h3 {
       margin: 0;
       color: #a97c50;
-      /* Ganti warna agar konsisten */
       font-weight: 700;
       font-size: 1.3rem;
     }
+
 
     .close-modal-btn {
       color: #aaa;
@@ -689,6 +741,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       transition: color 0.2s;
     }
 
+
     .close-modal-btn:hover,
     .close-modal-btn:focus {
       color: #432f17;
@@ -696,11 +749,13 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       cursor: pointer;
     }
 
+
     .profile-photo-area {
       text-align: center;
       margin-bottom: 25px;
       position: relative;
     }
+
 
     .profile-photo-wrapper {
       display: inline-block;
@@ -709,8 +764,8 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       height: 120px;
     }
 
+
     .profile-icon-large {
-      /* Menggunakan class dari .user-icon dan penyesuaian untuk ukuran besar */
       font-size: 7rem;
       color: #a97c50;
       border: 5px solid #f6f0e8;
@@ -722,14 +777,13 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       align-items: center;
       justify-content: center;
       object-fit: cover;
-      /* Untuk gambar */
     }
+
 
     .change-photo-btn {
       position: absolute;
       bottom: 0;
       right: -5px;
-      /* Penyesuaian posisi agar di sudut bawah kanan */
       background: #432f17;
       color: white;
       padding: 5px 12px;
@@ -742,9 +796,11 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       transition: background 0.2s;
     }
 
+
     .change-photo-btn:hover {
       background: #a97c50;
     }
+
 
     .remove-photo-btn {
       position: absolute;
@@ -763,6 +819,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       border: none;
     }
 
+
     .remove-photo-btn:hover {
       background: #c82333;
     }
@@ -774,6 +831,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       border-bottom: 1px solid #f6f0e8;
     }
 
+
     .user-info-detail p {
       font-size: 0.9em;
       color: #a97c50;
@@ -781,20 +839,22 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       font-weight: 600;
     }
 
+
     .user-info-detail h4 {
       font-size: 1.1em;
       color: #432f17;
       margin: 5px 0 0 0;
       font-weight: 700;
       word-wrap: break-word;
-      /* Tambahkan untuk email/username panjang */
     }
+
 
     .role-modal {
       font-size: 14px !important;
       padding: 4px 10px !important;
       margin-top: 5px;
     }
+
 
     .profile-modal-footer {
       display: flex;
@@ -803,14 +863,14 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
       padding-top: 15px;
     }
 
-    /* Tombol Logout Konsisten */
+
     .btn-danger {
       background-color: #dc3545;
       border-color: #dc3545;
       border-radius: 8px;
-      /* Konsistensi radius */
       transition: all 0.3s ease;
     }
+
 
     .btn-danger:hover {
       background-color: #c82333;
@@ -827,7 +887,8 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
   <main class="main">
     <div class="main-header">
       <div>
-        <h2>Dashboard Admin</h2> <small class="text-muted">
+        <h2>Dashboard Admin</h2>
+        <small class="text-muted">
           <i class="bi bi-speedometer2"></i> Ringkasan dan Statistik Aktivitas Sistem
           <span class="permission-badge">
             <?= RoleHelper::getRoleDisplayName($display_role) ?>
@@ -858,7 +919,6 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
     <section class="welcome-section">
       <h3 id="welcomeMessage">
         <?php
-        // Menggunakan $displayName yang sudah diproses
         echo "Selamat Datang, " . htmlspecialchars($displayName) . "!";
         ?>
       </h3>
@@ -933,8 +993,6 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
           </thead>
           <tbody>
             <?php
-            // Asumsikan file ini mengembalikan variabel $rows yang berisi <tr>
-            // PENTING: Pastikan baris-baris ini memiliki data-attribute: data-status="create" atau "delete"
             include '../backend/activity-logs.php';
             echo $rows;
             ?>
@@ -958,17 +1016,13 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
         </div>
 
         <div class="profile-modal-body">
-          <form id="profilePhotoForm" action="../backend/admin-update-photo.php" method="POST" enctype="multipart/form-data">
+          <form id="profilePhotoForm" action="<?php echo getApiUrl('/admin-update-photo.php'); ?>" method="POST" enctype="multipart/form-data">
             <div class="profile-photo-area">
               <div class="profile-photo-wrapper">
                 <?php if ($final_photo_path && $final_photo_path !== $default_photo): ?>
                   <img src="<?= htmlspecialchars($final_photo_path) ?>" alt="Foto Profil Admin"
                     class="profile-icon-large"
                     style="border-radius: 50%;">
-
-                  <!-- <button type="button" class="remove-photo-btn" id="removeAdminPhoto">
-                    <i class="bi bi-trash-fill"></i> Hapus
-                  </button> -->
                 <?php else: ?>
                   <i class="bi bi-person-circle profile-icon-large" id="modalProfileIcon"></i>
                 <?php endif; ?>
@@ -1013,11 +1067,16 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../frontend/dashboard.js"></script>
+
+  <!-- LOAD CONFIG.JS TERLEBIH DAHULU (PENTING!) -->
+  <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
+
+  <!-- BARU LOAD DASHBOARD.JS -->
+  <script src="<?php echo getAssetsUrl('frontend/dashboard.js'); ?>"></script>
+
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // NEW: Penanganan Pesan Sukses
       <?php if (!empty($success_message)): ?>
         Swal.fire({
           title: 'Berhasil!',
@@ -1031,7 +1090,6 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
         });
       <?php endif; ?>
 
-      // Error handling dengan SweetAlert2
       <?php if (!empty($error_message)): ?>
         Swal.fire({
           title: '<?= $error_type === "warning" ? "Peringatan!" : ($error_type === "error" ? "Error!" : "Informasi") ?>',
@@ -1045,86 +1103,64 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
         });
       <?php endif; ?>
 
-      /* ... kode JavaScript lainnya ... */
+      const searchInput = document.getElementById('activitySearchInput');
+      const filterSelect = document.getElementById('activityFilter');
+      const tableBody = document.querySelector('.activity-log-table tbody');
+      const noActivityMessage = document.getElementById('noActivityMessage');
 
- // ... di dalam document.addEventListener('DOMContentLoaded', () => { ...
-
-// LOGIKA PENCARIAN & FILTER AKTIVITAS
-const searchInput = document.getElementById('activitySearchInput');
-const filterSelect = document.getElementById('activityFilter');
-const tableBody = document.querySelector('.activity-log-table tbody');
-const noActivityMessage = document.getElementById('noActivityMessage');
-
-if (searchInput && tableBody && filterSelect && noActivityMessage) {
-    
-    // Fungsi untuk menghitung ulang kolom No (kolom pertama)
-    const renumberVisibleRows = (rows) => {
-        let currentNumber = 1;
-        rows.forEach(row => {
+      if (searchInput && tableBody && filterSelect && noActivityMessage) {
+        const renumberVisibleRows = (rows) => {
+          let currentNumber = 1;
+          rows.forEach(row => {
             if (row.style.display !== 'none' && row.id !== 'noActivityMessage') {
-                // Asumsi Kolom No adalah cell index 0
-                const noCell = row.cells[0];
-                if (noCell) {
-                    noCell.textContent = currentNumber;
-                    currentNumber++;
-                }
+              const noCell = row.cells[0];
+              if (noCell) {
+                noCell.textContent = currentNumber;
+                currentNumber++;
+              }
             }
-        });
-    };
+          });
+        };
 
-    const applyFilterAndSearch = () => {
-        const filter = searchInput.value.toLowerCase();
-        const activityType = filterSelect.value.toLowerCase(); 
-        const rows = tableBody.querySelectorAll('tr');
-        let visibleRowCount = 0;
+        const applyFilterAndSearch = () => {
+          const filter = searchInput.value.toLowerCase();
+          const activityType = filterSelect.value.toLowerCase();
+          const rows = tableBody.querySelectorAll('tr');
+          let visibleRowCount = 0;
 
-        rows.forEach(row => {
+          rows.forEach(row => {
             if (row.id === 'noActivityMessage') {
-                return;
+              return;
             }
 
             const rowText = row.textContent.toLowerCase();
-            
-            // Mengambil status dari data-attribute (DIREKOMENDASIKAN)
             const rowStatus = row.getAttribute('data-status') ? row.getAttribute('data-status').toLowerCase() : '';
-            
-            // Logika Filter Status
+
             let isVisibleByType;
             if (rowStatus !== '') {
-                isVisibleByType = activityType === '' || rowStatus === activityType;
+              isVisibleByType = activityType === '' || rowStatus === activityType;
             } else {
-                // Fallback (kurang akurat): mencari teks status di seluruh baris
-                isVisibleByType = activityType === '' || rowText.includes(activityType);
+              isVisibleByType = activityType === '' || rowText.includes(activityType);
             }
-            
-            // Logika Pencarian
-            let isVisibleBySearch = rowText.includes(filter);
 
-            // Tampilkan baris jika cocok dengan kedua filter
+            let isVisibleBySearch = rowText.includes(filter);
             const isVisible = isVisibleBySearch && isVisibleByType;
             row.style.display = isVisible ? '' : 'none';
-            
+
             if (isVisible) {
-                visibleRowCount++;
+              visibleRowCount++;
             }
-        });
+          });
 
-        // 1. Hitung ulang nomor urut untuk baris yang terlihat
-        renumberVisibleRows(rows);
+          renumberVisibleRows(rows);
+          noActivityMessage.style.display = (visibleRowCount === 0) ? '' : 'none';
+        };
 
-        // 2. Tampilkan/Sembunyikan pesan No Data
-        noActivityMessage.style.display = (visibleRowCount === 0) ? '' : 'none';
-    };
+        applyFilterAndSearch();
+        searchInput.addEventListener('input', applyFilterAndSearch);
+        filterSelect.addEventListener('change', applyFilterAndSearch);
+      }
 
-    // Panggil fungsi saat page load (default: "Semua Aktivitas")
-    applyFilterAndSearch();
-
-    // Tambahkan event listener untuk Input Pencarian dan Dropdown Filter
-    searchInput.addEventListener('input', applyFilterAndSearch);
-    filterSelect.addEventListener('change', applyFilterAndSearch);
-}
-
-      // Dynamic greeting berdasarkan waktu
       const currentHour = new Date().getHours();
       let greeting = '';
 
@@ -1138,7 +1174,6 @@ if (searchInput && tableBody && filterSelect && noActivityMessage) {
         greeting = 'Selamat Malam';
       }
 
-      // Update welcome message dengan greeting yang sesuai waktu
       const welcomeTitle = document.getElementById('welcomeMessage');
       const currentDisplayName = "<?= addslashes($displayName) ?>";
 
@@ -1146,7 +1181,6 @@ if (searchInput && tableBody && filterSelect && noActivityMessage) {
         welcomeTitle.innerHTML = `${greeting}, ${currentDisplayName}!`;
       }
 
-      // Animation untuk cards
       const cards = document.querySelectorAll('.card-stat');
       cards.forEach((card, index) => {
         setTimeout(() => {
@@ -1161,7 +1195,6 @@ if (searchInput && tableBody && filterSelect && noActivityMessage) {
         }, index * 100);
       });
 
-      // LOGIKA MODAL PROFIL DAN GANTI FOTO
       const modalOverlay = document.getElementById('profileModalOverlay');
       const openBtn = document.getElementById('openProfileModal');
       const closeBtn = document.getElementById('closeProfileModal');
@@ -1170,7 +1203,6 @@ if (searchInput && tableBody && filterSelect && noActivityMessage) {
       const removePhotoBtn = document.getElementById('removeAdminPhoto');
       const finalPhotoPath = '<?= addslashes($final_photo_path) ?>';
       const defaultPhoto = '<?= addslashes($default_photo) ?>';
-
 
       if (openBtn) {
         openBtn.addEventListener('click', () => {
@@ -1184,7 +1216,6 @@ if (searchInput && tableBody && filterSelect && noActivityMessage) {
         });
       }
 
-      // Tutup modal saat klik di luar area konten
       if (modalOverlay) {
         modalOverlay.addEventListener('click', (e) => {
           if (e.target === modalOverlay) {
@@ -1193,23 +1224,19 @@ if (searchInput && tableBody && filterSelect && noActivityMessage) {
         });
       }
 
-      // Trigger submit form ketika file dipilih
       if (inputPhoto) {
         inputPhoto.addEventListener('change', function() {
           if (this.files.length > 0) {
-            // Cek ukuran file (Misal Max 2MB)
             if (this.files[0].size > 2 * 1024 * 1024) {
               showToast('error', "Ukuran file terlalu besar! Maksimal 2MB.");
-              this.value = ''; // Reset input
+              this.value = '';
               return;
             }
-            // Kirim form
             photoForm.submit();
           }
         });
       }
 
-      // Tombol Hapus Foto
       if (removePhotoBtn && finalPhotoPath !== defaultPhoto) {
         removePhotoBtn.addEventListener('click', function() {
           Swal.fire({
@@ -1223,14 +1250,12 @@ if (searchInput && tableBody && filterSelect && noActivityMessage) {
             cancelButtonText: 'Batal'
           }).then((result) => {
             if (result.isConfirmed) {
-              // Kirim permintaan hapus ke backend
-              window.location.href = '../backend/admin-remove-photo.php';
+              window.location.href = '<?php echo getApiUrl('backend/admin-remove-photo.php'); ?>';
             }
           });
         });
       }
 
-      // Function untuk menampilkan toast notification
       function showToast(type, message) {
         Swal.fire({
           toast: true,

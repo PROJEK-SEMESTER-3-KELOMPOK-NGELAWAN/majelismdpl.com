@@ -1,13 +1,14 @@
 <?php
 // backend/update-photo.php
 
+require_once '../config.php';
 require_once 'koneksi.php'; // Pastikan path ke koneksi.php sudah benar
 session_start();
 
 // Cek status login
 if (!isset($_SESSION['id_user'])) {
     // Redirect atau kirim respons error
-    header('Location: ../login.php');
+    header('Location: ' . getPageUrl('index.php'));
     exit();
 }
 
@@ -23,7 +24,7 @@ if (!is_dir($target_dir)) {
 // Cek apakah file benar-benar diunggah
 if (empty($_FILES['foto_profil']['name'])) {
     $_SESSION['pesan_error'] = "Tidak ada file yang diunggah.";
-    header('Location: ../user/profile.php');
+    header('Location: ' . getPageUrl('user/profile.php'));
     exit();
 }
 
@@ -38,14 +39,14 @@ $target_file = $target_dir . $new_file_name;
 // Cek Error Unggahan
 if ($file['error'] !== UPLOAD_ERR_OK) {
     $_SESSION['pesan_error'] = "Gagal unggah file. Kode error: " . $file['error'];
-    header('Location: ../user/profile.php');
+    header('Location: ' . getPageUrl('user/profile.php'));
     exit();
 }
 
 // Cek Ukuran File
 if ($file['size'] > $max_file_size) {
     $_SESSION['pesan_error'] = "Ukuran file terlalu besar. Maksimal 2 MB.";
-    header('Location: ../user/profile.php');
+    header('Location: ' . getPageUrl('user/profile.php'));
     exit();
 }
 
@@ -53,7 +54,7 @@ if ($file['size'] > $max_file_size) {
 $allowed_types = ['jpg', 'jpeg', 'png'];
 if (!in_array($file_type, $allowed_types)) {
     $_SESSION['pesan_error'] = "Hanya file JPG, JPEG, dan PNG yang diizinkan.";
-    header('Location: ../user/profile.php');
+    header('Location: ' . getPageUrl('user/profile.php'));
     exit();
 }
 
@@ -72,20 +73,19 @@ $stmt_select->close();
 
 // 2. Pindahkan file baru ke folder target
 if (move_uploaded_file($file['tmp_name'], $target_file)) {
-    
+
     // 3. Update database
     $stmt_update = $conn->prepare("UPDATE users SET foto_profil = ? WHERE id_user = ?");
     $stmt_update->bind_param("si", $new_file_name, $id_user);
-    
+
     if ($stmt_update->execute()) {
-        
+
         // 4. Hapus file lama, kecuali file default
         if (!empty($old_photo_name) && $old_photo_name !== 'default.jpg' && file_exists($target_dir . $old_photo_name)) {
             unlink($target_dir . $old_photo_name);
         }
-        
+
         $_SESSION['pesan_sukses'] = "Foto profil berhasil diperbarui!";
-        
     } else {
         // Jika gagal update DB, hapus file yang baru diunggah
         if (file_exists($target_file)) {
@@ -94,12 +94,10 @@ if (move_uploaded_file($file['tmp_name'], $target_file)) {
         $_SESSION['pesan_error'] = "Gagal memperbarui database: " . $stmt_update->error;
     }
     $stmt_update->close();
-
 } else {
     $_SESSION['pesan_error'] = "Gagal memindahkan file yang diunggah. Pastikan folder 'img/profile/' memiliki izin tulis (write permission 0777).";
 }
 
 // Redirect kembali ke halaman profil
-header('Location: ../user/profile.php');
+header('Location: ' . getPageUrl('user/profile.php'));
 exit();
-?>

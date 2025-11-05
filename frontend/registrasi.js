@@ -1,16 +1,10 @@
-// ========== HELPER FUNCTION: DYNAMIC PATH DETECTION ==========
 function getBasePath() {
-  const path = window.location.pathname;
-  // Jika di subfolder user/ atau admin/, return '../'
-  if (path.includes("/user/") || path.includes("/admin/")) {
-    return "../";
-  }
-  // Jika di root, return './'
-  return "./";
+  // Gunakan getPageUrl dari config.php
+  return getPageUrl("").replace(window.location.origin, "");
 }
 
 function getFullBasePath() {
-  return window.location.origin + "/majelismdpl.com/";
+  return getPageUrl("");
 }
 
 // ========== CREATE OTP MODAL DYNAMICALLY ==========
@@ -119,8 +113,8 @@ function forceCloseOtpModal() {
 
 // ========== GOOGLE OAUTH ==========
 function handleGoogleOAuth() {
-  const fullBasePath = getFullBasePath();
-  window.location.href = fullBasePath + "backend/google-oauth.php";
+  window.location.href =
+    getPageUrl("backend/google-oauth.php") + "?type=signup";
 }
 
 function attachGoogleButtonListener() {

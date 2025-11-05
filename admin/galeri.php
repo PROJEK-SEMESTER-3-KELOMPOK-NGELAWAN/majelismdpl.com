@@ -1,5 +1,7 @@
 <?php
 require_once 'auth_check.php';
+require_once '../config.php';
+
 // Asumsi RoleHelper sudah dimuat di auth_check.php atau file lain yang diperlukan.
 if (!class_exists('RoleHelper')) {
     class RoleHelper
@@ -13,17 +15,21 @@ if (!class_exists('RoleHelper')) {
 $user_role = $user_role ?? 'user';
 ?>
 
+
 <!DOCTYPE html>
 <html lang="id">
+
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Galeri | Majelis MDPL</title>
 
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
 
     <style>
         /* --- CSS KONSISTENSI UTAMA DARI MASTER ADMIN --- */
@@ -36,14 +42,17 @@ $user_role = $user_role ?? 'user';
             margin: 0;
         }
 
+
         .text-brown {
             color: #a97c50 !important;
         }
+
 
         .bg-brown {
             background-color: #a97c50 !important;
             color: white;
         }
+
 
         /* --- Sidebar Styling (Dipertahankan) --- */
         .sidebar {
@@ -63,6 +72,7 @@ $user_role = $user_role ?? 'user';
             transition: width 0.25s;
         }
 
+
         /* --- Main Content & Header KONSISTENSI --- */
         .main {
             margin-left: 240px;
@@ -72,6 +82,7 @@ $user_role = $user_role ?? 'user';
             transition: margin-left 0.25s;
         }
 
+
         .main-header {
             display: flex;
             align-items: center;
@@ -80,6 +91,7 @@ $user_role = $user_role ?? 'user';
             padding-bottom: 28px;
         }
 
+
         .main-header h2 {
             font-size: 1.4rem;
             font-weight: 700;
@@ -87,6 +99,7 @@ $user_role = $user_role ?? 'user';
             margin-bottom: 0;
             letter-spacing: 1px;
         }
+
 
         .permission-badge {
             background-color: #28a745;
@@ -97,6 +110,7 @@ $user_role = $user_role ?? 'user';
             margin-left: 8px;
         }
 
+
         /* --- CARD & BUTTON KONSISTENSI --- */
         .card {
             border: none;
@@ -105,12 +119,14 @@ $user_role = $user_role ?? 'user';
             transition: all 0.3s ease;
         }
 
+
         .card-header {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             border-bottom: 2px solid #a97c50;
             border-radius: 15px 15px 0 0 !important;
             padding: 20px;
         }
+
 
         .btn-primary,
         .btn-upload {
@@ -123,11 +139,13 @@ $user_role = $user_role ?? 'user';
             color: white !important;
         }
 
+
         .btn-primary:hover,
         .btn-upload:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(169, 124, 80, 0.4);
         }
+
 
         /* Form Control KONSISTENSI */
         .form-label {
@@ -136,6 +154,7 @@ $user_role = $user_role ?? 'user';
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
         }
+
 
         .form-control {
             border: 2px solid #e9ecef;
@@ -146,7 +165,9 @@ $user_role = $user_role ?? 'user';
             height: 42px;
         }
 
+
         /* --- END KONSISTENSI MASTER ADMIN --- */
+
 
 
         /* --- GALERI SECTION STYLING --- */
@@ -158,11 +179,13 @@ $user_role = $user_role ?? 'user';
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
+
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 15px;
         }
+
 
         .gallery-item {
             border-radius: 16px;
@@ -171,20 +194,23 @@ $user_role = $user_role ?? 'user';
             cursor: pointer;
             transition: transform 0.3s ease;
             background: white;
-            padding: 0; 
+            padding: 0;
         }
+
 
         .gallery-item img {
             width: 100%;
-            height: 200px; 
+            height: 200px;
             object-fit: cover;
             display: block;
         }
+
 
         .gallery-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
+
 
         /* --- GALLERY OVERLAY DAN TOMBOL AKSI REVISI --- */
         .gallery-overlay {
@@ -202,9 +228,11 @@ $user_role = $user_role ?? 'user';
             transition: opacity 0.3s ease;
         }
 
+
         .gallery-item:hover .gallery-overlay {
             opacity: 1;
         }
+
 
         .gallery-overlay .btn {
             border-radius: 50%;
@@ -219,10 +247,12 @@ $user_role = $user_role ?? 'user';
             transition: opacity 0.2s, transform 0.2s;
         }
 
+
         .gallery-overlay .btn:hover {
             opacity: 1;
             transform: scale(1.1);
         }
+
 
         /* WARNA TOMBOL KONSISTENSI MASTER ADMIN */
         .btn-delete {
@@ -230,21 +260,25 @@ $user_role = $user_role ?? 'user';
             border-color: #dc3545 !important;
         }
 
+
         .btn-delete:hover {
             background-color: #c82333 !important;
         }
-        
+
         /* Dihapus: Styles untuk .btn-view dan .btn-view:hover */
 
-        /* Dihapus: Styles untuk .modal-body img.img-fluid karena modal detail dihilangkan */
 
+        /* Dihapus: Styles untuk .modal-body img.img-fluid karena modal detail dihilangkan */
     </style>
 </head>
+
 
 <body>
     <?php include 'sidebar.php'; ?>
 
+
     <main class="main">
+
 
         <div class="main-header">
             <div>
@@ -257,6 +291,7 @@ $user_role = $user_role ?? 'user';
                 </small>
             </div>
         </div>
+
 
         <section class="upload-section">
             <form id="formUpload" enctype="multipart/form-data">
@@ -272,8 +307,10 @@ $user_role = $user_role ?? 'user';
                     </div>
                 </div>
 
+
             </form>
         </section>
+
 
         <div class="card">
             <div class="card-header">
@@ -288,11 +325,13 @@ $user_role = $user_role ?? 'user';
                 </section>
             </div>
         </div>
-        
+
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../frontend/galeri.js"></script>
+    <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
+    <script src="<?php echo getAssetsUrl('frontend/galeri.js'); ?>"></script>
 </body>
+
 
 </html>

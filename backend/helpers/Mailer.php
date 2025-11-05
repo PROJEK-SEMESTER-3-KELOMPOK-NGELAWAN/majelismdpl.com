@@ -5,6 +5,8 @@ namespace App\Helpers;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+require_once __DIR__ . '/../../config.php';
+
 class Mailer
 {
   // ====== KONFIGURASI SMTP ======
@@ -16,10 +18,10 @@ class Mailer
   private static string $FROM_NAME  = 'Majelis MDPL';
 
   // Base URL website (ubah sesuai domain production Anda)
-  private static string $BASE_URL = 'http://localhost/majelismdpl.com';
+  private static string $BASE_URL = BASE_URL;
 
   private static string $LOGO_PATH_ABS = __DIR__ . '/../../assets/logo_majelis_noBg.png';
-  private static string $LOGO_FALLBACK_URL = 'http://localhost/majelismdpl.com/assets/logo_majelis_noBg.png';
+  private static string $LOGO_FALLBACK_URL = BASE_URL . '/assets/logo_majelis_noBg.png';
 
   private static bool   $USE_TLS    = true;
 

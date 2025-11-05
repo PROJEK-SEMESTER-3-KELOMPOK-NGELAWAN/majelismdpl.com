@@ -1,4 +1,5 @@
 <?php
+require_once '../config.php';
 require_once '../backend/koneksi.php';
 session_start();
 
@@ -16,7 +17,7 @@ if ($isLogin) {
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
-    header("Location: ../index.php");
+    header("Location: " . getPageUrl('index.php'));
     exit();
 }
 
@@ -28,7 +29,7 @@ $trip = $resultTrip->fetch_assoc();
 $stmtTrip->close();
 
 if (!$trip) {
-    header("Location: ../index.php");
+    header("Location: " . getPageUrl('index.php'));
     exit();
 }
 
@@ -2109,6 +2110,9 @@ function createIconList($text, $iconClass)
 
     <?php include '../footer.php'; ?>
 
+    <!-- LOAD CONFIG.JS TERLEBIH DAHULU -->
+    <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../frontend/registrasi.js"></script>
     <script src="../frontend/login.js"></script>
@@ -2440,10 +2444,25 @@ function createIconList($text, $iconClass)
         }
 
         function openPayment(id) {
-            document.getElementById('modal-payment').style.display = 'flex';
-            document.getElementById('hasil-pembayaran').innerHTML = 'Memproses pembayaran...';
+            // Verify config loaded
+            if (typeof getApiUrl !== 'function') {
+                console.error('getApiUrl function not available');
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Konfigurasi aplikasi tidak lengkap. Silakan refresh halaman.',
+                    icon: 'error',
+                    confirmButtonColor: '#FFB800'
+                });
+                return;
+            }
 
-            fetch(`../backend/payment-api.php?booking=${id}`)
+            document.getElementById('modal-payment').style.display = 'flex';
+            document.getElementById('hasil-pembayaran').innerHTML = '<i class="bi bi-hourglass-split"></i> Memproses pembayaran...';
+
+            // Gunakan payment API yang sudah diperbaiki
+            const paymentApiUrl = getApiUrl('payment-api.php') + '?booking=' + id;
+
+            fetch(paymentApiUrl)
                 .then(r => {
                     const contentType = r.headers.get('content-type');
                     if (!contentType || !contentType.includes('application/json')) {
@@ -2452,75 +2471,71 @@ function createIconList($text, $iconClass)
                     return r.json();
                 })
                 .then(resp => {
+                    if (!resp.success) {
+                        throw new Error(resp.error || 'Gagal mendapatkan token pembayaran');
+                    }
+
                     if (resp.snap_token) {
                         window.snap.pay(resp.snap_token, {
                             onSuccess: (result) => {
-                                document.getElementById('hasil-pembayaran').innerHTML = 'Pembayaran Berhasil!';
+                                document.getElementById('hasil-pembayaran').innerHTML = '<i class="bi bi-check-circle"></i> Pembayaran Berhasil!';
                                 setTimeout(() => {
                                     closePayment();
                                     Swal.fire({
                                         title: 'Pembayaran Berhasil!',
                                         text: 'Booking Anda telah dikonfirmasi.',
                                         icon: 'success',
-                                        background: 'rgba(255, 255, 255, 0.95)',
-                                        color: '#3D2F21',
                                         confirmButtonColor: '#FFB800'
                                     }).then(() => window.location.reload());
                                 }, 1000);
                             },
                             onPending: (result) => {
-                                document.getElementById('hasil-pembayaran').innerHTML = 'Menunggu Pembayaran...';
+                                document.getElementById('hasil-pembayaran').innerHTML = '<i class="bi bi-clock"></i> Menunggu Pembayaran...';
                                 setTimeout(() => {
                                     closePayment();
                                     Swal.fire({
                                         title: 'Pembayaran Pending',
                                         text: 'Silakan selesaikan pembayaran Anda.',
                                         icon: 'info',
-                                        background: 'rgba(255, 255, 255, 0.95)',
-                                        color: '#3D2F21',
                                         confirmButtonColor: '#FFB800'
                                     });
                                 }, 2000);
                             },
                             onError: (result) => {
-                                document.getElementById('hasil-pembayaran').innerHTML = 'Pembayaran Gagal!';
+                                document.getElementById('hasil-pembayaran').innerHTML = '<i class="bi bi-x-circle"></i> Pembayaran Gagal!';
                                 setTimeout(() => {
                                     closePayment();
                                     Swal.fire({
                                         title: 'Pembayaran Gagal',
                                         text: result.status_message || 'Terjadi kesalahan',
                                         icon: 'error',
-                                        background: 'rgba(255, 255, 255, 0.95)',
-                                        color: '#3D2F21',
                                         confirmButtonColor: '#FFB800'
                                     });
                                 }, 2000);
                             },
                             onClose: () => {
-                                document.getElementById('hasil-pembayaran').innerHTML = 'Popup Ditutup';
+                                document.getElementById('hasil-pembayaran').innerHTML = '<i class="bi bi-info-circle"></i> Popup Ditutup';
                                 setTimeout(closePayment, 1500);
                             }
                         });
                     } else {
-                        throw new Error(resp.error || 'Gagal mendapatkan Snap Token');
+                        throw new Error(resp.detail || 'Token pembayaran tidak diperoleh');
                     }
                 })
                 .catch(err => {
                     console.error('Payment error:', err);
-                    document.getElementById('hasil-pembayaran').innerHTML = 'Error: ' + err.message;
-                    setTimeout(() => {
-                        closePayment();
-                        Swal.fire({
-                            title: 'Error Pembayaran',
-                            text: err.message,
-                            icon: 'error',
-                            background: 'rgba(255, 255, 255, 0.95)',
-                            color: '#3D2F21',
-                            confirmButtonColor: '#FFB800'
-                        });
-                    }, 2000);
+
+                    closePayment();
+
+                    Swal.fire({
+                        title: 'Error Pembayaran',
+                        text: err.message || 'Gagal memproses pembayaran. Silakan coba lagi.',
+                        icon: 'error',
+                        confirmButtonColor: '#FFB800'
+                    });
                 });
         }
+
 
         function closePayment() {
             document.getElementById('modal-payment').style.display = 'none';

@@ -34,18 +34,12 @@ function hideLoginErrorModal() {
 
 // Fungsi untuk handle Google OAuth Login
 function handleGoogleLogin() {
-  const basePath = getBasePath();
-  window.location.href =
-    window.location.origin + basePath + "backend/google-oauth.php?type=login";
+  window.location.href = getPageUrl("backend/google-oauth.php") + "?type=login";
 }
 
-// Helper function untuk detect base path
+// Helper function untuk detect base path - GUNAKAN CONFIG
 function getBasePath() {
-  const path = window.location.pathname;
-  if (path.includes("/user/") || path.includes("/admin/")) {
-    return "/majelismdpl.com/";
-  }
-  return "/majelismdpl.com/";
+  return getPageUrl("").replace(window.location.origin, "");
 }
 
 // Function untuk attach Google login button listener
@@ -79,10 +73,9 @@ document.addEventListener("DOMContentLoaded", function () {
     loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
       const formData = new FormData(this);
-      const basePath = getBasePath();
 
       try {
-        const response = await fetch(basePath + "backend/login-api.php", {
+        const response = await fetch(getApiUrl("backend/login-api.php"), {
           method: "POST",
           body: formData,
         });
@@ -108,10 +101,10 @@ document.addEventListener("DOMContentLoaded", function () {
             // Redirect based on role
             if (["admin", "super_admin"].includes(result.role)) {
               setTimeout(() => {
-                window.location.href = basePath + "admin/index.php";
+                window.location.href = getPageUrl("admin/index.php");
               }, 100);
             } else {
-              window.location.href = basePath;
+              window.location.href = getPageUrl("index.php");
             }
           }, 350);
         } else {

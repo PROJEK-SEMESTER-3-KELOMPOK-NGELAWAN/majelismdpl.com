@@ -1,5 +1,6 @@
 <?php
 require_once 'auth_check.php';
+require_once '../config.php';
 require_once '../backend/koneksi.php';
 
 $id = $_GET['id'] ?? null;
@@ -14,7 +15,6 @@ if ($id) {
   $trip = $resultTrip->fetch_assoc();
 }
 if (!$trip) {
-  // Handling jika trip tidak ditemukan
   $trip = [
     'nama_gunung' => 'Trip Tidak Ditemukan',
     'tanggal' => '-',
@@ -55,7 +55,6 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
   $items = explode("\n", trim($text));
   $html = '<ul class="list-unstyled list-styled">';
 
-  // Cek apakah data default yang ditampilkan
   if (count($items) == 1 && (strpos($text, 'Belum ada data') !== false || strpos($text, 'Belum ada Syarat') !== false)) {
     return '<p class="text-muted fst-italic mt-2">' . nl2br(htmlspecialchars($text)) . '</p>';
   }
@@ -63,14 +62,13 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
   foreach ($items as $item) {
     $item = trim($item);
     if (!empty($item)) {
-      $cleanedItem = ltrim($item, "•- \t"); // Hapus bullet point atau tanda strip
+      $cleanedItem = ltrim($item, "•- \t");
       $html .= '<li><i class="bi ' . $iconClass . ' me-2"></i>' . htmlspecialchars($cleanedItem) . '</li>';
     }
   }
   $html .= '</ul>';
   return $html;
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -84,18 +82,12 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
   <style>
-    /* --- CSS KONSISTENSI UTAMA DARI trip.php --- */
     :root {
       --primary-color: #a97c50;
-      /* Cokelat Emas */
       --secondary-color: #695a3a;
-      /* Cokelat Tua */
       --background-color: #f6f0e8;
-      /* Krem Muda */
       --success-color: #2ea564;
-      /* Hijau */
       --danger-color: #d48d9a;
-      /* Merah Muda */
       --light-brown-bg: #f6f0e8;
     }
 
@@ -107,7 +99,6 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
       padding: 30px 20px;
     }
 
-    /* Tombol & Modal Konsisten (Diambil dari trip.php) */
     .btn-primary,
     .btn-success {
       background: linear-gradient(135deg, var(--primary-color) 0%, #8b6332 100%) !important;
@@ -139,7 +130,6 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
       font-weight: 600;
     }
 
-    /* Form Label Konsisten (Ditambahkan agar label form di modal punya ikon) */
     .modal-body .form-label {
       font-weight: 600;
       color: #495057;
@@ -157,9 +147,6 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
       outline: none;
     }
 
-    /* --- END KONSISTENSI UTAMA DARI trip.php --- */
-
-    /* --- STYLING KHUSUS detailTrip.php --- */
     .container-detail {
       max-width: 1100px;
       margin: auto;
@@ -340,7 +327,7 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
   <div class="container-detail">
     <div class="trip-header">
       <img id="tripGambar"
-        src="<?= $trip['gambar'] ? '../' . htmlspecialchars($trip['gambar']) : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80' ?>"
+        src="<?= $trip['gambar'] ? getAssetsUrl(ltrim($trip['gambar'], '/')) : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80' ?>"
         alt="Foto Gunung" class="trip-image" />
       <div class="trip-info">
         <h1 id="tripJudul"><?= htmlspecialchars($trip['nama_gunung']) ?></h1>
@@ -355,7 +342,7 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
           <span><i class="bi bi-signpost-2"></i> Via <span id="tripVia"><?= htmlspecialchars($trip['via_gunung']) ?></span></span>
         </div>
         <div class="trip-extra">
-          <div class="price">Harga: **Rp <?= isset($trip['harga']) && is_numeric($trip['harga']) ? number_format($trip['harga'], 0, ',', '.') : '0' ?>**</div>
+          <div class="price">Harga: <strong>Rp <?= isset($trip['harga']) && is_numeric($trip['harga']) ? number_format($trip['harga'], 0, ',', '.') : '0' ?></strong></div>
         </div>
       </div>
     </div>
@@ -399,13 +386,9 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
 
       if (!$linkMap || $linkMap === 'Belum Diatur') {
         echo '<p class="text-muted fst-italic"><em>Link Google Map Meeting Point belum diatur.</em></p>';
-      }
-      // Embed langsung jika sudah embed link
-      elseif (strpos($linkMap, '/maps/embed?') !== false) {
+      } elseif (strpos($linkMap, '/maps/embed?') !== false) {
         echo '<iframe src="' . htmlspecialchars($linkMap) . '" allowfullscreen loading="lazy"></iframe>';
-      }
-      // Auto-convert share url ke embed
-      elseif (preg_match('#^https:\/\/(www\.)?google\.(com|co\.id)\/maps/#', $linkMap)) {
+      } elseif (preg_match('#^https:\/\/(www\.)?google\.(com|co\.id)\/maps/#', $linkMap)) {
         if (strpos($linkMap, 'maps.app.goo.gl') !== false) {
           echo '<p><a href="' . htmlspecialchars($linkMap) . '" target="_blank" rel="noopener" class="btn btn-outline-primary mt-3"><i class="bi bi-box-arrow-up-right"></i> Buka Peta di Google Maps</a></p>';
           echo '<small class="text-muted">Gunakan link embed untuk preview otomatis.</small>';
@@ -413,9 +396,7 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
           $embedUrl = str_replace('/maps/', '/maps/embed/', $linkMap);
           echo '<iframe src="' . htmlspecialchars($embedUrl) . '" allowfullscreen loading="lazy"></iframe>';
         }
-      }
-      // Jika shortlink Google Maps atau format lain (fallback: hanya tampil link)
-      else {
+      } else {
         echo '<p><a href="' . htmlspecialchars($linkMap) . '" target="_blank" rel="noopener" class="btn btn-outline-primary mt-3"><i class="bi bi-box-arrow-up-right"></i> Buka Peta di Google Maps</a></p>';
         echo '<small class="text-muted">Gunakan link embed dari opsi "Share > Embed map" di Google Maps untuk menampilkan preview di sini.</small>';
       }
@@ -423,7 +404,7 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
     </section>
 
     <div class="d-flex justify-content-start mt-4">
-      <a href="trip.php" class="btn-back">
+      <a href="<?php echo getPageUrl('admin/trip.php'); ?>" class="btn-back">
         <i class="bi bi-arrow-left-circle"></i> Kembali ke Daftar Trip
       </a>
     </div>
@@ -533,14 +514,12 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="../frontend/trip-detail.js"></script>
+  <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
+  <script src="<?php echo getAssetsUrl('frontend/trip-detail.js'); ?>"></script>
   <script>
-    // Inisialisasi dan Event Listener untuk Modal
     const idTrip = '<?= htmlspecialchars($id) ?>';
 
-    // 1. Event listener untuk tombol 'Tambah/Edit Detail Trip'
     document.getElementById('btnTambahDetailTrip').addEventListener('click', function() {
-      // Update teks tombol di modal saat dibuka
       const actionType = document.getElementById('detailActionType').value;
       const modalTitle = document.getElementById('detailModalTitleText');
       modalTitle.textContent = actionType === 'updateDetail' ? 'Edit Detail Trip' : 'Tambah Detail Trip Baru';
@@ -549,10 +528,8 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
       modal.show();
     });
 
-    // 2. Handler Form Submit
     document.getElementById('formDetailTrip').addEventListener('submit', function(event) {
       event.preventDefault();
-      // Memanggil fungsi submit dari trip-detail.js
       if (typeof submitDetailTrip === 'function') {
         submitDetailTrip(event.target);
       } else {
@@ -560,7 +537,6 @@ function formatListContent($text, $iconClass = 'bi-check-circle-fill')
       }
     });
 
-    // 3. Update teks tombol 'Tambah/Edit Detail Trip' di luar modal saat page load
     document.addEventListener('DOMContentLoaded', function() {
       const detailActionType = document.getElementById('detailActionType').value;
       const btnTambahDetailTrip = document.getElementById('btnTambahDetailTrip');

@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__, 2) . '/vendor/autoload.php';
+require_once dirname(__FILE__, 2) . '/config.php';
 require_once 'koneksi.php';
 
 $helperPath = __DIR__ . '/helpers/Mailer.php';
@@ -7,35 +8,95 @@ if (file_exists($helperPath)) require_once $helperPath;
 
 use App\Helpers\Mailer;
 
+// ========== ERROR HANDLING ==========
+ob_start();
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
-error_reporting(0);
+ini_set('log_errors', 0);
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
 
 session_start();
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-function app_log($msg)
+function sendJsonError($message, $detail = null, $statusCode = 400)
 {
-    // no-op
+    ob_clean();
+    http_response_code($statusCode);
+    echo json_encode([
+        'success' => false,
+        'error' => $message,
+        'detail' => $detail
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+function sendJsonSuccess($data = [], $statusCode = 200)
+{
+    ob_clean();
+    http_response_code($statusCode);
+    echo json_encode(array_merge(['success' => true], $data), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-    app_log("PHP[$errno] $errstr @ " . basename($errfile) . ":$errline");
-    echo json_encode(['error' => 'PHP Error', 'message' => $errstr, 'where' => basename($errfile) . ':' . $errline]);
-    exit;
+    if ($errno === E_WARNING || $errno === E_NOTICE) {
+        return true;
+    }
+    sendJsonError('PHP Error', $errstr, 500);
 });
 
 set_exception_handler(function ($e) {
-    app_log("EXC " . $e->getMessage());
-    echo json_encode(['error' => 'Exception', 'message' => $e->getMessage()]);
-    exit;
+    sendJsonError('System Error', $e->getMessage(), 500);
 });
 
-\Midtrans\Config::$serverKey    = 'Mid-server-4bU4xow9Vq2yH-1WicaeTMiq';
-\Midtrans\Config::$isProduction = false;
-\Midtrans\Config::$isSanitized  = true;
-\Midtrans\Config::$is3ds        = true;
+// ========== VERIFY DATABASE CONNECTION ==========
+if (!$conn || $conn->connect_error) {
+    sendJsonError('Database Connection Error', 'Tidak dapat terhubung ke database', 500);
+}
 
+// ========== MIDTRANS CONFIG - SIMPLE & DIRECT ==========
+try {
+    if (!class_exists('\Midtrans\Config')) {
+        throw new Exception('Midtrans SDK tidak ditemukan. Pastikan composer install sudah dijalankan.');
+    }
+
+    \Midtrans\Config::$serverKey    = 'Mid-server-4bU4xow9Vq2yH-1WicaeTMiq';
+    \Midtrans\Config::$isProduction = false;
+    \Midtrans\Config::$isSanitized  = true;
+    \Midtrans\Config::$is3ds        = true;
+
+    // ✅ CHECK APP_MODE dari config.php - NGROK detected
+    $isProduction = false;
+    if (defined('APP_MODE')) {
+        if (APP_MODE === 'PRODUCTION') {
+            $isProduction = true;
+        }
+    }
+
+    // Set SSL verification berdasarkan APP_MODE
+    if ($isProduction) {
+        // Production: strict SSL verification
+        \Midtrans\Config::$curlOptions = array(
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_CONNECTTIMEOUT => 30,
+            CURLOPT_TIMEOUT => 30
+        );
+    } else {
+        // Local & Ngrok: disable SSL verification untuk menghindari certificate issue
+        \Midtrans\Config::$curlOptions = array(
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_CONNECTTIMEOUT => 30,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_RETURNTRANSFER => true
+        );
+    }
+} catch (Exception $e) {
+    sendJsonError('Midtrans Configuration Error', $e->getMessage(), 500);
+}
+
+// ========== STATUS MAPPING ==========
 $mapStatus = function ($transaction_status, $fraud_status) {
     $fraud_status = $fraud_status ?? 'accept';
     if ($transaction_status === 'capture') return ($fraud_status === 'accept') ? 'paid' : 'pending';
@@ -47,6 +108,7 @@ $mapStatus = function ($transaction_status, $fraud_status) {
     return 'pending';
 };
 
+// ========== HELPER FUNCTIONS ==========
 $deleteParticipants = function (mysqli $conn, int $id_booking) {
     if ($st = $conn->prepare("DELETE FROM participants WHERE id_booking=?")) {
         $st->bind_param("i", $id_booking);
@@ -88,95 +150,111 @@ $sendPendingMail = function (mysqli $conn, int $id_booking) use ($getEmailPack) 
     if (!class_exists(Mailer::class)) return;
     $d = $getEmailPack($conn, $id_booking);
     if (!$d) return;
-    $html = Mailer::buildPendingTemplate([
-        'order_id' => $d['order_id'] ?? '',
-        'nama_gunung' => $d['nama_gunung'],
-        'tanggal_booking' => $d['tanggal_booking'],
-        'total_harga' => $d['total_harga'],
-        'nama_user' => $d['username']
-    ]);
-    Mailer::send($d['email'], $d['username'], 'Menunggu Pembayaran', $html, 'Menunggu pembayaran');
+    try {
+        $html = Mailer::buildPendingTemplate([
+            'order_id' => $d['order_id'] ?? '',
+            'nama_gunung' => $d['nama_gunung'],
+            'tanggal_booking' => $d['tanggal_booking'],
+            'total_harga' => $d['total_harga'],
+            'nama_user' => $d['username']
+        ]);
+        Mailer::send($d['email'], $d['username'], 'Menunggu Pembayaran', $html, 'Menunggu pembayaran');
+    } catch (Exception $e) {
+        // Silent fail
+    }
 };
 
 $sendPaidMail = function (mysqli $conn, int $id_booking) use ($getEmailPack) {
     if (!class_exists(Mailer::class)) return;
     $d = $getEmailPack($conn, $id_booking);
     if (!$d) return;
-    $html = Mailer::buildPaidTemplate([
-        'order_id' => $d['order_id'] ?? '',
-        'nama_gunung' => $d['nama_gunung'],
-        'tanggal_booking' => $d['tanggal_booking'],
-        'total_harga' => $d['total_harga'],
-        'nama_user' => $d['username'],
-        'payment_id' => $d['id_payment'] ?? ''
-    ]);
-    Mailer::send($d['email'], $d['username'], 'Pembayaran Berhasil', $html, 'Pembayaran berhasil');
+    try {
+        $html = Mailer::buildPaidTemplate([
+            'order_id' => $d['order_id'] ?? '',
+            'nama_gunung' => $d['nama_gunung'],
+            'tanggal_booking' => $d['tanggal_booking'],
+            'total_harga' => $d['total_harga'],
+            'nama_user' => $d['username'],
+            'payment_id' => $d['id_payment'] ?? ''
+        ]);
+        Mailer::send($d['email'], $d['username'], 'Pembayaran Berhasil', $html, 'Pembayaran berhasil');
+    } catch (Exception $e) {
+        // Silent fail
+    }
 };
 
 $sendFailedMail = function (mysqli $conn, int $id_booking, string $variant) use ($getEmailPack) {
     if (!class_exists(Mailer::class)) return;
     $d = $getEmailPack($conn, $id_booking);
     if (!$d) return;
-    $html = Mailer::buildFailedTemplate([
-        'order_id' => $d['order_id'] ?? '',
-        'nama_gunung' => $d['nama_gunung'],
-        'tanggal_booking' => $d['tanggal_booking'],
-        'total_harga' => $d['total_harga'],
-        'nama_user' => $d['username']
-    ]);
-    $subject = $variant === 'expire' ? 'Pesanan Kedaluwarsa' : ($variant === 'cancel' ? 'Pesanan Dibatalkan' : 'Pembayaran Gagal');
-    Mailer::send($d['email'], $d['username'], $subject, $html, $subject);
+    try {
+        $html = Mailer::buildFailedTemplate([
+            'order_id' => $d['order_id'] ?? '',
+            'nama_gunung' => $d['nama_gunung'],
+            'tanggal_booking' => $d['tanggal_booking'],
+            'total_harga' => $d['total_harga'],
+            'nama_user' => $d['username']
+        ]);
+        $subject = $variant === 'expire' ? 'Pesanan Kedaluwarsa' : ($variant === 'cancel' ? 'Pesanan Dibatalkan' : 'Pembayaran Gagal');
+        Mailer::send($d['email'], $d['username'], $subject, $html, $subject);
+    } catch (Exception $e) {
+        // Silent fail
+    }
 };
 
 // ===== Cancel manual
 if (isset($_POST['cancel_booking'])) {
     $id_booking = (int)($_POST['cancel_booking'] ?? 0);
     if ($id_booking <= 0) {
-        echo json_encode(['error' => 'Invalid booking id']);
-        exit;
+        sendJsonError('Invalid booking id');
     }
-    $conn->begin_transaction();
-    if ($up = $conn->prepare("UPDATE payments SET status_pembayaran='cancel' WHERE id_booking=?")) {
-        $up->bind_param("i", $id_booking);
-        $up->execute();
-        $up->close();
-    } else {
+    try {
+        $conn->begin_transaction();
+        if ($up = $conn->prepare("UPDATE payments SET status_pembayaran='cancel' WHERE id_booking=?")) {
+            $up->bind_param("i", $id_booking);
+            $up->execute();
+            $up->close();
+        } else {
+            $conn->rollback();
+            sendJsonError('Database error: ' . $conn->error);
+        }
+        $setBookingStatus($conn, $id_booking, 'cancelled', true);
+        $conn->commit();
+        $sendFailedMail($conn, $id_booking, 'cancel');
+        sendJsonSuccess(['status' => 'cancel']);
+    } catch (Exception $e) {
         $conn->rollback();
-        echo json_encode(['error' => 'Database error: ' . $conn->error]);
-        exit;
+        sendJsonError('Cancel booking failed', $e->getMessage(), 500);
     }
-    $setBookingStatus($conn, $id_booking, 'cancelled', true);
-    $conn->commit();
-    $sendFailedMail($conn, $id_booking, 'cancel');
-    echo json_encode(['success' => true, 'status' => 'cancel']);
-    exit;
 }
 
 // ===== Cek status lokal
 if (isset($_GET['status_id'])) {
-    $id_booking = (int)($_GET['status_id'] ?? 0);
-    $status = 'unknown';
-    if ($id_booking > 0 && ($st = $conn->prepare("SELECT status_pembayaran FROM payments WHERE id_booking=?"))) {
-        $st->bind_param("i", $id_booking);
-        $st->execute();
-        $st->bind_result($status);
-        $st->fetch();
-        $st->close();
+    try {
+        $id_booking = (int)($_GET['status_id'] ?? 0);
+        $status = 'unknown';
+        if ($id_booking > 0 && ($st = $conn->prepare("SELECT status_pembayaran FROM payments WHERE id_booking=?"))) {
+            $st->bind_param("i", $id_booking);
+            $st->execute();
+            $st->bind_result($status);
+            $st->fetch();
+            $st->close();
+        }
+        sendJsonSuccess(['status' => $status ?: 'no_payment']);
+    } catch (Exception $e) {
+        sendJsonError('Status check failed', $e->getMessage(), 500);
     }
-    echo json_encode(['status' => $status ?: 'no_payment']);
-    exit;
 }
 
 // ===== Check Midtrans (poll)
 if (isset($_GET['check_status'])) {
     $order_id = trim($_GET['check_status']);
     if ($order_id === '') {
-        echo json_encode(['error' => 'Order ID required']);
-        exit;
+        sendJsonError('Order ID required');
     }
 
     try {
-        $status = \Midtrans\Transaction::status($order_id);
+        @$status = \Midtrans\Transaction::status($order_id);
         $transaction_status = $status->transaction_status ?? 'pending';
         $fraud_status = $status->fraud_status ?? 'accept';
         $status_pembayaran = $mapStatus($transaction_status, $fraud_status);
@@ -188,8 +266,7 @@ if (isset($_GET['check_status'])) {
             $st->close();
         } else {
             $conn->rollback();
-            echo json_encode(['error' => 'Database error: ' . $conn->error]);
-            exit;
+            sendJsonError('Database error: ' . $conn->error);
         }
 
         $id_booking = null;
@@ -219,235 +296,257 @@ if (isset($_GET['check_status'])) {
             }
         }
         $conn->commit();
-        echo json_encode(['success' => true, 'status' => $status_pembayaran, 'transaction_status' => $transaction_status]);
-        exit;
-    } catch (\Exception $e) {
-        app_log("check_status exception: " . $e->getMessage());
-        echo json_encode(['success' => false, 'error' => 'midtrans_exception', 'message' => $e->getMessage()]);
-        exit;
+        sendJsonSuccess(['status' => $status_pembayaran, 'transaction_status' => $transaction_status]);
+    } catch (Exception $e) {
+        if ($conn) $conn->rollback();
+        sendJsonError('Check status failed', $e->getMessage(), 500);
     }
 }
 
 // ===== Auto-expire >24 jam
 if (isset($_GET['expire_stale'])) {
-    $conn->begin_transaction();
-    $q = $conn->query("
-        SELECT p.id_payment, p.id_booking
-        FROM payments p
-        WHERE p.status_pembayaran='pending'
-          AND TIMESTAMPDIFF(HOUR, CONCAT(p.tanggal,' 00:00:00'), NOW()) >= 24
-    ");
-    $expired = 0;
-    if ($q) {
-        while ($r = $q->fetch_assoc()) {
-            $id_booking = (int)$r['id_booking'];
-            if ($up = $conn->prepare("UPDATE payments SET status_pembayaran='expire' WHERE id_payment=?")) {
-                $up->bind_param("i", $r['id_payment']);
-                $up->execute();
-                $up->close();
+    try {
+        $conn->begin_transaction();
+        $q = $conn->query("
+            SELECT p.id_payment, p.id_booking
+            FROM payments p
+            WHERE p.status_pembayaran='pending'
+              AND TIMESTAMPDIFF(HOUR, CONCAT(p.tanggal,' 00:00:00'), NOW()) >= 24
+        ");
+        $expired = 0;
+        if ($q) {
+            while ($r = $q->fetch_assoc()) {
+                $id_booking = (int)$r['id_booking'];
+                if ($up = $conn->prepare("UPDATE payments SET status_pembayaran='expire' WHERE id_payment=?")) {
+                    $up->bind_param("i", $r['id_payment']);
+                    $up->execute();
+                    $up->close();
+                }
+                $setBookingStatus($conn, $id_booking, 'cancelled', true);
+                $sendFailedMail($conn, $id_booking, 'expire');
+                $expired++;
             }
-            $setBookingStatus($conn, $id_booking, 'cancelled', true);
-            $sendFailedMail($conn, $id_booking, 'expire');
-            $expired++;
         }
+        $conn->commit();
+        sendJsonSuccess(['expired' => $expired]);
+    } catch (Exception $e) {
+        if ($conn) $conn->rollback();
+        sendJsonError('Expire stale failed', $e->getMessage(), 500);
     }
-    $conn->commit();
-    echo json_encode(['success' => true, 'expired' => $expired]);
-    exit;
 }
 
-// ===== Generate Snap Token
+// ===== Generate Snap Token (MAIN ENDPOINT)
 if (isset($_GET['booking'])) {
     $id_booking = (int)($_GET['booking'] ?? 0);
+
     if ($id_booking <= 0) {
-        echo json_encode(['error' => 'ID booking tidak valid']);
-        exit;
+        sendJsonError('ID booking tidak valid');
     }
-
-    $st = $conn->prepare("
-        SELECT b.id_booking, b.status, b.total_harga, t.nama_gunung, t.id_trip, u.username, u.email
-        FROM bookings b
-        JOIN paket_trips t ON b.id_trip=t.id_trip
-        JOIN users u ON b.id_user=u.id_user
-        WHERE b.id_booking=?
-    ");
-    if (!$st) {
-        echo json_encode(['error' => 'Database prepare error: ' . $conn->error]);
-        exit;
-    }
-    $st->bind_param("i", $id_booking);
-    $st->execute();
-    $booking = $st->get_result()->fetch_assoc();
-    $st->close();
-
-    if (!$booking) {
-        echo json_encode(['error' => 'Booking tidak ditemukan']);
-        exit;
-    }
-    if (in_array($booking['status'], ['cancelled', 'confirmed'])) {
-        echo json_encode(['error' => 'Booking tidak tersedia untuk pembayaran']);
-        exit;
-    }
-
-    $grossAmount = (int)($booking['total_harga'] ?? 0);
-    if ($grossAmount <= 0) {
-        echo json_encode(['error' => 'Total harga tidak valid']);
-        exit;
-    }
-
-    $customerName  = trim((string)($booking['username'] ?? 'User'));
-    $customerEmail = trim((string)($booking['email'] ?? ''));
-    if ($customerEmail === '') {
-        echo json_encode(['error' => 'Email pengguna kosong']);
-        exit;
-    }
-
-    $itemName = trim((string)($booking['nama_gunung'] ?? 'Trip'));
-    if ($itemName === '') $itemName = 'Trip ' . $booking['id_trip'];
-
-    $order_id = 'ORDER-' . $id_booking . '-' . time();
-
-    $params = [
-        'transaction_details' => [
-            'order_id' => $order_id,
-            'gross_amount' => $grossAmount
-        ],
-        'customer_details' => [
-            'first_name' => $customerName,
-            'email' => $customerEmail
-        ],
-        'item_details' => [[
-            'id' => $booking['id_trip'],
-            'price' => $grossAmount,
-            'quantity' => 1,
-            'name' => $itemName
-        ]]
-    ];
 
     try {
-        $snapToken = \Midtrans\Snap::getSnapToken($params);
-    } catch (\Exception $e) {
-        app_log('getSnapToken error: ' . $e->getMessage() . ' params=' . json_encode($params));
-        echo json_encode(['error' => 'Gagal membuat token pembayaran', 'detail' => $e->getMessage()]);
-        exit;
-    }
-
-    $cek = $conn->prepare("SELECT id_payment, sent_pending_email FROM payments WHERE id_booking=?");
-    if (!$cek) {
-        echo json_encode(['error' => 'Database error: ' . $conn->error]);
-        exit;
-    }
-    $cek->bind_param("i", $id_booking);
-    $cek->execute();
-    $cek->store_result();
-
-    if ($cek->num_rows == 0) {
-        $stmtPay = $conn->prepare("INSERT INTO payments
-            (id_booking, jumlah_bayar, tanggal, jenis_pembayaran, metode, status_pembayaran, order_id, sent_pending_email, sent_paid_email)
-            VALUES (?, ?, CURDATE(), 'trip', 'midtrans', 'pending', ?, 0, 0)");
-        if (!$stmtPay) {
-            echo json_encode(['error' => 'Insert payment error: ' . $conn->error]);
-            exit;
+        // 1. Ambil data booking
+        $st = $conn->prepare("
+            SELECT b.id_booking, b.status, b.total_harga, t.nama_gunung, t.id_trip, u.username, u.email
+            FROM bookings b
+            JOIN paket_trips t ON b.id_trip=t.id_trip
+            JOIN users u ON b.id_user=u.id_user
+            WHERE b.id_booking=?
+        ");
+        if (!$st) {
+            throw new Exception('Database prepare error: ' . $conn->error);
         }
-        $stmtPay->bind_param("iis", $id_booking, $grossAmount, $order_id);
-        $stmtPay->execute();
-        $stmtPay->close();
-
-        $sendPendingMail($conn, $id_booking);
-        $conn->query("UPDATE payments SET sent_pending_email=1 WHERE id_booking=" . $id_booking);
-    } else {
-        $cek->bind_result($id_payment, $sentPending);
-        $cek->fetch();
-        if ($u = $conn->prepare("UPDATE payments SET order_id=?, status_pembayaran='pending' WHERE id_booking=?")) {
-            $u->bind_param("si", $order_id, $id_booking);
-            $u->execute();
-            $u->close();
+        $st->bind_param("i", $id_booking);
+        if (!$st->execute()) {
+            throw new Exception('Database execute error: ' . $st->error);
         }
-        if ((int)$sentPending === 0) {
+        $booking = $st->get_result()->fetch_assoc();
+        $st->close();
+
+        if (!$booking) {
+            sendJsonError('Booking tidak ditemukan');
+        }
+
+        if (in_array($booking['status'], ['cancelled', 'confirmed'])) {
+            sendJsonError('Booking tidak tersedia untuk pembayaran (Status: ' . $booking['status'] . ')');
+        }
+
+        // 2. Validasi amount
+        $grossAmount = (int)($booking['total_harga'] ?? 0);
+        if ($grossAmount <= 0) {
+            sendJsonError('Total harga tidak valid');
+        }
+
+        // 3. Validasi customer data
+        $customerName  = trim((string)($booking['username'] ?? 'User'));
+        $customerEmail = trim((string)($booking['email'] ?? ''));
+        if (empty($customerEmail)) {
+            sendJsonError('Email pengguna kosong');
+        }
+
+        $itemName = trim((string)($booking['nama_gunung'] ?? 'Trip'));
+        if (empty($itemName)) $itemName = 'Trip ' . $booking['id_trip'];
+
+        $order_id = 'ORDER-' . $id_booking . '-' . time();
+
+        // 4. Prepare Midtrans params
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order_id,
+                'gross_amount' => $grossAmount
+            ],
+            'customer_details' => [
+                'first_name' => $customerName,
+                'email' => $customerEmail
+            ],
+            'item_details' => [[
+                'id' => (string)$booking['id_trip'],
+                'price' => $grossAmount,
+                'quantity' => 1,
+                'name' => $itemName
+            ]]
+        ];
+
+        // 5. Get Snap Token - WITH BETTER ERROR HANDLING
+        try {
+            @$snapToken = \Midtrans\Snap::getSnapToken($params);
+        } catch (\Exception $e) {
+            throw new Exception('Midtrans API Error: ' . $e->getMessage());
+        }
+
+        if (empty($snapToken)) {
+            throw new Exception('Snap token kosong dari Midtrans');
+        }
+
+        // 6. Check existing payment
+        $cek = $conn->prepare("SELECT id_payment, sent_pending_email FROM payments WHERE id_booking=?");
+        if (!$cek) {
+            throw new Exception('Database prepare error: ' . $conn->error);
+        }
+        $cek->bind_param("i", $id_booking);
+        $cek->execute();
+        $cek->store_result();
+
+        // 7. Insert or update payment
+        if ($cek->num_rows == 0) {
+            $stmtPay = $conn->prepare("INSERT INTO payments
+                (id_booking, jumlah_bayar, tanggal, jenis_pembayaran, metode, status_pembayaran, order_id, sent_pending_email, sent_paid_email)
+                VALUES (?, ?, CURDATE(), ?, ?, ?, ?, ?, ?)");
+            if (!$stmtPay) {
+                throw new Exception('Insert prepare error: ' . $conn->error);
+            }
+            
+            $jenis = 'trip';
+            $metode = 'midtrans';
+            $status = 'pending';
+            $sent_pending = 0;
+            $sent_paid = 0;
+            
+            $stmtPay->bind_param("iissssii", $id_booking, $grossAmount, $jenis, $metode, $status, $order_id, $sent_pending, $sent_paid);
+            if (!$stmtPay->execute()) {
+                throw new Exception('Insert execute error: ' . $stmtPay->error);
+            }
+            $stmtPay->close();
+
             $sendPendingMail($conn, $id_booking);
-            if ($uu = $conn->prepare("UPDATE payments SET sent_pending_email=1 WHERE id_payment=?")) {
-                $uu->bind_param("i", $id_payment);
-                $uu->execute();
-                $uu->close();
+            $conn->query("UPDATE payments SET sent_pending_email=1 WHERE id_booking=" . $id_booking);
+        } else {
+            $cek->bind_result($id_payment, $sentPending);
+            $cek->fetch();
+            if ($u = $conn->prepare("UPDATE payments SET order_id=?, status_pembayaran=?, metode=?, jenis_pembayaran=? WHERE id_booking=?")) {
+                $metode = 'midtrans';
+                $status = 'pending';
+                $jenis = 'trip';
+                $u->bind_param("ssssi", $order_id, $status, $metode, $jenis, $id_booking);
+                $u->execute();
+                $u->close();
+            }
+            
+            if ((int)$sentPending === 0) {
+                $sendPendingMail($conn, $id_booking);
+                if ($uu = $conn->prepare("UPDATE payments SET sent_pending_email=1 WHERE id_payment=?")) {
+                    $uu->bind_param("i", $id_payment);
+                    $uu->execute();
+                    $uu->close();
+                }
             }
         }
-    }
-    $cek->close();
+        $cek->close();
 
-    echo json_encode(['success' => true, 'snap_token' => $snapToken, 'order_id' => $order_id]);
-    exit;
+        sendJsonSuccess(['snap_token' => $snapToken, 'order_id' => $order_id]);
+        
+    } catch (Exception $e) {
+        sendJsonError('Gagal membuat token pembayaran', $e->getMessage(), 500);
+    }
 }
 
 // ===== Webhook
 $json = file_get_contents('php://input');
 if (empty($json)) {
-    echo json_encode(['ok' => true]);
-    exit;
+    sendJsonSuccess();
 }
 
-$notification = json_decode($json);
-if (!$notification) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Invalid notification']);
-    exit;
-}
-
-$validSignature = hash(
-    'sha512',
-    $notification->order_id .
-        $notification->status_code .
-        $notification->gross_amount .
-        \Midtrans\Config::$serverKey
-);
-if (($notification->signature_key ?? '') !== $validSignature) {
-    http_response_code(403);
-    echo json_encode(['error' => 'Invalid signature']);
-    exit;
-}
-
-$order_id = $notification->order_id;
-$transaction_status = $notification->transaction_status ?? 'pending';
-$fraud_status = $notification->fraud_status ?? 'accept';
-$status_pembayaran = $mapStatus($transaction_status, $fraud_status);
-
-$conn->begin_transaction();
-if ($st = $conn->prepare("UPDATE payments SET status_pembayaran=? WHERE order_id=?")) {
-    $st->bind_param("ss", $status_pembayaran, $order_id);
-    $st->execute();
-    $st->close();
-} else {
-    $conn->rollback();
-    http_response_code(500);
-    echo json_encode(['error' => 'Database error: ' . $conn->error]);
-    exit;
-}
-
-$id_booking = null;
-$sentPaid = 0;
-if ($gb = $conn->prepare("SELECT id_booking, sent_paid_email FROM payments WHERE order_id=? LIMIT 1")) {
-    $gb->bind_param("s", $order_id);
-    $gb->execute();
-    $gb->bind_result($id_booking, $sentPaid);
-    $gb->fetch();
-    $gb->close();
-    $id_booking = (int)$id_booking;
-}
-if ($id_booking) {
-    if ($status_pembayaran === 'paid') {
-        $setBookingStatus($conn, $id_booking, 'confirmed', false);
-        if ((int)$sentPaid === 0) {
-            $sendPaidMail($conn, $id_booking);
-            if ($u = $conn->prepare("UPDATE payments SET sent_paid_email=1 WHERE id_booking=?")) {
-                $u->bind_param("i", $id_booking);
-                $u->execute();
-                $u->close();
-            }
-        }
-    } elseif (in_array($status_pembayaran, ['failed', 'expire', 'cancel'])) {
-        $setBookingStatus($conn, $id_booking, 'cancelled', true);
-        $sendFailedMail($conn, $id_booking, $status_pembayaran);
+try {
+    $notification = json_decode($json);
+    if (!$notification) {
+        sendJsonError('Invalid notification', null, 400);
     }
+
+    $validSignature = hash(
+        'sha512',
+        $notification->order_id .
+            $notification->status_code .
+            $notification->gross_amount .
+            \Midtrans\Config::$serverKey
+    );
+    if (($notification->signature_key ?? '') !== $validSignature) {
+        sendJsonError('Invalid signature', null, 403);
+    }
+
+    $order_id = $notification->order_id;
+    $transaction_status = $notification->transaction_status ?? 'pending';
+    $fraud_status = $notification->fraud_status ?? 'accept';
+    $status_pembayaran = $mapStatus($transaction_status, $fraud_status);
+
+    $conn->begin_transaction();
+    if ($st = $conn->prepare("UPDATE payments SET status_pembayaran=? WHERE order_id=?")) {
+        $st->bind_param("ss", $status_pembayaran, $order_id);
+        $st->execute();
+        $st->close();
+    } else {
+        $conn->rollback();
+        sendJsonError('Database error: ' . $conn->error);
+    }
+
+    $id_booking = null;
+    $sentPaid = 0;
+    if ($gb = $conn->prepare("SELECT id_booking, sent_paid_email FROM payments WHERE order_id=? LIMIT 1")) {
+        $gb->bind_param("s", $order_id);
+        $gb->execute();
+        $gb->bind_result($id_booking, $sentPaid);
+        $gb->fetch();
+        $gb->close();
+        $id_booking = (int)$id_booking;
+    }
+    if ($id_booking) {
+        if ($status_pembayaran === 'paid') {
+            $setBookingStatus($conn, $id_booking, 'confirmed', false);
+            if ((int)$sentPaid === 0) {
+                $sendPaidMail($conn, $id_booking);
+                if ($u = $conn->prepare("UPDATE payments SET sent_paid_email=1 WHERE id_booking=?")) {
+                    $u->bind_param("i", $id_booking);
+                    $u->execute();
+                    $u->close();
+                }
+            }
+        } elseif (in_array($status_pembayaran, ['failed', 'expire', 'cancel'])) {
+            $setBookingStatus($conn, $id_booking, 'cancelled', true);
+            $sendFailedMail($conn, $id_booking, $status_pembayaran);
+        }
+    }
+    $conn->commit();
+    sendJsonSuccess(['message' => 'Notification processed', 'status' => $status_pembayaran]);
+} catch (Exception $e) {
+    if ($conn) $conn->rollback();
+    sendJsonError('Webhook error', $e->getMessage(), 500);
 }
-$conn->commit();
-http_response_code(200);
-echo json_encode(['success' => true, 'message' => 'Notification processed', 'status' => $status_pembayaran]);
+?>

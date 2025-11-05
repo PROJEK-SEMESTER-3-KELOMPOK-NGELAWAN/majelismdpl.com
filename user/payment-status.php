@@ -1,4 +1,5 @@
 <?php
+require_once '../config.php';
 require_once '../backend/koneksi.php';
 session_start();
 
@@ -12,7 +13,7 @@ if (!isset($_SESSION['id_user']) || empty($_SESSION['id_user'])) {
 $id_user = $_SESSION['id_user'];
 
 // Auto-expire pending >24 jam (non-blocking ping)
-$expire_url = '../backend/payment-api.php?expire_stale=1';
+$expire_url = getPageUrl('backend/payment-api.php') . '?expire_stale=1';
 $chx = curl_init();
 curl_setopt($chx, CURLOPT_URL, $expire_url);
 curl_setopt($chx, CURLOPT_RETURNTRANSFER, true);
@@ -33,8 +34,7 @@ if ($pendingStmt) {
 
     while ($row = $pendingResult->fetch_assoc()) {
         $order_id = $row['order_id'];
-        $check_url = '../backend/payment-api.php?check_status=' . urlencode($order_id);
-        // Panggil non-blocking
+        $check_url = getPageUrl('backend/payment-api.php') . '?check_status=' . urlencode($order_id);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $check_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -89,7 +89,7 @@ function format_status_card($status)
         $icon = 'fa-solid fa-ban';
         $text = 'DIBATALKAN';
     }
-    
+
     return [
         'icon' => $icon,
         'text' => $text
@@ -102,7 +102,7 @@ function format_status_card($status)
 function format_status_detail($status)
 {
     $s = strtolower($status ?? '');
-    
+
     $status_data = [
         'text' => 'DIBATALKAN',
         'color' => '#c62828',
@@ -110,23 +110,23 @@ function format_status_detail($status)
     ];
 
     if ($s === 'paid' || $s === 'settlement') {
-        $status_data['text'] = 'PEMBAYARAN DITERIMA'; 
+        $status_data['text'] = 'PEMBAYARAN DITERIMA';
         $status_data['color'] = '#2e7d32';
         $status_data['icon'] = '<i class="fa-solid fa-check-circle"></i>';
     } elseif ($s === 'pending') {
-        $status_data['text'] = 'MENUNGGU PEMBAYARAN'; 
+        $status_data['text'] = 'MENUNGGU PEMBAYARAN';
         $status_data['color'] = '#e65100';
         $status_data['icon'] = '<i class="fa-solid fa-hourglass-half"></i>';
     } elseif ($s === 'expire') {
-        $status_data['text'] = 'SUDAH KEDALUWARSA'; 
+        $status_data['text'] = 'SUDAH KEDALUWARSA';
         $status_data['color'] = '#ad1457';
         $status_data['icon'] = '<i class="fa-solid fa-clock-rotate-left"></i>';
     } elseif ($s === 'cancel' || $s === 'failed') {
-        $status_data['text'] = 'DIBATALKAN'; 
-        $status_data['color'] = '#dc3545'; 
+        $status_data['text'] = 'DIBATALKAN';
+        $status_data['color'] = '#dc3545';
         $status_data['icon'] = '<i class="fa-solid fa-ban"></i>';
     }
-    
+
     return "<span style='color:{$status_data['color']};font-weight:700;'>{$status_data['icon']} {$status_data['text']}</span>";
 }
 ?>
@@ -306,59 +306,63 @@ function format_status_detail($status)
             padding: 0;
             border-radius: 15px;
             font-weight: 700;
-            font-size: 0.85rem; 
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.3px;
             display: flex;
-            flex-direction: column; 
+            flex-direction: column;
             align-items: center;
             gap: 2px;
             white-space: normal;
             text-align: center;
-            line-height: 1.1; 
+            line-height: 1.1;
         }
-        
+
         .status-badge i {
-            font-size: 1.8rem; 
-            margin-bottom: 5px; 
+            font-size: 1.8rem;
+            margin-bottom: 5px;
         }
 
         .status-badge span {
-             font-weight: 800; 
+            font-weight: 800;
         }
 
         .status-badge.pending {
-            color: #ffb800; 
+            color: #ffb800;
         }
+
         .status-badge.pending i {
-             background: linear-gradient(135deg, #ffc107 0%, #ffb800 100%);
-             -webkit-background-clip: text;
-             -webkit-text-fill-color: transparent;
-             background-clip: text;
-             color: transparent;
+            background: linear-gradient(135deg, #ffc107 0%, #ffb800 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
         }
 
         .status-badge.paid {
-            color: #28a745; 
+            color: #28a745;
         }
+
         .status-badge.paid i {
-             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-             -webkit-background-clip: text;
-             -webkit-text-fill-color: transparent;
-             background-clip: text;
-             color: transparent;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
         }
 
         .status-badge.cancelled {
-            color: #dc3545; 
+            color: #dc3545;
         }
+
         .status-badge.cancelled i {
-             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-             -webkit-background-clip: text;
-             -webkit-text-fill-color: transparent;
-             background-clip: text;
-             color: transparent;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
         }
+
         /* Akhir CSS Status Card */
 
         .actions {
@@ -713,15 +717,17 @@ function format_status_detail($status)
                 min-width: auto;
                 justify-content: space-between;
             }
-            
+
             .card-sidebar .status-badge {
-                flex-direction: row; 
+                flex-direction: row;
                 gap: 5px;
                 padding: 0;
-                font-size: 0.8rem; /* Ukuran font disesuaikan untuk mobile */
+                font-size: 0.8rem;
+                /* Ukuran font disesuaikan untuk mobile */
             }
+
             .card-sidebar .status-badge i {
-                font-size: 1.0rem; 
+                font-size: 1.0rem;
                 margin-bottom: 0;
             }
 
@@ -764,7 +770,7 @@ function format_status_detail($status)
                 <i class="fa-solid fa-receipt"></i>
                 <h2>Belum Ada Transaksi</h2>
                 <p>Anda belum memiliki riwayat pemesanan</p>
-                <a href="<?= $navbarPath; ?>index.php#paketTrips" class="btn-explore">
+                <a href="<?= getPageUrl('index.php') ?>#paketTrips" class="btn-explore">
                     <i class="fa-solid fa-compass"></i> Jelajahi Trips
                 </a>
             </div>
@@ -773,9 +779,9 @@ function format_status_detail($status)
                 <?php foreach ($booking_list as $b):
                     $status = strtolower($b['status_pembayaran'] ?? 'pending');
                     $status_class = get_status_class($status);
-                    
+
                     // Menggunakan fungsi format_status_card
-                    $card_status_data = format_status_card($status); 
+                    $card_status_data = format_status_card($status);
                 ?>
                     <div class="card" data-booking-id="<?= $b['id_booking']; ?>" data-order-id="<?= htmlspecialchars($b['order_id'] ?? ''); ?>">
                         <div class="card-body">
@@ -831,7 +837,7 @@ function format_status_detail($status)
     <script src="../frontend/login.js"></script>
     <script>
         // Memindahkan semua fungsi JS ke konteks global untuk mengatasi ReferenceError
-        
+
         function periodicRefresh() {
             const cards = Array.from(document.querySelectorAll('.card[data-order-id]'));
             const pendings = cards.filter(c => {
@@ -940,9 +946,9 @@ function format_status_detail($status)
                     const form = new FormData();
                     form.append('cancel_booking', bookingId);
                     fetch('../backend/payment-api.php', {
-                                method: 'POST',
-                                body: form
-                            })
+                            method: 'POST',
+                            body: form
+                        })
                         .then(r => r.json())
                         .then(j => {
                             if (j.success) {
@@ -1016,7 +1022,7 @@ function format_status_detail($status)
                         `<button disabled class="btn-invoice">
                <i class="fa-solid fa-times-circle"></i> Invoice T/A
              </button>`;
-                    
+
                     // Fungsi JS untuk memformat status di modal (menggantikan fungsi PHP di sini)
                     const formatStatusDetailJs = (s) => {
                         let status_text_detail = 'DIBATALKAN';
@@ -1024,20 +1030,20 @@ function format_status_detail($status)
                         let status_icon = '<i class="fa-solid fa-times-circle"></i>';
 
                         if (s === 'paid' || s === 'settlement') {
-                            status_text_detail = 'PEMBAYARAN DITERIMA'; 
+                            status_text_detail = 'PEMBAYARAN DITERIMA';
                             status_color = '#2e7d32';
                             status_icon = '<i class="fa-solid fa-check-circle"></i>';
                         } else if (s === 'pending') {
-                            status_text_detail = 'MENUNGGU PEMBAYARAN'; 
+                            status_text_detail = 'MENUNGGU PEMBAYARAN';
                             status_color = '#e65100';
                             status_icon = '<i class="fa-solid fa-hourglass-half"></i>';
                         } else if (s === 'expire') {
-                            status_text_detail = 'SUDAH KEDALUWARSA'; 
+                            status_text_detail = 'SUDAH KEDALUWARSA';
                             status_color = '#ad1457';
                             status_icon = '<i class="fa-solid fa-clock-rotate-left"></i>';
                         } else if (s === 'cancel' || s === 'failed') {
-                            status_text_detail = 'DIBATALKAN'; 
-                            status_color = '#dc3545'; 
+                            status_text_detail = 'DIBATALKAN';
+                            status_color = '#dc3545';
                             status_icon = '<i class="fa-solid fa-ban"></i>';
                         }
                         return `<span style="color:${status_color};font-weight:700;">${status_icon} ${status_text_detail}</span>`;

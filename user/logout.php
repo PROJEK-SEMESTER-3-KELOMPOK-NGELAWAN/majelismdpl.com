@@ -1,5 +1,6 @@
 <?php
 // user/logout.php
+require_once '../config.php';
 session_start();
 
 // Hanya proses logout jika ada konfirmasi POST
@@ -16,11 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_logout'])) {
     session_destroy();
     
     // Redirect ke halaman utama (naik 1 level ke root)
-    header("Location: ../index.php");
+    header("Location: " . getPageUrl('index.php'));
     exit();
 } else {
     // Jika akses langsung tanpa POST, redirect ke halaman utama
-    header("Location: ../index.php");
+    header("Location: " . getPageUrl('index.php'));
     exit();
 }
 ?>

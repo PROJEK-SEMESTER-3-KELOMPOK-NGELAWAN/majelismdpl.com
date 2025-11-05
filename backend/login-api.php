@@ -1,16 +1,20 @@
 <?php
 session_start();
 header('Content-Type: application/json');
+require_once '../config.php';
 require_once 'koneksi.php';
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
+
     if (!$username || !$password) {
         echo json_encode(['success' => false, 'message' => 'Username dan password wajib diisi']);
         exit;
     }
+
 
     $stmt = $conn->prepare("SELECT id_user, username, password, role, email FROM users WHERE username = ?");
     if (!$stmt) {
@@ -20,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
+
 
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
@@ -31,9 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['email'] = $user['email'] ?? '';
             $_SESSION['last_activity'] = time();
 
+
             // Set flag khusus untuk admin dan super admin
             if (in_array($user['role'], ['admin', 'super_admin'])) {
                 $_SESSION['admin_logged_in'] = true;
+
 
                 // Extra flag untuk super admin
                 if ($user['role'] === 'super_admin') {
@@ -41,21 +48,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
+
             // Pastikan session tersimpan sebelum redirect
             session_write_close();
+
 
             // Response dengan role dan redirect info
             $redirect_url = '';
             switch ($user['role']) {
                 case 'super_admin':
                 case 'admin':
-                    $redirect_url = '../admin/index.php';
+                    $redirect_url = getPageUrl('admin/index.php');
                     break;
                 case 'user':
                 default:
-                    $redirect_url = 'index.php';
+                    $redirect_url = getPageUrl('index.php');
                     break;
             }
+
 
             echo json_encode([
                 'success' => true,

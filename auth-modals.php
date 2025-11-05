@@ -489,7 +489,7 @@
 
                 <button type="submit" class="btn-login">Masuk</button>
                 <div style="text-align:center;margin-top:13px;">
-                    <a href="<?php echo isset($navbarPath) ? $navbarPath : ''; ?>user/lupa-password.php" style="color: #a97c50; text-decoration: underline; font-size:14px;">
+                    <a href="<?php echo getPageUrl('user/lupa-password.php'); ?>" style="color: #a97c50; text-decoration: underline; font-size:14px;">
                         Lupa password?
                     </a>
                 </div>
@@ -518,7 +518,7 @@
         <!-- Left section dengan logo -->
         <div class="modal-left">
             <div class="logo-container">
-                <img src="<?php echo isset($navbarPath) ? $navbarPath : ''; ?>assets/logo_majelis_noBg.png" alt="Majelis MDPL Logo" class="modal-logo">
+                <img src="<?php echo getPageUrl('assets/logo_majelis_noBg.png'); ?>" alt="Majelis MDPL Logo" class="modal-logo">
             </div>
         </div>
 
@@ -584,7 +584,7 @@
                 </div>
                 <div class="google-signup-section">
                     <button type="button" id="googleSignUpBtn" class="btn-google">
-                        <img src="<?php echo isset($navbarPath) ? $navbarPath : ''; ?>assets/g-logo.png" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
+                        <img src="<?php echo getPageUrl('assets/g-logo.png'); ?>" alt="Google" style="width: 18px; height: 18px; margin-right: 8px;">
                         Sign up with Google
                     </button>
                 </div>

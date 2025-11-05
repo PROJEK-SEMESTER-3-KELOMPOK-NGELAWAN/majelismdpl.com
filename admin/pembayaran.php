@@ -1,6 +1,7 @@
 <?php
 require_once 'auth_check.php';
-// Asumsi RoleHelper sudah dimuat di auth_check.php atau file lain yang diperlukan.
+require_once '../config.php';
+
 if (!class_exists('RoleHelper')) {
   class RoleHelper
   {
@@ -12,7 +13,6 @@ if (!class_exists('RoleHelper')) {
 }
 $user_role = $user_role ?? 'user';
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 
@@ -26,7 +26,6 @@ $user_role = $user_role ?? 'user';
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    /* --- SIDEBAR & GLOBAL (KONSISTENSI FONT & BG) --- */
     body {
       background: #f6f0e8;
       color: #232323;
@@ -36,39 +35,6 @@ $user_role = $user_role ?? 'user';
       margin: 0;
     }
 
-    .sidebar {
-      background: #a97c50;
-      min-height: 100vh;
-      width: 240px;
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-    }
-
-    .nav-link {
-      width: 90%;
-      color: #fff;
-      font-weight: 500;
-      border-radius: 0.7rem;
-      margin-bottom: 5px;
-      padding: 13px 22px;
-      display: flex;
-      align-items: center;
-      font-size: 16px;
-      gap: 11px;
-      letter-spacing: 0.7px;
-      text-decoration: none;
-      transition: background 0.22s, color 0.22s;
-    }
-
-    .nav-link.active,
-    .nav-link:hover {
-      background: #432f17;
-      color: #ffd49c;
-    }
-
-    /* --- MAIN CONTENT & LAYOUT KONSISTENSI (Dari Master Admin) --- */
     .main {
       margin-left: 240px;
       min-height: 100vh;
@@ -95,7 +61,6 @@ $user_role = $user_role ?? 'user';
       color: white;
     }
 
-    /* Header Halaman KONSISTEN */
     .main-header {
       display: flex;
       align-items: center;
@@ -121,7 +86,6 @@ $user_role = $user_role ?? 'user';
       margin-left: 8px;
     }
 
-    /* --- CARD & SHADOW KONSISTENSI --- */
     .card {
       border: none;
       border-radius: 15px;
@@ -141,7 +105,6 @@ $user_role = $user_role ?? 'user';
       padding: 20px;
     }
 
-    /* Tombol Primary KONSISTEN */
     .btn-primary {
       background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
       border: none;
@@ -157,7 +120,6 @@ $user_role = $user_role ?? 'user';
       background: linear-gradient(135deg, #8b6332 0%, #a97c50 100%);
     }
 
-    /* Tombol Secondary/Tutup Modal KONSISTEN */
     .btn-secondary {
       background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
       color: white;
@@ -170,7 +132,6 @@ $user_role = $user_role ?? 'user';
       background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
     }
 
-    /* Close button modal (dari Master Admin) */
     .btn-close-black {
       filter: none;
       opacity: 0.8;
@@ -183,13 +144,11 @@ $user_role = $user_role ?? 'user';
     }
 
     .modal-header {
-      /* KONSISTENSI MODAL HEADER */
       background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
       color: white;
       border: none;
     }
 
-    /* --- SUMMARY CARDS (KEMBALI KE GAYA VERTIKAL ASLI) --- */
     .payment-summary {
       max-width: 900px;
       margin: 0 auto 30px auto;
@@ -246,7 +205,6 @@ $user_role = $user_role ?? 'user';
       color: #ffc107 !important;
     }
 
-    /* --- CHART & TABLE CONTAINER KONSISTENSI --- */
     .chart-container {
       background: #fff;
       padding: 25px;
@@ -268,7 +226,6 @@ $user_role = $user_role ?? 'user';
       height: auto;
     }
 
-    /* --- TABLE KONSISTENSI (BORDER RADIUS FIX) --- */
     .table-responsive {
       margin-top: 20px;
       border-radius: 15px;
@@ -302,9 +259,6 @@ $user_role = $user_role ?? 'user';
       color: #432f17;
     }
 
-    /* --- FILTER/SEARCH KONSISTENSI (REVISI PENJELARAN) --- */
-
-    /* Container untuk Filter dan Search */
     .table-controls {
       display: flex;
       justify-content: space-between;
@@ -316,7 +270,6 @@ $user_role = $user_role ?? 'user';
 
     .search-container {
       position: relative;
-      /* REVISI: Batasi lebar agar filter dan search rata */
       max-width: 350px;
       min-width: 250px;
       flex-grow: 1;
@@ -332,7 +285,6 @@ $user_role = $user_role ?? 'user';
       transition: all 0.3s ease;
       cursor: pointer;
       width: 100%;
-      /* Maksimum lebar filter agar menyisakan ruang untuk search */
       max-width: 200px;
     }
 
@@ -371,7 +323,6 @@ $user_role = $user_role ?? 'user';
       font-size: 1.1rem;
     }
 
-    /* --- MODAL DETAIL (KONSISTENSI) --- */
     #detailPaymentModal .modal-content {
       border-radius: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -389,7 +340,6 @@ $user_role = $user_role ?? 'user';
       font-weight: 600;
     }
 
-    /* --- TOMBOL DETAIL KHUSUS --- */
     .btn-detail {
       width: 40px;
       height: 40px;
@@ -410,7 +360,6 @@ $user_role = $user_role ?? 'user';
       box-shadow: 0 4px 8px rgba(169, 124, 80, 0.4);
     }
 
-    /* Info box user */
     .user-info-box {
       background: #f8f9fa;
       border-left: 4px solid #a97c50;
@@ -435,7 +384,6 @@ $user_role = $user_role ?? 'user';
 </head>
 
 <body>
-
   <?php include 'sidebar.php'; ?>
 
   <main class="main">
@@ -547,7 +495,6 @@ $user_role = $user_role ?? 'user';
             </div>
           </div>
 
-          <!-- User Info Section -->
           <div class="px-4 pt-4">
             <div class="mb-3 fw-semibold" style="font-size:1.06rem;">Informasi User</div>
             <div class="row g-3 mb-3">
@@ -566,7 +513,6 @@ $user_role = $user_role ?? 'user';
             </div>
           </div>
 
-          <!-- Trip Info Section -->
           <div class="px-4">
             <div class="mb-3 fw-semibold" style="font-size:1.06rem;">Informasi Trip</div>
             <div class="row g-3 mb-3">
@@ -628,12 +574,21 @@ $user_role = $user_role ?? 'user';
     </div>
   </div>
 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+  <!-- LOAD CONFIG.JS TERLEBIH DAHULU (CRITICAL!) -->
+  <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
+
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <!-- Load pembayaran.js -->
-  <script src="../frontend/pembayaran-admin.js"></script>
+
+  <!-- BARU LOAD PEMBAYARAN-ADMIN.JS -->
+  <script src="<?php echo getAssetsUrl('frontend/pembayaran-admin.js'); ?>"></script>
+
 </body>
 
 </html>

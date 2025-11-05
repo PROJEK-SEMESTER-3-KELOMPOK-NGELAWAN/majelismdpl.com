@@ -1,6 +1,33 @@
+// ========== CONFIG CHECK (CRITICAL!) ==========
+if (typeof getApiUrl !== "function") {
+  console.error("FATAL ERROR: config.js is not loaded!");
+  console.error("Please ensure frontend/config.js is loaded BEFORE peserta.js");
+
+  // Fallback untuk debugging
+  window.getApiUrl = function (endpoint) {
+    console.warn("Using fallback getApiUrl - config.js might not be loaded");
+    return "backend/" + endpoint;
+  };
+}
+
+/**
+ * ============================================
+ * FILE: frontend/peserta.js
+ * FUNGSI: Handle UI Peserta management
+ * UPDATED: Config.js integration + error handling
+ * ============================================
+ */
+
 class PesertaAPI {
   constructor() {
-    this.baseURL = "../backend/peserta-api.php";
+    // GUNAKAN getApiUrl yang sudah ada di config.js
+    if (typeof getApiUrl !== "function") {
+      console.error("getApiUrl function not available in constructor");
+      this.baseURL = "backend/peserta-api.php";
+    } else {
+      this.baseURL = getApiUrl("peserta-api.php");
+    }
+
     this.participants = [];
     this.currentEditParticipantId = null;
     this.currentTripFilterId = "";
@@ -65,7 +92,7 @@ class PesertaAPI {
 
     const tableBody = document.getElementById("participantsTableBody");
     if (tableBody) {
-      tableBody.innerHTML = `<tr><td colspan="13" class="text-center opacity-50"><i class="bi bi-arrow-clockwise spinner-border spinner-border-sm me-2"></i>Memuat data peserta...</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="14" class="text-center opacity-50"><i class="bi bi-arrow-clockwise spinner-border spinner-border-sm me-2"></i>Memuat data peserta...</td></tr>`;
     }
 
     try {
@@ -89,7 +116,7 @@ class PesertaAPI {
   renderErrorState(message) {
     const tableBody = document.getElementById("participantsTableBody");
     if (tableBody) {
-      tableBody.innerHTML = `<tr><td colspan="13" class="text-center opacity-50 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>${message}</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="14" class="text-center opacity-50 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>${message}</td></tr>`;
     }
   }
 
@@ -108,7 +135,7 @@ class PesertaAPI {
     if (!tableBody) return;
 
     if (!participants.length) {
-      tableBody.innerHTML = `<tr><td colspan="13" class="text-center opacity-50">Tidak ada peserta yang ditemukan.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="14" class="text-center opacity-50">Tidak ada peserta yang ditemukan.</td></tr>`;
       return;
     }
 
@@ -483,6 +510,19 @@ class PesertaAPI {
   }
 }
 
+// ========== INITIALIZE ==========
 document.addEventListener("DOMContentLoaded", () => {
+  // Verify config loaded
+  if (typeof getApiUrl !== "function") {
+    console.error("getApiUrl function not available at DOMContentLoaded");
+    Swal.fire({
+      title: "Error!",
+      text: "Konfigurasi aplikasi tidak lengkap. Silakan refresh halaman.",
+      icon: "error",
+      confirmButtonColor: "#a97c50",
+    });
+    return;
+  }
+
   window.pesertaAPI = new PesertaAPI();
 });

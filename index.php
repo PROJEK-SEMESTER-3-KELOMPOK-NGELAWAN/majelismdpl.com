@@ -1,4 +1,5 @@
 <?php
+require_once 'config.php';
 session_start();
 ?>
 
@@ -20,13 +21,15 @@ session_start();
   <!-- AOS Animation Library -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
+  <!-- Config JS - UNTUK DYNAMIC URL ROUTING -->
+  <script src="frontend/config.js"></script>
+
 </head>
 
 <body>
   <!-- Navbar -->
   <?php include 'navbar.php'; ?>
   <?php include 'auth-modals.php'; ?>
-
 
   <!-- Hero -->
   <section class="hero-home" id="home">
@@ -49,10 +52,7 @@ session_start();
         <img src="assets/rinjani.jpg" alt="Forest" class="carousel-item" data-index="2">
       </div>
     </div>
-
   </section>
-
-
 
   <!-- profile -->
   <section class="why-explorer style-4" id="profile">
@@ -64,7 +64,6 @@ session_start();
       <div class="shape shape-2"></div>
       <div class="shape shape-3"></div>
     </div>
-
 
     <!-- Header -->
     <div class="profile-header" data-aos="fade-down" data-aos-duration="600" data-aos-once="true">
@@ -148,8 +147,6 @@ session_start();
     </div>
   </section>
 
-
-
   <!-- Paket Trip Section -->
   <section class="paket-trip-section" id="paketTrips">
     <!-- Simple Pattern Background -->
@@ -205,9 +202,6 @@ session_start();
     </div>
   </section>
 
-
-
-
   <!-- Gallery Section -->
   <section class="gallery-cardstyle" id="gallerys">
     <!-- Particles.js Background (reduced) -->
@@ -255,9 +249,6 @@ session_start();
       </div>
     </div>
   </section>
-
-
-
 
   <!-- Testimonials -->
   <section id="testimonials" class="testimonials">
@@ -404,12 +395,7 @@ session_start();
     </div>
   </section>
 
-
   <?php include 'footer.php'; ?>
-
-
-
-
 
   <!-- Tombol WhatsApp -->
   <div class="whatsapp-container" data-aos="zoom-in" data-aos-delay="500">
@@ -422,8 +408,6 @@ session_start();
     </button>
     <div class="whatsapp-tooltip">Ada yang bisa kami bantu? 💬</div>
   </div>
-
-
 
   <!-- AOS Library Script -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -511,7 +495,7 @@ session_start();
     }
 
     // ========== GALERI API ==========
-    fetch('backend/galeri-api.php?action=get')
+    fetch(getApiUrl('galeri-api.php') + '?action=get')
       .then(response => response.json())
       .then(result => {
         if (result.success) {
@@ -773,7 +757,6 @@ session_start();
       });
     });
   </script>
-
 
   <!-- Load external JavaScript files -->
   <script src="frontend/registrasi.js"></script>
