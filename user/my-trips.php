@@ -54,7 +54,7 @@ $myTrips = [];
 while ($row = $result->fetch_assoc()) {
     $statusBookingRaw = strtolower(trim($row['status_booking'] ?? ''));
     $statusPembayaran = strtolower(trim($row['status_pembayaran'] ?? ''));
-    $statusTripRaw    = strtolower(trim($row['status_trip'] ?? ''));
+    $statusTripRaw       = strtolower(trim($row['status_trip'] ?? ''));
 
     // Status Booking (tidak dipaksa jadi selesai)
     if ($statusBookingRaw === 'finished') {
@@ -85,25 +85,25 @@ while ($row = $result->fetch_assoc()) {
 
 
     $myTrips[] = [
-        'id_booking'        => $row['id_booking'],
+        'id_booking'       => $row['id_booking'],
         'id_trip'           => $row['id_trip'],
         'nama_gunung'       => $row['nama_gunung'],
-        'jenis_trip'        => $row['jenis_trip'],
-        'tanggal_trip'      => $row['tanggal_trip'],
-        'durasi'            => $row['durasi'] ?? '1 hari',
-        'via_gunung'        => $row['via_gunung'] ?? 'Via Utama',
+        'jenis_trip'       => $row['jenis_trip'],
+        'tanggal_trip'       => $row['tanggal_trip'],
+        'durasi'           => $row['durasi'] ?? '1 hari',
+        'via_gunung'       => $row['via_gunung'] ?? 'Via Utama',
         'nama_lokasi'       => $row['nama_lokasi'] ?? 'Lokasi belum ditentukan',
-        'tanggal_booking'   => $row['tanggal_booking'],
-        'jumlah_orang'      => $row['jumlah_orang'],
+        'tanggal_booking' => $row['tanggal_booking'],
+        'jumlah_orang'       => $row['jumlah_orang'],
         'total_harga'       => $row['total_harga'],
-        'status_booking'    => $finalBookingStatus,
+        'status_booking'  => $finalBookingStatus,
         'status_trip'       => $finalTripStatus,
-        'gambar'            => $imagePath,
+        'gambar'           => $imagePath,
         'include'           => $row['include'] ?? 'Informasi akan diperbarui',
         'exclude'           => $row['exclude'] ?? 'Informasi akan diperbarui',
-        'syaratKetentuan'   => $row['syaratKetentuan'] ?? 'Informasi akan diperbarui',
-        'waktu_kumpul'      => $row['waktu_kumpul'] ?? '00:00',
-        'link_map'          => $row['link_map'] ?? '#',
+        'syaratKetentuan' => $row['syaratKetentuan'] ?? 'Informasi akan diperbarui',
+        'waktu_kumpul'       => $row['waktu_kumpul'] ?? '00:00',
+        'link_map'           => $row['link_map'] ?? '#',
         'status_pembayaran' => $paymentStatusForJS // Kirim status pembayaran yang relevan
     ];
 }
@@ -111,9 +111,9 @@ $stmt->close();
 
 // Statistik header:
 $totalTrips     = count($myTrips);
-$pendingCount   = count(array_filter($myTrips, fn($t) => strtolower($t['status_booking']) === 'pending'));
-$paidCount      = count(array_filter($myTrips, fn($t) => strtolower($t['status_booking']) === 'paid' || strtolower($t['status_booking']) === 'confirmed'));
-$finishedCount  = count(array_filter($myTrips, fn($t) => strtolower($t['status_trip']) === 'done'));
+$pendingCount     = count(array_filter($myTrips, fn($t) => strtolower($t['status_booking']) === 'pending'));
+$paidCount         = count(array_filter($myTrips, fn($t) => strtolower($t['status_booking']) === 'paid' || strtolower($t['status_booking']) === 'confirmed'));
+$finishedCount     = count(array_filter($myTrips, fn($t) => strtolower($t['status_trip']) === 'done'));
 
 /**
  * FUNGSI INI HANYA UNTUK MERENDER STATUS PEMBAYARAN DI DALAM MODAL
@@ -377,7 +377,6 @@ function format_status_detail($status)
             letter-spacing: .5px;
             box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
             z-index: 2;
-            /* Kembali ke tampilan asal: flex-row */
             display: flex;
             align-items: center;
             gap: 5px;
@@ -391,8 +390,6 @@ function format_status_detail($status)
         .badge-status i {
             font-size: 0.8rem;
         }
-
-        /* Akhir Kembali ke tampilan asal */
 
         .status-pending {
             background: linear-gradient(135deg, #ffc107 0%, #ffb800 100%);
@@ -658,6 +655,79 @@ function format_status_detail($status)
 
         /* ----------------------------------------------------- */
 
+        /* CSS BARU untuk Empty State (Menggunakan Ikon dengan Gaya Ilustrasi) */
+        .empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, .95);
+            backdrop-filter: blur(15px);
+            border-radius: 18px;
+            margin-top: 30px;
+            border: 2px solid rgba(169, 124, 80, .2);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .08);
+        }
+
+        /* Gaya Ikon Besar */
+        .empty .empty-icon {
+            font-size: 6rem;
+            /* Ikon sangat besar */
+            margin-bottom: 25px;
+            /* Gunakan gradien yang sama dengan elemen penting lainnya */
+            background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 8px rgba(169, 124, 80, 0.4));
+            /* Efek shadow untuk menonjolkan */
+        }
+
+        .empty h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #3D2F21;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .empty p {
+            font-size: 1rem;
+            color: #6B5847;
+            margin-bottom: 35px;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* Tombol Coklat/Emas/Orange */
+        .btn-explore {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, #a97c50 100%, #e6a700 0%);
+            /* Coklat ke Emas/Orange */
+            box-shadow: 0 5px 18px rgba(169, 124, 80, .4);
+            transition: all .3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .btn-explore:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(169, 124, 80, .6);
+            background: linear-gradient(135deg, #d4a574 100%, #ffc107 0%);
+        }
+
+        /* Akhir CSS BARU untuk Empty State */
+
+
         /* Responsif */
         @media (max-width: 768px) {
             body {
@@ -683,6 +753,23 @@ function format_status_detail($status)
             .done-stamp {
                 width: min(78%, 320px);
                 top: 54%
+            }
+
+            .empty h2 {
+                font-size: 1.5rem;
+            }
+
+            .empty p {
+                font-size: 0.9rem;
+            }
+
+            .empty .empty-icon {
+                font-size: 5rem;
+            }
+
+            .btn-explore {
+                padding: 12px 25px;
+                font-size: 0.9rem;
             }
         }
 
@@ -742,11 +829,12 @@ function format_status_detail($status)
 
         <?php if (empty($myTrips)): ?>
             <div class="empty">
-                <i class="fa-solid fa-mountain"></i>
-                <h2>Belum Ada Trip</h2>
-                <p>Mulai petualangan gunung Anda hari ini!</p>
+                <i class="fa-solid fa-person-hiking empty-icon"></i>
+                <h2>Petualangan Menanti!</h2>
+                <p>Mulai pendakian impian Anda sekarang. Jelajahi paket trip kami!</p>
                 <a href="<?= getPageUrl('index.php') ?>#paketTrips" class="btn-explore">
-                    <i class="fa-solid fa-compass"></i> Jelajahi Trip
+                    <i class="fa-solid fa-compass"></i> Jelajahi Paket Trip
+                </a>
                 </a>
             </div>
         <?php else: ?>
@@ -758,9 +846,9 @@ function format_status_detail($status)
                             <span class="badge badge-status status-<?= strtolower($trip['status_booking']); ?>" style="top:10px;right:10px">
                                 <?php
                                 $sb = strtolower($trip['status_booking']);
-                                if ($sb === 'pending')      echo '<i class="fa-solid fa-hourglass-half"></i> Menunggu';
+                                if ($sb === 'pending')         echo '<i class="fa-solid fa-hourglass-half"></i> Menunggu';
                                 elseif ($sb === 'paid' || $sb === 'confirmed') echo '<i class="fa-solid fa-credit-card"></i> Dibayar';
-                                elseif ($sb === 'finished')  echo '<i class="fa-solid fa-flag-checkered"></i> Selesai';
+                                elseif ($sb === 'finished')     echo '<i class="fa-solid fa-flag-checkered"></i> Selesai';
                                 elseif ($sb === 'cancelled') echo '<i class="fa-solid fa-times-circle"></i> Dibatalkan';
                                 else echo '<i class="fa-solid fa-info-circle"></i> ' . htmlspecialchars(ucfirst($trip['status_booking']));
                                 ?>

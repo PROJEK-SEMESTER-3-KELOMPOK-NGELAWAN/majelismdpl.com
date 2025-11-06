@@ -311,8 +311,7 @@ if (isset($_GET['expire_stale'])) {
             SELECT p.id_payment, p.id_booking
             FROM payments p
             WHERE p.status_pembayaran='pending'
-              AND TIMESTAMPDIFF(HOUR, CONCAT(p.tanggal,' 00:00:00'), NOW()) >= 24
-        ");
+             AND TIMESTAMPDIFF(HOUR, CONCAT(p.tanggal,' 00:00:00'), NOW()) >= 24  ");
         $expired = 0;
         if ($q) {
             while ($r = $q->fetch_assoc()) {

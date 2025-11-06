@@ -68,7 +68,7 @@ function get_status_class($status)
 }
 
 /**
- * REVISI: Fungsi untuk tampilan status di kartu (ikon di atas, teks 2 baris)
+ * REVISI: Fungsi untuk tampilan status di kartu (ikon di atas teks, 2 baris)
  */
 function format_status_card($status)
 {
@@ -144,7 +144,7 @@ function format_status_detail($status)
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-KFnuwUuiq_i1OUJf"></script>
 
     <style>
-        /* CSS DEFAULT DARI AWAL (DIUBAH HANYA BAGIAN STATUS CARD & SIDEBAR) */
+        /* CSS DEFAULT DARI AWAL (DIUBAH HANYA BAGIAN STATUS CARD & EMPTY STATE) */
         * {
             margin: 0;
             padding: 0;
@@ -304,7 +304,6 @@ function format_status_detail($status)
         /* CSS untuk tampilan status card (ikon di atas teks, 2 baris) */
         .status-badge {
             padding: 0;
-            border-radius: 15px;
             font-weight: 700;
             font-size: 0.85rem;
             text-transform: uppercase;
@@ -413,57 +412,72 @@ function format_status_detail($status)
             box-shadow: 0 4px 12px rgba(169, 124, 80, 0.4);
         }
 
+        /* CSS BARU untuk Empty State (Mengikuti mytrip.php) */
         .empty {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 50px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            border: 2px dashed rgba(169, 124, 80, 0.2);
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 18px;
+            margin-top: 30px;
+            border: 2px solid rgba(169, 124, 80, .2);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .08);
         }
 
-        .empty i {
-            font-size: 3.5rem;
+        /* Gaya Ikon Besar Baru */
+        .empty .empty-icon {
+            font-size: 6rem;
+            margin-bottom: 25px;
             background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 8px rgba(169, 124, 80, 0.4));
         }
 
         .empty h2 {
-            font-size: 1.4rem;
+            font-size: 1.8rem;
+            font-weight: 800;
             color: #3D2F21;
-            margin-bottom: 8px;
-            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.3;
         }
 
         .empty p {
+            font-size: 1rem;
             color: #6B5847;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
+            margin-bottom: 35px;
+            max-width: 500px;
+            line-height: 1.6;
         }
 
+        /* Tombol CTA Baru */
         .btn-explore {
-            padding: 10px 28px;
-            background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
-            color: #fff;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: inline-flex;
+            display: inline-flex !important;
             align-items: center;
             gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(169, 124, 80, 0.25);
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, #a97c50 0%, #e6a700 100%);
+            box-shadow: 0 5px 18px rgba(169, 124, 80, .4);
+            transition: all .3s ease;
             text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
 
         .btn-explore:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(169, 124, 80, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(169, 124, 80, .6);
+            background: linear-gradient(135deg, #d4a574 0%, #ffc107 100%);
         }
+        /* Akhir CSS BARU untuk Empty State */
 
         .modal {
             display: none;
@@ -702,38 +716,82 @@ function format_status_detail($status)
 
             .title {
                 font-size: 1.3rem;
-                flex-direction: column;
+            }
+            
+            .title i {
+                font-size: 1.4rem; 
             }
 
             .card {
                 grid-template-columns: 1fr;
             }
+            
+            .card-info {
+                flex-direction: column;
+                gap: 10px;
+            }
 
             .card-sidebar {
                 border-left: none;
                 border-top: 1px solid rgba(169, 124, 80, .1);
-                /* REVISI: Kembali ke flex-direction: row di mobile agar tidak terlalu lebar */
-                flex-direction: row;
+                /* Revisi: Ubah ke vertikal */
+                flex-direction: column; 
                 min-width: auto;
-                justify-content: space-between;
+                padding: 15px 15px; 
+                align-items: flex-start; 
+                gap: 12px; 
             }
 
             .card-sidebar .status-badge {
+                /* Status badge dalam mode horizontal, sekarang memanjang ke kiri */
                 flex-direction: row;
-                gap: 5px;
+                gap: 8px;
                 padding: 0;
-                font-size: 0.8rem;
-                /* Ukuran font disesuaikan untuk mobile */
+                font-size: 0.85rem;
+                text-align: left;
+                align-items: center;
+                width: 100%; 
+            }
+            
+            .card-sidebar .status-badge span {
+                display: inline;
+                font-size: 0.85rem; 
+                line-height: 1.2;
             }
 
             .card-sidebar .status-badge i {
-                font-size: 1.0rem;
+                font-size: 1.2rem;
                 margin-bottom: 0;
             }
 
             .actions {
+                /* Container untuk tombol "Detail" dan "Lanjut Bayar" */
                 flex-direction: row;
+                gap: 8px; 
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap; 
             }
+            
+            /* Aturan khusus untuk tombol "Batalkan" agar selalu di bawah/terpisah di baris baru */
+            .actions .btn-detail[style*="b02a37"] { 
+                order: 3; /* Pastikan tombol ini di posisi ketiga */
+                width: 100%; /* Lebar penuh */
+                margin-top: 5px; 
+                font-size: 0.75rem;
+            }
+            
+            /* TARGET UTAMA: Membuat tombol "Detail" dan "Lanjut Bayar" sama lebarnya */
+            .actions .btn-detail,
+            .actions .btn-pay {
+                flex: 1; 
+                width: calc(50% - 4px); /* Paksa 50% lebar dikurangi setengah gap (8px/2 = 4px) */
+                padding: 8px 10px;
+                font-size: 0.7rem; 
+                min-width: 0; /* Hapus min-width agar kalkulasi 50% berhasil */
+                box-sizing: border-box; /* Pastikan padding/border dihitung dalam lebar */
+            }
+
 
             .info-row {
                 flex-direction: column;
@@ -746,6 +804,189 @@ function format_status_detail($status)
                 font-size: .7rem;
                 padding: 6px 10px;
             }
+
+            /* Penyesuaian responsif untuk Empty State */
+            .empty h2 { font-size: 1.5rem; }
+            .empty p { font-size: 0.9rem; }
+            .empty .empty-icon { font-size: 5rem; }
+            .btn-explore { padding: 12px 25px; font-size: 0.9rem; }
+        }
+        
+        /* Tambahan: Media Query untuk layar sangat kecil */
+        @media (max-width: 400px) {
+            .card-sidebar {
+                padding: 12px 10px;
+                gap: 10px;
+            }
+            
+            .actions {
+                gap: 5px; /* Kurangi gap */
+            }
+
+            .actions .btn-detail,
+            .actions .btn-pay {
+                font-size: 0.65rem;
+                padding: 7px 8px;
+                /* Ulangi kalkulasi lebar 50% dengan gap 5px (5px/2 = 2.5px) */
+                width: calc(50% - 2.5px); 
+            }
+            
+            .actions .btn-detail[style*="b02a37"] {
+                font-size: 0.7rem; 
+                margin-top: 5px;
+            }
+        }
+
+
+        /* --- Penyesuaian Global SweetAlert2 untuk Tampilan Ramping --- */
+        .swal2-popup.custom-warning-popup {
+            max-width: 450px !important;
+            /* Lebar pop-up yang lebih kecil */
+            padding: 20px 0 20px 0 !important;
+            /* Memberi sedikit padding atas/bawah */
+            border-radius: 20px !important;
+        }
+
+        /* Mengatur ulang style judul agar tebal dan tidak memiliki background */
+        .swal2-popup.custom-warning-popup .swal2-title {
+            font-size: 1.8rem !important;
+            font-weight: 700 !important;
+            color: #444 !important;
+            padding: 0 !important;
+            background: none !important;
+            border-radius: 0 !important;
+        }
+
+        /* Mengatur ulang style teks agar rapi */
+        .swal2-popup.custom-warning-popup .swal2-html-container {
+            font-size: 1rem !important;
+            color: #666;
+            margin: 0 30px 20px 30px !important;
+            padding: 0 !important;
+        }
+
+        /* Memastikan tombol Batal di kiri dan Ya, batalkan di kanan */
+        .swal2-actions {
+            gap: 15px !important;
+            margin-top: 20px !important;
+            flex-direction: row-reverse;
+        }
+
+        /* Gaya tombol Batal (Kiri, Abu-abu) */
+        .swal2-cancel {
+            background-color: #6c757d !important;
+            color: white !important;
+            padding: 10px 20px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            order: 1 !important;
+        }
+
+        /* Gaya tombol Konfirmasi (Kanan, Ungu) */
+        .swal2-confirm {
+            background-color: #7568c8 !important;
+            color: white !important;
+            padding: 10px 20px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            order: 2 !important;
+        }
+
+        /* --- CSS BARU UNTUK POP-UP BERHASIL / SUKSES (Centang Hijau Berbuletan) --- */
+        .swal2-popup.custom-success-popup {
+            max-width: 380px !important;
+            padding: 20px 0 20px 0 !important;
+            border-radius: 20px !important;
+        }
+
+        .custom-success-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border: 5px solid #a8e6cf;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px auto 20px auto;
+            box-sizing: border-box;
+        }
+
+        .custom-success-icon {
+            font-size: 48px;
+            color: #7bc07b;
+        }
+
+        /* Gaya Judul dan Teks untuk Pop-up Sukses */
+        .swal2-popup.custom-success-popup .swal2-title {
+            font-size: 1.8rem !important;
+            font-weight: 700 !important;
+            color: #444 !important;
+            padding: 0 !important;
+            background: none !important;
+            border-radius: 0 !important;
+        }
+
+        .swal2-popup.custom-success-popup .swal2-html-container {
+            font-size: 1rem !important;
+            color: #666;
+            margin: 0 30px 20px 30px !important;
+            padding: 0 !important;
+        }
+
+        /* Pastikan tombol OK untuk sukses pop-up juga Ungu */
+        .swal2-popup.custom-success-popup .swal2-confirm {
+            background-color: #7568c8 !important;
+            /* Ungu */
+        }
+
+
+        /* --- CSS BARU UNTUK POP-UP INFO / PENDING (Jam Pasir Berbuletan) --- */
+        .swal2-popup.custom-info-popup {
+            max-width: 380px !important;
+            padding: 20px 0 20px 0 !important;
+            border-radius: 20px !important;
+        }
+
+        .custom-info-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border: 5px solid #ffddb3;
+            /* Outline Oranye Muda */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px auto 20px auto;
+            box-sizing: border-box;
+        }
+
+        .custom-info-icon {
+            font-size: 48px;
+            color: #ffb74d;
+            /* Ikon Oranye */
+        }
+
+        /* Gaya Judul dan Teks untuk Pop-up Info */
+        .swal2-popup.custom-info-popup .swal2-title {
+            font-size: 1.8rem !important;
+            font-weight: 700 !important;
+            color: #444 !important;
+            padding: 0 !important;
+            background: none !important;
+            border-radius: 0 !important;
+        }
+
+        .swal2-popup.custom-info-popup .swal2-html-container {
+            font-size: 1rem !important;
+            color: #666;
+            margin: 0 30px 20px 30px !important;
+            padding: 0 !important;
+        }
+
+        /* Pastikan tombol OK untuk info pop-up juga Ungu */
+        .swal2-popup.custom-info-popup .swal2-confirm {
+            background-color: #7568c8 !important;
+            /* Ungu */
         }
     </style>
 </head>
@@ -767,14 +1008,14 @@ function format_status_detail($status)
 
         <?php if (empty($booking_list)): ?>
             <div class="empty">
-                <i class="fa-solid fa-receipt"></i>
+                <i class="fa-solid fa-money-bill-transfer empty-icon"></i> 
                 <h2>Belum Ada Transaksi</h2>
-                <p>Anda belum memiliki riwayat pemesanan</p>
+                <p>Belum ada riwayat pembayaran yang tercatat. Mari mulai trip pertama Anda!</p>
                 <a href="<?= getPageUrl('index.php') ?>#paketTrips" class="btn-explore">
-                    <i class="fa-solid fa-compass"></i> Jelajahi Trips
+                    <i class="fa-solid fa-compass"></i> Jelajahi Paket Trip
                 </a>
             </div>
-        <?php else: ?>
+            <?php else: ?>
             <div class="cards">
                 <?php foreach ($booking_list as $b):
                     $status = strtolower($b['status_pembayaran'] ?? 'pending');
@@ -890,23 +1131,60 @@ function format_status_detail($status)
                                     fetch('../backend/payment-api.php?check_status=' + resp.order_id)
                                         .then(r => r.json())
                                         .then(s => {
-                                            Swal.fire({
-                                                title: s.status === 'paid' ? 'Pembayaran Berhasil!' : 'Pembayaran Diproses',
-                                                text: s.status === 'paid' ? 'Pemesanan dikonfirmasi' : 'Menunggu konfirmasi',
-                                                icon: s.status === 'paid' ? 'success' : 'info',
-                                                confirmButtonColor: '#a97c50'
-                                            }).then(() => window.location.reload());
+                                            // --- POP-UP PEMBAYARAN BERHASIL (Centang Hijau Berbuletan) ---
+                                            if (s.status === 'paid' || s.status === 'settlement') {
+                                                Swal.fire({
+                                                    html: `
+                                                <div class="custom-success-icon-wrapper">
+                                                    <i class="custom-success-icon fas fa-check"></i>
+                                                </div>
+                                                <div class="swal2-title" style="margin-bottom: 10px;">Pembayaran Berhasil!</div>
+                                                <div class="swal2-html-container" style="margin-bottom: 20px;">Pemesanan dikonfirmasi.</div>
+                                            `,
+                                                    customClass: {
+                                                        popup: 'custom-success-popup'
+                                                    },
+                                                    confirmButtonText: 'OK',
+                                                    confirmButtonColor: '#7568c8' // Tombol OK Ungu
+                                                }).then(() => window.location.reload());
+                                            } else {
+                                                // Status pending/diproses
+                                                Swal.fire({
+                                                    html: `
+                                                <div class="custom-info-icon-wrapper">
+                                                    <i class="custom-info-icon fas fa-hourglass-half"></i>
+                                                </div>
+                                                <div class="swal2-title" style="margin-bottom: 10px;">Pembayaran Diproses</div>
+                                                <div class="swal2-html-container" style="margin-bottom: 20px;">Menunggu konfirmasi pembayaran.</div>
+                                            `,
+                                                    customClass: {
+                                                        popup: 'custom-info-popup'
+                                                    },
+                                                    confirmButtonText: 'OK',
+                                                    confirmButtonColor: '#a97c50' // Warna tema cokelat/info
+                                                }).then(() => window.location.reload());
+                                            }
                                         });
                                 },
                                 onPending: () => {
+                                    // --- POP-UP PEMBAYARAN MENUNGGU (Jam Pasir Berbuletan) ---
                                     Swal.fire({
-                                        title: 'Pembayaran Menunggu',
-                                        text: 'Mohon selesaikan pembayaran Anda',
-                                        icon: 'info',
-                                        confirmButtonColor: '#a97c50'
+                                        html: `
+                                    <div class="custom-info-icon-wrapper">
+                                        <i class="custom-info-icon fas fa-hourglass-half"></i>
+                                    </div>
+                                    <div class="swal2-title" style="margin-bottom: 10px;">Pembayaran Menunggu</div>
+                                    <div class="swal2-html-container" style="margin-bottom: 20px;">Mohon selesaikan pembayaran Anda di halaman Midtrans.</div>
+                                `,
+                                        customClass: {
+                                            popup: 'custom-info-popup'
+                                        },
+                                        confirmButtonText: 'OK',
+                                        confirmButtonColor: '#7568c8' // Tombol OK Ungu
                                     }).then(() => window.location.reload());
                                 },
                                 onError: (r) => {
+                                    // --- POP-UP ERROR (Menggunakan ikon bawaan) ---
                                     Swal.fire({
                                         title: 'Pembayaran Gagal',
                                         text: r.status_message || 'Terjadi kesalahan',
@@ -932,15 +1210,29 @@ function format_status_detail($status)
                 });
         }
 
+        // ... (Di dalam tag <script> Anda)
+
         function cancelPayment(bookingId) {
             Swal.fire({
+                // Menggunakan icon bawaan SweetAlert2 (dengan asumsi CSS defaultnya sudah bagus)
+                icon: 'warning',
                 title: 'Batalkan Pembayaran?',
                 text: 'Peserta pada booking ini akan dihapus dan transaksi dibatalkan.',
-                icon: 'warning',
+
+                // Kelas kustom untuk tata letak dan ukuran pop-up
+                customClass: {
+                    // Gunakan class CSS yang sama untuk ukuran pop-up
+                    popup: 'custom-warning-popup'
+                },
+
                 showCancelButton: true,
                 confirmButtonText: 'Ya, batalkan',
                 cancelButtonText: 'Tidak',
-                confirmButtonColor: '#dc3545'
+
+                // Warna tombol persis seperti di gambar (Ungu dan Abu-abu)
+                confirmButtonColor: '#7568c8', // Ungu
+                cancelButtonColor: '#6c757d' // Abu-abu
+
             }).then(res => {
                 if (res.isConfirmed) {
                     const form = new FormData();
@@ -953,7 +1245,7 @@ function format_status_detail($status)
                         .then(j => {
                             if (j.success) {
                                 Swal.fire({
-                                    title: 'Dibatalkan',
+                                    title: 'Berhasil!',
                                     text: 'Transaksi telah dibatalkan.',
                                     icon: 'success',
                                     confirmButtonColor: '#a97c50'
@@ -1054,30 +1346,30 @@ function format_status_detail($status)
                     Swal.fire({
                         title: `Transaksi #${d.id_booking}`,
                         html: `<div style="text-align:left">
-              <div class="info-group">
-                <h4><i class="fa-solid fa-receipt"></i> Ringkasan</h4>
-                <div class="info-row"><span>Invoice:</span><strong>${inv}</strong></div>
-                <div class="info-row"><span>Pemesanan:</span><strong>#${d.id_booking}</strong></div>
-                <div class="info-row"><span>Tanggal Transaksi:</span><strong>${d.tanggal_booking_formatted}</strong></div>
-                <div class="info-row"><span>Status:</span>${fmt}</div>
-                <div class="info-row"><span>Jumlah Peserta:</span><strong>${d.jumlah_orang} Orang</strong></div>
-                <div class="info-row"><span>Total Harga:</span><strong class="price-total">Rp ${parseInt(d.total_harga).toLocaleString('id-ID')}</strong></div>
-              </div>
-              <div class="info-group">
-                <h4><i class="fa-solid fa-mountain"></i> Detail Trip</h4>
-                <div class="info-row"><span>Gunung:</span><strong>${d.nama_gunung}</strong></div>
-                <div class="info-row"><span>Tipe:</span><strong>${d.jenis_trip||'N/A'}</strong></div>
-                <div class="info-row"><span>Tanggal Trip:</span><strong>${d.tanggal_trip_formatted}</strong></div>
-                <div class="info-row"><span>Durasi:</span><strong>${d.durasi||'N/A'}</strong></div>
-                <div class="info-row"><span>Waktu Kumpul:</span><strong>${d.waktu_kumpul||'N/A'} WIB</strong></div>
-                <div class="info-row"><span>Lokasi Kumpul:</span><strong>${d.nama_lokasi||'N/A'}</strong></div>
-              </div>
-              <div class="info-group">
-                <h4><i class="fa-solid fa-users"></i> Peserta (${d.jumlah_orang})</h4>
-                ${parts}
-              </div>
-              <div style="text-align:center;padding-top:10px;border-top:1px solid #ddd">${invBtn}</div>
-            </div>`,
+             <div class="info-group">
+               <h4><i class="fa-solid fa-receipt"></i> Ringkasan</h4>
+               <div class="info-row"><span>Invoice:</span><strong>${inv}</strong></div>
+               <div class="info-row"><span>Pemesanan:</span><strong>#${d.id_booking}</strong></div>
+               <div class="info-row"><span>Tanggal Transaksi:</span><strong>${d.tanggal_booking_formatted}</strong></div>
+               <div class="info-row"><span>Status:</span>${fmt}</div>
+               <div class="info-row"><span>Jumlah Peserta:</span><strong>${d.jumlah_orang} Orang</strong></div>
+               <div class="info-row"><span>Total Harga:</span><strong class="price-total">Rp ${parseInt(d.total_harga).toLocaleString('id-ID')}</strong></div>
+             </div>
+             <div class="info-group">
+               <h4><i class="fa-solid fa-mountain"></i> Detail Trip</h4>
+               <div class="info-row"><span>Gunung:</span><strong>${d.nama_gunung}</strong></div>
+               <div class="info-row"><span>Tipe:</span><strong>${d.jenis_trip||'N/A'}</strong></div>
+               <div class="info-row"><span>Tanggal Trip:</span><strong>${d.tanggal_trip_formatted}</strong></div>
+               <div class="info-row"><span>Durasi:</span><strong>${d.durasi||'N/A'}</strong></div>
+               <div class="info-row"><span>Waktu Kumpul:</span><strong>${d.waktu_kumpul||'N/A'} WIB</strong></div>
+               <div class="info-row"><span>Lokasi Kumpul:</span><strong>${d.nama_lokasi||'N/A'}</strong></div>
+             </div>
+             <div class="info-group">
+               <h4><i class="fa-solid fa-users"></i> Peserta (${d.jumlah_orang})</h4>
+               ${parts}
+             </div>
+             <div style="text-align:center;padding-top:10px;border-top:1px solid #ddd">${invBtn}</div>
+           </div>`,
                         width: '700px',
                         showCloseButton: true,
                         showConfirmButton: false
