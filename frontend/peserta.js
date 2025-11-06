@@ -3,6 +3,7 @@ if (typeof getApiUrl !== "function") {
   console.error("FATAL ERROR: config.js is not loaded!");
   console.error("Please ensure frontend/config.js is loaded BEFORE peserta.js");
 
+
   // Fallback untuk debugging
   window.getApiUrl = function (endpoint) {
     console.warn("Using fallback getApiUrl - config.js might not be loaded");
@@ -10,13 +11,15 @@ if (typeof getApiUrl !== "function") {
   };
 }
 
+
 /**
  * ============================================
  * FILE: frontend/peserta.js
  * FUNGSI: Handle UI Peserta management
- * UPDATED: Config.js integration + error handling
+ * UPDATED: Config.js integration + error handling + Nomor column styling FIXED
  * ============================================
  */
+
 
 class PesertaAPI {
   constructor() {
@@ -28,6 +31,7 @@ class PesertaAPI {
       this.baseURL = getApiUrl("peserta-api.php");
     }
 
+
     this.participants = [];
     this.currentEditParticipantId = null;
     this.currentTripFilterId = "";
@@ -35,12 +39,14 @@ class PesertaAPI {
     this.init();
   }
 
+
   async init() {
     await this.loadTripsForFilter();
     await this.loadParticipants();
     this.setupEventListeners();
     this.setupPrintHandler();
   }
+
 
   setupPrintHandler() {
     const btn = document.getElementById("printPdfBtn");
@@ -57,6 +63,7 @@ class PesertaAPI {
       window.open(`${this.baseURL}?${params.toString()}`, "_blank");
     });
   }
+
 
   async loadTripsForFilter() {
     const filterGunung = document.getElementById("filterGunung");
@@ -84,16 +91,19 @@ class PesertaAPI {
     }
   }
 
+
   async loadParticipants() {
     let url = `${this.baseURL}?action=all`;
     if (this.currentTripFilterId) url += `&id_trip=${this.currentTripFilterId}`;
     if (this.currentSearchTerm.trim())
       url += `&search=${encodeURIComponent(this.currentSearchTerm.trim())}`;
 
+
     const tableBody = document.getElementById("participantsTableBody");
     if (tableBody) {
-      tableBody.innerHTML = `<tr><td colspan="14" class="text-center opacity-50"><i class="bi bi-arrow-clockwise spinner-border spinner-border-sm me-2"></i>Memuat data peserta...</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="15" class="text-center opacity-50"><i class="bi bi-arrow-clockwise spinner-border spinner-border-sm me-2"></i>Memuat data peserta...</td></tr>`;
     }
+
 
     try {
       const response = await fetch(url);
@@ -113,12 +123,14 @@ class PesertaAPI {
     }
   }
 
+
   renderErrorState(message) {
     const tableBody = document.getElementById("participantsTableBody");
     if (tableBody) {
-      tableBody.innerHTML = `<tr><td colspan="14" class="text-center opacity-50 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>${message}</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="15" class="text-center opacity-50 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>${message}</td></tr>`;
     }
   }
+
 
   getImagePath(imagePath) {
     if (!imagePath) return "";
@@ -132,20 +144,27 @@ class PesertaAPI {
     return "../uploads/ktp/" + imagePath;
   }
 
+
   renderParticipants() {
     const tableBody = document.getElementById("participantsTableBody");
     const participants = this.participants;
     if (!tableBody) return;
 
+
     if (!participants.length) {
-      tableBody.innerHTML = `<tr><td colspan="14" class="text-center opacity-50">Tidak ada peserta yang ditemukan.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="15" class="text-center opacity-50">Tidak ada peserta yang ditemukan.</td></tr>`;
       return;
     }
 
+
     tableBody.innerHTML = participants
-      .map(
-        (p) => `
+      .map((p, index) => {
+        // Nomor urut
+        const nomorUrut = index + 1;
+        
+        return `
       <tr>
+        <td class="text-center col-number">${nomorUrut}</td>
         <td>${this.escapeHtml(p.id_participant || "")}</td>
         <td>${this.escapeHtml(p.nama || "")}</td>
         <td>${this.escapeHtml(p.email || "")}</td>
@@ -188,12 +207,14 @@ class PesertaAPI {
           </div>
         </td>
       </tr>
-    `
-      )
+    `;
+      })
       .join("");
+
 
     this.setupImagePreview();
   }
+
 
   setupImagePreview() {
     document.querySelectorAll(".participant-photo").forEach((img) => {
@@ -212,6 +233,7 @@ class PesertaAPI {
     });
   }
 
+
   showImagePreview(imagePath, participantName, participantNik, participantId) {
     const modal = document.getElementById("previewImageModal");
     const previewImage = document.getElementById("previewImageFull");
@@ -221,6 +243,7 @@ class PesertaAPI {
     const nikElement = document.getElementById("previewParticipantNIK");
     const downloadBtn = document.getElementById("previewDownloadBtn");
     if (!modal || !previewImage) return;
+
 
     previewImage.style.display = "none";
     loadingSpinner.style.display = "block";
@@ -232,6 +255,7 @@ class PesertaAPI {
       participantNik || "unknown"
     }.jpg`;
 
+
     previewImage.onload = () => {
       loadingSpinner.style.display = "none";
       previewImage.style.display = "block";
@@ -242,8 +266,10 @@ class PesertaAPI {
     };
     previewImage.src = imagePath;
 
+
     const bootstrapModal = new bootstrap.Modal(modal);
     bootstrapModal.show();
+
 
     document.addEventListener("keydown", (e) => {
       const m = document.getElementById("previewImageModal");
@@ -253,6 +279,7 @@ class PesertaAPI {
       }
     });
   }
+
 
   setupEventListeners() {
     const searchInput = document.getElementById("searchInput");
@@ -271,6 +298,7 @@ class PesertaAPI {
     this.setupFilePreview();
   }
 
+
   setupEditFormHandler() {
     const form = document.getElementById("formEditPeserta");
     if (!form) return;
@@ -279,6 +307,7 @@ class PesertaAPI {
       await this.handleEditSubmit(e);
     });
   }
+
 
   setupFilePreview() {
     const fileInput = document.getElementById("edit_foto_ktp");
@@ -309,6 +338,7 @@ class PesertaAPI {
     });
   }
 
+
   async getParticipantDetail(id) {
     try {
       const res = await fetch(`${this.baseURL}?action=detail&id=${id}`);
@@ -324,6 +354,7 @@ class PesertaAPI {
       return null;
     }
   }
+
 
   async updateParticipant(id, formData) {
     try {
@@ -348,6 +379,7 @@ class PesertaAPI {
     }
   }
 
+
   async deleteParticipant(id) {
     const confirm = await Swal.fire({
       title: "Konfirmasi Hapus",
@@ -360,6 +392,7 @@ class PesertaAPI {
       cancelButtonText: "Batal",
     });
     if (!confirm.isConfirmed) return;
+
 
     try {
       const response = await fetch(`${this.baseURL}?action=delete&id=${id}`, {
@@ -379,17 +412,21 @@ class PesertaAPI {
     }
   }
 
+
   async showEditModal(id) {
     const participant = await this.getParticipantDetail(id);
     if (!participant) return;
 
+
     this.currentEditParticipantId = participant.id_participant;
+
 
     const form = document.getElementById("formEditPeserta");
     if (!form) {
       this.showError("Form edit tidak ditemukan");
       return;
     }
+
 
     form.id_participant.value = participant.id_participant;
     form.nama.value = participant.nama || "";
@@ -401,6 +438,7 @@ class PesertaAPI {
     form.tanggal_lahir.value = participant.tanggal_lahir || "";
     form.tempat_lahir.value = participant.tempat_lahir || "";
     form.nik.value = participant.nik || "";
+
 
     const preview = document.getElementById("edit_preview_ktp");
     if (preview) {
@@ -416,14 +454,17 @@ class PesertaAPI {
       }
     }
 
+
     const fileInput = document.getElementById("edit_foto_ktp");
     if (fileInput) fileInput.value = "";
+
 
     const modal = new bootstrap.Modal(
       document.getElementById("editPesertaModal")
     );
     modal.show();
   }
+
 
   async handleEditSubmit(event) {
     event.preventDefault();
@@ -432,14 +473,17 @@ class PesertaAPI {
       return;
     }
 
+
     const submitBtn = event.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Menyimpan...';
     submitBtn.disabled = true;
 
+
     const form = event.target;
     const formData = new FormData(form);
     formData.append("id_participant", this.currentEditParticipantId);
+
 
     try {
       const success = await this.updateParticipant(
@@ -461,12 +505,14 @@ class PesertaAPI {
     }
   }
 
+
   escapeHtml(text) {
     if (text === null || text === undefined) return "";
     const div = document.createElement("div");
     div.textContent = text.toString();
     return div.innerHTML;
   }
+
 
   showSuccess(message) {
     if (typeof Swal !== "undefined") {
@@ -482,6 +528,7 @@ class PesertaAPI {
     }
   }
 
+
   showError(message) {
     if (typeof Swal !== "undefined") {
       Swal.fire({
@@ -495,14 +542,17 @@ class PesertaAPI {
     }
   }
 
+
   async refresh() {
     await this.loadParticipants();
   }
+
 
   debugParticipants() {
     console.log("=== DEBUG PARTICIPANTS ===");
     this.participants.forEach((p, index) => {
       console.log(`Participant ${index + 1}:`, {
+        nomor: index + 1,
         id: p.id_participant,
         nama: p.nama,
         foto_ktp: p.foto_ktp,
@@ -512,6 +562,7 @@ class PesertaAPI {
     console.log("=== END DEBUG ===");
   }
 }
+
 
 // ========== INITIALIZE ==========
 document.addEventListener("DOMContentLoaded", () => {
@@ -526,6 +577,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     return;
   }
+
 
   window.pesertaAPI = new PesertaAPI();
 });

@@ -2,6 +2,7 @@
 require_once 'auth_check.php';
 require_once '../config.php';
 
+
 if (!class_exists('RoleHelper')) {
   class RoleHelper
   {
@@ -15,6 +16,7 @@ $user_role = $user_role ?? 'user';
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 
 <head>
   <meta charset="UTF-8" />
@@ -34,6 +36,7 @@ $user_role = $user_role ?? 'user';
       margin: 0
     }
 
+
     .main {
       margin-left: 280px;
       min-height: 100vh;
@@ -41,6 +44,7 @@ $user_role = $user_role ?? 'user';
       background: #f6f0e8;
       transition: margin-left .3s ease
     }
+
 
     @media (max-width:800px) {
       .main {
@@ -51,14 +55,17 @@ $user_role = $user_role ?? 'user';
       }
     }
 
+
     .text-brown {
       color: #a97c50 !important
     }
+
 
     .bg-brown {
       background-color: #a97c50 !important;
       color: #fff
     }
+
 
     .main-header {
       display: flex;
@@ -68,6 +75,7 @@ $user_role = $user_role ?? 'user';
       padding-bottom: 28px
     }
 
+
     .main-header h2 {
       font-size: 1.4rem;
       font-weight: 700;
@@ -75,6 +83,7 @@ $user_role = $user_role ?? 'user';
       margin-bottom: 0;
       letter-spacing: 1px
     }
+
 
     .permission-badge {
       background-color: #28a745;
@@ -84,6 +93,7 @@ $user_role = $user_role ?? 'user';
       border-radius: 4px;
       margin-left: 8px
     }
+
 
     .info-badge {
       background-color: #17a2b8;
@@ -95,6 +105,7 @@ $user_role = $user_role ?? 'user';
       display: inline-block;
     }
 
+
     .card {
       border: none;
       border-radius: 15px;
@@ -102,10 +113,12 @@ $user_role = $user_role ?? 'user';
       transition: all .3s ease
     }
 
+
     .card:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(0, 0, 0, .12)
     }
+
 
     .card-header {
       background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
@@ -113,6 +126,7 @@ $user_role = $user_role ?? 'user';
       border-radius: 15px 15px 0 0 !important;
       padding: 20px
     }
+
 
     .btn-primary {
       background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
@@ -123,11 +137,13 @@ $user_role = $user_role ?? 'user';
       transition: all .3s ease
     }
 
+
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(169, 124, 80, .4);
       background: linear-gradient(135deg, #8b6332 0%, #a97c50 100%)
     }
+
 
     .btn-secondary {
       background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
@@ -138,10 +154,12 @@ $user_role = $user_role ?? 'user';
       transition: all .3s ease
     }
 
+
     .table-responsive-custom {
       overflow-x: auto;
       margin-bottom: 0
     }
+
 
     table {
       width: 100%;
@@ -151,6 +169,7 @@ $user_role = $user_role ?? 'user';
       font-size: 14px;
       border-spacing: 0
     }
+
 
     thead th {
       background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
@@ -164,6 +183,12 @@ $user_role = $user_role ?? 'user';
       white-space: nowrap
     }
 
+
+    thead th.text-center {
+      text-align: center;
+    }
+
+
     tbody td {
       padding: 15px;
       text-align: left;
@@ -176,14 +201,22 @@ $user_role = $user_role ?? 'user';
       text-overflow: ellipsis
     }
 
+
+    tbody td.text-center {
+      text-align: center;
+    }
+
+
     tbody tr:last-child td {
       border-bottom: none
     }
+
 
     tbody tr:hover td {
       background-color: #f9e8d0;
       color: #a97c50
     }
+
 
     img.participant-photo {
       width: 60px;
@@ -194,10 +227,12 @@ $user_role = $user_role ?? 'user';
       transition: transform .2s ease, box-shadow .2s ease
     }
 
+
     img.participant-photo:hover {
       transform: scale(1.05);
       box-shadow: 0 2px 8px rgba(0, 0, 0, .3)
     }
+
 
     .btn-action-group {
       display: flex;
@@ -205,6 +240,7 @@ $user_role = $user_role ?? 'user';
       justify-content: center;
       align-items: center
     }
+
 
     .btn-edit,
     .btn-delete {
@@ -221,15 +257,18 @@ $user_role = $user_role ?? 'user';
       font-size: 1.2rem
     }
 
+
     .btn-edit {
       background-color: #ffc107;
       color: #432f17
     }
 
+
     .btn-delete {
       background-color: #dc3545;
       color: #fff
     }
+
 
     .btn-edit:hover {
       background-color: #e0a800;
@@ -237,16 +276,19 @@ $user_role = $user_role ?? 'user';
       box-shadow: 0 4px 8px rgba(0, 0, 0, .2)
     }
 
+
     .btn-delete:hover {
       background-color: #c82333;
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, .2)
     }
 
+
     .search-container {
       max-width: 450px;
       position: relative
     }
+
 
     .search-input {
       padding-left: 15px;
@@ -260,12 +302,14 @@ $user_role = $user_role ?? 'user';
       transition: all .3s ease
     }
 
+
     .search-input:focus {
       outline: none;
       border-color: #a97c50;
       box-shadow: 0 0 0 .2rem rgba(169, 124, 80, .15);
       transform: translateY(-1px)
     }
+
 
     .search-icon {
       position: absolute;
@@ -277,12 +321,14 @@ $user_role = $user_role ?? 'user';
       font-size: 1.1rem
     }
 
+
     .form-label {
       font-weight: 600;
       color: #495057;
       margin-bottom: .5rem;
       font-size: .9rem
     }
+
 
     .form-control,
     .form-select {
@@ -294,6 +340,7 @@ $user_role = $user_role ?? 'user';
       height: 42px
     }
 
+
     .form-control:focus,
     .form-select:focus {
       border-color: #a97c50;
@@ -301,15 +348,18 @@ $user_role = $user_role ?? 'user';
       transform: translateY(-1px)
     }
 
+
     .btn-close-white {
       filter: invert(1);
       opacity: .8
     }
 
+
     .btn-close-white:hover {
       opacity: 1;
       transform: scale(1.1)
     }
+
 
     #previewImageModal .modal-header {
       background: linear-gradient(135deg, #a97c50 0%, #8b6332 100%);
@@ -317,9 +367,11 @@ $user_role = $user_role ?? 'user';
       border: none
     }
 
+
     #imageLoadingSpinner .spinner-border {
       color: #a97c50 !important
     }
+
 
     #previewImageFull {
       max-height: 70vh;
@@ -332,6 +384,7 @@ $user_role = $user_role ?? 'user';
       transition: transform .3s ease
     }
 
+
     #previewImageModal .modal-body {
       background-color: #f8f9fa;
       min-height: 350px;
@@ -340,8 +393,31 @@ $user_role = $user_role ?? 'user';
       justify-content: center !important;
       padding: 20px
     }
+
+
+    /* Style untuk kolom nomor di header */
+    thead th.col-number {
+      width: 60px;
+      text-align: center;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Style untuk kolom nomor di body - WARNA SAMA DENGAN KOLOM LAIN */
+    tbody td.col-number {
+      width: 60px;
+      text-align: center;
+      font-weight: 600;
+      color: #432f17;
+    }
+
+    /* Saat hover, warna nomor ikut berubah seperti kolom lain */
+    tbody tr:hover td.col-number {
+      color: #a97c50;
+    }
   </style>
 </head>
+
 
 <body>
   <?php include 'sidebar.php'; ?>
@@ -356,6 +432,7 @@ $user_role = $user_role ?? 'user';
         </small>
       </div>
     </div>
+
 
     <div class="card">
       <div class="card-header">
@@ -380,10 +457,12 @@ $user_role = $user_role ?? 'user';
           </div>
         </div>
 
+
         <div class="table-responsive-custom">
           <table>
             <thead>
               <tr>
+                <th class="text-center col-number">No</th>
                 <th>ID</th>
                 <th>Nama</th>
                 <th>Email</th>
@@ -401,13 +480,14 @@ $user_role = $user_role ?? 'user';
             </thead>
             <tbody id="participantsTableBody">
               <tr>
-                <td colspan="14" class="text-center">Memuat data peserta...</td>
+                <td colspan="15" class="text-center">Memuat data peserta...</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
+
 
     <!-- Modal Edit Peserta -->
     <div class="modal fade" id="editPesertaModal" tabindex="-1" aria-hidden="true">
@@ -451,6 +531,7 @@ $user_role = $user_role ?? 'user';
       </div>
     </div>
 
+
     <!-- Modal Preview Image -->
     <div class="modal fade" id="previewImageModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -482,13 +563,17 @@ $user_role = $user_role ?? 'user';
     </div>
   </main>
 
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 
   <!-- LOAD CONFIG.JS TERLEBIH DAHULU (CRITICAL!) -->
   <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
 
+
   <!-- BARU LOAD PESERTA.JS -->
   <script src="<?php echo getAssetsUrl('frontend/peserta.js'); ?>"></script>
 </body>
+
 
 </html>
