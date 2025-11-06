@@ -67,6 +67,18 @@ function createIconList($text, $iconClass)
     $html .= '</ul>';
     return $html;
 }
+
+// --- ATURAN PENDAKIAN MAJELIS MDPL (BARU) ---
+$climbingSOP = "
+Wajib Membawa Perlengkapan Pribadi Lengkap (Jaket, Sepatu, Ransel, dll.).
+Wajib dalam kondisi fisik dan mental yang prima.
+Dilarang membawa dan mengonsumsi Narkoba, Miras, atau zat terlarang lainnya.
+Mengikuti instruksi dan arahan dari Leader/Guide.
+Menerapkan etika 'Leave No Trace' (Tidak meninggalkan sampah).
+Mengisi dan menyerahkan Surat Pernyataan sebelum pendakian.
+Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
+";
+// --- END ATURAN PENDAKIAN MAJELIS MDPL ---
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -80,9 +92,9 @@ function createIconList($text, $iconClass)
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-KFnuwUuiq_i1OUJf"></script>
 
     <style>
+        /* CSS DARI KODE SEBELUMNYA + CSS WHATSAPP LENGKAP */
         * {
             margin: 0;
             padding: 0;
@@ -129,9 +141,7 @@ function createIconList($text, $iconClass)
             content: "";
             position: fixed;
             inset: 0;
-            background-image:
-                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(255, 184, 0, 0.04) 0%, transparent 50%);
+            background-image: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.06) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255, 184, 0, 0.04) 0%, transparent 50%);
             pointer-events: none;
             z-index: 0;
         }
@@ -217,9 +227,7 @@ function createIconList($text, $iconClass)
             line-height: 0.95;
             margin-bottom: 2rem;
             color: var(--white);
-            text-shadow:
-                0 4px 16px rgba(0, 0, 0, 0.5),
-                0 12px 48px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 12px 48px rgba(0, 0, 0, 0.3);
         }
 
         .btn-hero-wrapper {
@@ -243,9 +251,7 @@ function createIconList($text, $iconClass)
             border: none;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            box-shadow:
-                0 8px 32px rgba(255, 184, 0, 0.35),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(255, 184, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
             overflow: hidden;
         }
 
@@ -264,9 +270,7 @@ function createIconList($text, $iconClass)
 
         .btn-hero:hover {
             transform: translateY(-3px);
-            box-shadow:
-                0 12px 40px rgba(255, 184, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            box-shadow: 0 12px 40px rgba(255, 184, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
 
         .btn-hero:disabled {
@@ -324,17 +328,13 @@ function createIconList($text, $iconClass)
             backdrop-filter: blur(30px) saturate(200%);
             -webkit-backdrop-filter: blur(30px) saturate(200%);
             border: 2px solid var(--glass-border);
-            box-shadow:
-                0 4px 16px rgba(255, 255, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
         }
 
         .info-item:hover {
             background: rgba(255, 255, 255, 0.45);
             transform: scale(1.03);
-            box-shadow:
-                0 8px 24px rgba(208, 178, 140, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 24px rgba(208, 178, 140, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
 
         .info-item i {
@@ -441,18 +441,14 @@ function createIconList($text, $iconClass)
             backdrop-filter: blur(30px) saturate(200%);
             -webkit-backdrop-filter: blur(30px) saturate(200%);
             border: 2px solid var(--glass-border);
-            box-shadow:
-                0 2px 8px rgba(255, 255, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
         }
 
         .icon-list li:hover {
             color: var(--text-dark);
             background: rgba(255, 255, 255, 0.45);
             padding-left: 3.25rem;
-            box-shadow:
-                0 4px 16px rgba(208, 178, 140, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            box-shadow: 0 4px 16px rgba(208, 178, 140, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.7);
         }
 
         .icon-list li i {
@@ -486,7 +482,6 @@ function createIconList($text, $iconClass)
         }
 
         /* LOGIN WARNING MODAL */
-
         #loginWarningModal {
             display: none;
             position: fixed;
@@ -525,9 +520,7 @@ function createIconList($text, $iconClass)
             width: 100%;
             padding: clamp(1.5rem, 5vw, 2.5rem);
             text-align: center;
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.18),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
             position: relative;
             animation: modalSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -636,9 +629,8 @@ function createIconList($text, $iconClass)
             border-color: rgba(208, 178, 140, 0.5);
         }
 
-        /* BOOKING MODAL - FIXED HEIGHT UNTUK SEMUA DEVICE */
-
-        #modal-booking {
+        /* --- NEW: PRE-BOOKING MODAL STYLES --- */
+        #preBookingModal {
             display: none;
             position: fixed;
             inset: 0;
@@ -652,339 +644,161 @@ function createIconList($text, $iconClass)
             animation: modalBackdrop 0.4s ease-out;
         }
 
-        #modal-booking.active {
+        #preBookingModal.active {
             display: flex;
         }
 
-        #modal-booking .booking-modal-box {
+        #preBookingModal .pre-booking-box {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(40px) saturate(200%);
             -webkit-backdrop-filter: blur(40px) saturate(200%);
             width: 100%;
-            max-width: 550px;
+            max-width: 600px;
             border-radius: 1.5rem;
             border: 2px solid rgba(255, 255, 255, 0.6);
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.18),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
             position: relative;
             animation: modalSlideIn 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
-            max-height: 85vh;
-            height: 85vh;
         }
 
-        .booking-modal-header {
+        .pre-booking-header {
             padding: 1.5rem;
             border-bottom: 2px solid rgba(208, 178, 140, 0.2);
             flex-shrink: 0;
+            text-align: center;
         }
 
-        .booking-modal-box h3 {
+        .pre-booking-header h3 {
             margin: 0;
-            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
             font-weight: 900;
             color: var(--tan-darkest);
-            text-align: center;
             letter-spacing: -0.02em;
         }
 
-        .booking-form-container {
-            width: 100%;
-            flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-
-        .form-slide-wrapper {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
-        }
-
-        .form-slide {
-            width: 100%;
-            height: 100%;
-            flex-shrink: 0;
+        .pre-booking-content {
             padding: 1.5rem;
             overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .form-slide::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .form-slide::-webkit-scrollbar-track {
-            background: rgba(208, 178, 140, 0.1);
-            border-radius: 10px;
-        }
-
-        .form-slide::-webkit-scrollbar-thumb {
-            background: rgba(208, 178, 140, 0.4);
-            border-radius: 10px;
-        }
-
-        .form-slide::-webkit-scrollbar-thumb:hover {
-            background: rgba(208, 178, 140, 0.6);
-        }
-
-        .group-title {
-            margin: 0 0 1.25rem 0;
-            font-size: clamp(0.85rem, 2vw, 0.95rem);
-            color: var(--tan-darkest);
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid rgba(208, 178, 140, 0.25);
-            text-transform: uppercase;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .form-row.full {
-            grid-template-columns: 1fr;
-        }
-
-        .form-control {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-        }
-
-        .form-control label {
-            display: block;
-            font-weight: 700;
-            font-size: 0.65rem;
-            color: var(--tan-darkest);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-
-        .form-control input[type=text],
-        .form-control input[type=email],
-        .form-control input[type=date],
-        .form-control textarea,
-        .form-control input[type=file] {
-            width: 100%;
-            padding: 0.65rem 0.8rem;
-            border: 2px solid rgba(208, 178, 140, 0.35);
-            background: rgba(255, 255, 255, 0.8);
-            color: var(--text-dark);
-            border-radius: 8px;
-            font-size: clamp(0.8rem, 2vw, 0.9rem);
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
-        }
-
-        .form-control input:focus,
-        .form-control textarea:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 0 0 3px rgba(255, 184, 0, 0.1);
-        }
-
-        .form-control textarea {
-            resize: none;
-            min-height: 60px;
-        }
-
-        .form-control input[type=file] {
-            padding: 0.5rem 0.7rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-        }
-
-        /* SLIDE CONTROLS */
-
-        .slide-controls {
-            display: flex;
-            gap: 0.75rem;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem 1.25rem;
-            border-top: 2px solid rgba(208, 178, 140, 0.2);
-            background: rgba(245, 234, 216, 0.5);
-            flex-wrap: wrap;
-            flex-shrink: 0;
-        }
-
-        .slide-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: rgba(208, 178, 140, 0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .slide-dot.active {
-            background: var(--accent-gold);
-            width: 24px;
-            border-radius: 3px;
-            box-shadow: 0 0 10px rgba(255, 184, 0, 0.4);
-        }
-
-        .slide-nav-btn {
-            background: rgba(255, 184, 0, 0.15);
-            border: 2px solid rgba(255, 184, 0, 0.3);
-            color: var(--accent-gold);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .slide-nav-btn:hover:not(:disabled) {
-            background: rgba(255, 184, 0, 0.3);
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(255, 184, 0, 0.3);
-        }
-
-        .slide-nav-btn:disabled {
-            opacity: 0.25;
-            cursor: not-allowed;
-        }
-
-        .slide-counter {
-            font-size: 0.75rem;
-            color: var(--text-medium);
-            font-weight: 700;
-            padding: 0.4rem 0.8rem;
-            background: rgba(208, 178, 140, 0.1);
-            border-radius: 5px;
-            min-width: 50px;
-            text-align: center;
-        }
-
-        .peserta-controls {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            margin-left: auto;
-        }
-
-        .btn-peserta-add,
-        .btn-peserta-remove {
-            background: rgba(255, 184, 0, 0.15);
-            border: 2px solid rgba(255, 184, 0, 0.3);
-            color: var(--accent-gold);
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            font-size: 0.9rem;
-            padding: 0;
-        }
-
-        .btn-peserta-add:hover {
-            background: rgba(76, 175, 80, 0.2);
-            border-color: rgba(76, 175, 80, 0.5);
-            color: #4CAF50;
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-        }
-
-        .btn-peserta-remove:hover:not(:disabled) {
-            background: rgba(244, 67, 54, 0.2);
-            border-color: rgba(244, 67, 54, 0.5);
-            color: #f44336;
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
-        }
-
-        .btn-peserta-remove:disabled {
-            opacity: 0.25;
-            cursor: not-allowed;
-        }
-
-        .peserta-label {
-            font-size: 0.7rem;
-            color: var(--text-medium);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            white-space: nowrap;
-        }
-
-        /* FORM BUTTONS */
-
-        .form-buttons {
-            display: flex;
-            gap: 0.75rem;
-            padding: 1rem 1.25rem;
-            border-top: 2px solid rgba(208, 178, 140, 0.2);
-            background: rgba(245, 234, 216, 0.3);
-            flex-shrink: 0;
-            justify-content: center;
-        }
-
-        .btn-main {
-            margin: 0;
-            border: none;
-            border-radius: 8px;
-            padding: 0.9rem 1.8rem;
-            font-weight: 800;
-            font-size: clamp(0.75rem, 2vw, 0.9rem);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4rem;
-            min-height: 42px;
-            background: var(--accent-gold);
-            color: var(--tan-darkest);
-            box-shadow: 0 4px 16px rgba(255, 184, 0, 0.3);
             flex: 1;
         }
+        
+        /* New style for the content sections inside modal */
+        .modal-section {
+            margin-bottom: 1.5rem;
+        }
 
-        .btn-main:hover {
+        .modal-section h4 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--tan-darkest);
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(208, 178, 140, 0.2);
+            padding-bottom: 0.5rem;
+        }
+        
+        /* Override icon-list in modal for better icon */
+        .modal-section .icon-list li i.bi-check-circle-fill {
+            color: #4CAF50; /* Green for SOP/Rules */
+        }
+        .modal-section .icon-list li i.bi-exclamation-triangle-fill {
+            color: #FFB800; /* Gold for S&K */
+        }
+
+
+        .pre-booking-footer {
+            padding: 1rem 1.5rem;
+            border-top: 2px solid rgba(208, 178, 140, 0.2);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            font-weight: 600;
+            color: var(--text-dark);
+            user-select: none;
+        }
+
+        .checkbox-container input {
+            /* Hide default checkbox */
+            opacity: 0;
+            position: absolute;
+        }
+
+        .checkmark {
+            height: 20px;
+            width: 20px;
+            background-color: var(--tan-pale);
+            border: 2px solid var(--tan-dark);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox-container input:checked~.checkmark {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .checkmark:after {
+            content: "\f26e";
+            /* bi-check-lg icon */
+            font-family: 'bootstrap-icons';
+            color: white;
+            font-size: 14px;
+            display: none;
+        }
+
+        .checkbox-container input:checked~.checkmark:after {
+            display: block;
+        }
+
+        .btn-main-next {
+            background: var(--accent-gold);
+            color: var(--tan-darkest);
+            padding: 0.85rem 1.5rem;
+            font-weight: 800;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            box-shadow: 0 4px 16px rgba(255, 184, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-main-next:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 184, 0, 0.4);
         }
 
-        .btn-main:active {
-            transform: translateY(0);
-        }
-
-        .btn-main:disabled {
+        .btn-main-next:disabled {
             background: rgba(155, 138, 118, 0.5);
+            color: rgba(255, 255, 255, 0.5);
             cursor: not-allowed;
-            opacity: 0.6;
             box-shadow: none;
         }
 
-        .btn-main i {
-            font-size: 0.9rem;
-        }
-
-        .booking-modal-box .close-btn {
+        .pre-booking-box .close-btn {
             position: absolute;
             top: 1rem;
             right: 1rem;
@@ -1003,70 +817,12 @@ function createIconList($text, $iconClass)
             z-index: 100;
         }
 
-        .booking-modal-box .close-btn:hover {
+        .pre-booking-box .close-btn:hover {
             background: rgba(208, 178, 140, 0.25);
             border-color: rgba(208, 178, 140, 0.5);
             transform: rotate(90deg);
         }
 
-        /* PAYMENT MODAL */
-
-        #modal-payment {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(25px) brightness(0.92);
-            -webkit-backdrop-filter: blur(25px) brightness(0.92);
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        #modal-payment>div {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(40px) saturate(200%);
-            -webkit-backdrop-filter: blur(40px) saturate(200%);
-            padding: clamp(1.5rem, 4vw, 3rem);
-            max-width: 500px;
-            width: 100%;
-            border-radius: 1.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.6);
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.18),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9);
-            text-align: center;
-            position: relative;
-        }
-
-        #modal-payment button {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(208, 178, 140, 0.15);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid rgba(208, 178, 140, 0.3);
-            color: var(--tan-dark);
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
-        }
-
-        #modal-payment button:hover {
-            background: rgba(208, 178, 140, 0.25);
-            transform: rotate(90deg);
-        }
-
-        #hasil-pembayaran {
-            color: var(--text-dark);
-            padding: 1.5rem;
-            font-size: clamp(0.9rem, 2vw, 1rem);
-        }
-
-        /* === WHATSAPP BUTTON === */
         /* === WHATSAPP BUTTON === */
         /* ========== WHATSAPP BUTTON - CUTE & ANIMATED ========== */
         .whatsapp-container {
@@ -1254,10 +1010,6 @@ function createIconList($text, $iconClass)
                 0 0 0 8px rgba(37, 211, 102, 0.2);
         }
 
-        .whatsapp-button:hover i {
-            animation: shake 0.5s ease-in-out;
-        }
-
         /* Shake Animation on Hover */
         @keyframes shake {
 
@@ -1439,6 +1191,20 @@ function createIconList($text, $iconClass)
                 top: -1px;
                 right: -1px;
             }
+            
+            /* Pre-booking modal responsive adjustments */
+            #preBookingModal .pre-booking-box {
+                max-width: 90%;
+            }
+            .pre-booking-header {
+                padding: 1.25rem;
+            }
+            .pre-booking-content {
+                padding: 1.25rem;
+            }
+            .pre-booking-footer {
+                padding: 1rem 1.25rem;
+            }
         }
 
         /* ========== RESPONSIVE - SMALL MOBILE ========== */
@@ -1466,9 +1232,26 @@ function createIconList($text, $iconClass)
             .whatsapp-button.expanded {
                 padding: 10px 16px;
             }
+            
+            /* Pre-booking modal responsive adjustments */
+            #preBookingModal .pre-booking-box {
+                max-height: 90vh;
+            }
+            .pre-booking-header {
+                padding: 1rem;
+            }
+            .pre-booking-content {
+                padding: 1rem;
+            }
+            .pre-booking-footer {
+                padding: 0.75rem 1rem;
+            }
+            .pre-booking-header h3 {
+                font-size: 1.1rem;
+            }
         }
 
-        /* ========== ACCESSIBILITY ========== */
+        /* ========== ACCESSIBILITY & ANIMATION KEYFRAMES ========== */
         @media (prefers-reduced-motion: reduce) {
 
             .whatsapp-button,
@@ -1494,32 +1277,6 @@ function createIconList($text, $iconClass)
                 background: #2d2d2d;
                 border-right-color: rgba(37, 211, 102, 0.3);
                 border-bottom-color: rgba(37, 211, 102, 0.3);
-            }
-        }
-
-        @keyframes shimmer {
-
-            0%,
-            100% {
-                transform: translateX(-100%) translateY(-100%) rotate(45deg);
-            }
-
-            50% {
-                transform: translateX(100%) translateY(100%) rotate(45deg);
-            }
-        }
-
-        @keyframes pulseRing {
-            0% {
-                width: 100%;
-                height: 100%;
-                opacity: 0.8;
-            }
-
-            100% {
-                width: 140%;
-                height: 180%;
-                opacity: 0;
             }
         }
 
@@ -1550,292 +1307,6 @@ function createIconList($text, $iconClass)
                 transform: rotate(-5deg) scale(1.05);
             }
         }
-
-        .ping-dot {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
-            background: #ff4444;
-            border: 2px solid white;
-            border-radius: 50%;
-            animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-            z-index: 3;
-        }
-
-        @keyframes ping {
-
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-
-            50% {
-                transform: scale(1.3);
-                opacity: 0.8;
-            }
-        }
-
-
-        @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0) rotate(0deg);
-            }
-
-            25% {
-                transform: translateX(-6px) rotate(-10deg);
-            }
-
-            75% {
-                transform: translateX(6px) rotate(10deg);
-            }
-        }
-
-        @keyframes tooltipBounce {
-
-            0%,
-            100% {
-                transform: translateY(0) scale(1);
-            }
-
-            50% {
-                transform: translateY(-4px) scale(1.02);
-            }
-        }
-
-        /* ==================== RESPONSIVE BREAKPOINTS ==================== */
-
-        @media (max-width: 992px) {
-            .container {
-                margin-top: 70px;
-            }
-
-            .info-bar {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin-top: 65px;
-                padding: 0 0.75rem;
-            }
-
-            .booking-modal-header {
-                padding: 1.25rem;
-            }
-
-            .booking-modal-box h3 {
-                font-size: 1.15rem;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 0.6rem;
-            }
-
-            .info-bar {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-                padding: 1rem;
-            }
-
-            .info-item {
-                padding: 0.75rem;
-            }
-
-            .content-area {
-                padding: 1rem;
-            }
-
-            .map-container iframe {
-                height: 280px;
-            }
-
-            .form-slide {
-                padding: 1.25rem;
-            }
-
-            .slide-controls {
-                padding: 0.85rem 1rem;
-                gap: 0.6rem;
-            }
-
-            .form-buttons {
-                padding: 0.85rem 1rem;
-                gap: 0.6rem;
-            }
-
-            .peserta-controls {
-                margin-left: 0.5rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .container {
-                padding: 0 0.5rem;
-            }
-
-            .hero-content {
-                padding: 0 1rem;
-            }
-
-            #modal-booking .booking-modal-box {
-                max-height: 90vh;
-                height: 90vh;
-            }
-
-            .booking-modal-header {
-                padding: 1rem;
-            }
-
-            .booking-modal-box h3 {
-                font-size: 1rem;
-            }
-
-            .form-slide {
-                padding: 1rem;
-            }
-
-            .form-row {
-                gap: 0.5rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .group-title {
-                font-size: 0.8rem;
-                margin-bottom: 1rem;
-            }
-
-            .form-control label {
-                font-size: 0.6rem;
-            }
-
-            .form-control input,
-            .form-control textarea {
-                font-size: 0.8rem;
-                padding: 0.6rem 0.7rem;
-            }
-
-            .form-control textarea {
-                min-height: 55px;
-            }
-
-            .slide-controls {
-                padding: 0.75rem;
-                gap: 0.5rem;
-            }
-
-            .form-buttons {
-                padding: 0.75rem;
-                gap: 0.5rem;
-            }
-
-            .btn-main {
-                padding: 0.8rem 1.5rem;
-            }
-
-            .slide-counter {
-                font-size: 0.7rem;
-                padding: 0.35rem 0.6rem;
-            }
-
-            .peserta-label {
-                font-size: 0.65rem;
-            }
-
-            .info-bar {
-                padding: 0.75rem;
-                gap: 0.6rem;
-                border-radius: 1rem;
-            }
-
-            .info-item {
-                padding: 0.6rem;
-            }
-
-            .info-item i {
-                font-size: 1.4rem;
-            }
-
-            .content-area {
-                padding: 0.75rem;
-                border-radius: 1rem;
-            }
-
-            section.detail-section {
-                padding: 1rem 0;
-                margin-bottom: 1rem;
-            }
-
-            section.detail-section h2 {
-                font-size: 1rem;
-                margin-bottom: 0.75rem;
-            }
-
-            section.detail-section h2::after {
-                width: 40px;
-                height: 2px;
-                bottom: -8px;
-            }
-
-            .icon-list li {
-                margin-bottom: 0.75rem;
-                padding: 0.7rem 0.85rem 0.7rem 2.3rem;
-                font-size: 0.8rem;
-            }
-
-            .icon-list li i {
-                font-size: 0.95rem;
-                left: 0.85rem;
-            }
-
-            .map-container iframe {
-                height: 250px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .container {
-                padding: 0 0.4rem;
-            }
-
-            #modal-booking .booking-modal-box {
-                max-height: 92vh;
-            }
-
-            .form-slide {
-                padding: 0.85rem;
-            }
-
-            .form-row {
-                gap: 0.4rem;
-                margin-bottom: 0.4rem;
-            }
-
-            .form-control input,
-            .form-control textarea {
-                font-size: 0.75rem;
-                padding: 0.55rem 0.65rem;
-            }
-
-            .btn-main {
-                font-size: 0.7rem;
-                padding: 0.7rem 1.2rem;
-            }
-
-            .info-bar {
-                grid-template-columns: 1fr;
-            }
-
-            .slide-dot.active {
-                width: 20px;
-            }
-        }
     </style>
 
 </head>
@@ -1856,6 +1327,16 @@ function createIconList($text, $iconClass)
         }
     }
     $soldOut = ($trip['status'] !== 'available' || intval($trip['slot']) <= 0);
+    // Simpan data penting untuk JavaScript
+    $tripDetailsJson = json_encode([
+        'id_trip' => $trip['id_trip'],
+        'nama_gunung' => $trip['nama_gunung'],
+        'tanggal' => date('d M Y', strtotime($trip['tanggal'])),
+        'harga' => $trip['harga'],
+        'slot' => intval($trip['slot']),
+        'syaratKetentuanHtml' => createIconList($detail['syaratKetentuan'], 'bi bi-exclamation-triangle-fill'),
+        'climbingSOPHtml' => createIconList($climbingSOP, 'bi bi-check-circle-fill') // Menambahkan SOP
+    ]);
     ?>
 
     <section class="hero">
@@ -1870,7 +1351,7 @@ function createIconList($text, $iconClass)
                         <i class="bi bi-x-circle"></i> Sold Out
                     </button>
                 <?php else: ?>
-                    <button class="btn-hero" type="button" onclick="bookTripModal()">
+                    <button class="btn-hero" type="button" onclick="showPreBookingModal()">
                         <i class="bi bi-calendar-check"></i> Daftar Sekarang
                     </button>
                 <?php endif; ?>
@@ -1903,18 +1384,6 @@ function createIconList($text, $iconClass)
         </nav>
 
         <div class="content-area">
-            <?php
-            if ($isLogin) {
-                $id_booking_pending = null;
-                $stmtBP = $conn->prepare("SELECT id_booking FROM payments WHERE status_pembayaran='pending' AND id_booking IN (SELECT id_booking FROM bookings WHERE id_user=?) ORDER BY id_payment DESC LIMIT 1");
-                $stmtBP->bind_param("i", $_SESSION['id_user']);
-                $stmtBP->execute();
-                $stmtBP->bind_result($id_booking_pending);
-                $stmtBP->fetch();
-                $stmtBP->close();
-            }
-            ?>
-
             <section class="detail-section">
                 <h2>Meeting Point</h2>
                 <p><strong>Nama Lokasi:</strong> <?= htmlspecialchars($detail['nama_lokasi']) ?></p>
@@ -1949,14 +1418,15 @@ function createIconList($text, $iconClass)
                 <?= createIconList($detail['exclude'], 'bi bi-x-octagon-fill') ?>
             </section>
 
-            <section class="detail-section">
+            <section class="detail-section" id="syarat-ketentuan-section">
                 <h2>Syarat & Ketentuan</h2>
-                <?= createIconList($detail['syaratKetentuan'], 'bi bi-exclamation-triangle-fill') ?>
+                <div id="syarat-ketentuan-content">
+                    <?= createIconList($detail['syaratKetentuan'], 'bi bi-exclamation-triangle-fill') ?>
+                </div>
             </section>
         </div>
     </div>
 
-    <!-- LOGIN WARNING MODAL -->
     <div id="loginWarningModal">
         <div class="login-warning-container">
             <div class="login-warning-icon">
@@ -1975,128 +1445,36 @@ function createIconList($text, $iconClass)
         </div>
     </div>
 
-    <!-- BOOKING MODAL -->
-    <div id="modal-booking">
-        <div class="booking-modal-box">
-            <button class="close-btn" onclick="closeBooking()"><i class="bi bi-x-lg"></i></button>
-            <div class="booking-modal-header">
-                <h3>Form Pendaftaran Trip</h3>
+    <div id="preBookingModal">
+        <div class="pre-booking-box">
+            <button class="close-btn" onclick="closePreBookingModal()"><i class="bi bi-x-lg"></i></button>
+            <div class="pre-booking-header">
+                <h3>Persetujuan & Aturan Trip: <?= htmlspecialchars($trip['nama_gunung']) ?></h3>
             </div>
-
-            <div class="booking-form-container">
-                <div class="form-slide-wrapper" id="formSlideWrapper">
-                    <!-- FORM UTAMA (Peserta 1) -->
-                    <!-- FORM UTAMA Peserta 1 -->
-                    <div class="form-slide">
-                        <form class="booking-form" id="form-book-trip" enctype="multipart/form-data" style="display: none;">
-                            <input type="hidden" name="id_trip" value="<?= $trip['id_trip'] ?>">
-                            <input type="hidden" name="jumlah_peserta" id="jumlah-peserta" value="1">
-                        </form>
-
-                        <div class="group-title">Data Diri Anda</div>
-                        <div class="form-row">
-                            <div class="form-control">
-                                <label>Nama Lengkap</label>
-                                <input type="text" name="nama[]" required value="<?= htmlspecialchars($userLogin['username'] ?? '', ENT_QUOTES) ?>">
-                            </div>
-                            <div class="form-control">
-                                <label>Email</label>
-                                <input type="email" name="email[]" required value="<?= htmlspecialchars($userLogin['email'] ?? '', ENT_QUOTES) ?>">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-control">
-                                <label>Tanggal Lahir</label>
-                                <input type="date" name="tanggal_lahir[]" required>
-                            </div>
-                            <div class="form-control">
-                                <label>Tempat Lahir</label>
-                                <input type="text" name="tempat_lahir[]">
-                            </div>
-                        </div>
-
-                        <div class="form-row full">
-                            <div class="form-control">
-                                <label>NIK</label>
-                                <input type="text" name="nik[]" maxlength="20">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-control">
-                                <label>No. WA</label>
-                                <input type="text" name="no_wa[]" required value="<?= htmlspecialchars($userLogin['no_wa'] ?? '', ENT_QUOTES) ?>">
-                            </div>
-                            <div class="form-control">
-                                <label>No. Darurat</label>
-                                <input type="text" name="no_wa_darurat[]">
-                            </div>
-                        </div>
-
-                        <div class="form-row full">
-                            <div class="form-control">
-                                <label>Alamat</label>
-                                <textarea name="alamat[]" required><?= htmlspecialchars($userLogin['alamat'] ?? '', ENT_QUOTES) ?></textarea>
-                            </div>
-                        </div>
-
-                        <div class="form-row full">
-                            <div class="form-control">
-                                <label>Riwayat Penyakit</label>
-                                <input type="text" name="riwayat_penyakit[]" maxlength="60">
-                            </div>
-                        </div>
-
-                        <div class="form-row full">
-                            <div class="form-control">
-                                <label>Foto KTP</label>
-                                <input type="file" name="foto_ktp[]" accept="image/*">
-                            </div>
-                        </div>
-                    </div>
-
+            <div class="pre-booking-content" id="preBookingContent">
+                <div class="modal-section">
+                    <h4>Prosedur Operasional Standar (SOP) Pendakian</h4>
+                    <?= createIconList($climbingSOP, 'bi bi-check-circle-fill') ?>
                 </div>
-            </div>
 
-            <div class="slide-controls">
-                <button class="slide-nav-btn" id="prevBtn" onclick="prevSlide()" disabled>
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-                <div id="slideDots" style="display: flex; gap: 5px;"></div>
-                <button class="slide-nav-btn" id="nextBtn" onclick="nextSlide()">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-                <span class="slide-counter"><span id="slideCounter">1</span>/<span id="totalSlides">1</span></span>
-
-                <div class="peserta-controls">
-                    <button type="button" class="btn-peserta-remove" id="btnRemovePeserta" onclick="removePeserta()" disabled>
-                        <i class="bi bi-dash-lg"></i>
-                    </button>
-                    <span class="peserta-label">PESERTA</span>
-                    <button type="button" class="btn-peserta-add" onclick="addPeserta()">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
+                <div class="modal-section">
+                    <h4>Syarat & Ketentuan Tambahan Trip</h4>
+                    <?= createIconList($detail['syaratKetentuan'], 'bi bi-exclamation-triangle-fill') ?>
                 </div>
-            </div>
 
-            <div class="form-buttons">
-                <button type="button" class="btn-main" id="submitBtn" onclick="if(currentSlide === totalPeserta - 1) submitForm(); else nextSlide();">
-                    <i class="bi bi-check-circle"></i> <span id="btnText">Daftar & Booking</span>
+            </div>
+            <div class="pre-booking-footer">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="agreementCheckbox" onclick="toggleNextButton()">
+                    <div class="checkmark"></div>
+                    Saya **telah membaca, memahami, dan menyetujui** seluruh Aturan SOP dan Syarat & Ketentuan di atas.
+                </label>
+                <button type="button" class="btn-main-next" id="nextStepBtn" disabled onclick="continueToRegistration()">
+                    <i class="bi bi-arrow-right-circle"></i> Lanjutkan Isi Data Peserta
                 </button>
             </div>
         </div>
     </div>
-
-    <!-- PAYMENT MODAL -->
-    <div id="modal-payment">
-        <div>
-            <button onclick="closePayment()"><i class="bi bi-x-lg"></i></button>
-            <div id="hasil-pembayaran"></div>
-        </div>
-    </div>
-
-    <!-- WHATSAPP BUTTON -->
     <div class="whatsapp-container" data-aos="zoom-in" data-aos-delay="500">
         <button class="whatsapp-button" id="whatsappBtn" onclick="bukaWhatsapp()">
             <div class="whatsapp-icon-wrapper">
@@ -2110,7 +1488,6 @@ function createIconList($text, $iconClass)
 
     <?php include '../footer.php'; ?>
 
-    <!-- LOAD CONFIG.JS TERLEBIH DAHULU -->
     <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -2118,9 +1495,9 @@ function createIconList($text, $iconClass)
     <script src="../frontend/login.js"></script>
 
     <script>
-        let currentSlide = 0;
-        let totalPeserta = 1;
-        const slotTersedia = <?= intval($trip['slot']) ?>;
+        const tripData = <?= $tripDetailsJson ?>;
+        const isUserLoggedIn = <?= $isLogin ? 'true' : 'false' ?>;
+        const registrationPageUrl = '<?= getPageUrl('user/register-trip.php') ?>';
 
         function showLoginWarning() {
             document.getElementById('loginWarningModal').classList.add('active');
@@ -2142,406 +1519,54 @@ function createIconList($text, $iconClass)
             }
         }
 
-        function bookTripModal() {
-            <?php if (!$isLogin): ?>
+        function showPreBookingModal() {
+            if (!isUserLoggedIn) {
                 showLoginWarning();
                 return;
-            <?php endif; ?>
+            }
 
-            document.getElementById('modal-booking').classList.add('active');
-            currentSlide = 0;
-            totalPeserta = 1;
-            updateSlideUI();
+            // Konten sudah di-render langsung di HTML modal (di bagian PHP)
+            
+            // Reset checkbox and button state
+            document.getElementById('agreementCheckbox').checked = false;
+            document.getElementById('nextStepBtn').disabled = true;
+
+            document.getElementById('preBookingModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // Fokuskan pada konten modal agar bisa di-scroll
+            const contentArea = document.getElementById('preBookingContent');
+            if (contentArea) contentArea.scrollTop = 0;
         }
 
-        function closeBooking() {
-            document.getElementById('modal-booking').classList.remove('active');
-            currentSlide = 0;
-            totalPeserta = 1;
-            resetForm();
+        function closePreBookingModal() {
+            document.getElementById('preBookingModal').classList.remove('active');
             document.body.style.overflow = '';
         }
 
-        function resetForm() {
-            const wrapper = document.getElementById('formSlideWrapper');
-            while (wrapper.children.length > 1) {
-                wrapper.removeChild(wrapper.lastChild);
-            }
-
-            // Reset form pertama
-            const firstSlide = wrapper.firstElementChild;
-            if (firstSlide) {
-                const inputs = firstSlide.querySelectorAll('input:not([type="hidden"]), textarea');
-                inputs.forEach(input => {
-                    if (input.type !== 'file') {
-                        if (input.name === 'nama[]') {
-                            input.value = '<?= htmlspecialchars($userLogin['username'] ?? '', ENT_QUOTES) ?>';
-                        } else if (input.name === 'email[]') {
-                            input.value = '<?= htmlspecialchars($userLogin['email'] ?? '', ENT_QUOTES) ?>';
-                        } else if (input.name === 'no_wa[]') {
-                            input.value = '<?= htmlspecialchars($userLogin['no_wa'] ?? '', ENT_QUOTES) ?>';
-                        } else if (input.name === 'alamat[]') {
-                            input.value = '<?= htmlspecialchars($userLogin['alamat'] ?? '', ENT_QUOTES) ?>';
-                        } else {
-                            input.value = '';
-                        }
-                    } else {
-                        input.value = '';
-                    }
-                });
-            }
-
-            totalPeserta = 1;
-            currentSlide = 0;
-            document.getElementById('jumlah-peserta').value = 1;
+        function toggleNextButton() {
+            const checkbox = document.getElementById('agreementCheckbox');
+            document.getElementById('nextStepBtn').disabled = !checkbox.checked;
         }
 
-        function updateSlideUI() {
-            const wrapper = document.getElementById('formSlideWrapper');
-            wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
-
-            document.getElementById('prevBtn').disabled = currentSlide === 0;
-            document.getElementById('nextBtn').disabled = currentSlide === totalPeserta - 1;
-            document.getElementById('btnRemovePeserta').disabled = totalPeserta === 1;
-
-            document.getElementById('slideCounter').textContent = currentSlide + 1;
-            document.getElementById('totalSlides').textContent = totalPeserta;
-
-            const submitBtn = document.getElementById('submitBtn');
-            if (currentSlide === totalPeserta - 1) {
-                submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> <span id="btnText">Daftar & Booking</span>';
+        function continueToRegistration() {
+            if (document.getElementById('agreementCheckbox').checked) {
+                closePreBookingModal();
+                // Redirect ke halaman registrasi baru dengan ID trip
+                window.location.href = registrationPageUrl + '?id=' + tripData.id_trip;
             } else {
-                submitBtn.innerHTML = '<i class="bi bi-chevron-right"></i> <span id="btnText">Lanjut</span>';
-            }
-
-            updateSlideDots();
-        }
-
-        function updateSlideDots() {
-            const dotsContainer = document.getElementById('slideDots');
-            dotsContainer.innerHTML = '';
-
-            for (let i = 0; i < totalPeserta; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'slide-dot' + (i === currentSlide ? ' active' : '');
-                dot.onclick = () => goToSlide(i);
-                dotsContainer.appendChild(dot);
-            }
-        }
-
-        function goToSlide(n) {
-            if (n >= 0 && n < totalPeserta) {
-                currentSlide = n;
-                updateSlideUI();
-            }
-        }
-
-        function nextSlide() {
-            if (currentSlide < totalPeserta - 1) {
-                currentSlide++;
-                updateSlideUI();
-            }
-        }
-
-        function prevSlide() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                updateSlideUI();
-            }
-        }
-
-        function addPeserta() {
-            if (totalPeserta >= slotTersedia) {
                 Swal.fire({
-                    title: 'Slot Terbatas',
-                    text: `Hanya tersedia ${slotTersedia} slot untuk trip ini`,
+                    title: 'Persetujuan Diperlukan',
+                    text: 'Anda harus menyetujui Aturan SOP dan Syarat & Ketentuan untuk melanjutkan.',
                     icon: 'warning',
                     background: 'rgba(255, 255, 255, 0.95)',
                     color: '#3D2F21',
                     confirmButtonColor: '#FFB800'
                 });
-                return;
-            }
-
-            const wrapper = document.getElementById('formSlideWrapper');
-            const newSlide = document.createElement('div');
-            newSlide.className = 'form-slide';
-
-            const pesertaNum = totalPeserta + 1;
-            newSlide.innerHTML = `
-            <div class="group-title">Peserta ${pesertaNum}</div>
-            <div class="form-row">
-                <div class="form-control">
-                    <label>Nama Lengkap</label>
-                    <input type="text" name="nama[]" required>
-                </div>
-                <div class="form-control">
-                    <label>Email</label>
-                    <input type="email" name="email[]" required>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-control">
-                    <label>Tanggal Lahir</label>
-                    <input type="date" name="tanggal_lahir[]" required>
-                </div>
-                <div class="form-control">
-                    <label>Tempat Lahir</label>
-                    <input type="text" name="tempat_lahir[]">
-                </div>
-            </div>
-            <div class="form-row full">
-                <div class="form-control">
-                    <label>NIK</label>
-                    <input type="text" name="nik[]" maxlength="20">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-control">
-                    <label>No. WA</label>
-                    <input type="text" name="no_wa[]" required>
-                </div>
-                <div class="form-control">
-                    <label>No. Darurat</label>
-                    <input type="text" name="no_wa_darurat[]">
-                </div>
-            </div>
-            <div class="form-row full">
-                <div class="form-control">
-                    <label>Alamat</label>
-                    <textarea name="alamat[]" required></textarea>
-                </div>
-            </div>
-            <div class="form-row full">
-                <div class="form-control">
-                    <label>Riwayat Penyakit</label>
-                    <input type="text" name="riwayat_penyakit[]" maxlength="60">
-                </div>
-            </div>
-            <div class="form-row full">
-                <div class="form-control">
-                    <label>Foto KTP</label>
-                    <input type="file" name="foto_ktp[]" accept="image/*">
-                </div>
-            </div>
-        `;
-
-            wrapper.appendChild(newSlide);
-            totalPeserta++;
-            document.getElementById('jumlah-peserta').value = totalPeserta;
-            currentSlide = totalPeserta - 1;
-            updateSlideUI();
-        }
-
-        function removePeserta() {
-            if (totalPeserta > 1) {
-                const wrapper = document.getElementById('formSlideWrapper');
-                wrapper.removeChild(wrapper.lastChild);
-                totalPeserta--;
-                document.getElementById('jumlah-peserta').value = totalPeserta;
-
-                if (currentSlide >= totalPeserta) {
-                    currentSlide = totalPeserta - 1;
-                }
-                updateSlideUI();
             }
         }
 
-        // ✅ FUNGSI SUBMIT YANG SUDAH DIPERBAIKI
-        function submitForm() {
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Memproses...';
-
-            // Ambil semua data dari form slides
-            const formData = new FormData();
-
-            // Tambahkan hidden fields
-            formData.append('id_trip', document.querySelector('input[name="id_trip"]').value);
-            formData.append('jumlah_peserta', document.querySelector('input[name="jumlah_peserta"]').value);
-
-            // Ambil semua input dari semua slide
-            const allSlides = document.querySelectorAll('.form-slide');
-
-            allSlides.forEach((slide, index) => {
-                // Ambil semua input text, textarea, email, date
-                const textInputs = slide.querySelectorAll('input[type="text"], input[type="email"], input[type="date"], textarea');
-                textInputs.forEach(input => {
-                    if (input.name && input.name.includes('[]')) {
-                        formData.append(input.name, input.value || '');
-                    }
-                });
-
-                // Ambil file input secara khusus
-                const fileInput = slide.querySelector('input[type="file"]');
-                if (fileInput && fileInput.files.length > 0) {
-                    formData.append('foto_ktp[]', fileInput.files[0]);
-                } else {
-                    // Kirim file kosong jika tidak ada
-                    formData.append('foto_ktp[]', new Blob(), '');
-                }
-            });
-
-            // Kirim data dengan fetch
-            fetch('../backend/booking-api.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(async res => {
-                    const contentType = res.headers.get('content-type');
-
-                    // Check if response is JSON
-                    if (!contentType || !contentType.includes('application/json')) {
-                        const htmlText = await res.text();
-                        console.error('Server returned HTML:', htmlText);
-                        throw new Error('Server mengembalikan HTML alih-alih JSON. Cek console untuk detail.');
-                    }
-
-                    return res.json();
-                })
-                .then(json => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Daftar & Booking';
-
-                    if (json.success && json.id_booking) {
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            text: json.message,
-                            icon: 'success',
-                            background: 'rgba(255, 255, 255, 0.95)',
-                            color: '#3D2F21',
-                            confirmButtonColor: '#FFB800'
-                        });
-                        closeBooking();
-                        setTimeout(() => openPayment(json.id_booking), 1100);
-                    } else {
-                        Swal.fire({
-                            title: 'Gagal',
-                            text: json.message || 'Terjadi kesalahan',
-                            icon: 'error',
-                            background: 'rgba(255, 255, 255, 0.95)',
-                            color: '#3D2F21',
-                            confirmButtonColor: '#FFB800'
-                        });
-                    }
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Daftar & Booking';
-
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Terjadi kesalahan sistem: ' + err.message,
-                        icon: 'error',
-                        background: 'rgba(255, 255, 255, 0.95)',
-                        color: '#3D2F21',
-                        confirmButtonColor: '#FFB800'
-                    });
-                });
-        }
-
-        function openPayment(id) {
-            // Verify config loaded
-            if (typeof getApiUrl !== 'function') {
-                console.error('getApiUrl function not available');
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Konfigurasi aplikasi tidak lengkap. Silakan refresh halaman.',
-                    icon: 'error',
-                    confirmButtonColor: '#FFB800'
-                });
-                return;
-            }
-
-            document.getElementById('modal-payment').style.display = 'flex';
-            document.getElementById('hasil-pembayaran').innerHTML = '<i class="bi bi-hourglass-split"></i> Memproses pembayaran...';
-
-            // Gunakan payment API yang sudah diperbaiki
-            const paymentApiUrl = getApiUrl('payment-api.php') + '?booking=' + id;
-
-            fetch(paymentApiUrl)
-                .then(r => {
-                    const contentType = r.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        throw new Error('Server mengembalikan HTML bukan JSON');
-                    }
-                    return r.json();
-                })
-                .then(resp => {
-                    if (!resp.success) {
-                        throw new Error(resp.error || 'Gagal mendapatkan token pembayaran');
-                    }
-
-                    if (resp.snap_token) {
-                        window.snap.pay(resp.snap_token, {
-                            onSuccess: (result) => {
-                                document.getElementById('hasil-pembayaran').innerHTML = '<i class="bi bi-check-circle"></i> Pembayaran Berhasil!';
-                                setTimeout(() => {
-                                    closePayment();
-                                    Swal.fire({
-                                        title: 'Pembayaran Berhasil!',
-                                        text: 'Booking Anda telah dikonfirmasi.',
-                                        icon: 'success',
-                                        confirmButtonColor: '#FFB800'
-                                    }).then(() => window.location.reload());
-                                }, 1000);
-                            },
-                            onPending: (result) => {
-                                document.getElementById('hasil-pembayaran').innerHTML = '<i class="bi bi-clock"></i> Menunggu Pembayaran...';
-                                setTimeout(() => {
-                                    closePayment();
-                                    Swal.fire({
-                                        title: 'Pembayaran Pending',
-                                        text: 'Silakan selesaikan pembayaran Anda.',
-                                        icon: 'info',
-                                        confirmButtonColor: '#FFB800'
-                                    });
-                                }, 2000);
-                            },
-                            onError: (result) => {
-                                document.getElementById('hasil-pembayaran').innerHTML = '<i class="bi bi-x-circle"></i> Pembayaran Gagal!';
-                                setTimeout(() => {
-                                    closePayment();
-                                    Swal.fire({
-                                        title: 'Pembayaran Gagal',
-                                        text: result.status_message || 'Terjadi kesalahan',
-                                        icon: 'error',
-                                        confirmButtonColor: '#FFB800'
-                                    });
-                                }, 2000);
-                            },
-                            onClose: () => {
-                                document.getElementById('hasil-pembayaran').innerHTML = '<i class="bi bi-info-circle"></i> Popup Ditutup';
-                                setTimeout(closePayment, 1500);
-                            }
-                        });
-                    } else {
-                        throw new Error(resp.detail || 'Token pembayaran tidak diperoleh');
-                    }
-                })
-                .catch(err => {
-                    console.error('Payment error:', err);
-
-                    closePayment();
-
-                    Swal.fire({
-                        title: 'Error Pembayaran',
-                        text: err.message || 'Gagal memproses pembayaran. Silakan coba lagi.',
-                        icon: 'error',
-                        confirmButtonColor: '#FFB800'
-                    });
-                });
-        }
-
-
-        function closePayment() {
-            document.getElementById('modal-payment').style.display = 'none';
-        }
-
-        // WhatsApp Button
+        // --- WhatsApp Button Logic ---
         (function() {
             const whatsappBtn = document.getElementById('whatsappBtn');
             if (whatsappBtn) {
@@ -2589,7 +1614,7 @@ function createIconList($text, $iconClass)
 
         function bukaWhatsapp() {
             const nomor = '6285233463360';
-            const pesan = encodeURIComponent('Halo! Saya ingin bertanya tentang paket trip Majelis MDPL.');
+            const pesan = encodeURIComponent('Halo! Saya ingin bertanya tentang paket trip Majelis MDPL (<?= htmlspecialchars($trip['nama_gunung']) ?>).');
             const url = `https://wa.me/${nomor}?text=${pesan}`;
             window.open(url, '_blank');
 
