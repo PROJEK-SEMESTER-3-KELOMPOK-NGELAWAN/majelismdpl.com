@@ -179,7 +179,29 @@ function updateSummary() {
 }
 
 /**
- * Update chart
+ * Format Month Name - Ubah format YYYY-MM menjadi Nama Bulan Tahun
+ */
+function formatMonthName(monthString) {
+  const months = {
+    "01": "Januari",
+    "02": "Februari",
+    "03": "Maret",
+    "04": "April",
+    "05": "Mei",
+    "06": "Juni",
+    "07": "Juli",
+    "08": "Agustus",
+    "09": "September",
+    "10": "Oktober",
+    "11": "November",
+    "12": "Desember",
+  };
+  const [year, month] = monthString.split("-");
+  return months[month] + " " + year;
+}
+
+/**
+ * Update chart - AREA CHART DENGAN GRADIENT YANG ELEGAN
  */
 function updateChart() {
   if (!dom.paymentsChart) return;
@@ -194,6 +216,7 @@ function updateChart() {
   });
 
   const months = Object.keys(monthlyData).sort();
+  const monthLabels = months.map((m) => formatMonthName(m));
   const amounts = months.map((m) => monthlyData[m]);
 
   if (chartInstance) {
@@ -201,40 +224,99 @@ function updateChart() {
   }
 
   const ctx = dom.paymentsChart.getContext("2d");
+  
+  // Create gradient
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, "rgba(169, 124, 80, 0.4)");
+  gradient.addColorStop(1, "rgba(169, 124, 80, 0.01)");
+
   chartInstance = new Chart(ctx, {
-    type: "bar",
+    type: "line",
     data: {
-      labels: months,
+      labels: monthLabels,
       datasets: [
         {
           label: "Total Pembayaran",
           data: amounts,
-          backgroundColor: "#a97c50",
-          borderColor: "#8b6332",
-          borderWidth: 2,
-          borderRadius: 8,
+          borderColor: "#a97c50",
+          backgroundColor: gradient,
+          borderWidth: 4,
+          fill: true,
+          tension: 0.45,
+          pointRadius: 7,
+          pointBackgroundColor: "#ffffff",
+          pointBorderColor: "#a97c50",
+          pointBorderWidth: 3,
+          pointHoverRadius: 10,
+          pointHoverBackgroundColor: "#a97c50",
+          pointHoverBorderColor: "#ffffff",
+          pointHoverBorderWidth: 3,
+          segment: {
+            borderDash: [],
+          },
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: true,
+      interaction: {
+        mode: "index",
+        intersect: false,
+      },
       plugins: {
         legend: {
           display: true,
           labels: {
-            font: { size: 12, weight: "bold" },
+            font: { size: 13, weight: "600" },
             color: "#495057",
+            padding: 20,
+            usePointStyle: true,
+            pointStyle: "circle",
+          },
+        },
+        tooltip: {
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          titleColor: "#fff",
+          bodyColor: "#fff",
+          borderColor: "#a97c50",
+          borderWidth: 1,
+          padding: 12,
+          displayColors: true,
+          callbacks: {
+            label: function (context) {
+              let label = context.dataset.label || "";
+              if (label) {
+                label += ": ";
+              }
+              label += "Rp " + formatCurrency(context.parsed.y);
+              return label;
+            },
           },
         },
       },
       scales: {
         y: {
           beginAtZero: true,
+          grid: {
+            color: "rgba(0, 0, 0, 0.05)",
+            drawBorder: true,
+          },
           ticks: {
+            font: { size: 11 },
+            color: "#6c757d",
             callback: function (value) {
               return "Rp " + formatCurrency(value);
             },
+          },
+        },
+        x: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            font: { size: 11, weight: "500" },
+            color: "#495057",
           },
         },
       },

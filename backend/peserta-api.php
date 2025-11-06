@@ -57,7 +57,7 @@ function validateFilePath($filename)
 }
 
 /**
- * Get KTP upload directory - FIXED PATH uploads/ktp/
+ * Get KTP upload directory
  */
 function getKtpUploadDir()
 {
@@ -67,9 +67,6 @@ function getKtpUploadDir()
 
 /**
  * Delete file foto KTP dari filesystem
- * @param string $foto_ktp_path Path dari database (misal: 'uploads/ktp/filename.jpg' atau 'ktp_1732023400_5678.jpg')
- * @param string $participant_name Nama peserta untuk logging
- * @return array Result dengan 'success' dan 'message'
  */
 function deleteKtpFile($foto_ktp_path, $participant_name = 'Unknown')
 {
@@ -161,7 +158,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'trips') {
     respond_json(200, ['status' => 200, 'data' => $rows]);
 }
 
-// GET: all peserta
+// GET: all peserta - HANYA YANG SUDAH BAYAR & CONFIRMED
 if (isset($_GET['action']) && $_GET['action'] === 'all') {
     $id_trip = isset($_GET['id_trip']) && $_GET['id_trip'] !== '' ? intval($_GET['id_trip']) : null;
     $search  = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -169,11 +166,14 @@ if (isset($_GET['action']) && $_GET['action'] === 'all') {
     $sql = "SELECT 
           p.id_participant, p.nama, p.email, p.no_wa, p.alamat, p.riwayat_penyakit,
           p.no_wa_darurat, p.tanggal_lahir, p.tempat_lahir, p.nik, p.foto_ktp,
-          p.id_booking, t.nama_gunung
+          p.id_booking, t.nama_gunung,
+          b.status as booking_status, pay.status_pembayaran
         FROM participants p
         LEFT JOIN bookings b ON p.id_booking = b.id_booking
         LEFT JOIN paket_trips t ON b.id_trip = t.id_trip
-        WHERE 1=1";
+        LEFT JOIN payments pay ON b.id_booking = pay.id_booking
+        WHERE b.status = 'confirmed' AND pay.status_pembayaran = 'paid'";
+    
     $types = '';
     $params = [];
 
@@ -281,13 +281,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'update') {
         }
 
         // Validasi ukuran file (max 5MB)
-        $max_size = 5 * 1024 * 1024; // 5MB
+        $max_size = 5 * 1024 * 1024;
         if ($_FILES['foto_ktp']['size'] > $max_size) {
             respond_json(400, ['status' => 400, 'message' => 'Ukuran file terlalu besar. Maksimal 5MB']);
         }
 
         // Generate safe filename
-        $safe_filename = 'ktp_' . time() . '_' . mt_rand(10000, 99999) . '.' . $file_ext;
+        $safe_filename = 'ktp_' . time() . '_' . mt_rand(100000, 999999) . '.' . $file_ext;
 
         $ktp_dir = getKtpUploadDir();
 
@@ -305,7 +305,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'update') {
             respond_json(500, ['status' => 500, 'message' => 'Gagal upload foto KTP']);
         }
 
-        // Path untuk disimpan ke database (relative path)
+        // Path untuk disimpan ke database (hanya filename)
         $new_foto_path = $safe_filename;
         $foto_sql = ", foto_ktp=?";
 
@@ -351,7 +351,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'update') {
     }
 }
 
-// DELETE: peserta + file foto - FIXED TO DELETE FILE FROM FOLDER
+// DELETE: peserta + file foto
 if (isset($_GET['action']) && $_GET['action'] === 'delete') {
     $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
     if ($id <= 0) {
@@ -373,7 +373,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete') {
         respond_json(404, ['status' => 404, 'message' => 'Peserta tidak ditemukan']);
     }
 
-    // HAPUS FILE FOTO DARI FILESYSTEM TERLEBIH DAHULU - IMPORTANT!
+    // HAPUS FILE FOTO DARI FILESYSTEM TERLEBIH DAHULU
     $file_delete_result = null;
     if (!empty($participant['foto_ktp'])) {
         $file_delete_result = deleteKtpFile($participant['foto_ktp'], $participant['nama']);
@@ -409,7 +409,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete') {
     }
 }
 
-// GET: print_pdf
+// GET: print_pdf - HANYA YANG SUDAH BAYAR & CONFIRMED
 if (isset($_GET['action']) && $_GET['action'] === 'print_pdf') {
     restore_error_handler();
     restore_exception_handler();
@@ -438,11 +438,14 @@ if (isset($_GET['action']) && $_GET['action'] === 'print_pdf') {
     $sql = "SELECT 
           p.id_participant, p.nama, p.email, p.no_wa, p.alamat, p.riwayat_penyakit,
           p.no_wa_darurat, p.tanggal_lahir, p.tempat_lahir, p.nik, p.foto_ktp,
-          p.id_booking, t.nama_gunung
+          p.id_booking, t.nama_gunung,
+          b.status as booking_status, pay.status_pembayaran
         FROM participants p
         LEFT JOIN bookings b ON p.id_booking = b.id_booking
         LEFT JOIN paket_trips t ON b.id_trip = t.id_trip
-        WHERE 1=1";
+        LEFT JOIN payments pay ON b.id_booking = pay.id_booking
+        WHERE b.status = 'confirmed' AND pay.status_pembayaran = 'paid'";
+    
     $types = '';
     $params = [];
 
@@ -473,14 +476,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'print_pdf') {
         if (!$path) return '';
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) return $path;
 
-        // Path format: 'ktp_1732023400_5678.jpg' atau 'uploads/ktp/filename.jpg'
-        if (str_starts_with($path, 'uploads/ktp/')) {
-            $abs = dirname(__DIR__) . '/' . $path;
-            return file_exists($abs) ? $abs : '';
-        }
-
-        // Jika hanya filename saja
-        $abs = dirname(__DIR__) . '/uploads/ktp/' . $path;
+        // Path format: 'ktp_1732023400_5678.jpg'
+        $abs = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'ktp' . DIRECTORY_SEPARATOR . $path;
         return file_exists($abs) ? $abs : '';
     };
 
@@ -580,7 +577,7 @@ if (isset($_GET['status_id'])) {
     respond_json(200, ['status' => $status ?: 'no_payment']);
 }
 
-// GET: check_status
+// GET: check_status - CEK STATUS PEMBAYARAN & KURANGI SLOT
 if (isset($_GET['check_status'])) {
     $order_id = trim($_GET['check_status']);
     if ($order_id === '') {
@@ -594,6 +591,8 @@ if (isset($_GET['check_status'])) {
             (($transaction_status === 'capture' && $fraud_status === 'accept') || $transaction_status === 'settlement') ? 'paid' : ($transaction_status === 'pending' ? 'pending' : (in_array($transaction_status, ['deny', 'expire', 'cancel']) ? 'failed' : 'pending'));
 
         $conn->begin_transaction();
+
+        // UPDATE PAYMENT STATUS
         $stmt = $conn->prepare("UPDATE payments SET status_pembayaran=? WHERE order_id=?");
         if (!$stmt) {
             $conn->rollback();
@@ -603,14 +602,68 @@ if (isset($_GET['check_status'])) {
         $stmt->execute();
         $stmt->close();
 
+        // JIKA PAID, UPDATE BOOKING & KURANGI SLOT
         if ($status_pembayaran === 'paid') {
+            // UPDATE BOOKING STATUS
             $b = $conn->prepare("UPDATE bookings SET status='confirmed' WHERE id_booking=(SELECT id_booking FROM payments WHERE order_id=?)");
             if ($b) {
                 $b->bind_param("s", $order_id);
                 $b->execute();
                 $b->close();
             }
+
+            // AMBIL INFO BOOKING
+            $stmtInfo = $conn->prepare("
+                SELECT b.id_booking, b.id_trip, b.jumlah_orang
+                FROM bookings b
+                WHERE b.id_booking = (SELECT id_booking FROM payments WHERE order_id = ?)
+            ");
+            if ($stmtInfo) {
+                $stmtInfo->bind_param("s", $order_id);
+                $stmtInfo->execute();
+                $result = $stmtInfo->get_result();
+                $booking = $result->fetch_assoc();
+                $stmtInfo->close();
+
+                if ($booking) {
+                    // KURANGI SLOT
+                    $jumlah_orang = intval($booking['jumlah_orang']);
+                    $id_trip = intval($booking['id_trip']);
+
+                    $stmtSlot = $conn->prepare("
+                        UPDATE paket_trips 
+                        SET slot = slot - ? 
+                        WHERE id_trip = ? AND slot >= ?
+                    ");
+                    if ($stmtSlot) {
+                        $stmtSlot->bind_param("iii", $jumlah_orang, $id_trip, $jumlah_orang);
+                        $stmtSlot->execute();
+                        $stmtSlot->close();
+
+                        // CEK SLOT TERSISA
+                        $stmtCheck = $conn->prepare("SELECT slot FROM paket_trips WHERE id_trip = ?");
+                        if ($stmtCheck) {
+                            $stmtCheck->bind_param("i", $id_trip);
+                            $stmtCheck->execute();
+                            $resultCheck = $stmtCheck->get_result();
+                            $tripData = $resultCheck->fetch_assoc();
+                            $stmtCheck->close();
+
+                            // UPDATE STATUS JIKA SOLD OUT
+                            if ($tripData && intval($tripData['slot']) <= 0) {
+                                $stmtUpdateStatus = $conn->prepare("UPDATE paket_trips SET status = 'sold' WHERE id_trip = ?");
+                                if ($stmtUpdateStatus) {
+                                    $stmtUpdateStatus->bind_param("i", $id_trip);
+                                    $stmtUpdateStatus->execute();
+                                    $stmtUpdateStatus->close();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+
         $conn->commit();
 
         respond_json(200, ['success' => true, 'status' => $status_pembayaran, 'transaction_status' => $transaction_status]);
@@ -620,7 +673,7 @@ if (isset($_GET['check_status'])) {
     }
 }
 
-// GET: booking
+// GET: booking - GENERATE SNAP TOKEN
 if (isset($_GET['booking'])) {
     $id_booking = intval($_GET['booking']);
     if ($id_booking <= 0) {
@@ -709,6 +762,8 @@ $status_pembayaran =
     (($transaction_status === 'capture' && $fraud_status === 'accept') || $transaction_status === 'settlement') ? 'paid' : ($transaction_status === 'pending' ? 'pending' : (in_array($transaction_status, ['deny', 'expire', 'cancel']) ? 'failed' : 'pending'));
 
 $conn->begin_transaction();
+
+// UPDATE PAYMENT STATUS
 $stmt = $conn->prepare("UPDATE payments SET status_pembayaran=? WHERE order_id=?");
 if ($stmt) {
     $stmt->bind_param("ss", $status_pembayaran, $order_id);
@@ -719,6 +774,8 @@ if ($stmt) {
     $conn->rollback();
     respond_json(500, ['status' => 500, 'error' => 'Database error: ' . $conn->error]);
 }
+
+// JIKA PAID, UPDATE BOOKING & KURANGI SLOT
 if ($status_pembayaran === 'paid') {
     $b = $conn->prepare("UPDATE bookings SET status='confirmed' WHERE id_booking=(SELECT id_booking FROM payments WHERE order_id=?)");
     if ($b) {
@@ -726,7 +783,59 @@ if ($status_pembayaran === 'paid') {
         $b->execute();
         $b->close();
     }
+
+    // AMBIL INFO BOOKING
+    $stmtInfo = $conn->prepare("
+        SELECT b.id_booking, b.id_trip, b.jumlah_orang
+        FROM bookings b
+        WHERE b.id_booking = (SELECT id_booking FROM payments WHERE order_id = ?)
+    ");
+    if ($stmtInfo) {
+        $stmtInfo->bind_param("s", $order_id);
+        $stmtInfo->execute();
+        $result = $stmtInfo->get_result();
+        $booking = $result->fetch_assoc();
+        $stmtInfo->close();
+
+        if ($booking) {
+            // KURANGI SLOT
+            $jumlah_orang = intval($booking['jumlah_orang']);
+            $id_trip = intval($booking['id_trip']);
+
+            $stmtSlot = $conn->prepare("
+                UPDATE paket_trips 
+                SET slot = slot - ? 
+                WHERE id_trip = ? AND slot >= ?
+            ");
+            if ($stmtSlot) {
+                $stmtSlot->bind_param("iii", $jumlah_orang, $id_trip, $jumlah_orang);
+                $stmtSlot->execute();
+                $stmtSlot->close();
+
+                // CEK SLOT TERSISA
+                $stmtCheck = $conn->prepare("SELECT slot FROM paket_trips WHERE id_trip = ?");
+                if ($stmtCheck) {
+                    $stmtCheck->bind_param("i", $id_trip);
+                    $stmtCheck->execute();
+                    $resultCheck = $stmtCheck->get_result();
+                    $tripData = $resultCheck->fetch_assoc();
+                    $stmtCheck->close();
+
+                    // UPDATE STATUS JIKA SOLD OUT
+                    if ($tripData && intval($tripData['slot']) <= 0) {
+                        $stmtUpdateStatus = $conn->prepare("UPDATE paket_trips SET status = 'sold' WHERE id_trip = ?");
+                        if ($stmtUpdateStatus) {
+                            $stmtUpdateStatus->bind_param("i", $id_trip);
+                            $stmtUpdateStatus->execute();
+                            $stmtUpdateStatus->close();
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
+
 $conn->commit();
 
 respond_json(200, ['status' => 200, 'success' => true, 'message' => 'Notification processed', 'payment_status' => $status_pembayaran, 'affected_rows' => $affected ?? 0]);

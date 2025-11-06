@@ -122,10 +122,13 @@ class PesertaAPI {
 
   getImagePath(imagePath) {
     if (!imagePath) return "";
+    // Jika sudah URL lengkap
     if (imagePath.startsWith("http://") || imagePath.startsWith("https://"))
       return imagePath;
     if (imagePath.startsWith("../")) return imagePath;
+    // Format: 'ktp_1732023400_5678.jpg' atau 'uploads/ktp/filename.jpg'
     if (imagePath.startsWith("uploads/")) return "../" + imagePath;
+    // Asumsikan hanya filename
     return "../uploads/ktp/" + imagePath;
   }
 

@@ -75,7 +75,7 @@ try {
             return '';
         }
 
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $file['tmp_name'][$idx]);
         finfo_close($finfo);
@@ -90,21 +90,28 @@ try {
         }
 
         $ext = strtolower(pathinfo($file['name'][$idx], PATHINFO_EXTENSION));
-        $fileName = 'ktp_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+        // Buat nama file yang aman
+        $fileName = 'ktp_' . time() . '_' . rand(100000, 999999) . '.' . $ext;
 
-        $upDir = __DIR__ . '/../uploads/ktp/';
+        $upDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'ktp' . DIRECTORY_SEPARATOR;
 
+        // Buat folder jika belum ada
         if (!is_dir($upDir)) {
-            mkdir($upDir, 0755, true);
+            if (!mkdir($upDir, 0755, true)) {
+                error_log("Failed to create directory: $upDir");
+                return '';
+            }
         }
 
         $target = $upDir . $fileName;
 
-        if (move_uploaded_file($file['tmp_name'][$idx], $target)) {
-            return 'uploads/ktp/' . $fileName;
+        if (!move_uploaded_file($file['tmp_name'][$idx], $target)) {
+            error_log("Failed to move uploaded file to: $target");
+            return '';
         }
 
-        return '';
+        // Return hanya filename (akan diakses dari path uploads/ktp/)
+        return $fileName;
     }
 
     $stmt = $conn->prepare("SELECT slot, harga, status FROM paket_trips WHERE id_trip = ?");
@@ -155,19 +162,30 @@ try {
     }
 
     for ($i = 0; $i < $jumlah_peserta; $i++) {
-        $ktpPath = '';
-        if ($foto_ktp_files && isset($foto_ktp_files['tmp_name'][$i])) {
-            $ktpPath = uploadKTP($foto_ktp_files, $i);
-        }
-
-        if (!empty($nik[$i]) && strlen($nik[$i]) != 16) {
+        // Validasi data sebelum insert
+        if (empty($nama[$i])) {
             $conn->rollback();
-            throw new Exception("NIK peserta " . ($i + 1) . " harus 16 digit");
+            throw new Exception("Nama peserta " . ($i + 1) . " tidak boleh kosong");
         }
 
         if (!filter_var($email[$i], FILTER_VALIDATE_EMAIL)) {
             $conn->rollback();
             throw new Exception("Email peserta " . ($i + 1) . " tidak valid");
+        }
+
+        if (!empty($nik[$i]) && strlen(preg_replace('/\D/', '', $nik[$i])) != 16) {
+            $conn->rollback();
+            throw new Exception("NIK peserta " . ($i + 1) . " harus 16 digit");
+        }
+
+        // Upload KTP
+        $ktpPath = '';
+        if ($foto_ktp_files && isset($foto_ktp_files['tmp_name'][$i]) && $foto_ktp_files['error'][$i] === UPLOAD_ERR_OK) {
+            $ktpPath = uploadKTP($foto_ktp_files, $i);
+            if (empty($ktpPath)) {
+                error_log("Warning: KTP upload failed for participant " . ($i + 1));
+                // Lanjut tanpa KTP (opsional - bisa juga throw exception)
+            }
         }
 
         $stmtParticipant->bind_param(
@@ -186,7 +204,7 @@ try {
 
         if (!$stmtParticipant->execute()) {
             $conn->rollback();
-            throw new Exception('Gagal menyimpan peserta: ' . $stmtParticipant->error);
+            throw new Exception('Gagal menyimpan peserta ' . ($i + 1) . ': ' . $stmtParticipant->error);
         }
 
         $participant_ids[] = $conn->insert_id;
@@ -240,53 +258,6 @@ try {
         $stmtUpdateParticipant->close();
     }
 
-    $stmtUpdateSlot = $conn->prepare("
-        UPDATE paket_trips 
-        SET slot = slot - ? 
-        WHERE id_trip = ? AND slot >= ?
-    ");
-
-    if (!$stmtUpdateSlot) {
-        $conn->rollback();
-        throw new Exception('Database prepare error: ' . $conn->error);
-    }
-
-    $stmtUpdateSlot->bind_param("iii", $jumlah_peserta, $id_trip, $jumlah_peserta);
-
-    if (!$stmtUpdateSlot->execute()) {
-        $conn->rollback();
-        throw new Exception('Gagal update slot trip');
-    }
-
-    $affectedRows = $stmtUpdateSlot->affected_rows;
-    $stmtUpdateSlot->close();
-
-    if ($affectedRows === 0) {
-        $conn->rollback();
-        throw new Exception('Slot tidak cukup atau trip tidak tersedia');
-    }
-
-    $stmtCheckSlot = $conn->prepare("SELECT slot FROM paket_trips WHERE id_trip = ?");
-    if (!$stmtCheckSlot) {
-        $conn->rollback();
-        throw new Exception('Database prepare error: ' . $conn->error);
-    }
-
-    $stmtCheckSlot->bind_param("i", $id_trip);
-    $stmtCheckSlot->execute();
-    $resultSlot = $stmtCheckSlot->get_result();
-    $sisaSlot = $resultSlot->fetch_assoc()['slot'];
-    $stmtCheckSlot->close();
-
-    if ($sisaSlot <= 0) {
-        $stmtUpdateStatus = $conn->prepare("UPDATE paket_trips SET status = 'sold' WHERE id_trip = ?");
-        if ($stmtUpdateStatus) {
-            $stmtUpdateStatus->bind_param("i", $id_trip);
-            $stmtUpdateStatus->execute();
-            $stmtUpdateStatus->close();
-        }
-    }
-
     $conn->commit();
 
     ob_clean();
@@ -295,9 +266,9 @@ try {
         'success' => true,
         'id_booking' => $id_booking,
         'total_harga' => $total_harga,
-        'sisa_slot' => $sisaSlot,
         'message' => 'Pendaftaran berhasil! Silakan lanjut ke pembayaran.'
     ], JSON_UNESCAPED_UNICODE);
+
 } catch (Exception $e) {
     if (isset($conn) && $conn->ping()) {
         $conn->rollback();
@@ -309,6 +280,7 @@ try {
         'success' => false,
         'message' => $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
+
 } finally {
     if (isset($conn)) {
         $conn->close();

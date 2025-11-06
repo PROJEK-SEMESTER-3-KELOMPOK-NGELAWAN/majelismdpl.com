@@ -85,6 +85,16 @@ $user_role = $user_role ?? 'user';
       margin-left: 8px
     }
 
+    .info-badge {
+      background-color: #17a2b8;
+      color: #fff;
+      font-size: .75em;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+      display: inline-block;
+    }
+
     .card {
       border: none;
       border-radius: 15px;
@@ -339,8 +349,10 @@ $user_role = $user_role ?? 'user';
     <div class="main-header">
       <div>
         <h2>Kelola Data Peserta</h2>
-        <small class="text-muted"><i class="bi bi-people-fill"></i> Daftar semua data pendaftar trip.
+        <small class="text-muted">
+          <i class="bi bi-people-fill"></i> Daftar peserta yang sudah membayar.
           <span class="permission-badge"><?= RoleHelper::getRoleDisplayName($user_role) ?></span>
+          <span class="info-badge"><i class="bi bi-info-circle"></i> Hanya menampilkan data peserta dengan status pembayaran PAID dan booking CONFIRMED</span>
         </small>
       </div>
     </div>
@@ -348,7 +360,7 @@ $user_role = $user_role ?? 'user';
     <div class="card">
       <div class="card-header">
         <div class="d-flex justify-content-between align-items-center">
-          <h5 class="mb-0 text-brown"><i class="bi bi-table"></i> Data Peserta</h5>
+          <h5 class="mb-0 text-brown"><i class="bi bi-table"></i> Data Peserta Terkonfirmasi</h5>
         </div>
       </div>
       <div class="card-body p-4">
@@ -384,7 +396,6 @@ $user_role = $user_role ?? 'user';
                 <th class="hide-col">NIK</th>
                 <th>Foto KTP</th>
                 <th>ID Booking</th>
-                <th>Trip</th>
                 <th>Aksi</th>
               </tr>
             </thead>
