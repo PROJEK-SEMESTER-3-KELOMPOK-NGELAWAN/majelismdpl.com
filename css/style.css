@@ -3389,3 +3389,21 @@ section {
     );
   }
 }
+
+/* SweetAlert2 custom CSS */
+.colored-toast.swal2-icon-success {
+  background-color: #a5dc86 !important;
+  color: #fff !important;
+}
+
+.colored-toast .swal2-title {
+  color: #fff !important;
+}
+
+.colored-toast .swal2-html-container {
+  color: #fff !important;
+}
+
+.colored-toast .swal2-progress-bar {
+  background-color: #38a169 !important; /* Warna hijau yang lebih gelap */
+}

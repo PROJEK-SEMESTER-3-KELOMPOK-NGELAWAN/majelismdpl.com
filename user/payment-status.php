@@ -465,7 +465,7 @@ function format_status_detail($status)
             font-weight: 700;
             text-decoration: none;
             color: #fff;
-            background: linear-gradient(135deg, #a97c50 0%, #e6a700 100%);
+            background: linear-gradient(135deg, #a97c50 100%, #e6a700 0%);
             box-shadow: 0 5px 18px rgba(169, 124, 80, .4);
             transition: all .3s ease;
             text-transform: uppercase;
@@ -475,7 +475,7 @@ function format_status_detail($status)
         .btn-explore:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 25px rgba(169, 124, 80, .6);
-            background: linear-gradient(135deg, #d4a574 0%, #ffc107 100%);
+            background: linear-gradient(135deg, #d4a574 100%, #ffc107 0%);
         }
         /* Akhir CSS BARU untuk Empty State */
 

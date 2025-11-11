@@ -595,11 +595,11 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                             <div class="form-row full">
                                 <div class="form-control">
                                     <label>Foto KTP (Wajib)</label>
-                                    <input type="file" name="foto_ktp[]" accept="image/*" required>
+                                    <input type="file" name="foto_ktp[]" accept="image/*" required class="input-foto-ktp">
                                 </div>
                             </div>
                         </div>
-                        </div>
+                    </div>
                 </div>
 
                 <div class="slide-controls">
@@ -638,8 +638,6 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
         </div>
     </div>
 
-    <?php include '../footer.php'; ?>
-
     <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -650,12 +648,76 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
         let currentSlide = 0;
         let totalPeserta = 1;
         const slotTersedia = <?= $slotTersedia ?>;
-        const hargaPerPeserta = <?= $hargaPerPeserta ?>; 
-        
-        // URL untuk mengarahkan ke halaman status pembayaran
-        const paymentStatusUrl = '<?= getPageUrl("user/payment-status.php") ?>'; 
+        const hargaPerPeserta = <?= $hargaPerPeserta ?>;
 
-        // --- CORE SLIDE LOGIC (fungsi-fungsi yang harus ada) ---
+        // URL untuk mengarahkan ke halaman status pembayaran
+        const paymentStatusUrl = '<?= getPageUrl("user/payment-status.php") ?>';
+
+        // Nama key untuk menyimpan data di localStorage. Gunakan ID Trip dan ID User agar unik
+        const STORAGE_KEY = `trip_booking_data_<?= $id_trip ?>_<?= $_SESSION['id_user'] ?>`;
+
+        // --- TEMPLATE PESERTA BARU (Digunakan untuk addPeserta dan restoreFormData) ---
+        function getPesertaTemplate(pesertaNum) {
+            return `
+        <div class="group-title">Peserta ${pesertaNum}</div>
+        <div class="form-row">
+            <div class="form-control">
+                <label>Nama Lengkap</label>
+                <input type="text" name="nama[]" required>
+            </div>
+            <div class="form-control">
+                <label>Email</label>
+                <input type="email" name="email[]" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-control">
+                <label>Tanggal Lahir</label>
+                <input type="date" name="tanggal_lahir[]" required>
+            </div>
+            <div class="form-control">
+                <label>Tempat Lahir</label>
+                <input type="text" name="tempat_lahir[]">
+            </div>
+        </div>
+        <div class="form-row full">
+            <div class="form-control">
+                <label>NIK</label>
+                <input type="text" name="nik[]" maxlength="20">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-control">
+                <label>No. WA</label>
+                <input type="text" name="no_wa[]" required>
+            </div>
+            <div class="form-control">
+                <label>No. Darurat</label>
+                <input type="text" name="no_wa_darurat[]">
+            </div>
+        </div>
+        <div class="form-row full">
+            <div class="form-control">
+                <label>Alamat</label>
+                <textarea name="alamat[]" required></textarea>
+            </div>
+        </div>
+        <div class="form-row full">
+            <div class="form-control">
+                <label>Riwayat Penyakit</label>
+                <input type="text" name="riwayat_penyakit[]" maxlength="60">
+            </div>
+        </div>
+        <div class="form-row full">
+            <div class="form-control">
+                <label>Foto KTP (Wajib)</label>
+                <input type="file" name="foto_ktp[]" accept="image/*" required class="input-foto-ktp">
+            </div>
+        </div>
+        `;
+        }
+
+        // --- CORE SLIDE LOGIC ---
         function updateSlideUI() {
             const wrapper = document.getElementById('formSlideWrapper');
             wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
@@ -670,7 +732,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
             const submitBtn = document.getElementById('submitBtn');
             if (currentSlide === totalPeserta - 1) {
                 submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> <span id="btnText">Daftar & Booking</span>';
-                submitBtn.onclick = submitForm; 
+                submitBtn.onclick = submitForm;
             } else {
                 submitBtn.innerHTML = '<i class="bi bi-chevron-right"></i> <span id="btnText">Lanjut</span>';
                 submitBtn.onclick = nextSlide;
@@ -720,7 +782,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                 updateSlideUI();
             }
         }
-        
+
         function validateCurrentSlide() {
             const currentSlideElement = document.getElementById('formSlideWrapper').children[currentSlide];
             const requiredInputs = currentSlideElement.querySelectorAll('[required]');
@@ -741,66 +803,145 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
             return isValid;
         }
 
-        // --- PESERTA LOGIC ---
-        function getPesertaTemplate(pesertaNum) {
-            return `
-            <div class="group-title">Peserta ${pesertaNum}</div>
-            <div class="form-row">
-                <div class="form-control">
-                    <label>Nama Lengkap</label>
-                    <input type="text" name="nama[]" required>
-                </div>
-                <div class="form-control">
-                    <label>Email</label>
-                    <input type="email" name="email[]" required>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-control">
-                    <label>Tanggal Lahir</label>
-                    <input type="date" name="tanggal_lahir[]" required>
-                </div>
-                <div class="form-control">
-                    <label>Tempat Lahir</label>
-                    <input type="text" name="tempat_lahir[]">
-                </div>
-            </div>
-            <div class="form-row full">
-                <div class="form-control">
-                    <label>NIK</label>
-                    <input type="text" name="nik[]" maxlength="20">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-control">
-                    <label>No. WA</label>
-                    <input type="text" name="no_wa[]" required>
-                </div>
-                <div class="form-control">
-                    <label>No. Darurat</label>
-                    <input type="text" name="no_wa_darurat[]">
-                </div>
-            </div>
-            <div class="form-row full">
-                <div class="form-control">
-                    <label>Alamat</label>
-                    <textarea name="alamat[]" required></textarea>
-                </div>
-            </div>
-            <div class="form-row full">
-                <div class="form-control">
-                    <label>Riwayat Penyakit</label>
-                    <input type="text" name="riwayat_penyakit[]" maxlength="60">
-                </div>
-            </div>
-            <div class="form-row full">
-                <div class="form-control">
-                    <label>Foto KTP (Wajib)</label>
-                    <input type="file" name="foto_ktp[]" accept="image/*" required>
-                </div>
-            </div>
-            `;
+        // --- LOCAL STORAGE & PERSISTENCY LOGIC ---
+
+        function saveFormData() {
+            const formData = {};
+            const form = document.getElementById('form-book-trip');
+            const slides = form.querySelectorAll('.form-slide');
+
+            // Simpan jumlah peserta
+            formData.totalPeserta = totalPeserta;
+
+            // Simpan data setiap peserta (Hanya data teks)
+            formData.pesertaData = [];
+
+            slides.forEach((slide) => {
+                const slideData = {};
+                const inputs = slide.querySelectorAll('input, textarea');
+
+                inputs.forEach(input => {
+                    // Kita hanya menyimpan nilai untuk input non-file
+                    if (input.type !== 'file') {
+                        const name = input.name.replace('[]', '');
+                        slideData[name] = input.value;
+                    }
+                });
+                formData.pesertaData.push(slideData);
+            });
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
         }
+
+        function restoreFormData(data) {
+            // 1. Atur jumlah peserta
+            const targetPeserta = data.totalPeserta;
+            const wrapper = document.getElementById('formSlideWrapper');
+
+            // Tambah slide jika kurang
+            while (totalPeserta < targetPeserta) {
+                const newSlide = document.createElement('div');
+                newSlide.className = 'form-slide';
+                newSlide.innerHTML = getPesertaTemplate(totalPeserta + 1);
+                wrapper.appendChild(newSlide);
+                totalPeserta++;
+            }
+            // Hapus slide jika lebih
+            while (totalPeserta > targetPeserta && totalPeserta > 1) {
+                wrapper.removeChild(wrapper.lastChild);
+                totalPeserta--;
+            }
+
+            document.getElementById('jumlah-peserta').value = totalPeserta;
+
+            // 2. Isi data ke setiap slide
+            const slides = document.querySelectorAll('.form-slide');
+            data.pesertaData.forEach((slideData, index) => {
+                if (slides[index]) {
+                    // Hapus notifikasi upload sebelumnya
+                    slides[index].querySelectorAll('.upload-warning').forEach(el => el.remove());
+
+                    const inputs = slides[index].querySelectorAll('input, textarea');
+                    inputs.forEach(input => {
+                        const name = input.name.replace('[]', '');
+                        if (slideData[name] !== undefined && input.type !== 'file') {
+                            input.value = slideData[name];
+                        }
+                    });
+
+                    // LOGIKA PEMBERITAHUAN UNTUK INPUT FILE
+                    const fileInput = slides[index].querySelector('.input-foto-ktp');
+                    if (fileInput) {
+                        fileInput.value = ''; // Nilai input file harus dikosongkan setelah refresh
+
+                        // Tambahkan elemen visual untuk mengingatkan user agar upload ulang
+                        fileInput.insertAdjacentHTML('afterend',
+                            '<p class="upload-warning" style="color:#F44336; font-size:0.75rem; margin-top:5px; font-weight: 600;">⚠️ **Mohon upload ulang Foto KTP**. Browser tidak menyimpan file setelah refresh.</p>'
+                        );
+
+                        // Hapus atribut 'required' sementara di slide ini (kecuali slide terakhir)
+                        // Agar user bisa next slide tanpa upload file
+                        if (index !== slides.length - 1) {
+                            fileInput.removeAttribute('required');
+                            // Kembalikan required saat pindah slide
+                            slides[index].addEventListener('change', () => {
+                                if (fileInput.files.length === 0) {
+                                    fileInput.setAttribute('required', true);
+                                } else {
+                                    fileInput.removeAttribute('required');
+                                }
+                            });
+                        }
+                    }
+
+                    // Perbarui judul slide jika lebih dari 1 peserta
+                    if (index > 0) {
+                        slides[index].querySelector('.group-title').textContent = `Peserta ${index + 1}`;
+                    }
+                }
+            });
+
+            // 3. Update UI dan navigasi
+            currentSlide = 0;
+            updateSlideUI();
+        }
+
+        function loadFormData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+
+            if (savedData) {
+                const data = JSON.parse(savedData);
+
+                // Tampilkan pop-up konfirmasi pemulihan
+                Swal.fire({
+                    title: 'Data Pendaftaran Ditemukan!',
+                    text: `Ditemukan data pendaftaran Trip: <?= $tripTitle ?> untuk ${data.totalPeserta} orang yang belum selesai. Apakah Anda ingin melanjutkan?`,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4CAF50',
+                    cancelButtonColor: '#F44336',
+                    confirmButtonText: 'Ya, Lanjutkan',
+                    cancelButtonText: 'Tidak, Mulai Baru'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        restoreFormData(data);
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Data Berhasil Dipulihkan!',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    } else {
+                        // Jika pengguna memilih memulai baru, hapus data lama
+                        localStorage.removeItem(STORAGE_KEY);
+                    }
+                });
+            }
+        }
+
+        // --- PESERTA LOGIC ---
 
         function addPeserta() {
             if (totalPeserta >= slotTersedia) {
@@ -816,15 +957,28 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
             const wrapper = document.getElementById('formSlideWrapper');
             const newSlide = document.createElement('div');
             newSlide.className = 'form-slide';
-            
+
+            // Cek validasi slide saat ini sebelum menambah
+            if (!validateCurrentSlide()) {
+                Swal.fire({
+                    title: 'Data Belum Lengkap',
+                    text: 'Mohon lengkapi semua field yang wajib diisi pada Peserta ' + (currentSlide + 1),
+                    icon: 'warning',
+                    confirmButtonColor: '#FFB800'
+                });
+                return;
+            }
+
+
             newSlide.innerHTML = getPesertaTemplate(totalPeserta + 1);
 
             wrapper.appendChild(newSlide);
             totalPeserta++;
             document.getElementById('jumlah-peserta').value = totalPeserta;
-            
-            currentSlide = totalPeserta - 1; 
+
+            currentSlide = totalPeserta - 1;
             updateSlideUI();
+            saveFormData(); // Simpan data setelah menambah peserta
         }
 
         function removePeserta() {
@@ -838,22 +992,23 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                     currentSlide = totalPeserta - 1;
                 }
                 updateSlideUI();
+                saveFormData(); // Simpan data setelah menghapus peserta
             }
         }
-        
-        // --- SUBMIT DAN LOGIKA PEMBAYARAN YANG DIREVISI ---
+
+        // --- SUBMIT DAN LOGIKA PEMBAYARAN ---
 
         function submitForm() {
             if (!validateCurrentSlide()) {
                 Swal.fire({
                     title: 'Data Belum Lengkap',
-                    text: 'Mohon lengkapi semua field yang wajib diisi dan pastikan format input sudah benar pada Peserta ' + (currentSlide + 1),
+                    text: 'Mohon lengkapi semua field yang wajib diisi dan pastikan format input sudah benar pada Peserta ' + (currentSlide + 1) + '. **Pastikan Foto KTP sudah di-upload!**',
                     icon: 'warning',
                     confirmButtonColor: '#FFB800'
                 });
                 return;
             }
-            
+
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Memproses...';
@@ -876,6 +1031,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                 if (fileInput && fileInput.files.length > 0) {
                     formData.append('foto_ktp[]', fileInput.files[0]);
                 } else {
+                    // Jika input file kosong (wajib diisi, tapi dikirim sebagai placeholder)
                     formData.append('foto_ktp[]', new Blob(), '');
                 }
             });
@@ -899,7 +1055,10 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                     submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Daftar & Booking';
 
                     if (json.success && json.id_booking) {
-                        
+
+                        // Hapus data form dari localStorage setelah berhasil disimpan ke DB
+                        localStorage.removeItem(STORAGE_KEY);
+
                         Swal.fire({
                             toast: true,
                             position: 'top-end',
@@ -908,7 +1067,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        
+
                         // Lanjutkan ke pembayaran Midtrans Snap
                         openPayment(json.id_booking);
 
@@ -949,7 +1108,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                     }
 
                     document.getElementById('modal-payment').style.display = 'none';
-                    
+
                     if (resp.snap_token) {
                         window.snap.pay(resp.snap_token, {
                             onSuccess: (result) => {
@@ -968,7 +1127,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                                     text: 'Silakan lanjutkan pembayaran Anda melalui menu status pembayaran.',
                                     icon: 'info',
                                     confirmButtonColor: '#FFB800'
-                                }).then(() => window.location.href = paymentStatusUrl); // Arahkan ke Halaman Status
+                                }).then(() => window.location.href = paymentStatusUrl);
                             },
                             onError: (result) => {
                                 // CASE 3: Pembayaran Gagal (Error)
@@ -977,7 +1136,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                                     text: 'Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi dari menu status pembayaran.',
                                     icon: 'error',
                                     confirmButtonColor: '#F44336'
-                                }).then(() => window.location.href = paymentStatusUrl); // Arahkan ke Halaman Status
+                                }).then(() => window.location.href = paymentStatusUrl);
                             },
                             onClose: () => {
                                 // CASE 4: Pop-up Ditutup oleh User (Incomplete/Deferred Payment)
@@ -986,7 +1145,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                                     text: 'Silakan lanjutkan pembayaran Anda dari menu status pembayaran.',
                                     icon: 'info',
                                     confirmButtonColor: '#FFB800'
-                                }).then(() => window.location.href = paymentStatusUrl); // Arahkan ke Halaman Status
+                                }).then(() => window.location.href = paymentStatusUrl);
                             }
                         });
                     } else {
@@ -1010,9 +1169,15 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
             document.getElementById('modal-payment').style.display = 'none';
         }
 
-        // Initialize UI on load
+        // Initialize UI and Load Data on load
         document.addEventListener('DOMContentLoaded', () => {
             updateSlideUI();
+            loadFormData();
+
+            // Tambahkan event listener untuk menyimpan data setiap ada perubahan pada form
+            const form = document.getElementById('form-book-trip');
+            form.addEventListener('change', saveFormData);
+            form.addEventListener('keyup', saveFormData); // Simpan saat ketikan
         });
     </script>
 </body>

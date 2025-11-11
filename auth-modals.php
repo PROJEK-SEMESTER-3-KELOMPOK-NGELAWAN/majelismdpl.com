@@ -456,7 +456,7 @@
         <!-- Left section dengan logo -->
         <div class="modal-left">
             <div class="logo-container">
-                <img src="<?php echo isset($navbarPath) ? $navbarPath : ''; ?>assets/logo_majelis_noBg.png" alt="Majelis MDPL Logo" class="modal-logo">
+                <img src="<?php echo isset($navbarPath) ? $navbarPath : ''; ?>assets/majelis.png" alt="Majelis MDPL Logo" class="modal-logo">
             </div>
         </div>
 
@@ -518,7 +518,7 @@
         <!-- Left section dengan logo -->
         <div class="modal-left">
             <div class="logo-container">
-                <img src="<?php echo getPageUrl('assets/logo_majelis_noBg.png'); ?>" alt="Majelis MDPL Logo" class="modal-logo">
+                <img src="<?php echo getPageUrl('assets/majelis.png'); ?>" alt="Majelis MDPL Logo" class="modal-logo">
             </div>
         </div>
 

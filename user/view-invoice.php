@@ -100,14 +100,25 @@ $companyDetails = [
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <style>
-        /* ... COPY SEMUA CSS DARI FILE view-invoice.php YANG ANDA BERIKAN ... */
+        /* --- VAR CSS --- */
         :root {
             --color-mdpl-dark: #a97c50;
             --color-mdpl-light: #d6b38c;
             --color-success: #2e7d32;
             --color-primary-btn: #4a90e2;
+
+            /* Font Sizes - Mobile First Approach */
+            --font-size-xxs: 0.65rem; 
+            --font-size-xs: 0.75rem; 
+            --font-size-sm: 0.85rem; 
+            --font-size-base: 0.95rem; 
+            --font-size-md: 1.1rem;
+            --font-size-lg: 1.3rem;
+            --font-size-xl: 1.6rem;
+            --font-size-xxl: 2rem;
         }
 
+        /* --- GLOBAL --- */
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -115,10 +126,12 @@ $companyDetails = [
             background-color: #f0f0f0;
             color: #333;
             line-height: 1.6;
+            font-size: var(--font-size-base);
         }
 
+        /* 📌 PENYESUAIAN A4 SIZE */
         .invoice-wrapper {
-            max-width: 900px;
+            max-width: 793.7px; /* A4 width in px at 96dpi (210mm) */
             margin: 30px auto;
             padding: 40px;
             background: #fff;
@@ -131,7 +144,7 @@ $companyDetails = [
 
         .action-bar {
             text-align: center;
-            max-width: 900px;
+            max-width: 793.7px;
             margin: 20px auto;
             display: flex;
             justify-content: flex-end;
@@ -162,12 +175,6 @@ $companyDetails = [
             color: white;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Tanda Air PAID */
         .paid-stamp-overlay {
             position: absolute;
             top: 0;
@@ -241,18 +248,26 @@ $companyDetails = [
             font-weight: 700;
         }
 
-        /* Info Grid */
+        /* Info Grid - Dipertahankan 2 kolom untuk desktop */
         .info-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr; /* Default: Berdampingan di Desktop */
             gap: 40px;
             margin-bottom: 40px;
+        }
+        
+        /* Tambahan style untuk kotak info Pemesan/Trip */
+        .info-box.pemesan-box {
+            border-left: 5px solid var(--color-mdpl-light);
+        }
+
+        .info-box.trip-box {
+            border-left: 5px solid var(--color-mdpl-dark);
         }
 
         .info-box {
             padding: 20px;
             background: #fcfcfc;
-            border-left: 5px solid var(--color-mdpl-light);
             border-radius: 5px;
         }
 
@@ -278,7 +293,7 @@ $companyDetails = [
             width: 55%;
             color: #333;
         }
-
+        
         /* Section Title */
         .section-title-table {
             font-size: 1.4em;
@@ -310,30 +325,20 @@ $companyDetails = [
             border-bottom: 1px dashed #eee;
             font-size: 0.9em;
         }
-
-        /* Total Summary */
-        .total-summary {
-            float: right;
-            width: 380px;
-            padding-top: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            background-color: #fcfcfc;
-            margin-bottom: 20px;
+        
+        /* Gaya sub-tabel peserta */
+        .sub-participant-list {
+            margin-top: 10px;
+            padding: 5px 0 0 0;
+            border-top: 1px dashed #ddd;
+            font-size: 0.85em;
+            color: #555;
         }
-
-        .total-summary .info-row {
-            padding: 8px 20px;
-            border-bottom: 1px dashed #eee;
-        }
-
-        .grand-total-row {
-            font-size: 1.4em !important;
-            font-weight: 800 !important;
-            color: var(--color-mdpl-dark) !important;
-            padding: 12px 20px !important;
-            border-top: 2px solid var(--color-mdpl-dark);
+        
+        .sub-participant-list strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
         }
 
         /* Footer */
@@ -350,15 +355,79 @@ $companyDetails = [
             color: #555;
         }
 
+        /* --- MEDIA QUERIES --- */
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .invoice-wrapper {
+                margin: 15px;
+                padding: 20px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .action-bar {
+                margin: 10px auto;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .invoice-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+            }
+
+            .invoice-meta {
+                text-align: left;
+                margin-top: 15px;
+                width: 100%;
+            }
+
+            .info-container {
+                grid-template-columns: 1fr; /* Stack columns on mobile */
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                width: 100%; 
+            }
+            
+            .data-table, .participants-table {
+                table-layout: auto; 
+            }
+
+            .data-table th, .data-table td {
+                padding: 8px 10px;
+            }
+
+            .paid-stamp-overlay::before {
+                font-size: 8em;
+            }
+        }
+        
+        /* Print (A4) */
         @media print {
+            @page {
+                size: A4;
+                margin: 20mm;
+            }
+            body {
+                background-color: #fff;
+            }
             .action-bar {
                 display: none;
             }
-
             .invoice-wrapper {
                 box-shadow: none;
                 margin: 0;
                 border-radius: 0;
+                max-width: 100%;
+                padding: 0;
             }
         }
     </style>
@@ -386,38 +455,28 @@ $companyDetails = [
                 <h1>INVOICE</h1>
                 <p>No. Invoice: <strong><?php echo $invoiceNumber; ?></strong></p>
                 <p>Status: <strong style="color: var(--color-success);">PAID</strong></p>
+                <p style="font-size: 0.8em; margin-top: 10px;">
+                </p>
             </div>
         </header>
-
+        
         <div class="info-container">
-            <div class="info-box">
-                <h4><i class="fa-solid fa-receipt"></i> Detail Pembayaran</h4>
-                <div class="info-row"><span>ID Booking:</span> <strong>#<?php echo $invoiceData['id_booking']; ?></strong></div>
-                <div class="info-row"><span>Tgl. Pembayaran:</span> <strong><?php echo $formatDate($invoiceData['tanggal']); ?></strong></div>
-                <div class="info-row"><span>Metode Bayar:</span> <strong><?php echo $invoiceData['metode']; ?></strong></div>
-            </div>
-
-            <div class="info-box">
-                <h4><i class="fa-solid fa-user"></i> Pemesan</h4>
+            <div class="info-box pemesan-box">
+                <h4><i class="fa-solid fa-user"></i> Detail Pemesan</h4>
                 <div class="info-row"><span>Nama:</span> <strong><?php echo $invoiceData['username']; ?></strong></div>
                 <div class="info-row"><span>Email:</span> <strong><?php echo $invoiceData['email']; ?></strong></div>
                 <div class="info-row"><span>Telepon:</span> <strong><?php echo $invoiceData['no_wa']; ?></strong></div>
             </div>
-        </div>
 
-        <div class="section-title-table">Detail Trip Pendakian</div>
-        <div class="info-box" style="margin-bottom: 40px; border-left: 5px solid var(--color-mdpl-dark);">
-            <div class="info-row" style="margin-bottom: 5px;">
-                <span>Tujuan:</span> <strong style="color: var(--color-mdpl-dark);"><?php echo $invoiceData['nama_gunung']; ?> (Via <?php echo $invoiceData['jenis_trip']; ?>)</strong>
-            </div>
-            <div class="info-row">
-                <span>Tanggal/Durasi:</span> <strong><?php echo $formatDate($invoiceData['trip_date']); ?> / <?php echo $invoiceData['durasi']; ?></strong>
-            </div>
-            <div class="info-row">
-                <span>Basecamp:</span> <strong><?php echo $invoiceData['nama_lokasi']; ?></strong>
+            <div class="info-box trip-box">
+                <h4><i class="fa-solid fa-mountain-sun"></i> Detail Trip Pendakian</h4>
+                <div class="info-row"><span>Tujuan:</span> <strong style="color: var(--color-mdpl-dark);"><?php echo $invoiceData['nama_gunung']; ?></strong></div>
+                <div class="info-row"><span>Via/Jenis Trip:</span> <strong><?php echo $invoiceData['jenis_trip']; ?></strong></div>
+                <div class="info-row"><span>Tgl/Durasi:</span> <strong><?php echo $formatDate($invoiceData['trip_date']); ?> / <?php echo $invoiceData['durasi']; ?></strong></div>
+                <div class="info-row"><span>Basecamp:</span> <strong><?php echo $invoiceData['nama_lokasi']; ?></strong></div>
             </div>
         </div>
-
+        
         <div class="section-title-table">Rincian Biaya</div>
         <table class="data-table cost-table">
             <thead>
@@ -437,24 +496,15 @@ $companyDetails = [
                     <td style="text-align: right;"><?php echo number_format($invoiceData['harga'], 0, ',', '.'); ?></td>
                     <td style="text-align: right;"><?php echo number_format($invoiceData['total_harga'], 0, ',', '.'); ?></td>
                 </tr>
+
+                <tr style="border-top: 2px solid var(--color-mdpl-dark); font-weight: 700; background: #fcfcfc;">
+                    <td colspan="4" style="text-align: right; padding-top: 15px;">TOTAL DIBAYARKAN</td>
+                    <td style="text-align: right; padding-top: 15px; color: var(--color-success); font-size: 1.1em;">
+                        <?php echo number_format($invoiceData['total_harga'], 0, ',', '.'); ?>
+                    </td>
+                </tr>
             </tbody>
         </table>
-
-        <div class="total-summary">
-            <div class="info-row total-row">
-                <span>Subtotal:</span>
-                <strong>Rp <?php echo number_format($invoiceData['total_harga'], 0, ',', '.'); ?></strong>
-            </div>
-            <div class="info-row total-row">
-                <span>Pajak/Biaya Admin:</span>
-                <strong>Rp 0</strong>
-            </div>
-            <div class="info-row total-row grand-total-row">
-                <span>TOTAL DIBAYARKAN:</span>
-                <strong style="font-size: 1.1em;">Rp <?php echo number_format($invoiceData['total_harga'], 0, ',', '.'); ?></strong>
-            </div>
-        </div>
-
         <div style="clear: both;"></div>
 
         <div class="section-title-table" style="margin-top: 20px;">Daftar Peserta Trip (<?php echo count($participants); ?> Orang)</div>
@@ -479,7 +529,7 @@ $companyDetails = [
                 <?php endforeach; ?>
             </tbody>
         </table>
-
+        
         <div class="invoice-footer">
             <div style="text-align: center;">
                 <p><strong>DOKUMEN VALID DIBUAT SECARA DIGITAL</strong></p>

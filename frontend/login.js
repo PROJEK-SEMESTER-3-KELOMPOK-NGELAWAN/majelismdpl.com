@@ -1,3 +1,8 @@
+/**
+ * ============================================
+ * MODAL & ERROR HANDLING FUNCTIONS (LEGACY/FALLBACK)
+ * ============================================
+ */
 function closeLoginModal() {
   const modal = document.getElementById("loginModal");
   if (modal) {
@@ -12,7 +17,7 @@ function closeLoginModal() {
   }
 }
 
-// Fungsi untuk show error modal seperti logout confirmation
+// Fungsi untuk show error modal seperti logout confirmation (Hanya sebagai FALLBACK)
 function showLoginErrorModal(errorMessage) {
   const errorModal = document.getElementById("login-error-modal");
   const errorMessageEl = document.getElementById("login-error-message");
@@ -24,7 +29,7 @@ function showLoginErrorModal(errorMessage) {
   }
 }
 
-// Fungsi untuk hide error modal
+// Fungsi untuk hide error modal (Hanya sebagai FALLBACK)
 function hideLoginErrorModal() {
   const errorModal = document.getElementById("login-error-modal");
   if (errorModal) {
@@ -32,6 +37,11 @@ function hideLoginErrorModal() {
   }
 }
 
+/**
+ * ============================================
+ * GOOGLE LOGIN & HELPER FUNCTIONS
+ * ============================================
+ */
 // Fungsi untuk handle Google OAuth Login
 function handleGoogleLogin() {
   window.location.href = getPageUrl("backend/google-oauth.php") + "?type=login";
@@ -39,6 +49,7 @@ function handleGoogleLogin() {
 
 // Helper function untuk detect base path - GUNAKAN CONFIG
 function getBasePath() {
+  // Asumsi getPageUrl("") mengembalikan base URL
   return getPageUrl("").replace(window.location.origin, "");
 }
 
@@ -66,7 +77,15 @@ function attachGoogleLoginListener() {
   return false;
 }
 
-// Handle regular form submission
+// Global fallback function
+window.handleGoogleLogin = handleGoogleLogin;
+
+
+/**
+ * ============================================
+ * REGULAR FORM SUBMISSION HANDLER (INTEGRATED SWEETALERT2)
+ * ============================================
+ */
 document.addEventListener("DOMContentLoaded", function () {
   const loginForm = document.querySelector("#loginModal form");
   if (loginForm) {
@@ -90,48 +109,127 @@ document.addEventListener("DOMContentLoaded", function () {
           // ✅ LOGIN BERHASIL
           closeLoginModal();
 
-          // Show success message using alert (simple approach)
-          // Or gunakan custom success modal jika ingin yang fancy
-          setTimeout(() => {
-            alert(
-              "✅ Login berhasil! Selamat datang " +
-                (result.username || formData.get("username"))
-            );
+          if (typeof Swal !== "undefined") {
+            const username = result.username || formData.get("username");
 
-            // Redirect based on role
-            if (["admin", "super_admin"].includes(result.role)) {
-              setTimeout(() => {
+            Swal.fire({
+              title: "Login Berhasil! 🎉",
+              html: `Selamat datang, ${username}!`, // Teks lebih simpel
+              icon: "success",
+              timer: 2000, // Otomatis tertutup lebih cepat
+              timerProgressBar: true,
+              showConfirmButton: false,
+              position: "center",
+              toast: false,
+              allowOutsideClick: false,
+              backdrop: `
+                rgba(0,0,0,0.6)
+                url("${getAssetsUrl('assets/success-bg.gif')}") // Ganti dengan path gambar success Anda
+                center center
+                no-repeat
+              `,
+              customClass: {
+                  popup: 'swal2-custom-background'
+              }
+            }).then(() => {
+              // Redirect setelah SweetAlert tertutup
+              if (["admin", "super_admin"].includes(result.role)) {
                 window.location.href = getPageUrl("admin/index.php");
-              }, 100);
-            } else {
-              window.location.href = getPageUrl("index.php");
-            }
-          }, 350);
+              } else {
+                window.location.href = getPageUrl("index.php");
+              }
+            });
+          } else {
+            // Fallback (jika SweetAlert tidak dimuat)
+            setTimeout(() => {
+                alert(
+                    "✅ Login berhasil! Selamat datang" +
+                    (result.username || formData.get("username"))
+                );
+                if (["admin", "super_admin"].includes(result.role)) {
+                    window.location.href = getPageUrl("admin/index.php");
+                } else {
+                    window.location.href = getPageUrl("index.php");
+                }
+            }, 350);
+          }
         } else {
-          // ✅ LOGIN GAGAL - Close modal dulu, baru error muncul
+          // ✅ LOGIN GAGAL - Tampilkan SweetAlert Error
           closeLoginModal();
+          
+          const errorMessage = result.message || "Username atau kata sandi salah."; // Teks lebih simpel
 
-          // Delay untuk smooth transition seperti logout confirmation
           setTimeout(() => {
-            showLoginErrorModal(
-              result.message || "Terjadi kesalahan. Silakan coba lagi."
-            );
+            if (typeof Swal !== "undefined") {
+                Swal.fire({
+                    title: "Login Gagal ⚠️",
+                    html: errorMessage,
+                    icon: "error",
+                    confirmButtonText: "Coba Lagi",
+                    showCancelButton: true,
+                    cancelButtonText: "Tutup",
+                    position: "center",
+                    allowOutsideClick: true,
+                    backdrop: `
+                        rgba(0,0,0,0.6)
+                        url("${getAssetsUrl('assets/error-bg.gif')}") // Ganti dengan path gambar error Anda
+                        center center
+                        no-repeat
+                    `,
+                    customClass: {
+                        popup: 'swal2-custom-background'
+                    }
+                }).then((action) => {
+                    if (action.isConfirmed) {
+                        // Re-open login modal
+                        const loginModal = document.getElementById("loginModal");
+                        if (loginModal && typeof openModal === "function") {
+                            openModal(loginModal);
+                        }
+                    }
+                });
+            } else {
+                // Fallback error
+                showLoginErrorModal(errorMessage);
+            }
           }, 350);
         }
       } catch (error) {
-        // ✅ ERROR SISTEM - Close modal dulu, baru error muncul
+        // ✅ ERROR SISTEM - Tampilkan SweetAlert Sistem Error
         closeLoginModal();
 
         setTimeout(() => {
-          showLoginErrorModal(
-            "Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator."
-          );
+          if (typeof Swal !== "undefined") {
+             Swal.fire({
+                title: "Kesalahan Sistem ❌",
+                text: "Terjadi kesalahan. Coba lagi nanti.", // Teks lebih simpel
+                icon: "error",
+                confirmButtonText: "Tutup",
+                position: "center",
+                allowOutsideClick: true,
+                backdrop: `
+                    rgba(0,0,0,0.6)
+                    url("${getAssetsUrl('assets/system-error-bg.gif')}") // Ganti dengan path gambar system error Anda
+                    center center
+                    no-repeat
+                `,
+                customClass: {
+                    popup: 'swal2-custom-background'
+                }
+            });
+          } else {
+            // Fallback system error
+            showLoginErrorModal(
+                "Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator."
+            );
+          }
         }, 350);
       }
     });
   }
 
-  // ========== ERROR MODAL EVENT HANDLERS ==========
+  // ========== ERROR MODAL EVENT HANDLERS (Hanya untuk Fallback/Modal Lain) ==========
+  // Ini tetap dipertahankan karena Anda mungkin masih menggunakan showLoginErrorModal untuk tujuan lain atau sebagai fallback.
   const errorModal = document.getElementById("login-error-modal");
   const errorRetryBtn = document.getElementById("login-error-retry-btn");
   const errorCancelBtn = document.getElementById("login-error-cancel-btn");
@@ -172,6 +270,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+/**
+ * ============================================
+ * GOOGLE LISTENER CHECK STRATEGIES
+ * ============================================
+ */
 // Strategy for when DOM already loaded
 if (
   document.readyState === "complete" ||
@@ -201,6 +304,3 @@ document.addEventListener("click", function (e) {
     }, 200);
   }
 });
-
-// Global fallback function
-window.handleGoogleLogin = handleGoogleLogin;
