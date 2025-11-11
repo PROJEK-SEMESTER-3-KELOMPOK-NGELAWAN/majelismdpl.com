@@ -33,6 +33,7 @@ function loadTripDetail(idTrip) {
         document.getElementById("nama_lokasi").value = data.nama_lokasi || "";
         document.getElementById("alamat").value = data.alamat || "";
         document.getElementById("waktu_kumpul").value = data.waktu_kumpul || "";
+        document.getElementById("link_map_mobile").value = data.link_map_mobile || "";
         document.getElementById("link_map").value = data.link_map || "";
         document.getElementById("include").value = data.include || "";
         document.getElementById("exclude").value = data.exclude || "";

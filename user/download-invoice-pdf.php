@@ -75,18 +75,20 @@ ob_start();
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <style>
         /* ✅ CSS SCALED DOWN 60% dari view-invoice.php untuk fit 1 page */
-        body { 
-            font-family: 'DejaVu Sans', Arial, sans-serif; 
-            margin: 0; 
-            padding: 15px; 
-            color: #333; 
-            font-size: 8pt;  /* Original: 13pt (60% scale) */
+        body {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            color: #333;
+            font-size: 8pt;
+            /* Original: 13pt (60% scale) */
             line-height: 1.3;
         }
-        
+
         /* Header Invoice */
         .invoice-header {
             display: table;
@@ -95,67 +97,70 @@ ob_start();
             padding-bottom: 8px;
             margin-bottom: 12px;
         }
-        
+
         .logo-box {
             display: table-cell;
             width: 50%;
             vertical-align: middle;
         }
-        
+
         .logo-box h2 {
-            font-size: 16pt;  /* Original: 2em ~ 26pt */
+            font-size: 16pt;
+            /* Original: 2em ~ 26pt */
             margin: 0;
             font-weight: 800;
             color: #a97c50;
         }
-        
+
         .logo-box p {
             margin: 0;
-            font-size: 6.5pt;  /* Original: 0.8em */
+            font-size: 6.5pt;
+            /* Original: 0.8em */
             color: #777;
         }
-        
+
         .invoice-meta {
             display: table-cell;
             width: 50%;
             text-align: right;
             vertical-align: middle;
         }
-        
+
         .invoice-meta h1 {
             color: #333;
-            font-size: 20pt;  /* Original: 3em ~ 39pt */
+            font-size: 20pt;
+            /* Original: 3em ~ 39pt */
             margin: 0 0 2px 0;
             font-weight: 700;
         }
-        
+
         .invoice-meta p {
             font-size: 6.5pt;
             margin: 2px 0;
         }
-        
+
         .invoice-meta strong {
             color: #a97c50;
             font-weight: 700;
         }
-        
+
         /* Info Container - Grid 2 Kolom */
         .info-container {
             display: table;
             width: 100%;
             margin-bottom: 15px;
         }
-        
+
         .info-col {
             display: table-cell;
             width: 50%;
             vertical-align: top;
         }
-        
+
         .info-col:first-child {
             padding-right: 10px;
         }
-        
+
         .info-box {
             padding: 8px;
             background: #fcfcfc;
@@ -163,34 +168,36 @@ ob_start();
             border-radius: 3px;
             margin-bottom: 8px;
         }
-        
+
         .info-box h4 {
             color: #a97c50;
-            font-size: 8.5pt;  /* Original: 1.1em */
+            font-size: 8.5pt;
+            /* Original: 1.1em */
             margin: 0 0 5px 0;
             font-weight: 700;
         }
-        
+
         .info-row {
             display: table;
             width: 100%;
             padding: 2px 0;
-            font-size: 7pt;  /* Original: 0.9em */
+            font-size: 7pt;
+            /* Original: 0.9em */
         }
-        
+
         .info-row span:first-child {
             display: table-cell;
             width: 45%;
             color: #777;
         }
-        
+
         .info-row strong {
             display: table-cell;
             width: 55%;
             color: #333;
             font-weight: 600;
         }
-        
+
         /* Trip Detail Box */
         .trip-detail-box {
             padding: 8px;
@@ -199,24 +206,25 @@ ob_start();
             border-radius: 3px;
             margin-bottom: 15px;
         }
-        
+
         /* Section Title */
         .section-title-table {
-            font-size: 9pt;  /* Original: 1.4em */
+            font-size: 9pt;
+            /* Original: 1.4em */
             color: #a97c50;
             margin-bottom: 6px;
             font-weight: 700;
             border-bottom: 2px solid #d6b38c;
             padding-bottom: 3px;
         }
-        
+
         /* Data Table */
         .data-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 8px;
         }
-        
+
         .data-table th {
             background-color: #f4f4f4;
             color: #555;
@@ -226,13 +234,13 @@ ob_start();
             font-size: 6.5pt;
             border-bottom: 2px solid #ddd;
         }
-        
+
         .data-table td {
             padding: 4px 6px;
             border-bottom: 1px dashed #eee;
             font-size: 6.5pt;
         }
-        
+
         /* Total Summary */
         .total-summary {
             float: right;
@@ -244,26 +252,27 @@ ob_start();
             background-color: #fcfcfc;
             margin-bottom: 10px;
         }
-        
+
         .total-summary .info-row {
             padding: 4px 10px;
             border-bottom: 1px dashed #eee;
             font-size: 6.5pt;
         }
-        
+
         .grand-total-row {
-            font-size: 9pt !important;  /* Original: 1.4em */
+            font-size: 9pt !important;
+            /* Original: 1.4em */
             font-weight: 800 !important;
             color: #a97c50 !important;
             padding: 6px 10px !important;
             border-top: 2px solid #a97c50;
             border-bottom: none;
         }
-        
+
         .grand-total-row strong {
             font-size: 9pt !important;
         }
-        
+
         /* Footer */
         .invoice-footer {
             clear: both;
@@ -272,18 +281,19 @@ ob_start();
             margin-top: 12px;
             text-align: center;
         }
-        
+
         .invoice-footer p {
             font-size: 6pt;
             color: #555;
             margin: 3px 0;
         }
-        
+
         .invoice-footer strong {
             font-size: 6.5pt;
         }
     </style>
 </head>
+
 <body>
     <!-- HEADER -->
     <div class="invoice-header">
@@ -297,7 +307,7 @@ ob_start();
             <p>Status: <strong style="color: #2e7d32;">PAID</strong></p>
         </div>
     </div>
-    
+
     <!-- INFO CONTAINER (2 KOLOM) -->
     <div class="info-container">
         <div class="info-col">
@@ -317,7 +327,7 @@ ob_start();
                     <strong><?php echo $invoiceData['metode']; ?></strong>
                 </div>
             </div>
-            
+
             <!-- Pemesan -->
             <div class="info-box">
                 <h4>Pemesan</h4>
@@ -335,7 +345,7 @@ ob_start();
                 </div>
             </div>
         </div>
-        
+
         <div class="info-col">
             <!-- Detail Trip -->
             <div class="info-box">
@@ -355,7 +365,7 @@ ob_start();
             </div>
         </div>
     </div>
-    
+
     <!-- RINCIAN BIAYA -->
     <div class="section-title-table">Rincian Biaya</div>
     <table class="data-table">
@@ -378,7 +388,7 @@ ob_start();
             </tr>
         </tbody>
     </table>
-    
+
     <!-- TOTAL SUMMARY -->
     <div class="total-summary">
         <div class="info-row">
@@ -394,9 +404,9 @@ ob_start();
             <strong>Rp <?php echo number_format($invoiceData['total_harga'], 0, ',', '.'); ?></strong>
         </div>
     </div>
-    
+
     <div style="clear: both;"></div>
-    
+
     <!-- DAFTAR PESERTA -->
     <div class="section-title-table" style="margin-top: 10px;">Daftar Peserta Trip (<?php echo count($participants); ?> Orang)</div>
     <table class="data-table">
@@ -409,17 +419,18 @@ ob_start();
             </tr>
         </thead>
         <tbody>
-            <?php $no = 1; foreach ($participants as $p): ?>
-            <tr>
-                <td><?php echo $no++; ?></td>
-                <td><?php echo htmlspecialchars($p['nama']); ?></td>
-                <td><?php echo $p['tempat_lahir'] . ', ' . date('d M Y', strtotime($p['tanggal_lahir'])); ?></td>
-                <td><?php echo $p['nik']; ?></td>
-            </tr>
+            <?php $no = 1;
+            foreach ($participants as $p): ?>
+                <tr>
+                    <td><?php echo $no++; ?></td>
+                    <td><?php echo htmlspecialchars($p['nama']); ?></td>
+                    <td><?php echo $p['tempat_lahir'] . ', ' . date('d M Y', strtotime($p['tanggal_lahir'])); ?></td>
+                    <td><?php echo $p['nik']; ?></td>
+                </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
-    
+
     <!-- FOOTER -->
     <div class="invoice-footer">
         <p><strong>DOKUMEN VALID DIBUAT SECARA DIGITAL</strong></p>
@@ -427,6 +438,7 @@ ob_start();
         <p style="margin-top: 3px; color: #a97c50;"><strong>Terima kasih atas kepercayaan Anda kepada Majelis MDPL.</strong></p>
     </div>
 </body>
+
 </html>
 <?php
 $html = ob_get_clean();
@@ -446,15 +458,14 @@ try {
     $mpdf->SetWatermarkText('PAID', 0.08);
     $mpdf->showWatermarkText = true;
     $mpdf->watermarkTextAlpha = 0.08;
-    
+
     $mpdf->SetTitle('Invoice - ' . $invoiceNumber);
     $mpdf->SetAuthor('Majelis MDPL');
     $mpdf->WriteHTML($html);
-    
+
     // ✅ Output PDF sebagai download
     $filename = $invoiceNumber . '.pdf';
     $mpdf->Output($filename, 'D');
-    
 } catch (\Mpdf\MpdfException $e) {
     die('Error generating PDF: ' . $e->getMessage());
 }

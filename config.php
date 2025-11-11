@@ -3,13 +3,11 @@
 // CONFIGURATION - SIMPLE VERSION
 // ========================================
 
-// 🟢 UBAH SINI untuk ganti environment ganti yang sebelah kanan tulisan APP_MODE
 define('APP_MODE', 'LOCAL'); // Pilih: 'LOCAL' | 'NGROK' | 'PRODUCTION'
 
-// 🔵 UBAH URL SINI saat Ngrok/Production berubah
 const BASE_URL_MAP = [
     'LOCAL'      => 'http://localhost/majelismdpl.com',
-    'NGROK'      => 'https://5fa1ddc59e83.ngrok-free.app',      // ← UBAH INI
+    'NGROK'      => 'https://b1ad7700d48e.ngrok-free.app',      // ← UBAH INI
     'PRODUCTION' => 'https://majelismdpl.com',                   // ← UBAH INI
 ];
 

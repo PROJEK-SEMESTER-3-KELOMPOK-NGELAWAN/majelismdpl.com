@@ -24,16 +24,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $data = $result->fetch_assoc();
     $stmt->close();
 
+    // Pastikan kolom baru ada meskipun data kosong
     if (!$data) {
         $data = [
             'nama_lokasi' => '',
             'alamat' => '',
             'waktu_kumpul' => '',
             'link_map' => '',
+            'link_map_mobile' => '',
             'include' => '',
             'exclude' => '',
             'syaratKetentuan' => ''
         ];
+    } else {
+        if (!isset($data['link_map_mobile'])) $data['link_map_mobile'] = '';
     }
 
     echo json_encode(['success' => true, 'data' => $data]);
@@ -46,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $alamat = $_POST['alamat'] ?? '';
     $waktu_kumpul = $_POST['waktu_kumpul'] ?? '';
     $link_map = $_POST['link_map'] ?? '';
+    $link_map_mobile = $_POST['link_map_mobile'] ?? '';
     $include = $_POST['include'] ?? '';
     $exclude = $_POST['exclude'] ?? '';
     $syaratKetentuan = $_POST['syaratKetentuan'] ?? '';
@@ -64,15 +69,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($isUpdate) {
         $stmt = $conn->prepare(
-            "UPDATE detail_trips SET nama_lokasi=?, alamat=?, waktu_kumpul=?, link_map=?, `include`=?, `exclude`=?, syaratKetentuan=? WHERE id_trip=?"
+            "UPDATE detail_trips SET nama_lokasi=?, alamat=?, waktu_kumpul=?, link_map=?, link_map_mobile=?, `include`=?, `exclude`=?, syaratKetentuan=? WHERE id_trip=?"
         );
-        $stmt->bind_param("sssssssi", $nama_lokasi, $alamat, $waktu_kumpul, $link_map, $include, $exclude, $syaratKetentuan, $id_trip);
+        $stmt->bind_param("ssssssssi", $nama_lokasi, $alamat, $waktu_kumpul, $link_map, $link_map_mobile, $include, $exclude, $syaratKetentuan, $id_trip);
     } else {
         $stmt = $conn->prepare(
-            "INSERT INTO detail_trips (id_trip, nama_lokasi, alamat, waktu_kumpul, link_map, `include`, `exclude`, syaratKetentuan)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO detail_trips (id_trip, nama_lokasi, alamat, waktu_kumpul, link_map, link_map_mobile, `include`, `exclude`, syaratKetentuan)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
-        $stmt->bind_param("isssssss", $id_trip, $nama_lokasi, $alamat, $waktu_kumpul, $link_map, $include, $exclude, $syaratKetentuan);
+        $stmt->bind_param("issssssss", $id_trip, $nama_lokasi, $alamat, $waktu_kumpul, $link_map, $link_map_mobile, $include, $exclude, $syaratKetentuan);
     }
     $cek->close();
 
