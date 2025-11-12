@@ -440,6 +440,16 @@ $user_role = $user_role ?? 'user';
                                 <input type="text" class="form-control" id="via_gunung" name="via_gunung" required placeholder="Cth: Via Sembalun" />
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="gambar" class="form-label"><i class="bi bi-image-fill me-1"></i> Upload Gambar</label>
+                                <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="status" class="form-label"><i class="bi bi-info-circle-fill me-1"></i> Status</label>
@@ -450,23 +460,19 @@ $user_role = $user_role ?? 'user';
                                 </select>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row">
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="gambar" class="form-label"><i class="bi bi-image-fill me-1"></i> Upload Gambar</label>
-                                <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*" />
+                            <div class="mb-3" id="linkDriveContainerContent" style="opacity: 0; height: 0; overflow: hidden; transition: all 0.2s ease-in-out;">
+                                <label for="link_drive" class="form-label"><i class="bi bi-link-45deg me-1"></i> Link Google Drive (Opsional)</label>
+                                <input type="url" class="form-control" id="link_drive" name="link_drive" placeholder="Masukkan link Google Drive Album Foto Trip" />
                             </div>
                         </div>
-                        <div class="col-md-6"></div>
                     </div>
-                </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i> Tutup</button>
-                    <button type="submit" class="btn btn-primary" id="saveButton"><i class="bi bi-save me-1"></i> Simpan</button>
-                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i> Tutup</button>
+                        <button type="submit" class="btn btn-primary" id="saveButton"><i class="bi bi-save me-1"></i> Simpan</button>
+                    </div>
             </form>
         </div>
     </div>

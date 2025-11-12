@@ -80,7 +80,6 @@ function attachGoogleLoginListener() {
 // Global fallback function
 window.handleGoogleLogin = handleGoogleLogin;
 
-
 /**
  * ============================================
  * REGULAR FORM SUBMISSION HANDLER (INTEGRATED SWEETALERT2)
@@ -112,85 +111,77 @@ document.addEventListener("DOMContentLoaded", function () {
           if (typeof Swal !== "undefined") {
             const username = result.username || formData.get("username");
 
+            // SWEETALERT REVISI: Menggunakan tombol OK/Lanjutkan
             Swal.fire({
               title: "Login Berhasil! 🎉",
-              html: `Selamat datang, ${username}!`, // Teks lebih simpel
+              html: `Selamat datang, ${username}!`,
               icon: "success",
-              timer: 2000, // Otomatis tertutup lebih cepat
-              timerProgressBar: true,
-              showConfirmButton: false,
+              showConfirmButton: true, // Tampilkan tombol
+              confirmButtonText: "Lanjutkan", // Teks tombol seperti yang diminta
               position: "center",
               toast: false,
               allowOutsideClick: false,
               backdrop: `
                 rgba(0,0,0,0.6)
-                url("${getAssetsUrl('assets/success-bg.gif')}") // Ganti dengan path gambar success Anda
+                url("${getAssetsUrl(
+                  "assets/login-bg.jpg"
+                )}") 
                 center center
                 no-repeat
               `,
               customClass: {
-                  popup: 'swal2-custom-background'
-              }
+                popup: "swal2-custom-background",
+              },
             }).then(() => {
-              // Redirect setelah SweetAlert tertutup
+              // Redirect hanya dilakukan setelah pengguna mengklik tombol
               if (["admin", "super_admin"].includes(result.role)) {
                 window.location.href = getPageUrl("admin/index.php");
               } else {
                 window.location.href = getPageUrl("index.php");
               }
             });
-          } else {
-            // Fallback (jika SweetAlert tidak dimuat)
-            setTimeout(() => {
-                alert(
-                    "✅ Login berhasil! Selamat datang" +
-                    (result.username || formData.get("username"))
-                );
-                if (["admin", "super_admin"].includes(result.role)) {
-                    window.location.href = getPageUrl("admin/index.php");
-                } else {
-                    window.location.href = getPageUrl("index.php");
-                }
-            }, 350);
           }
-        } else {
+          } else {
           // ✅ LOGIN GAGAL - Tampilkan SweetAlert Error
           closeLoginModal();
-          
-          const errorMessage = result.message || "Username atau kata sandi salah."; // Teks lebih simpel
+
+          const errorMessage =
+            result.message || "Username atau kata sandi salah."; // Teks lebih simpel
 
           setTimeout(() => {
             if (typeof Swal !== "undefined") {
-                Swal.fire({
-                    title: "Login Gagal ⚠️",
-                    html: errorMessage,
-                    icon: "error",
-                    confirmButtonText: "Coba Lagi",
-                    showCancelButton: true,
-                    cancelButtonText: "Tutup",
-                    position: "center",
-                    allowOutsideClick: true,
-                    backdrop: `
+              Swal.fire({
+                title: "Login Gagal ⚠️",
+                html: errorMessage,
+                icon: "error",
+                confirmButtonText: "Coba Lagi",
+                showCancelButton: true,
+                cancelButtonText: "Tutup",
+                position: "center",
+                allowOutsideClick: true,
+                backdrop: `
                         rgba(0,0,0,0.6)
-                        url("${getAssetsUrl('assets/error-bg.gif')}") // Ganti dengan path gambar error Anda
+                        url("${getAssetsUrl(
+                          "assets/error-bg.gif"
+                        )}") // Ganti dengan path gambar error Anda
                         center center
                         no-repeat
                     `,
-                    customClass: {
-                        popup: 'swal2-custom-background'
-                    }
-                }).then((action) => {
-                    if (action.isConfirmed) {
-                        // Re-open login modal
-                        const loginModal = document.getElementById("loginModal");
-                        if (loginModal && typeof openModal === "function") {
-                            openModal(loginModal);
-                        }
-                    }
-                });
+                customClass: {
+                  popup: "swal2-custom-background",
+                },
+              }).then((action) => {
+                if (action.isConfirmed) {
+                  // Re-open login modal
+                  const loginModal = document.getElementById("loginModal");
+                  if (loginModal && typeof openModal === "function") {
+                    openModal(loginModal);
+                  }
+                }
+              });
             } else {
-                // Fallback error
-                showLoginErrorModal(errorMessage);
+              // Fallback error
+              showLoginErrorModal(errorMessage);
             }
           }, 350);
         }
@@ -200,27 +191,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
         setTimeout(() => {
           if (typeof Swal !== "undefined") {
-             Swal.fire({
-                title: "Kesalahan Sistem ❌",
-                text: "Terjadi kesalahan. Coba lagi nanti.", // Teks lebih simpel
-                icon: "error",
-                confirmButtonText: "Tutup",
-                position: "center",
-                allowOutsideClick: true,
-                backdrop: `
+            Swal.fire({
+              title: "Kesalahan Sistem ❌",
+              text: "Terjadi kesalahan. Coba lagi nanti.", // Teks lebih simpel
+              icon: "error",
+              confirmButtonText: "Tutup",
+              position: "center",
+              allowOutsideClick: true,
+              backdrop: `
                     rgba(0,0,0,0.6)
-                    url("${getAssetsUrl('assets/system-error-bg.gif')}") // Ganti dengan path gambar system error Anda
+                    url("${getAssetsUrl(
+                      "assets/system-error-bg.gif"
+                    )}") // Ganti dengan path gambar system error Anda
                     center center
                     no-repeat
                 `,
-                customClass: {
-                    popup: 'swal2-custom-background'
-                }
+              customClass: {
+                popup: "swal2-custom-background",
+              },
             });
           } else {
             // Fallback system error
             showLoginErrorModal(
-                "Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator."
+              "Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator."
             );
           }
         }, 350);

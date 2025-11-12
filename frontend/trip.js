@@ -290,6 +290,14 @@ function handleEdit(id_trip) {
     form.via_gunung.value = trip.via_gunung || "";
     form.status.value = (trip.status || "available").toString().toLowerCase();
 
+    // START: BARIS BARU UNTUK LINK GOOGLE DRIVE
+    const linkDriveInput = document.getElementById("link_drive");
+    if (linkDriveInput) {
+      // Asumsi kolom di DB/API adalah 'link_drive'
+      linkDriveInput.value = trip.link_drive || "";
+    }
+    // END: BARIS BARU
+
     const modal = new bootstrap.Modal(document.getElementById(MODAL_ID));
     modal.show();
   } else {
@@ -378,10 +386,69 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   loadTrips();
+
   const modalElement = document.getElementById(MODAL_ID);
+  const statusDropdown = document.getElementById("status");
+  // Gunakan ID yang sesuai dengan HTML: linkDriveContainerContent
+  const linkDriveContainerContent = document.getElementById(
+    "linkDriveContainerContent"
+  );
+
+  // --- LOGIKA KONDISIONAL LINK DRIVE (DITEMPATKAN DI SINI) ---
+  if (statusDropdown && linkDriveContainerContent && modalElement) {
+    function toggleLinkDriveInput() {
+      const statusDropdown = document.getElementById("status");
+      const linkDriveContainerContent = document.getElementById(
+        "linkDriveContainerContent"
+      );
+
+      if (!statusDropdown || !linkDriveContainerContent) return; // Guard clause
+
+      if (statusDropdown.value === "done") {
+        // Tampilkan: Atur tinggi ke auto/nilai penuh, dan opacity 1
+        linkDriveContainerContent.style.height = "78px"; // Kunci tinggi field + margin mb-3 (Contoh: 78px)
+        linkDriveContainerContent.style.opacity = "1";
+        linkDriveContainerContent.style.overflow = "visible";
+      } else {
+        // Sembunyikan: Atur tinggi ke 0, dan opacity 0
+        linkDriveContainerContent.style.height = "0";
+        linkDriveContainerContent.style.opacity = "0";
+        linkDriveContainerContent.style.overflow = "hidden";
+      }
+    }
+
+    // Pasang listeners
+    statusDropdown.addEventListener("change", toggleLinkDriveInput);
+    modalElement.addEventListener("shown.bs.modal", toggleLinkDriveInput); // Cek saat modal ditampilkan (Edit Mode)
+
+    // Panggil inisialisasi awal
+    toggleLinkDriveInput();
+  } else {
+    console.error("DEBUG: Inisialisasi Link Drive gagal. Cek ID HTML.");
+  }
+  // --- AKHIR LOGIKA LINK DRIVE ---
+
+  // Listener penutupan modal (sudah ada)
   if (modalElement) {
     modalElement.addEventListener("hidden.bs.modal", function () {
       resetFormAndModalState();
     });
   }
 });
+
+// Contoh Logika (Biasanya di dalam file JS Anda, misalnya saat menutup modal)
+function closeModal(modalElement) {
+  // ... Logika penutupan modal yang sudah ada ...
+
+  // Temukan elemen yang harus mendapatkan fokus selanjutnya (misal, tombol Tambah Trip)
+  const triggerButton = document.querySelector(
+    '[data-bs-target="#tambahTripModal"]'
+  );
+
+  if (triggerButton) {
+    triggerButton.focus(); // Pindahkan fokus
+  } else {
+    // Pindahkan fokus ke <body> jika tidak ada tombol pemicu
+    document.body.focus();
+  }
+}

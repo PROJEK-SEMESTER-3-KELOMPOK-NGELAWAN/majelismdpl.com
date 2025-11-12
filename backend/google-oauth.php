@@ -153,7 +153,7 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
                         <script>
                             Swal.fire({
-                                title: 'Login Berhasil!',
+                                title: 'Login Berhasil! 🎉',
                                 text: 'Selamat datang kembali " . addslashes($user['username']) . "',
                                 icon: 'success',
                                 confirmButtonText: 'Lanjutkan'
