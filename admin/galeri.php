@@ -42,17 +42,109 @@ $user_role = $user_role ?? 'user';
             margin: 0;
         }
 
+        /* ========== SWEETALERT2 CUSTOM STYLING ========== */
+
+        /* Popup Styling */
+        .swal2-popup {
+            border-radius: 15px !important;
+            font-family: "Poppins", Arial, sans-serif !important;
+        }
+
+        .swal2-title {
+            color: #a97c50 !important;
+            font-family: "Poppins", Arial, sans-serif !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-html-container {
+            font-family: "Poppins", Arial, sans-serif !important;
+            color: #495057 !important;
+        }
+
+        /* Button Styling - Confirm (Primary) */
+        .swal2-confirm {
+            background-color: #a97c50 !important;
+            border-radius: 8px !important;
+            font-family: "Poppins", Arial, sans-serif !important;
+            font-weight: 500 !important;
+            padding: 10px 24px !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+        }
+
+        .swal2-confirm:hover {
+            background-color: #8b6332 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(169, 124, 80, 0.4) !important;
+        }
+
+        /* Button Styling - Cancel (Secondary) */
+        .swal2-cancel {
+            background-color: #6c757d !important;
+            border-radius: 8px !important;
+            font-family: "Poppins", Arial, sans-serif !important;
+            font-weight: 500 !important;
+            padding: 10px 24px !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+        }
+
+        .swal2-cancel:hover {
+            background-color: #5a6268 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3) !important;
+        }
+
+        /* Icon Styling */
+        .swal2-icon.swal2-warning {
+            border-color: #a97c50 !important;
+            color: #a97c50 !important;
+        }
+
+        .swal2-icon.swal2-success {
+            border-color: #28a745 !important;
+        }
+
+        .swal2-icon.swal2-error {
+            border-color: #dc3545 !important;
+        }
+
+        .swal2-icon.swal2-info {
+            border-color: #17a2b8 !important;
+        }
+
+        /* Toast Styling */
+        .colored-toast.swal2-icon-success {
+            background-color: #a5dc86 !important;
+        }
+
+        .colored-toast.swal2-icon-error {
+            background-color: #f27474 !important;
+        }
+
+        .colored-toast.swal2-icon-warning {
+            background-color: #f8bb86 !important;
+        }
+
+        .colored-toast.swal2-icon-info {
+            background-color: #3fc3ee !important;
+        }
+
+        .colored-toast .swal2-title {
+            color: white !important;
+            font-size: 16px !important;
+        }
+
+        /* ========== END SWEETALERT2 STYLING ========== */
 
         .text-brown {
             color: #a97c50 !important;
         }
 
-
         .bg-brown {
             background-color: #a97c50 !important;
             color: white;
         }
-
 
         /* --- Sidebar Styling (Dipertahankan) --- */
         .sidebar {
@@ -72,7 +164,6 @@ $user_role = $user_role ?? 'user';
             transition: width 0.25s;
         }
 
-
         /* --- Main Content & Header KONSISTENSI --- */
         .main {
             margin-left: 240px;
@@ -82,7 +173,6 @@ $user_role = $user_role ?? 'user';
             transition: margin-left 0.25s;
         }
 
-
         .main-header {
             display: flex;
             align-items: center;
@@ -91,7 +181,6 @@ $user_role = $user_role ?? 'user';
             padding-bottom: 28px;
         }
 
-
         .main-header h2 {
             font-size: 1.4rem;
             font-weight: 700;
@@ -99,7 +188,6 @@ $user_role = $user_role ?? 'user';
             margin-bottom: 0;
             letter-spacing: 1px;
         }
-
 
         .permission-badge {
             background-color: #28a745;
@@ -110,7 +198,6 @@ $user_role = $user_role ?? 'user';
             margin-left: 8px;
         }
 
-
         /* --- CARD & BUTTON KONSISTENSI --- */
         .card {
             border: none;
@@ -119,14 +206,12 @@ $user_role = $user_role ?? 'user';
             transition: all 0.3s ease;
         }
 
-
         .card-header {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             border-bottom: 2px solid #a97c50;
             border-radius: 15px 15px 0 0 !important;
             padding: 20px;
         }
-
 
         .btn-primary,
         .btn-upload {
@@ -139,13 +224,11 @@ $user_role = $user_role ?? 'user';
             color: white !important;
         }
 
-
         .btn-primary:hover,
         .btn-upload:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(169, 124, 80, 0.4);
         }
-
 
         /* Form Control KONSISTENSI */
         .form-label {
@@ -154,7 +237,6 @@ $user_role = $user_role ?? 'user';
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
         }
-
 
         .form-control {
             border: 2px solid #e9ecef;
@@ -165,10 +247,7 @@ $user_role = $user_role ?? 'user';
             height: 42px;
         }
 
-
         /* --- END KONSISTENSI MASTER ADMIN --- */
-
-
 
         /* --- GALERI SECTION STYLING --- */
         .upload-section {
@@ -179,13 +258,11 @@ $user_role = $user_role ?? 'user';
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
-
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 15px;
         }
-
 
         .gallery-item {
             border-radius: 16px;
@@ -195,8 +272,8 @@ $user_role = $user_role ?? 'user';
             transition: transform 0.3s ease;
             background: white;
             padding: 0;
+            position: relative;
         }
-
 
         .gallery-item img {
             width: 100%;
@@ -205,12 +282,10 @@ $user_role = $user_role ?? 'user';
             display: block;
         }
 
-
         .gallery-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
-
 
         /* --- GALLERY OVERLAY DAN TOMBOL AKSI REVISI --- */
         .gallery-overlay {
@@ -228,11 +303,9 @@ $user_role = $user_role ?? 'user';
             transition: opacity 0.3s ease;
         }
 
-
         .gallery-item:hover .gallery-overlay {
             opacity: 1;
         }
-
 
         .gallery-overlay .btn {
             border-radius: 50%;
@@ -247,12 +320,10 @@ $user_role = $user_role ?? 'user';
             transition: opacity 0.2s, transform 0.2s;
         }
 
-
         .gallery-overlay .btn:hover {
             opacity: 1;
             transform: scale(1.1);
         }
-
 
         /* WARNA TOMBOL KONSISTENSI MASTER ADMIN */
         .btn-delete {
@@ -260,16 +331,11 @@ $user_role = $user_role ?? 'user';
             border-color: #dc3545 !important;
         }
 
-
         .btn-delete:hover {
             background-color: #c82333 !important;
         }
-
-        /* Dihapus: Styles untuk .btn-view dan .btn-view:hover */
-
-
-        /* Dihapus: Styles untuk .modal-body img.img-fluid karena modal detail dihilangkan */
     </style>
+
 </head>
 
 

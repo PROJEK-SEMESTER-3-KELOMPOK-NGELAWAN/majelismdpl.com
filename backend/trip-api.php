@@ -3,8 +3,8 @@
 /**
  * ============================================
  * FILE: backend/trip-api.php
- * FUNGSI: Handle CRUD Trip + file management
- * FIXED: Delete file gambar 100% dengan proper path handling
+ * FUNGSI: Handle CRUD Trip + file management + trip_galleries
+ * FIXED: Bug pada updateTrip - variabel $gdrive_link diganti $link_drive
  * ============================================
  */
 
@@ -159,6 +159,52 @@ function logActivity($conn, $id_user, $aktivitas, $statusLog)
     }
 }
 
+/**
+ * Save or Update Gallery to trip_galleries table
+ * UPDATED: galery_name otomatis menggunakan nama_gunung
+ */
+function saveOrUpdateGallery($conn, $id_trip, $nama_gunung, $gdrive_link)
+{
+    // Otomatis generate galery_name dari nama_gunung
+    $gallery_name = $nama_gunung;
+
+    // Cek apakah sudah ada data gallery untuk id_trip ini
+    $checkStmt = $conn->prepare("SELECT id_trip FROM trip_galleries WHERE id_trip = ?");
+    $checkStmt->bind_param("i", $id_trip);
+    $checkStmt->execute();
+    $checkStmt->store_result();
+
+    if ($checkStmt->num_rows > 0) {
+        // UPDATE existing
+        $checkStmt->close();
+        $updateStmt = $conn->prepare("UPDATE trip_galleries SET galery_name = ?, gdrive_link = ? WHERE id_trip = ?");
+        $updateStmt->bind_param("ssi", $gallery_name, $gdrive_link, $id_trip);
+        $result = $updateStmt->execute();
+        $updateStmt->close();
+        return $result;
+    } else {
+        // INSERT new
+        $checkStmt->close();
+        $insertStmt = $conn->prepare("INSERT INTO trip_galleries (id_trip, galery_name, gdrive_link) VALUES (?, ?, ?)");
+        $insertStmt->bind_param("iss", $id_trip, $gallery_name, $gdrive_link);
+        $result = $insertStmt->execute();
+        $insertStmt->close();
+        return $result;
+    }
+}
+
+/**
+ * Delete Gallery from trip_galleries table
+ */
+function deleteGallery($conn, $id_trip)
+{
+    $stmt = $conn->prepare("DELETE FROM trip_galleries WHERE id_trip = ?");
+    $stmt->bind_param("i", $id_trip);
+    $result = $stmt->execute();
+    $stmt->close();
+    return $result;
+}
+
 // ========== FIELDS TO TRACK ==========
 
 $fieldsToTrack = [
@@ -176,7 +222,7 @@ $fieldsToTrack = [
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
 
-    // ========== DELETE TRIP + FILE GAMBAR ==========
+    // ========== DELETE TRIP + FILE GAMBAR + GALLERY ==========
     if ($action === 'deleteTrip' && isset($_POST['id_trip'])) {
         $id_trip_del = (int)$_POST['id_trip'];
 
@@ -212,7 +258,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
             $file_delete_result = deleteGameFile($gambar_path);
         }
 
-        // HAPUS DARI DATABASE
+        // HAPUS DARI trip_galleries (CASCADE)
+        deleteGallery($conn, $id_trip_del);
+
+        // HAPUS DARI DATABASE paket_trips
         $stmt = $conn->prepare("DELETE FROM paket_trips WHERE id_trip=?");
         if (!$stmt) {
             http_response_code(500);
@@ -229,14 +278,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
         $stmt->close();
 
         if ($success && $id_user) {
-            $aktivitas = "Trip \"{$nama_gunung_del}\" dihapus";
+            $aktivitas = "Trip \"{$nama_gunung_del}\" dihapus beserta gallery";
             $statusLog = "Delete";
             logActivity($conn, $id_user, $aktivitas, $statusLog);
         }
 
         echo json_encode([
             'success' => $success,
-            'msg' => $success ? 'Trip dan file gambar berhasil dihapus' : 'Gagal menghapus trip',
+            'msg' => $success ? 'Trip, file gambar, dan gallery berhasil dihapus' : 'Gagal menghapus trip',
             'fileDeleteInfo' => $file_delete_result
         ]);
         exit;
@@ -251,6 +300,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
     $harga       = (int)($_POST['harga'] ?? 0);
     $via_gunung  = $_POST['via_gunung'] ?? '';
     $status = isset($_POST['status']) ? strtolower(trim($_POST['status'])) : 'available';
+
+    // TAMBAHAN: Ambil input gallery (link_drive saja, galery_name otomatis)
+    $link_drive = $_POST['link_drive'] ?? '';
 
     // Validasi status
     $allowedStatuses = ['available', 'sold', 'done'];
@@ -317,6 +369,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
 
         $id = $stmt->insert_id;
         $stmt->close();
+
+        // SAVE GALLERY DATA (JIKA STATUS = DONE DAN ADA LINK)
+        // galery_name otomatis menggunakan nama_gunung
+        if ($status === 'done' && !empty($link_drive)) {
+            saveOrUpdateGallery($conn, $id, $nama_gunung, $link_drive);
+        }
 
         // Log activity
         if ($id_user) {
@@ -401,6 +459,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action) {
 
         $stmt->close();
 
+        // UPDATE/INSERT GALLERY DATA (JIKA STATUS = DONE)
+        // galery_name otomatis menggunakan nama_gunung
+        // FIXED: Menggunakan $link_drive bukan $gdrive_link
+        if ($status === 'done') {
+            if (!empty($link_drive)) {
+                saveOrUpdateGallery($conn, $id_trip_update, $nama_gunung, $link_drive);
+            }
+        } else {
+            // Jika status bukan done, hapus gallery data (opsional)
+            // Uncomment baris berikut jika ingin menghapus gallery saat status berubah dari done
+            // deleteGallery($conn, $id_trip_update);
+        }
+
         // Track changes
         $changedDetails = [];
         $newDataFromPost = [
@@ -472,6 +543,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'getTrip' && isset($_GET
     $trip = $result->fetch_assoc();
     $q->close();
     echo json_encode(['success' => (bool)$trip, 'data' => $trip]);
+    exit;
+}
+
+// GET: Gallery data for specific trip
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'getGallery' && isset($_GET['id_trip'])) {
+    $id_trip = intval($_GET['id_trip']);
+    $q = $conn->prepare("SELECT * FROM trip_galleries WHERE id_trip = ?");
+    $q->bind_param("i", $id_trip);
+    $q->execute();
+    $result = $q->get_result();
+    $gallery = $result->fetch_assoc();
+    $q->close();
+    echo json_encode(['success' => (bool)$gallery, 'data' => $gallery]);
     exit;
 }
 

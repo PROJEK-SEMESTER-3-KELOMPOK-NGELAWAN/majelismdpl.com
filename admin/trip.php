@@ -34,6 +34,101 @@ $user_role = $user_role ?? 'user';
             margin: 0;
         }
 
+        /* ========== SWEETALERT2 CUSTOM STYLING ========== */
+
+        /* Popup Styling */
+        .swal2-popup {
+            border-radius: 15px !important;
+            font-family: "Poppins", Arial, sans-serif !important;
+        }
+
+        .swal2-title {
+            color: #a97c50 !important;
+            font-family: "Poppins", Arial, sans-serif !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-html-container {
+            font-family: "Poppins", Arial, sans-serif !important;
+            color: #495057 !important;
+        }
+
+        /* Button Styling - Confirm (Primary) */
+        .swal2-confirm {
+            background-color: #a97c50 !important;
+            border-radius: 8px !important;
+            font-family: "Poppins", Arial, sans-serif !important;
+            font-weight: 500 !important;
+            padding: 10px 24px !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+        }
+
+        .swal2-confirm:hover {
+            background-color: #8b6332 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(169, 124, 80, 0.4) !important;
+        }
+
+        /* Button Styling - Cancel (Secondary) */
+        .swal2-cancel {
+            background-color: #6c757d !important;
+            border-radius: 8px !important;
+            font-family: "Poppins", Arial, sans-serif !important;
+            font-weight: 500 !important;
+            padding: 10px 24px !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+        }
+
+        .swal2-cancel:hover {
+            background-color: #5a6268 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3) !important;
+        }
+
+        /* Icon Styling */
+        .swal2-icon.swal2-warning {
+            border-color: #a97c50 !important;
+            color: #a97c50 !important;
+        }
+
+        .swal2-icon.swal2-success {
+            border-color: #28a745 !important;
+        }
+
+        .swal2-icon.swal2-error {
+            border-color: #dc3545 !important;
+        }
+
+        .swal2-icon.swal2-info {
+            border-color: #17a2b8 !important;
+        }
+
+        /* Toast Styling */
+        .colored-toast.swal2-icon-success {
+            background-color: #a5dc86 !important;
+        }
+
+        .colored-toast.swal2-icon-error {
+            background-color: #f27474 !important;
+        }
+
+        .colored-toast.swal2-icon-warning {
+            background-color: #f8bb86 !important;
+        }
+
+        .colored-toast.swal2-icon-info {
+            background-color: #3fc3ee !important;
+        }
+
+        .colored-toast .swal2-title {
+            color: white !important;
+            font-size: 16px !important;
+        }
+
+        /* ========== END SWEETALERT2 STYLING ========== */
+
         .text-brown {
             color: #a97c50 !important;
         }
@@ -348,6 +443,7 @@ $user_role = $user_role ?? 'user';
             margin-top: 24px;
         }
     </style>
+
 </head>
 
 <body>
@@ -468,11 +564,12 @@ $user_role = $user_role ?? 'user';
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i> Tutup</button>
-                        <button type="submit" class="btn btn-primary" id="saveButton"><i class="bi bi-save me-1"></i> Simpan</button>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i> Tutup</button>
+                    <button type="submit" class="btn btn-primary" id="saveButton"><i class="bi bi-save me-1"></i> Simpan</button>
+                </div>
             </form>
         </div>
     </div>

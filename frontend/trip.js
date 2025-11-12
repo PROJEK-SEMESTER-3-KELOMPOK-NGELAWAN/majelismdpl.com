@@ -16,7 +16,6 @@ const FORM_ID = "formTambahTrip";
 const MODAL_ID = "tambahTripModal";
 
 // GUNAKAN getApiUrl yang sudah ada di config.js
-// JANGAN deklarasikan API_URL lagi karena sudah ada di config.js
 const TRIP_API_URL =
   typeof getApiUrl === "function"
     ? getApiUrl("trip-api.php")
@@ -271,7 +270,7 @@ async function handleDelete(id_trip) {
 }
 
 /* ===== EDIT TRIP ===== */
-function handleEdit(id_trip) {
+async function handleEdit(id_trip) {
   const trip = tripsData.find((t) => t.id_trip == id_trip);
   if (trip) {
     currentEditTripId = trip.id_trip;
@@ -290,13 +289,26 @@ function handleEdit(id_trip) {
     form.via_gunung.value = trip.via_gunung || "";
     form.status.value = (trip.status || "available").toString().toLowerCase();
 
-    // START: BARIS BARU UNTUK LINK GOOGLE DRIVE
-    const linkDriveInput = document.getElementById("link_drive");
-    if (linkDriveInput) {
-      // Asumsi kolom di DB/API adalah 'link_drive'
-      linkDriveInput.value = trip.link_drive || "";
+    // LOAD EXISTING GALLERY DATA FROM trip_galleries
+    try {
+      const galleryRes = await fetch(
+        `${TRIP_API_URL}?action=getGallery&id_trip=${id_trip}`
+      );
+      const galleryData = await galleryRes.json();
+
+      const linkDriveInput = document.getElementById("link_drive");
+
+      if (galleryData.success && galleryData.data) {
+        if (linkDriveInput) {
+          linkDriveInput.value = galleryData.data.gdrive_link || "";
+        }
+      } else {
+        // Reset jika tidak ada data gallery
+        if (linkDriveInput) linkDriveInput.value = "";
+      }
+    } catch (err) {
+      console.error("Error loading gallery data:", err);
     }
-    // END: BARIS BARU
 
     const modal = new bootstrap.Modal(document.getElementById(MODAL_ID));
     modal.show();
@@ -389,12 +401,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const modalElement = document.getElementById(MODAL_ID);
   const statusDropdown = document.getElementById("status");
-  // Gunakan ID yang sesuai dengan HTML: linkDriveContainerContent
   const linkDriveContainerContent = document.getElementById(
     "linkDriveContainerContent"
   );
 
-  // --- LOGIKA KONDISIONAL LINK DRIVE (DITEMPATKAN DI SINI) ---
+  // --- LOGIKA KONDISIONAL LINK DRIVE ---
   if (statusDropdown && linkDriveContainerContent && modalElement) {
     function toggleLinkDriveInput() {
       const statusDropdown = document.getElementById("status");
@@ -402,15 +413,15 @@ document.addEventListener("DOMContentLoaded", () => {
         "linkDriveContainerContent"
       );
 
-      if (!statusDropdown || !linkDriveContainerContent) return; // Guard clause
+      if (!statusDropdown || !linkDriveContainerContent) return;
 
       if (statusDropdown.value === "done") {
-        // Tampilkan: Atur tinggi ke auto/nilai penuh, dan opacity 1
-        linkDriveContainerContent.style.height = "78px"; // Kunci tinggi field + margin mb-3 (Contoh: 78px)
+        // Tampilkan input link drive
+        linkDriveContainerContent.style.height = "78px";
         linkDriveContainerContent.style.opacity = "1";
         linkDriveContainerContent.style.overflow = "visible";
       } else {
-        // Sembunyikan: Atur tinggi ke 0, dan opacity 0
+        // Sembunyikan input link drive
         linkDriveContainerContent.style.height = "0";
         linkDriveContainerContent.style.opacity = "0";
         linkDriveContainerContent.style.overflow = "hidden";
@@ -419,36 +430,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Pasang listeners
     statusDropdown.addEventListener("change", toggleLinkDriveInput);
-    modalElement.addEventListener("shown.bs.modal", toggleLinkDriveInput); // Cek saat modal ditampilkan (Edit Mode)
+    modalElement.addEventListener("shown.bs.modal", toggleLinkDriveInput);
 
     // Panggil inisialisasi awal
     toggleLinkDriveInput();
   } else {
     console.error("DEBUG: Inisialisasi Link Drive gagal. Cek ID HTML.");
   }
-  // --- AKHIR LOGIKA LINK DRIVE ---
 
-  // Listener penutupan modal (sudah ada)
+  // Listener penutupan modal
   if (modalElement) {
     modalElement.addEventListener("hidden.bs.modal", function () {
       resetFormAndModalState();
     });
   }
 });
-
-// Contoh Logika (Biasanya di dalam file JS Anda, misalnya saat menutup modal)
-function closeModal(modalElement) {
-  // ... Logika penutupan modal yang sudah ada ...
-
-  // Temukan elemen yang harus mendapatkan fokus selanjutnya (misal, tombol Tambah Trip)
-  const triggerButton = document.querySelector(
-    '[data-bs-target="#tambahTripModal"]'
-  );
-
-  if (triggerButton) {
-    triggerButton.focus(); // Pindahkan fokus
-  } else {
-    // Pindahkan fokus ke <body> jika tidak ada tombol pemicu
-    document.body.focus();
-  }
-}

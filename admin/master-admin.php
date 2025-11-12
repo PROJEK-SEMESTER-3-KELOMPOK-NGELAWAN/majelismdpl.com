@@ -474,6 +474,27 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
                 padding: 20px 15px;
             }
         }
+
+        .swal2-popup {
+            border-radius: 15px !important;
+        }
+
+
+        .swal2-title {
+            color: #a97c50 !important;
+            font-family: "Poppins", Arial, sans-serif !important;
+        }
+
+
+        .swal2-confirm {
+            background-color: #a97c50 !important;
+            border-radius: 8px !important;
+        }
+
+
+        .swal2-confirm:hover {
+            background-color: #8b6332 !important;
+        }
     </style>
 </head>
 
