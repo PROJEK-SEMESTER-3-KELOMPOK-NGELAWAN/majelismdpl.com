@@ -970,8 +970,6 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
             <option value="create">Tambah Data (Create)</option>
             <option value="update">Ubah Data (Update)</option>
             <option value="delete">Hapus Data (Delete)</option>
-            <option value="login">Login</option>
-            <option value="logout">Logout</option>
           </select>
           <div class="search-container" style="max-width: 280px; width: 100%;">
             <input type="text" id="activitySearchInput" class="search-input" placeholder="Cari detail aktivitas..." />

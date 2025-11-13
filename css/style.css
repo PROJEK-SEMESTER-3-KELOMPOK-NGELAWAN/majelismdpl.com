@@ -3407,3 +3407,49 @@ section {
 .colored-toast .swal2-progress-bar {
   background-color: #38a169 !important; /* Warna hijau yang lebih gelap */
 }
+
+/* Pastikan SweetAlert2 CSS sudah terload */
+
+/* 1. Mengubah Border-Radius Popup secara keseluruhan */
+.swal2-popup {
+    border-radius: 15px !important; /* Nilai yang lebih tinggi untuk efek lebih melengkung */
+    font-family: 'Poppins', sans-serif; /* Ganti dengan font yang Anda gunakan di aplikasi Anda */
+    /* Menghilangkan bayangan default jika diinginkan */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+}
+
+/* 2. Menyesuaikan Ikon Peringatan/Info (untuk mirip ikon '!' di gambar) */
+/* Ikon default SweetAlert2 sulit diubah menjadi ikon seperti gambar Anda tanpa SVG/HTML kustom.
+   Namun, Anda bisa menyesuaikan warna ikon jika menggunakan 'warning' atau 'info' */
+.swal2-icon.swal2-warning, .swal2-icon.swal2-info {
+    /* Jika Anda memutuskan menggunakan 'warning' atau 'info' untuk Kesalahan/Logout */
+    border-color: #a9865a; 
+    color: #a9865a; 
+}
+
+/* 3. Menyesuaikan Tombol Konfirmasi (Ya, Logout / Lanjutkan / Coba Lagi) */
+.swal2-custom-confirm-button {
+    /* SweetAlert2 menggunakan !important, jadi kita tambahkan */
+    background-color: #a9865a !important; /* Warna Ya, Logout */
+    color: white !important;
+    border-radius: 12px !important; /* Border radius tombol */
+    border: none !important;
+    font-size: 1em !important;
+    font-weight: 600 !important; /* Menyesuaikan ketebalan font */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 4. Menyesuaikan Tombol Batal (Batal / Tutup) */
+.swal2-custom-cancel-button {
+    background-color: #6c757d !important; /* Warna Batal */
+    color: white !important;
+    border-radius: 12px !important;
+    border: none !important;
+    font-size: 1em !important;
+    font-weight: 600 !important;
+}
+
+/* 5. Mengatur Jarak antara tombol (opsional, jika perlu) */
+.swal2-actions {
+    margin-top: 20px;
+}
