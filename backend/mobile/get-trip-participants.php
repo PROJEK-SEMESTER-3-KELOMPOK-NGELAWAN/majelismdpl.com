@@ -1,8 +1,10 @@
 <?php
 /**
  * ============================================
- * GET TRIP PARTICIPANTS API
+ * UNTUK MENU DAFTAR PESERTA 
+ * GET TRIP PARTICIPANTS API 
  * Mengambil data peserta berdasarkan id_trip
+ * Hanya untuk trip dengan status 'available'
  * Join: paket_trips -> bookings -> participants -> users
  * Format konsisten dengan get-profile.php
  * ============================================
@@ -56,8 +58,45 @@ if ($id_trip <= 0) {
 
 // Query database
 try {
-    // Query untuk mengambil peserta berdasarkan id_trip
-    // Join: paket_trips -> bookings -> participants -> users
+    // CEK DULU: Apakah trip masih available?
+    $checkQuery = "SELECT status FROM paket_trips WHERE id_trip = ? LIMIT 1";
+    $checkStmt = $conn->prepare($checkQuery);
+    
+    if (!$checkStmt) {
+        throw new Exception("Gagal menyiapkan statement: " . $conn->error);
+    }
+    
+    $checkStmt->bind_param("i", $id_trip);
+    $checkStmt->execute();
+    $checkResult = $checkStmt->get_result();
+    
+    if ($checkResult->num_rows === 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Trip tidak ditemukan',
+            'received_id_trip' => $id_trip
+        ]);
+        $checkStmt->close();
+        $conn->close();
+        exit;
+    }
+    
+    $tripData = $checkResult->fetch_assoc();
+    $checkStmt->close();
+    
+    // Jika status bukan 'available', tolak request
+    if ($tripData['status'] !== 'available') {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Trip ini sudah tidak aktif (status: ' . $tripData['status'] . ')',
+            'trip_status' => $tripData['status'],
+            'received_id_trip' => $id_trip
+        ]);
+        $conn->close();
+        exit;
+    }
+    
+    // Lanjutkan query peserta jika trip masih available
     $query = "
         SELECT 
             p.id_participant,
@@ -78,7 +117,8 @@ try {
             u.foto_profil,
             pt.id_trip,
             pt.nama_gunung,
-            pt.jenis_trip
+            pt.jenis_trip,
+            pt.status AS trip_status
         FROM 
             participants p
         INNER JOIN 
@@ -89,10 +129,11 @@ try {
             users u ON b.id_user = u.id_user
         WHERE 
             pt.id_trip = ?
+            AND pt.status = 'available'
         ORDER BY 
             b.tanggal_booking DESC, p.id_participant ASC
     ";
-
+    
     $stmt = $conn->prepare($query);
 
     if (!$stmt) {
@@ -173,7 +214,8 @@ try {
         'message' => 'Data peserta berhasil diambil',
         'data' => $participants,
         'total_participants' => count($participants),
-        'id_trip' => $id_trip
+        'id_trip' => $id_trip,
+        'trip_status' => 'available'
     ];
 
     echo json_encode($response);

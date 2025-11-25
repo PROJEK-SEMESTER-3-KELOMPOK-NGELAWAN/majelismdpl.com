@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'redirect_url' => $redirect_url,
                 'message' => 'Login berhasil sebagai ' . ucfirst(str_replace('_', ' ', $user['role'])),
                 'user' => [
-                    'id' => $user['id_user'],
+                    'id_user' => $user['id_user'],
                     'username' => $user['username'],
                     'email' => $user['email'] ?? '',
                     'whatsapp' => $user['no_wa'] ?? '',

@@ -3,16 +3,19 @@
 require_once (isset($navbarPath) ? $navbarPath : '') . 'config.php';
 require_once (isset($navbarPath) ? $navbarPath : '') . 'backend/koneksi.php';
 
+
 // Set navbarPath jika belum didefinisikan
 if (!isset($navbarPath)) {
   $navbarPath = '';
 }
+
 
 $isLoggedIn = isset($_SESSION['id_user']) && !empty($_SESSION['id_user']);
 $userName = 'User';
 $photoFileName = 'default.jpg';
 $isCustomPhoto = false;
 $initials = '';
+
 
 if ($isLoggedIn) {
   $id_user = $_SESSION['id_user'];
@@ -22,12 +25,14 @@ if ($isLoggedIn) {
   $result = $stmt->get_result()->fetch_assoc();
   $stmt->close();
 
+
   if ($result) {
     $userName = $result['username'];
     $photoFileName = $result['foto_profil'] ?? 'default.jpg';
     $initials = strtoupper(substr($userName, 0, 1));
   }
 }
+
 
 $escapedPhotoFileName = htmlspecialchars($photoFileName, ENT_QUOTES, 'UTF-8');
 $projectDirName = '/majelismdpl.com';
@@ -38,9 +43,11 @@ $photoPathFinal = $navbarPath . 'img/profile/' . $escapedPhotoFileName;
 $cacheBuster = '?' . time();
 ?>
 
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
 
 <nav class="navbar" role="navigation" aria-label="Main Navigation">
   <div class="navbar-logo">
@@ -49,6 +56,7 @@ $cacheBuster = '?' . time();
     </a>
   </div>
 
+
   <ul class="navbar-menu" id="navbarMenu" role="menu">
     <li><a href="<?php echo getPageUrl('index.php'); ?>#home" role="menuitem"><i class="fa-solid fa-house"></i> Home</a></li>
     <li><a href="<?php echo getPageUrl('index.php'); ?>#profile" role="menuitem"><i class="fa-solid fa-user"></i> Profile</a></li>
@@ -56,6 +64,7 @@ $cacheBuster = '?' . time();
     <li><a href="<?php echo getPageUrl('index.php'); ?>#gallerys" role="menuitem"><i class="fa-solid fa-image"></i> Galeri</a></li>
     <li><a href="<?php echo getPageUrl('index.php'); ?>#testimonials" role="menuitem"><i class="fa-solid fa-comment-dots"></i> Testimoni</a></li>
   </ul>
+
 
   <?php if (!$isLoggedIn): ?>
     <div class="nav-btns">
@@ -76,6 +85,7 @@ $cacheBuster = '?' . time();
         <i class="fa-solid fa-chevron-down dropdown-icon"></i>
       </button>
 
+
       <div class="user-dropdown" id="userDropdown">
         <a href="<?php echo getPageUrl('user/profile.php'); ?>" class="dropdown-item">
           <i class="fa-solid fa-user"></i> Profil
@@ -94,6 +104,7 @@ $cacheBuster = '?' . time();
     </div>
   <?php endif; ?>
 
+
   <button class="hamburger" id="hamburgerBtn" aria-label="Toggle Menu" aria-expanded="false" aria-controls="navbarMenu">
     <span class="hamburger-line"></span>
     <span class="hamburger-line"></span>
@@ -101,9 +112,11 @@ $cacheBuster = '?' . time();
   </button>
 </nav>
 
+
 <form id="logout-form" method="POST" action="<?php echo getPageUrl('user/logout.php'); ?>" style="display: none;">
   <input type="hidden" name="confirm_logout" value="1">
 </form>
+
 
 <div id="logout-modal" class="logout-modal-overlay">
   <div class="logout-modal-container">
@@ -119,6 +132,7 @@ $cacheBuster = '?' . time();
   </div>
 </div>
 
+
 <style>
   * {
     margin: 0;
@@ -126,9 +140,11 @@ $cacheBuster = '?' . time();
     box-sizing: border-box;
   }
 
+
   html {
     scroll-behavior: smooth;
   }
+
 
   body {
     font-family: "Poppins", Arial, sans-serif;
@@ -137,6 +153,7 @@ $cacheBuster = '?' . time();
     color: #333;
     overflow-x: hidden;
   }
+
 
   /* ========== NAVBAR ========== */
   .navbar {
@@ -158,11 +175,13 @@ $cacheBuster = '?' . time();
     border-bottom: 1px solid rgba(169, 124, 80, 0.15);
   }
 
+
   .navbar.scrolled {
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(50px) saturate(180%);
     box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
   }
+
 
   .navbar-logo {
     display: flex;
@@ -171,11 +190,13 @@ $cacheBuster = '?' . time();
     z-index: 1201;
   }
 
+
   .navbar-logo a {
     display: flex;
     align-items: center;
     text-decoration: none;
   }
+
 
   .logo-img {
     height: 50px;
@@ -185,9 +206,11 @@ $cacheBuster = '?' . time();
     filter: drop-shadow(0 2px 8px rgba(169, 124, 80, 0.2));
   }
 
+
   .logo-img:hover {
     transform: scale(1.08) rotate(-5deg);
   }
+
 
   .profile-initials-nav {
     width: 26px;
@@ -205,11 +228,13 @@ $cacheBuster = '?' . time();
     font-weight: 700;
   }
 
+
   .user-menu-toggle:hover .profile-initials-nav {
     transform: scale(1.08);
     border-color: #ffd44a;
     box-shadow: 0 0 12px rgba(255, 212, 74, 0.35);
   }
+
 
   /* ========== MENU ITEMS ========== */
   .navbar-menu {
@@ -220,10 +245,12 @@ $cacheBuster = '?' . time();
     padding: 0;
   }
 
+
   .navbar-menu li {
     display: flex;
     align-items: center;
   }
+
 
   .navbar-menu a {
     display: flex;
@@ -238,205 +265,85 @@ $cacheBuster = '?' . time();
     gap: 10px;
   }
 
+
   .navbar-menu a:hover {
     background: #a97c50;
     color: #fff;
   }
+
 
   .navbar-menu a.active {
     background: #8b5e3c;
     color: #fff;
   }
 
+
   .navbar-menu a i {
     font-size: 1.3em;
     color: #000000;
     transition: transform 0.25s cubic-bezier(0.54, 0.14, 0.23, 1.12), color 0.2s;
     display: inline-block;
+    animation: none !important;
   }
 
-  /* ========== ICON ANIMATIONS ========== */
-  .navbar-menu li:nth-child(1) a i {
-    animation: jellyBounce 2.5s ease-in-out infinite;
-  }
 
-  @keyframes jellyBounce {
-
-    0%,
-    100% {
-      transform: translateY(0) scaleY(1);
-    }
-
-    30% {
-      transform: translateY(-10px) scaleY(1.08);
-    }
-
-    40% {
-      transform: translateY(-8px) scaleY(0.92);
-    }
-
-    50% {
-      transform: translateY(0) scaleY(1.04);
-    }
-
-    60% {
-      transform: translateY(0) scaleY(0.96);
-    }
-  }
-
-  .navbar-menu li:nth-child(2) a i {
-    animation: crazyWiggle 2s ease-in-out infinite;
-    animation-delay: 0.4s;
-  }
-
-  @keyframes crazyWiggle {
-
-    0%,
-    100% {
-      transform: rotate(0deg) scale(1);
-    }
-
-    15% {
-      transform: rotate(-18deg) scale(1.08);
-    }
-
-    30% {
-      transform: rotate(18deg) scale(0.96);
-    }
-
-    45% {
-      transform: rotate(-14deg) scale(1.04);
-    }
-
-    60% {
-      transform: rotate(14deg) scale(0.98);
-    }
-
-    75% {
-      transform: rotate(-8deg) scale(1.02);
-    }
-  }
-
-  .navbar-menu li:nth-child(3) a i {
-    animation: heartbeat 1.8s ease-in-out infinite;
-    animation-delay: 0.6s;
-  }
-
-  @keyframes heartbeat {
-
-    0%,
-    100% {
-      transform: scale(1);
-    }
-
-    10% {
-      transform: scale(1.18);
-    }
-
-    20% {
-      transform: scale(1);
-    }
-
-    30% {
-      transform: scale(1.14);
-    }
-
-    40% {
-      transform: scale(1);
-    }
-  }
-
-  .navbar-menu li:nth-child(4) a i {
-    animation: spinScale 3s ease-in-out infinite;
-    animation-delay: 0.8s;
-  }
-
-  @keyframes spinScale {
-
-    0%,
-    100% {
-      transform: rotate(0deg) scale(1);
-    }
-
-    25% {
-      transform: rotate(180deg) scale(1.18);
-    }
-
-    50% {
-      transform: rotate(360deg) scale(1);
-    }
-
-    75% {
-      transform: rotate(540deg) scale(1.12);
-    }
-  }
-
+  /* ========== ICON ANIMATIONS - REMOVED ========== */
+  /* All individual icon animations have been disabled */
+  .navbar-menu li:nth-child(1) a i,
+  .navbar-menu li:nth-child(2) a i,
+  .navbar-menu li:nth-child(3) a i,
+  .navbar-menu li:nth-child(4) a i,
   .navbar-menu li:nth-child(5) a i {
-    animation: waveFloat 2.2s ease-in-out infinite;
-    animation-delay: 1s;
+    animation: none !important;
   }
 
-  @keyframes waveFloat {
 
-    0%,
-    100% {
-      transform: translateY(0) rotate(0deg);
-    }
-
-    20% {
-      transform: translateY(-7px) rotate(-10deg);
-    }
-
-    40% {
-      transform: translateY(-3px) rotate(7deg);
-    }
-
-    60% {
-      transform: translateY(-9px) rotate(-7deg);
-    }
-
-    80% {
-      transform: translateY(-2px) rotate(9deg);
-    }
-  }
-
+  /* Hover effect remains active */
   .navbar-menu a:hover i {
     color: #ffffff;
     transform: scale(1.25) rotate(-13deg) translateY(-5px);
     animation: navbarBounce 0.44s cubic-bezier(0.39, 1.6, 0.63, 1) 1;
   }
 
+
   @keyframes navbarBounce {
     0% {
       transform: scale(1.07) rotate(-8deg) translateY(0);
     }
 
+
     28% {
       transform: scale(1.28) rotate(-13deg) translateY(-10px);
     }
+
 
     49% {
       transform: scale(1.24) rotate(-9deg) translateY(2px);
     }
 
+
     70% {
       transform: scale(1.2) rotate(-11deg) translateY(-3px);
     }
+
 
     100% {
       transform: scale(1.25) rotate(-13deg) translateY(-5px);
     }
   }
 
+
   .navbar-menu a.active i {
     color: #ffffff;
   }
+
 
   /* ========== BUTTONS ========== */
   .nav-btns {
     display: flex;
     gap: 10px;
   }
+
 
   .nav-btns .btn {
     padding: 9px 28px;
@@ -454,11 +361,13 @@ $cacheBuster = '?' . time();
     cursor: pointer;
   }
 
+
   .nav-btns .btn:hover {
     background: #8b5e3c;
     color: #fff;
     transform: translateY(-2px);
   }
+
 
   /* ========== USER MENU ========== */
   .user-menu-container {
@@ -467,6 +376,7 @@ $cacheBuster = '?' . time();
     align-items: center;
     z-index: 1100;
   }
+
 
   .user-menu-toggle {
     display: flex;
@@ -488,6 +398,7 @@ $cacheBuster = '?' . time();
     overflow: hidden;
   }
 
+
   .user-menu-toggle::before {
     content: "";
     position: absolute;
@@ -500,19 +411,23 @@ $cacheBuster = '?' . time();
     pointer-events: none;
   }
 
+
   @keyframes shimmerMove {
     0% {
       left: -100%;
     }
 
+
     50% {
       left: 100%;
     }
+
 
     100% {
       left: 100%;
     }
   }
+
 
   .user-menu-toggle:hover {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.3) 100%);
@@ -521,6 +436,7 @@ $cacheBuster = '?' . time();
     transform: translateY(-1px);
   }
 
+
   .user-menu-toggle .dropdown-icon {
     font-size: 0.7em;
     transition: transform 0.3s ease;
@@ -528,9 +444,11 @@ $cacheBuster = '?' . time();
     margin-left: 2px;
   }
 
+
   .user-menu-toggle.active .dropdown-icon {
     transform: rotate(180deg);
   }
+
 
   .user-name {
     max-width: 110px;
@@ -540,6 +458,7 @@ $cacheBuster = '?' . time();
     font-weight: 600;
     color: #5c3922;
   }
+
 
   .profile-img-nav {
     width: 26px;
@@ -551,11 +470,13 @@ $cacheBuster = '?' . time();
     transition: all 0.3s ease;
   }
 
+
   .user-menu-toggle:hover .profile-img-nav {
     transform: scale(1.08);
     border-color: #ffd44a;
     box-shadow: 0 0 12px rgba(255, 212, 74, 0.35);
   }
+
 
   /* ========== DROPDOWN ========== */
   .user-dropdown {
@@ -578,11 +499,13 @@ $cacheBuster = '?' . time();
     overflow: hidden;
   }
 
+
   .user-dropdown.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
   }
+
 
   .dropdown-item {
     display: flex;
@@ -598,9 +521,11 @@ $cacheBuster = '?' . time();
     position: relative;
   }
 
+
   .dropdown-item:last-child {
     border-bottom: none;
   }
+
 
   .dropdown-item::before {
     content: "";
@@ -614,9 +539,11 @@ $cacheBuster = '?' . time();
     transition: transform 0.25s ease;
   }
 
+
   .dropdown-item:hover::before {
     transform: scaleY(1);
   }
+
 
   .dropdown-item i {
     font-size: 1em;
@@ -626,39 +553,47 @@ $cacheBuster = '?' . time();
     transition: all 0.25s ease;
   }
 
+
   .dropdown-item:hover {
     background: rgba(169, 124, 80, 0.07);
     padding-left: 20px;
     color: #5c3922;
   }
 
+
   .dropdown-item:hover i {
     transform: scale(1.12);
     color: #ffd44a;
   }
+
 
   .dropdown-item.logout {
     color: #d9534f;
     cursor: pointer;
   }
 
+
   .dropdown-item.logout i {
     color: #d9534f;
   }
+
 
   .dropdown-item.logout:hover {
     background: rgba(217, 83, 79, 0.07);
   }
 
+
   .dropdown-item.logout:hover i {
     color: #ff5459;
   }
+
 
   .dropdown-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(169, 124, 80, 0.12), transparent);
     margin: 5px 0;
   }
+
 
   /* ========== HAMBURGER ========== */
   .hamburger {
@@ -674,6 +609,7 @@ $cacheBuster = '?' . time();
     z-index: 1201;
   }
 
+
   .hamburger-line {
     width: 100%;
     height: 3px;
@@ -682,17 +618,21 @@ $cacheBuster = '?' . time();
     transition: all 0.3s ease;
   }
 
+
   .hamburger.active .hamburger-line:nth-child(1) {
     transform: translateY(8px) rotate(45deg);
   }
+
 
   .hamburger.active .hamburger-line:nth-child(2) {
     opacity: 0;
   }
 
+
   .hamburger.active .hamburger-line:nth-child(3) {
     transform: translateY(-8px) rotate(-45deg);
   }
+
 
   /* ========== LOGOUT MODAL ========== */
   .logout-modal-overlay {
@@ -710,19 +650,23 @@ $cacheBuster = '?' . time();
     animation: fadeIn 0.3s ease;
   }
 
+
   .logout-modal-overlay.show {
     display: flex;
   }
+
 
   @keyframes fadeIn {
     from {
       opacity: 0;
     }
 
+
     to {
       opacity: 1;
     }
   }
+
 
   .logout-modal-container {
     background: #fff;
@@ -735,17 +679,20 @@ $cacheBuster = '?' . time();
     animation: slideIn 0.3s ease;
   }
 
+
   @keyframes slideIn {
     from {
       transform: translateY(-50px);
       opacity: 0;
     }
 
+
     to {
       transform: translateY(0);
       opacity: 1;
     }
   }
+
 
   .logout-modal-icon {
     width: 80px;
@@ -759,10 +706,12 @@ $cacheBuster = '?' . time();
     box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3);
   }
 
+
   .logout-modal-icon i {
     font-size: 2.5em;
     color: #fff;
   }
+
 
   .logout-modal-title {
     font-size: 1.5em;
@@ -771,17 +720,20 @@ $cacheBuster = '?' . time();
     margin-bottom: 10px;
   }
 
+
   .logout-modal-text {
     font-size: 1em;
     color: #666;
     margin-bottom: 30px;
   }
 
+
   .logout-modal-buttons {
     display: flex;
     gap: 15px;
     justify-content: center;
   }
+
 
   .logout-btn-confirm,
   .logout-btn-cancel {
@@ -794,11 +746,13 @@ $cacheBuster = '?' . time();
     transition: all 0.3s ease;
   }
 
+
   .logout-btn-confirm {
     background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);
     color: #fff;
     box-shadow: 0 4px 15px rgba(180, 150, 102, 0.3);
   }
+
 
   .logout-btn-confirm:hover {
     background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
@@ -806,17 +760,20 @@ $cacheBuster = '?' . time();
     box-shadow: 0 6px 20px rgba(180, 150, 102, 0.4);
   }
 
+
   .logout-btn-cancel {
     background: #6c757d;
     color: #fff;
     box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
   }
 
+
   .logout-btn-cancel:hover {
     background: #5a6268;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
   }
+
 
   /* ========== RESPONSIVE - MOBILE ========== */
   @media (max-width: 900px) {
@@ -825,13 +782,16 @@ $cacheBuster = '?' . time();
       height: 70px;
     }
 
+
     .logo-img {
       height: 40px;
     }
 
+
     .navbar-logo {
       order: 1;
     }
+
 
     .nav-btns {
       order: 2;
@@ -840,11 +800,13 @@ $cacheBuster = '?' . time();
       gap: 6px;
     }
 
+
     .nav-btns .btn {
       padding: 7px 16px;
       font-size: 0.85em;
       border-radius: 18px;
     }
+
 
     .user-menu-container {
       order: 2;
@@ -852,11 +814,13 @@ $cacheBuster = '?' . time();
       margin-right: 10px;
     }
 
+
     .user-menu-toggle {
       padding: 5px 10px;
       gap: 5px;
       font-size: 0.78em;
     }
+
 
     .profile-img-nav,
     .profile-initials-nav {
@@ -865,15 +829,18 @@ $cacheBuster = '?' . time();
       font-size: 0.75em;
     }
 
+
     .user-name {
       max-width: 70px;
       font-size: 0.85em;
     }
 
+
     .hamburger {
       display: flex !important;
       order: 3;
     }
+
 
     .navbar-menu {
       display: none;
@@ -894,13 +861,16 @@ $cacheBuster = '?' . time();
       overflow-y: auto;
     }
 
+
     .navbar-menu.show {
       display: flex !important;
     }
 
+
     .navbar-menu li {
       width: 100%;
     }
+
 
     .navbar-menu a {
       width: 100%;
@@ -910,9 +880,11 @@ $cacheBuster = '?' . time();
       border-radius: 12px;
     }
 
+
     .user-dropdown {
       min-width: 200px;
     }
+
 
     .dropdown-item {
       padding: 10px 14px;
@@ -920,42 +892,51 @@ $cacheBuster = '?' . time();
     }
   }
 
+
   @media (max-width: 600px) {
     .navbar {
       padding: 8px 12px;
       height: 65px;
     }
 
+
     .logo-img {
       height: 36px;
     }
 
+
     .navbar-menu {
       top: 65px;
     }
+
 
     .hamburger {
       width: 24px;
       height: 17px;
     }
 
+
     .nav-btns {
       margin-right: 8px;
     }
+
 
     .nav-btns .btn {
       padding: 6px 14px;
       font-size: 0.8em;
     }
 
+
     .user-menu-container {
       margin-right: 8px;
     }
+
 
     .user-menu-toggle {
       padding: 4px 8px;
       font-size: 0.72em;
     }
+
 
     .profile-img-nav,
     .profile-initials-nav {
@@ -963,10 +944,12 @@ $cacheBuster = '?' . time();
       height: 20px;
     }
 
+
     .user-name {
       max-width: 60px;
     }
   }
+
 
   @media (max-width: 480px) {
     .nav-btns .btn {
@@ -975,6 +958,7 @@ $cacheBuster = '?' . time();
     }
   }
 </style>
+
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -988,18 +972,22 @@ $cacheBuster = '?' . time();
     const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
     const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
 
+
     // Hamburger menu toggle
     if (hamburger) {
       hamburger.addEventListener('click', function(e) {
         e.stopPropagation();
         this.classList.toggle('active');
 
+
         if (navbarMenu) {
           navbarMenu.classList.toggle('show');
         }
 
+
         const expanded = this.getAttribute('aria-expanded') === 'true';
         this.setAttribute('aria-expanded', !expanded);
+
 
         // Close user dropdown if open
         if (userDropdown && userDropdown.classList.contains('show')) {
@@ -1012,6 +1000,7 @@ $cacheBuster = '?' . time();
       });
     }
 
+
     // User menu toggle
     if (userMenuToggle && userDropdown) {
       userMenuToggle.addEventListener('click', function(e) {
@@ -1019,8 +1008,10 @@ $cacheBuster = '?' . time();
         userDropdown.classList.toggle('show');
         this.classList.toggle('active');
 
+
         const isExpanded = userDropdown.classList.contains('show');
         this.setAttribute('aria-expanded', isExpanded);
+
 
         // Close hamburger menu on mobile
         if (window.innerWidth <= 900) {
@@ -1033,6 +1024,7 @@ $cacheBuster = '?' . time();
       });
     }
 
+
     // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
       if (userDropdown && userMenuToggle) {
@@ -1043,6 +1035,7 @@ $cacheBuster = '?' . time();
         }
       }
 
+
       if (hamburger && navbarMenu) {
         if (!navbarMenu.contains(e.target) && !hamburger.contains(e.target)) {
           hamburger.classList.remove('active');
@@ -1052,6 +1045,7 @@ $cacheBuster = '?' . time();
       }
     });
 
+
     // Logout modal
     if (logoutBtn && logoutModal && logoutForm) {
       logoutBtn.addEventListener('click', function(e) {
@@ -1060,6 +1054,7 @@ $cacheBuster = '?' . time();
         logoutModal.classList.add('show');
       });
 
+
       if (confirmLogoutBtn) {
         confirmLogoutBtn.addEventListener('click', function() {
           logoutModal.classList.remove('show');
@@ -1067,11 +1062,13 @@ $cacheBuster = '?' . time();
         });
       }
 
+
       if (cancelLogoutBtn) {
         cancelLogoutBtn.addEventListener('click', function() {
           logoutModal.classList.remove('show');
         });
       }
+
 
       logoutModal.addEventListener('click', function(e) {
         if (e.target === logoutModal) {
@@ -1079,6 +1076,7 @@ $cacheBuster = '?' . time();
         }
       });
     }
+
 
     // Close menu when clicking menu links (mobile)
     const menuLinks = document.querySelectorAll('.navbar-menu a');
@@ -1094,6 +1092,7 @@ $cacheBuster = '?' . time();
       });
     });
 
+
     // Handle window resize
     window.addEventListener('resize', function() {
       if (window.innerWidth > 900) {
@@ -1104,6 +1103,7 @@ $cacheBuster = '?' . time();
         if (navbarMenu) navbarMenu.classList.remove('show');
       }
     });
+
 
     // Navbar scroll effect
     window.addEventListener('scroll', function() {

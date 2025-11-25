@@ -1,8 +1,10 @@
 <?php
 /**
  * ============================================
+ * UNTUK MENU DAFTAR PESERTA 
  * GET USER TRIPS API
- * Mengambil semua trip yang pernah dibooking user
+ * Mengambil semua trip AKTIF yang pernah dibooking user
+ * Hanya tampilkan trip dengan status 'available'
  * Format konsisten dengan get-profile.php
  * ============================================
  */
@@ -55,7 +57,8 @@ if ($id_user <= 0) {
 
 // Query database
 try {
-    // Query untuk mengambil trip yang pernah dibooking user dengan jumlah peserta
+    // Query untuk mengambil trip AKTIF yang pernah dibooking user
+    // PENTING: Tambahkan filter pt.status = 'available'
     $query = "
         SELECT 
             pt.id_trip,
@@ -83,6 +86,7 @@ try {
         WHERE 
             b.id_user = ?
             AND b.status IN ('confirmed', 'paid', 'pending')
+            AND pt.status = 'available'
         GROUP BY 
             pt.id_trip, b.id_booking
         ORDER BY 
@@ -103,11 +107,11 @@ try {
 
     $result = $stmt->get_result();
 
-    // Cek apakah ada trip
+    // Cek apakah ada trip aktif
     if ($result->num_rows === 0) {
         echo json_encode([
             'success' => true,
-            'message' => 'Tidak ada trip yang ditemukan',
+            'message' => 'Tidak ada trip aktif yang ditemukan',
             'data' => [],
             'total_trips' => 0,
             'received_id_user' => $id_user
@@ -121,7 +125,7 @@ try {
     $trips = [];
     
     while ($row = $result->fetch_assoc()) {
-        // Format gambar URL - PERBAIKAN DI SINI
+        // Format gambar URL
         $gambarUrl = '';
         if (!empty($row['gambar'])) {
             // Jika sudah full URL (dimulai dengan http)
@@ -147,7 +151,7 @@ try {
             'slot' => intval($row['slot'] ?? 0),
             'status' => $row['status'] ?? '',
             'gambar_url' => $gambarUrl,
-            'gambar_file' => $row['gambar'] ?? '', // Tambahan untuk debugging
+            'gambar_file' => $row['gambar'] ?? '',
             'id_booking' => intval($row['id_booking']),
             'booking_status' => $row['booking_status'] ?? '',
             'tanggal_booking' => $row['tanggal_booking'] ?? '',
@@ -161,11 +165,11 @@ try {
     // Format response
     $response = [
         'success' => true,
-        'message' => 'Data trip berhasil diambil',
+        'message' => 'Data trip aktif berhasil diambil',
         'data' => $trips,
         'total_trips' => count($trips),
         'id_user' => $id_user,
-        'base_url' => BASE_URL // Tambahan untuk debugging
+        'base_url' => BASE_URL
     ];
 
     echo json_encode($response);
