@@ -3,11 +3,11 @@
 // CONFIGURATION - SIMPLE VERSION
 // ========================================
 
-define('APP_MODE', 'NGROK'); // Pilih: 'LOCAL' | 'NGROK' | 'PRODUCTION'
+define('APP_MODE', 'LOCAL'); // Pilih: 'LOCAL' | 'NGROK' | 'PRODUCTION'
 
 const BASE_URL_MAP = [
     'LOCAL'      => 'http://localhost/majelismdpl.com',
-    'NGROK'      => 'https://98b453eb556d.ngrok-free.app',      // ← UBAH INI
+    // 'NGROK'      => 'https://98b453eb556d.ngrok-free.app',      // ← UBAH INI
     'PRODUCTION' => 'https://majelismdpl.com',                  // ← UBAH INI
 ];
 

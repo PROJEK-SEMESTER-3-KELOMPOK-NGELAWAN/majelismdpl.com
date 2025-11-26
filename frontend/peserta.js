@@ -175,19 +175,6 @@ class PesertaAPI {
         <td class="hide-col">${this.escapeHtml(p.tanggal_lahir || "")}</td>
         <td class="hide-col">${this.escapeHtml(p.tempat_lahir || "")}</td>
         <td class="hide-col">${this.escapeHtml(p.nik || "")}</td>
-        <td>${
-          p.foto_ktp
-            ? `<img src="${this.getImagePath(
-                p.foto_ktp
-              )}" alt="KTP" class="participant-photo"
-                  data-participant-id="${p.id_participant}"
-                  data-participant-name="${this.escapeHtml(p.nama || "")}"
-                  data-participant-nik="${this.escapeHtml(p.nik || "")}"
-                  title="Klik untuk melihat gambar lebih besar"
-                  onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
-                  <span class="opacity-50" style="display:none;">Gambar error</span>`
-            : '<span class="opacity-50">Tidak ada</span>'
-        }</td>
         <td>${this.escapeHtml(p.id_booking || "Belum booking")}
           ${
             p.nama_gunung

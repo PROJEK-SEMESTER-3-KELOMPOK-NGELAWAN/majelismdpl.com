@@ -352,19 +352,19 @@ $cacheBuster = '?' . time();
     font-weight: 600;
     border: none;
     color: #fff;
-    background: #b49666;
+    background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);
     text-decoration: none;
     transition: background 0.18s, color 0.17s, transform 0.2s;
     display: inline-block;
-    box-shadow: 0 2px 8px rgba(168, 100, 48, 0.06);
+    box-shadow: 0 4px 15px rgba(180, 150, 102, 0.3);
     outline: none;
     cursor: pointer;
   }
 
 
   .nav-btns .btn:hover {
-    background: #8b5e3c;
-    color: #fff;
+    background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
+    box-shadow: 0 6px 20px rgba(180, 150, 102, 0.4);
     transform: translateY(-2px);
   }
 

@@ -173,7 +173,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'all') {
         LEFT JOIN paket_trips t ON b.id_trip = t.id_trip
         LEFT JOIN payments pay ON b.id_booking = pay.id_booking
         WHERE b.status = 'confirmed' AND pay.status_pembayaran = 'paid'";
-    
+
     $types = '';
     $params = [];
 
@@ -445,7 +445,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'print_pdf') {
         LEFT JOIN paket_trips t ON b.id_trip = t.id_trip
         LEFT JOIN payments pay ON b.id_booking = pay.id_booking
         WHERE b.status = 'confirmed' AND pay.status_pembayaran = 'paid'";
-    
+
     $types = '';
     $params = [];
 
@@ -513,7 +513,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'print_pdf') {
     <th class="w-tgl">Tgl Lahir</th>
     <th class="w-tmp">Tmp Lahir</th>
     <th class="w-nik">NIK</th>
-    <th class="w-foto">Foto KTP</th>
     <th class="w-book">ID Booking</th>
     <th class="w-trip">Trip</th>
   </tr></thead><tbody>';
@@ -535,7 +534,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'print_pdf') {
                 '<td class="nowrap">' . htmlspecialchars((string)($r['tanggal_lahir'] ?? '')) . '</td>' .
                 '<td>' . htmlspecialchars((string)($r['tempat_lahir'] ?? '')) . '</td>' .
                 '<td class="nowrap">' . htmlspecialchars((string)($r['nik'] ?? '')) . '</td>' .
-                '<td>' . $ktpImg . '</td>' .
                 '<td class="nowrap">' . htmlspecialchars((string)($r['id_booking'] ?? '')) . '</td>' .
                 '<td>' . htmlspecialchars((string)($r['nama_gunung'] ?? '')) . '</td>' .
                 '</tr>';

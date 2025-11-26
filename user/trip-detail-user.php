@@ -215,7 +215,7 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             font-weight: 600;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: var(--accent-gold);
+            color: #b49666;
             margin-bottom: 1rem;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
@@ -231,7 +231,7 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
         }
 
         .btn-hero-wrapper {
-            margin-top: 2rem;
+            margin-top: 3rem;
             display: flex;
             gap: 1rem;
             justify-content: center;
@@ -240,18 +240,18 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
 
         .btn-hero {
             position: relative;
-            background: var(--accent-gold);
-            color: var(--tan-darkest);
+            background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);
+            color: white;
             padding: 1rem 2rem;
             font-weight: 800;
             font-size: clamp(0.8rem, 2vw, 1rem);
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.33, 1, 0.68, 1);
+            transition: background 0.18s, color 0.17s, transform 0.2s;
             border: none;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            box-shadow: 0 8px 32px rgba(255, 184, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(180, 150, 102, 0.3);
             overflow: hidden;
         }
 
@@ -259,7 +259,6 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(255, 255, 255, 0.25);
             opacity: 0;
             transition: opacity 0.4s;
         }
@@ -269,8 +268,9 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
         }
 
         .btn-hero:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(255, 184, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
+            box-shadow: 0 6px 20px rgba(180, 150, 102, 0.4);
+            transform: translateY(-2px);
         }
 
         .btn-hero:disabled {
@@ -609,7 +609,7 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
 
         .btn-warning-login {
             background: var(--accent-gold);
-            color: var(--tan-darkest);
+            color: white;
             box-shadow: 0 4px 20px rgba(255, 184, 0, 0.35);
         }
 
@@ -684,7 +684,7 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             overflow-y: auto;
             flex: 1;
         }
-        
+
         /* New style for the content sections inside modal */
         .modal-section {
             margin-bottom: 1.5rem;
@@ -698,13 +698,16 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             border-bottom: 1px solid rgba(208, 178, 140, 0.2);
             padding-bottom: 0.5rem;
         }
-        
+
         /* Override icon-list in modal for better icon */
         .modal-section .icon-list li i.bi-check-circle-fill {
-            color: #4CAF50; /* Green for SOP/Rules */
+            color: #4CAF50;
+            /* Green for SOP/Rules */
         }
+
         .modal-section .icon-list li i.bi-exclamation-triangle-fill {
-            color: #FFB800; /* Gold for S&K */
+            color: #FFB800;
+            /* Gold for S&K */
         }
 
 
@@ -768,8 +771,8 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
         }
 
         .btn-main-next {
-            background: var(--accent-gold);
-            color: var(--tan-darkest);
+            background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);
+            color: white;
             padding: 0.85rem 1.5rem;
             font-weight: 800;
             font-size: clamp(0.8rem, 2vw, 0.95rem);
@@ -779,7 +782,7 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             border: none;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            box-shadow: 0 4px 16px rgba(255, 184, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(180, 150, 102, 0.3);;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -787,8 +790,9 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
         }
 
         .btn-main-next:hover {
+            background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
+            box-shadow: 0 6px 20px rgba(180, 150, 102, 0.4);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 184, 0, 0.4);
         }
 
         .btn-main-next:disabled {
@@ -1191,17 +1195,20 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
                 top: -1px;
                 right: -1px;
             }
-            
+
             /* Pre-booking modal responsive adjustments */
             #preBookingModal .pre-booking-box {
                 max-width: 90%;
             }
+
             .pre-booking-header {
                 padding: 1.25rem;
             }
+
             .pre-booking-content {
                 padding: 1.25rem;
             }
+
             .pre-booking-footer {
                 padding: 1rem 1.25rem;
             }
@@ -1232,20 +1239,24 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             .whatsapp-button.expanded {
                 padding: 10px 16px;
             }
-            
+
             /* Pre-booking modal responsive adjustments */
             #preBookingModal .pre-booking-box {
                 max-height: 90vh;
             }
+
             .pre-booking-header {
                 padding: 1rem;
             }
+
             .pre-booking-content {
                 padding: 1rem;
             }
+
             .pre-booking-footer {
                 padding: 0.75rem 1rem;
             }
+
             .pre-booking-header h3 {
                 font-size: 1.1rem;
             }
@@ -1526,14 +1537,14 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             }
 
             // Konten sudah di-render langsung di HTML modal (di bagian PHP)
-            
+
             // Reset checkbox and button state
             document.getElementById('agreementCheckbox').checked = false;
             document.getElementById('nextStepBtn').disabled = true;
 
             document.getElementById('preBookingModal').classList.add('active');
             document.body.style.overflow = 'hidden';
-            
+
             // Fokuskan pada konten modal agar bisa di-scroll
             const contentArea = document.getElementById('preBookingContent');
             if (contentArea) contentArea.scrollTop = 0;
