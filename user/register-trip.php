@@ -295,16 +295,16 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
         }
 
         .slide-dot.active {
-            background: var(--accent-gold);
+            background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);;
             width: 24px;
             border-radius: 3px;
-            box-shadow: 0 0 10px rgba(255, 184, 0, 0.4);
+            box-shadow: 0 4px 15px rgba(180, 150, 102, 0.3);
         }
 
         .slide-nav-btn {
-            background: rgba(255, 184, 0, 0.15);
+            background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);
             border: 2px solid rgba(255, 184, 0, 0.3);
-            color: var(--accent-gold);
+            color: white;
             width: 32px;
             height: 32px;
             border-radius: 50%;
@@ -348,9 +348,9 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
 
         .btn-peserta-add,
         .btn-peserta-remove {
-            background: rgba(255, 184, 0, 0.15);
+            background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);
             border: 2px solid rgba(255, 184, 0, 0.3);
-            color: var(--accent-gold);
+            color: white;
             width: 28px;
             height: 28px;
             border-radius: 50%;
@@ -421,15 +421,16 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
             justify-content: center;
             gap: 0.4rem;
             min-height: 42px;
-            background: var(--accent-gold);
-            color: var(--tan-darkest);
-            box-shadow: 0 4px 16px rgba(255, 184, 0, 0.3);
+            background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(180, 150, 102, 0.3);
             flex: 1;
         }
 
         .btn-main:hover {
+            background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
+            box-shadow: 0 6px 20px rgba(180, 150, 102, 0.4);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 184, 0, 0.4);
         }
 
         .btn-main:active {
