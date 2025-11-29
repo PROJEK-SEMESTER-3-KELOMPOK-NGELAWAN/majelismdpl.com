@@ -3,7 +3,8 @@
 /**
  * ============================================
  * GET USER TRIP HISTORY API
- * Menampilkan riwayat trip user: trip paket_trips.status='done' YANG sudah dibooking user (join bookings)
+ * Menampilkan riwayat trip user yang sudah selesai
+ * HANYA trip dengan booking_status = 'confirmed'
  * ============================================
  */
 
@@ -49,27 +50,28 @@ if ($id_user <= 0) {
 }
 
 try {
+    // FIXED: Tambahkan filter b.status = 'confirmed'
     $query = "
-    SELECT 
-        b.id_booking, 
-        b.id_trip, 
-        b.status AS booking_status,
-        pt.nama_gunung, 
-        pt.tanggal, 
-        pt.durasi, 
-        pt.gambar,
-        pt.jenis_trip,
-        pt.status AS trip_status,
-        b.jumlah_orang,
-        b.total_harga,
-        pt.slot
-    FROM bookings b
-    JOIN paket_trips pt ON b.id_trip = pt.id_trip
-    WHERE b.id_user = ?
-    AND pt.status = 'done'
-    ORDER BY pt.tanggal DESC
-";
-
+        SELECT 
+            b.id_booking, 
+            b.id_trip, 
+            b.status AS booking_status,
+            pt.nama_gunung, 
+            pt.tanggal, 
+            pt.durasi, 
+            pt.gambar,
+            pt.jenis_trip,
+            pt.status AS trip_status,
+            b.jumlah_orang,
+            b.total_harga,
+            pt.slot
+        FROM bookings b
+        JOIN paket_trips pt ON b.id_trip = pt.id_trip
+        WHERE b.id_user = ?
+        AND b.status = 'confirmed'
+        AND pt.status = 'done'
+        ORDER BY pt.tanggal DESC
+    ";
 
     $stmt = $conn->prepare($query);
     if (!$stmt) throw new Exception("Gagal menyiapkan statement: " . $conn->error);
@@ -77,15 +79,10 @@ try {
     $stmt->bind_param("i", $id_user);
     if (!$stmt->execute()) throw new Exception("Gagal mengeksekusi query: " . $stmt->error);
 
-
     $result = $stmt->get_result();
 
     $history = [];
     while ($row = $result->fetch_assoc()) {
-        $imageUrl = '';
-        if (!empty($row['gambar'])) {
-            $imageUrl = BASE_URL . '/' . ltrim($row['gambar'], '/');
-        }
         $history[] = [
             'id_booking' => intval($row['id_booking']),
             'id_trip' => intval($row['id_trip']),
@@ -103,11 +100,22 @@ try {
     }
     $stmt->close();
 
-    echo json_encode([
-        'success' => true,
-        'message' => 'History trip berhasil diambil',
-        'data' => $history
-    ]);
+    // Better message untuk empty history
+    if (empty($history)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Belum ada riwayat trip yang selesai',
+            'data' => []
+        ]);
+    } else {
+        echo json_encode([
+            'success' => true,
+            'message' => 'History trip berhasil diambil',
+            'count' => count($history),
+            'data' => $history
+        ]);
+    }
+
 } catch (Exception $e) {
     echo json_encode([
         'success' => false,
@@ -116,3 +124,4 @@ try {
 }
 
 $conn->close();
+?>
