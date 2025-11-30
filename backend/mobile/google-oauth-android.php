@@ -1,39 +1,48 @@
 <?php
 session_start();
-require_once 'koneksi.php';
-require_once '../config.php';
+require_once '../koneksi.php';
+require_once '../../config.php';
+
 
 // ==================== CONFIGURATION ====================
 // Gunakan BASE_URL dari config.php
 $base_url_from_config = BASE_URL;
+
 
 // 🔵 DEVELOPMENT CONFIGURATION
 $is_production = strpos($base_url_from_config, 'localhost') === false &&
     strpos($base_url_from_config, 'ngrok') === false ? false : false;
 
 
+
 // OAuth Credentials
 $GOOGLE_CLIENT_ID = '330248433279-1dj4e4squfhatlfkcrqa149kobuftqq0.apps.googleusercontent.com';
 $GOOGLE_CLIENT_SECRET = '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';
 
+
 // ==================== ENVIRONMENT DETECTION ====================
 // Gunakan config.php untuk semua URL handling
 $base_url = BASE_URL . '/backend';
-$redirect_uri = $base_url . '/google-oauth-android.php';
+$redirect_uri = $base_url . '/mobile/google-oauth-android.php';
+
 
 error_log("OAUTH: Using BASE_URL from config.php: " . BASE_URL);
 error_log("OAUTH: Redirect URI = " . $redirect_uri);
+
 
 
 $google_oauth_client_id = $GOOGLE_CLIENT_ID;
 $google_oauth_client_secret = $GOOGLE_CLIENT_SECRET;
 $google_oauth_redirect_uri = $redirect_uri;
 
+
 // Debug: Log URL yang akan digunakan
 error_log("OAUTH CONFIG: Redirect URI = " . $redirect_uri);
 
+
 // Determine auth type
 $auth_type = $_GET['type'] ?? 'login';
+
 
 // Validasi credentials
 if (empty($google_oauth_client_id) || empty($google_oauth_client_secret)) {
@@ -47,6 +56,7 @@ if (empty($google_oauth_client_id) || empty($google_oauth_client_secret)) {
     exit;
 }
 
+
 // Step 1: Redirect to Google if no code
 if (!isset($_GET['code'])) {
     $params = [
@@ -59,19 +69,25 @@ if (!isset($_GET['code'])) {
         'state' => $auth_type
     ];
 
+
     $auth_url = 'https://accounts.google.com/o/oauth2/auth?' . http_build_query($params);
 
-    error_log("OAUTH: Redirecting to Google with ngrok URI: " . $google_oauth_redirect_uri);
+
+    error_log("OAUTH: Redirecting to Google with redirect URI: " . $google_oauth_redirect_uri);
+
 
     header('Location: ' . $auth_url);
     exit;
 }
 
+
 // Step 2: Handle callback from Google
 if (isset($_GET['code']) && !empty($_GET['code'])) {
     error_log("OAUTH: Received authorization code from Google");
 
+
     $auth_type = $_GET['state'] ?? 'login';
+
 
     // Exchange code for token
     $params = [
@@ -82,7 +98,9 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
         'grant_type' => 'authorization_code'
     ];
 
+
     error_log("OAUTH: Exchanging code for token with redirect_uri: " . $google_oauth_redirect_uri);
+
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, 'https://oauth2.googleapis.com/token');
@@ -93,10 +111,12 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
     $response = curl_exec($ch);
 
+
     if (curl_error($ch)) {
         $error = curl_error($ch);
         curl_close($ch);
         error_log("OAUTH ERROR: cURL error - " . $error);
+
 
         $params = http_build_query([
             'success' => '0',
@@ -107,17 +127,22 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
         exit;
     }
 
+
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
+
 
     error_log("OAUTH: Google token response HTTP code: " . $http_code);
     error_log("OAUTH: Google token response: " . $response);
 
+
     $response = json_decode($response, true);
+
 
     if (isset($response['error'])) {
         error_log("OAUTH ERROR: Token exchange failed - " . json_encode($response));
         $error_msg = $response['error_description'] ?? $response['error'] ?? 'Unknown error';
+
 
         $params = http_build_query([
             'success' => '0',
@@ -128,8 +153,10 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
         exit;
     }
 
+
     if (isset($response['access_token'])) {
         error_log("OAUTH: Successfully got access token");
+
 
         // Get user info
         $ch = curl_init();
@@ -141,9 +168,12 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
         $user_response = curl_exec($ch);
         curl_close($ch);
 
+
         $user_data = json_decode($user_response, true);
 
+
         error_log("OAUTH: User data received: " . json_encode($user_data));
+
 
         if (isset($user_data['email'])) {
             // Check if user exists
@@ -159,21 +189,28 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                 exit;
             }
 
+
             $stmt->bind_param("s", $user_data['email']);
             $stmt->execute();
             $result = $stmt->get_result();
 
+
             if ($result->num_rows > 0) {
                 // User exists - LOGIN
                 $user = $result->fetch_assoc();
-                error_log("OAUTH LOGIN SUCCESS: User=" . $user['username'] . ", Email=" . $user_data['email']);
+                error_log("OAUTH LOGIN SUCCESS: User=" . $user['username'] . ", Email=" . $user_data['email'] . ", ID=" . $user['id_user']);
 
+
+                // ============ PERBAIKAN: Tambahkan id_user di callback ============
                 $params = http_build_query([
                     'success' => '1',
+                    'id_user' => $user['id_user'],  // ← TAMBAHAN BARU
                     'username' => $user['username'],
                     'role' => $user['role'],
                     'message' => 'Login berhasil! Selamat datang ' . $user['username']
                 ]);
+                // ==================================================================
+
 
                 $redirect_url = "majelismdpl://oauth/callback?{$params}";
                 error_log("OAUTH: Redirecting to Android app: " . $redirect_url);
@@ -183,6 +220,7 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                 // User doesn't exist
                 if ($auth_type === 'login') {
                     error_log("OAUTH LOGIN FAILED: User not found - " . $user_data['email']);
+
 
                     $params = http_build_query([
                         'success' => '0',
@@ -194,9 +232,11 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                     $email = $user_data['email'];
                     $password = password_hash('google_oauth_' . uniqid(), PASSWORD_DEFAULT);
 
+
                     $stmt2 = $conn->prepare(
                         "INSERT INTO users (username, password, role, email, no_wa, alamat) VALUES (?, ?, 'user', ?, '', '')"
                     );
+
 
                     if (!$stmt2) {
                         error_log("OAUTH ERROR: Database prepare failed for insert - " . mysqli_error($conn));
@@ -207,17 +247,24 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                     } else {
                         $stmt2->bind_param("sss", $username, $password, $email);
 
+
                         if ($stmt2->execute()) {
-                            error_log("OAUTH SIGNUP SUCCESS: User=" . $username . ", Email=" . $email);
+                            // ============ PERBAIKAN: Ambil ID user yang baru dibuat ============
+                            $new_user_id = $conn->insert_id;
+                            error_log("OAUTH SIGNUP SUCCESS: User=" . $username . ", Email=" . $email . ", ID=" . $new_user_id);
+
 
                             $params = http_build_query([
                                 'success' => '1',
+                                'id_user' => $new_user_id,  // ← TAMBAHAN BARU
                                 'username' => $username,
                                 'role' => 'user',
                                 'message' => 'Registrasi berhasil! Selamat datang ' . $username
                             ]);
+                            // ====================================================================
                         } else {
                             error_log("OAUTH SIGNUP FAILED: Database execute error - " . mysqli_error($conn));
+
 
                             $params = http_build_query([
                                 'success' => '0',
@@ -227,6 +274,7 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
                         $stmt2->close();
                     }
                 }
+
 
                 $redirect_url = "majelismdpl://oauth/callback?{$params}";
                 error_log("OAUTH: Redirecting to Android app: " . $redirect_url);
@@ -255,6 +303,7 @@ if (isset($_GET['code']) && !empty($_GET['code'])) {
         exit;
     }
 }
+
 
 // Fallback error
 error_log("OAUTH FALLBACK ERROR: Reached end of script without processing");
