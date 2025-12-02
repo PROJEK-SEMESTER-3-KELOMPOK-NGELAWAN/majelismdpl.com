@@ -160,7 +160,7 @@ window.handleGoogleLogin = handleGoogleLogin;
 document.addEventListener("DOMContentLoaded", function () {
   const loginForm = document.querySelector("#loginModal form");
   
-  // Warna tombol/ikon/teks
+  // Warna tombol (Hanya dipakai untuk Error State)
   const PRIMARY_BUTTON_COLOR = "#a9865a"; 
   const SECONDARY_BUTTON_COLOR = "#6c757d"; 
 
@@ -182,59 +182,58 @@ document.addEventListener("DOMContentLoaded", function () {
         const result = await response.json();
 
         if (result.success) {
-          // ✅ LOGIN BERHASIL
+          // ============================================================
+          // ✅ 1. LOGIN BERHASIL
+          // ============================================================
+          
+          // Tutup modal login terlebih dahulu
           closeLoginModal();
 
-          if (typeof Swal !== "undefined") {
-            const username = result.username || formData.get("username");
+          // -----------------------------------------------------------
+          // PENTING: KITA LANGSUNG REDIRECT!
+          // Tidak ada Swal.fire() di sini. 
+          // Popup "Login Berhasil" akan muncul otomatis DI HALAMAN TUJUAN
+          // karena sudah diatur oleh backend (login-api.php).
+          // -----------------------------------------------------------
 
-            // SWEETALERT LOGIN BERHASIL (Menggunakan style CSS yang diinjeksi)
-            Swal.fire({
-              title: "Login Berhasil! 🎉",
-              html: `Selamat datang, ${username}!`,
-              icon: "success",
-              showConfirmButton: true,
-              confirmButtonText: "Lanjutkan",
-              confirmButtonColor: PRIMARY_BUTTON_COLOR, 
-              position: "center",
-              toast: false,
-              allowOutsideClick: false,
-              backdrop: true, 
-              customClass: {},
-            }).then(() => {
-              if (["admin", "super_admin"].includes(result.role)) {
-                window.location.href = getPageUrl("admin/index.php");
-              } else {
-                window.location.href = getPageUrl("index.php");
-              }
-            });
+          if (["admin", "super_admin"].includes(result.role)) {
+             window.location.href = getPageUrl("admin/index.php");
+          } else {
+             window.location.href = getPageUrl("index.php");
           }
-        } else {
-          // ✅ LOGIN GAGAL - Tampilkan SweetAlert Error
-          closeLoginModal();
 
-          const errorMessage =
-            result.message || "Username atau kata sandi salah.";
+        } else {
+          // ============================================================
+          // ❌ 2. LOGIN GAGAL (PASSWORD SALAH)
+          // ============================================================
+          // Untuk error, kita TETAP pakai JS Popup agar user tidak perlu refresh halaman
+          
+          closeLoginModal();
+          const errorMessage = result.message || "Username atau kata sandi salah.";
 
           setTimeout(() => {
             if (typeof Swal !== "undefined") {
-              // SWEETALERT LOGIN GAGAL (Menggunakan style CSS yang diinjeksi)
               Swal.fire({
-                title: "Login Gagal ⚠️",
-                html: errorMessage,
+                title: "Login Gagal",
+                text: errorMessage,
                 icon: "error",
                 confirmButtonText: "Coba Lagi",
-                confirmButtonColor: PRIMARY_BUTTON_COLOR, 
+                confirmButtonColor: PRIMARY_BUTTON_COLOR,
                 showCancelButton: true,
-                cancelButtonText: "Tutup",
-                cancelButtonColor: SECONDARY_BUTTON_COLOR, 
-                position: "center",
-                allowOutsideClick: true,
-                backdrop: true, 
-                customClass: {},
+                cancelButtonText: "Batal",
+                cancelButtonColor: SECONDARY_BUTTON_COLOR,
+                // Styling konsisten dengan tema
+                width: '400px',
+                padding: '2em',
+                background: '#fff',
+                backdrop: `rgba(0,0,0,0.5)`,
+                customClass: {
+                    popup: 'custom-theme-popup', 
+                    confirmButton: 'btn-swal-custom'
+                }
               }).then((action) => {
                 if (action.isConfirmed) {
-                  // Re-open login modal
+                  // Buka kembali modal login jika user ingin mencoba lagi
                   const loginModal = document.getElementById("loginModal");
                   if (loginModal && typeof openModal === "function") {
                     openModal(loginModal);
@@ -242,36 +241,27 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
               });
             } else {
-              // Fallback error
-              showLoginErrorModal(errorMessage);
+              alert(errorMessage);
             }
-          }, 350);
+          }, 300);
         }
       } catch (error) {
-        // ✅ ERROR SISTEM - Tampilkan SweetAlert Sistem Error
+        // ============================================================
+        // ⚠️ 3. ERROR SISTEM
+        // ============================================================
         closeLoginModal();
-
+        console.error("Login Error:", error);
+        
         setTimeout(() => {
-          if (typeof Swal !== "undefined") {
-            // SWEETALERT ERROR SISTEM (Menggunakan style CSS yang diinjeksi)
-            Swal.fire({
-              title: "Kesalahan Sistem ❌",
-              text: "Terjadi kesalahan. Coba lagi nanti.", 
-              icon: "error",
-              confirmButtonText: "Tutup",
-              confirmButtonColor: PRIMARY_BUTTON_COLOR, 
-              position: "center",
-              allowOutsideClick: true,
-              backdrop: true, 
-              customClass: {},
-            });
-          } else {
-            // Fallback system error
-            showLoginErrorModal(
-              "Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator."
-            );
-          }
-        }, 350);
+            if (typeof Swal !== "undefined") {
+                Swal.fire({
+                    title: "Terjadi Kesalahan",
+                    text: "Gagal terhubung ke server.",
+                    icon: "error",
+                    confirmButtonColor: PRIMARY_BUTTON_COLOR
+                });
+            }
+        }, 300);
       }
     });
   }

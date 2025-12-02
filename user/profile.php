@@ -351,6 +351,7 @@ $initials = strtoupper(substr($userData['username'], 0, 1));
 <body>
 
     <?php include '../navbar.php'; ?>
+    <?php include '../auth-modals.php'; ?>
 
     <div class="container pb-5">
         <div class="row g-4">

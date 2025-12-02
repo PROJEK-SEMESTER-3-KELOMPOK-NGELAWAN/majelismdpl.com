@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Query dengan data lengkap untuk mobile
+    // Query dengan data lengkap
     $stmt = $conn->prepare("SELECT id_user, username, password, role, email, no_wa, alamat, foto_profil FROM users WHERE username = ?");
     if (!$stmt) {
         echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
@@ -37,8 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
+
         if (password_verify($password, $user['password'])) {
-            // Set session variables
+            // 1. Set session variables standar
             $_SESSION['id_user'] = $user['id_user'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
@@ -53,9 +54,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
+            // ============================================================
+            // 2. SET FLASH MESSAGE UNTUK POPUP DI HALAMAN TUJUAN (BARU)
+            // ============================================================
+            // Data ini akan dibaca oleh flash_handler.php setelah redirect
+            $_SESSION['flash_swal'] = [
+                'type' => 'success',
+                'title' => 'Login Berhasil!',
+                'text' => 'Selamat datang kembali, ' . $user['username'],
+                'buttonText' => 'Lanjutkan'
+            ];
+            // ============================================================
+
             session_write_close();
 
-            // Response untuk mobile (dengan data user lengkap)
+            // Tentukan URL Redirect
             $redirect_url = '';
             switch ($user['role']) {
                 case 'super_admin':
@@ -68,12 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
             }
 
+            // Kirim Response JSON
             echo json_encode([
                 'success' => true,
                 'role' => $user['role'],
                 'username' => $user['username'],
                 'redirect_url' => $redirect_url,
-                'message' => 'Login berhasil sebagai ' . ucfirst(str_replace('_', ' ', $user['role'])),
+                'message' => 'Login berhasil',
                 'user' => [
                     'id_user' => $user['id_user'],
                     'username' => $user['username'],

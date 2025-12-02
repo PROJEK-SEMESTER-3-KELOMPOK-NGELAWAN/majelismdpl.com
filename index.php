@@ -30,6 +30,7 @@ session_start();
   <!-- Navbar -->
   <?php include 'navbar.php'; ?>
   <?php include 'auth-modals.php'; ?>
+  <?php include 'flash_handler.php'; ?>
 
   <!-- Hero -->
   <section class="hero-home" id="home">

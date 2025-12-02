@@ -716,40 +716,6 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             font-weight: 500;
         }
 
-        /* MODALS */
-        #preBookingModal,
-        #loginWarningModal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            background: rgba(78, 52, 46, 0.85);
-            backdrop-filter: blur(8px);
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        #preBookingModal.active,
-        #loginWarningModal.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .pre-booking-box,
-        .login-warning-container {
-            background: #fff;
-            width: 100%;
-            max-width: 600px;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(62, 39, 35, 0.3);
-            display: flex;
-            flex-direction: column;
-            max-height: 85vh;
-            position: relative;
-        }
-
         .pre-booking-header {
             background: var(--bg-body);
             padding: 1.5rem;
@@ -1006,6 +972,151 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
                 opacity: 1;
             }
         }
+
+        /* --- TARUH INI DI DALAM TAG <style> ANDA --- */
+
+        /* Kustomisasi Container Popup SweetAlert */
+        .swal2-popup.custom-theme-popup {
+            border-radius: 30px !important;
+            /* Sudut sangat membulat */
+            padding: 2.5rem 2rem !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2) !important;
+            /* Shadow lembut */
+        }
+
+        /* Menghilangkan border default pada actions */
+        .swal2-actions {
+            margin-top: 1.5rem !important;
+        }
+
+        /* Kustomisasi Ikon */
+        /* Kita akan membuat ikon custom menggunakan HTML, jadi kita style container-nya */
+        .swal-custom-icon-container {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            /* Warna emas/coklat tema */
+            border-radius: 50%;
+            /* Lingkaran penuh */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            /* Posisi tengah */
+            box-shadow: 0 10px 20px -5px rgba(156, 126, 92, 0.4);
+            /* Shadow lembut di bawah ikon */
+        }
+
+        .swal-custom-icon-container i {
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        /* Kustomisasi Judul dan Teks */
+        .swal-custom-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .swal-custom-text {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-body-gray);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Kustomisasi Tombol (PENTING) */
+        /* Kita matikan styling default SweetAlert dan gunakan class kita sendiri */
+        .btn-swal-custom {
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            /* Sudut tombol agak membulat */
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            /* Transisi halus untuk hover */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 0 0.5rem;
+            /* Jarak antar tombol */
+        }
+
+        /* Tombol Konfirmasi (Login) */
+        .btn-swal-confirm {
+            background-color: var(--primary) !important;
+            color: white !important;
+        }
+
+        /* Efek Hover Tombol Konfirmasi */
+        .btn-swal-confirm:hover {
+            background-color: var(--primary-dark) !important;
+            /* Warna lebih gelap saat hover */
+            transform: translateY(-3px);
+            /* Efek naik sedikit */
+            box-shadow: 0 8px 15px rgba(156, 126, 92, 0.3);
+        }
+
+        /* Tombol Batal */
+        .btn-swal-cancel {
+            background-color: #6c757d !important;
+            /* Warna abu-abu standard */
+            color: white !important;
+        }
+
+        /* Efek Hover Tombol Batal */
+        .btn-swal-cancel:hover {
+            background-color: #5a6268 !important;
+            /* Abu-abu lebih gelap */
+            transform: translateY(-3px);
+            /* Efek naik sedikit */
+            box-shadow: 0 8px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        /* MODALS */
+        /* Pastikan ID ini berdiri sendiri sekarang */
+        #preBookingModal {
+            display: none;
+            /* INI KUNCI UTAMANYA: Sembunyikan secara default */
+            position: fixed;
+            /* Agar melayang di atas konten lain */
+            inset: 0;
+            z-index: 10000;
+            background: rgba(78, 52, 46, 0.85);
+            /* Background gelap transparan */
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Class ini ditambahkan oleh Javascript saat tombol diklik */
+        #preBookingModal.active {
+            display: flex;
+            /* Ubah jadi flex agar muncul */
+            animation: fadeIn 0.3s ease;
+        }
+
+        .pre-booking-box {
+            background: #fff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(62, 39, 35, 0.3);
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+            position: relative;
+        }
+
+        /* ... sisa CSS di bawahnya (header, content, footer) sudah benar ... */
     </style>
 </head>
 
@@ -1179,18 +1290,6 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <div id="loginWarningModal">
-        <div class="login-warning-container" style="text-align: center; padding: 3rem 2rem;">
-            <div style="font-size: 4rem; color: var(--primary); margin-bottom: 1rem;"><i class="bi bi-lock-fill"></i></div>
-            <h2 style="margin-bottom: 1rem; color: var(--primary);">Login Diperlukan</h2>
-            <p style="color: var(--text-muted); margin-bottom: 2rem;">Anda harus masuk ke akun Anda untuk mendaftar trip ini.</p>
-            <div style="display: flex; gap: 1rem; justify-content: center;">
-                <button onclick="closeLoginWarning()" style="padding: 0.8rem 1.5rem; border: 1px solid #D7CCC8; background: white; color: var(--text-muted); border-radius: 8px; cursor: pointer; font-weight: 600;">Batal</button>
-                <button onclick="openLoginFromWarning()" style="padding: 0.8rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(156, 126, 92, 0.2);">Login Sekarang</button>
-            </div>
-        </div>
-    </div>
-
     <div id="preBookingModal">
         <div class="pre-booking-box">
             <button class="close-btn" onclick="closePreBookingModal()">&times;</button>
@@ -1237,35 +1336,73 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
     <script src="../frontend/registrasi.js"></script>
     <script src="../frontend/login.js"></script>
     <script>
+        // GANTI BAGIAN SCRIPT LAMA DENGAN INI
+
         const tripData = <?= $tripDetailsJson ?>;
         const isUserLoggedIn = <?= $isLogin ? 'true' : 'false' ?>;
         const registrationPageUrl = '<?= getPageUrl('user/register-trip.php') ?>';
 
+        // --- FUNGSI BARU MENGGUNAKAN SWEETALERT2 ---
         function showLoginWarning() {
-            document.getElementById('loginWarningModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
+            Swal.fire({
+                // Kita gunakan HTML kustom untuk struktur konten agar mirip desain target
+                html: `
+            <div class="swal-custom-content">
+                <div class="swal-custom-icon-container">
+                    <i class="bi bi-lock-fill"></i> </div>
+                <h2 class="swal-custom-title">Login Diperlukan</h2>
+                <p class="swal-custom-text">Anda harus masuk ke akun Anda untuk mendaftar trip ini.</p>
+            </div>
+        `,
+                showCancelButton: true,
+                confirmButtonText: 'Login Sekarang',
+                cancelButtonText: 'Batal',
+                reverseButtons: true, // Tombol konfirmasi di kanan, batal di kiri (opsional)
+
+                // PENTING: Set ke false agar kita bisa pakai CSS class kita sendiri untuk tombol
+                buttonsStyling: false,
+
+                // Terapkan class CSS kustom yang sudah kita buat di atas
+                customClass: {
+                    popup: 'custom-theme-popup',
+                    confirmButton: 'btn-swal-custom btn-swal-confirm',
+                    cancelButton: 'btn-swal-custom btn-swal-cancel'
+                },
+                // Backdrop gelap transparan
+                backdrop: `rgba(0, 0, 0, 0.6)`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Aksi jika tombol "Login Sekarang" diklik
+                    openLoginFromWarning();
+                }
+            });
         }
 
+        // Fungsi closeLoginWarning tidak lagi diperlukan karena SweetAlert menanganinya otomatis, 
+        // tapi jika ada pemanggilan lain, biarkan kosong atau hapus.
         function closeLoginWarning() {
-            document.getElementById('loginWarningModal').classList.remove('active');
-            document.body.style.overflow = '';
+            Swal.close();
         }
 
         function openLoginFromWarning() {
-            closeLoginWarning();
+            // Tidak perlu memanggil closeLoginWarning() manual karena Swal otomatis close setelah klik confirm
             const loginModal = document.getElementById('loginModal');
             if (loginModal) {
                 loginModal.style.display = 'flex';
-                loginModal.classList.add('open');
+                setTimeout(() => {
+                    loginModal.classList.add('open');
+                }, 10); // Sedikit delay agar transisi CSS berjalan halus
                 document.body.style.overflow = 'hidden';
             }
         }
 
+        // --- SISA SCRIPT LAIN TETAP SAMA ---
         function showPreBookingModal() {
             if (!isUserLoggedIn) {
                 showLoginWarning();
                 return;
             }
+            // ... kode prebooking modal selanjutnya ...
             document.getElementById('agreementCheckbox').checked = false;
             document.getElementById('nextStepBtn').disabled = true;
             document.getElementById('preBookingModal').classList.add('active');

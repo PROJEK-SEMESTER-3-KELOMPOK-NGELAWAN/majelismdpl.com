@@ -58,6 +58,7 @@
         font-size: 28px;
         font-weight: bold;
         color: #fff;
+        background: transparent;
         cursor: pointer;
         z-index: 10;
         text-decoration: none;

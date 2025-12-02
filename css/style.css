@@ -120,28 +120,6 @@ section.gallery-cardstyle {
   padding: 12px 40px;
 }
 
-/* Logo dengan animasi float */
-.navbar-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: floatAnimation 3s ease-in-out infinite;
-}
-
-.logo-img {
-  height: 50px;
-  width: auto;
-  margin-right: 8px;
-  object-fit: contain;
-  display: inline-block;
-  vertical-align: middle;
-  transition: transform 0.3s ease;
-}
-
-.logo-img:hover {
-  transform: rotate(360deg) scale(1.1);
-}
-
 /* Menu navigasi dengan efek lebih halus */
 .navbar-menu {
   list-style: none;

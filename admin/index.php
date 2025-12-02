@@ -883,6 +883,7 @@ $displayName = ($display_username && $display_username !== 'root' && $display_us
 <body>
 
   <?php include 'sidebar.php'; ?>
+  <?php include '../flash_handler.php'; ?>
 
   <main class="main">
     <div class="main-header">
