@@ -1,7 +1,7 @@
 <?php
 require_once '../config.php';
-
 session_start();
+
 if (!isset($_SESSION['id_user'])) {
     header('Location: ' . getPageUrl('index.php'));
     exit;
@@ -11,32 +11,11 @@ $navbarPath = '../';
 require_once '../backend/koneksi.php';
 $id_user = $_SESSION['id_user'];
 
-/*
- Ambil data booking + status trip aktual:
- - status_booking: status proses booking user (pending/paid/cancelled/finished/confirmed)
- - status_pembayaran: paid/unpaid (payments)
- - status_trip: status paket dari admin (available/sold/done)
-*/
+// Query data booking
 $query = "SELECT 
-            b.id_booking,
-            b.id_trip,
-            b.jumlah_orang,
-            b.total_harga,
-            b.tanggal_booking,
-            b.status AS status_booking,
-            t.nama_gunung,
-            t.jenis_trip,
-            t.tanggal AS tanggal_trip,
-            t.durasi,
-            t.via_gunung,
-            t.gambar,
-            t.status AS status_trip,
-            d.nama_lokasi,
-            d.waktu_kumpul,
-            d.link_map,
-            d.include,
-            d.exclude,
-            d.syaratKetentuan,
+            b.id_booking, b.id_trip, b.jumlah_orang, b.total_harga, b.tanggal_booking, b.status AS status_booking,
+            t.nama_gunung, t.jenis_trip, t.tanggal AS tanggal_trip, t.durasi, t.via_gunung, t.gambar, t.status AS status_trip,
+            d.nama_lokasi, d.waktu_kumpul, d.link_map, d.include, d.exclude, d.syaratKetentuan,
             p.status_pembayaran
           FROM bookings b
           JOIN paket_trips t ON b.id_trip = t.id_trip
@@ -54,9 +33,8 @@ $myTrips = [];
 while ($row = $result->fetch_assoc()) {
     $statusBookingRaw = strtolower(trim($row['status_booking'] ?? ''));
     $statusPembayaran = strtolower(trim($row['status_pembayaran'] ?? ''));
-    $statusTripRaw       = strtolower(trim($row['status_trip'] ?? ''));
+    $statusTripRaw    = strtolower(trim($row['status_trip'] ?? ''));
 
-    // Status Booking (tidak dipaksa jadi selesai)
     if ($statusBookingRaw === 'finished') {
         $finalBookingStatus = 'finished';
     } elseif ($statusBookingRaw === 'cancelled') {
@@ -69,193 +47,136 @@ while ($row = $result->fetch_assoc()) {
         $finalBookingStatus = 'pending';
     }
 
-    // Status Trip (hanya 'done' yang ditandai di UI)
     $finalTripStatus = in_array($statusTripRaw, ['available', 'sold', 'done'], true) ? $statusTripRaw : 'available';
 
-    // Gambar
     $imagePath = $navbarPath . 'img/default-mountain.jpg';
     if (!empty($row['gambar'])) {
-        $imagePath = (strpos($row['gambar'], 'img/') === 0)
-            ? $navbarPath . $row['gambar']
-            : $navbarPath . 'img/' . $row['gambar'];
+        $imagePath = (strpos($row['gambar'], 'img/') === 0) ? $navbarPath . $row['gambar'] : $navbarPath . 'img/' . $row['gambar'];
     }
 
-    // Tentukan status pembayaran untuk diparse di JavaScript
-    $paymentStatusForJS = $row['status_pembayaran'] ?? ($finalBookingStatus === 'paid' ? 'settlement' : ($finalBookingStatus === 'cancelled' ? 'cancel' : 'pending'));
-
-
-    $myTrips[] = [
-        'id_booking'       => $row['id_booking'],
-        'id_trip'           => $row['id_trip'],
-        'nama_gunung'       => $row['nama_gunung'],
-        'jenis_trip'       => $row['jenis_trip'],
-        'tanggal_trip'       => $row['tanggal_trip'],
-        'durasi'           => $row['durasi'] ?? '1 hari',
-        'via_gunung'       => $row['via_gunung'] ?? 'Via Utama',
-        'nama_lokasi'       => $row['nama_lokasi'] ?? 'Lokasi belum ditentukan',
-        'tanggal_booking' => $row['tanggal_booking'],
-        'jumlah_orang'       => $row['jumlah_orang'],
-        'total_harga'       => $row['total_harga'],
-        'status_booking'  => $finalBookingStatus,
-        'status_trip'       => $finalTripStatus,
-        'gambar'           => $imagePath,
-        'include'           => $row['include'] ?? 'Informasi akan diperbarui',
-        'exclude'           => $row['exclude'] ?? 'Informasi akan diperbarui',
-        'syaratKetentuan' => $row['syaratKetentuan'] ?? 'Informasi akan diperbarui',
-        'waktu_kumpul'       => $row['waktu_kumpul'] ?? '00:00',
-        'link_map'           => $row['link_map'] ?? '#',
-        'status_pembayaran' => $paymentStatusForJS // Kirim status pembayaran yang relevan
-    ];
+    $myTrips[] = array_merge($row, [
+        'status_booking' => $finalBookingStatus,
+        'status_trip' => $finalTripStatus,
+        'gambar' => $imagePath
+    ]);
 }
 $stmt->close();
 
-// Statistik header:
+// Statistik
 $totalTrips     = count($myTrips);
-$pendingCount     = count(array_filter($myTrips, fn($t) => strtolower($t['status_booking']) === 'pending'));
-$paidCount         = count(array_filter($myTrips, fn($t) => strtolower($t['status_booking']) === 'paid' || strtolower($t['status_booking']) === 'confirmed'));
-$finishedCount     = count(array_filter($myTrips, fn($t) => strtolower($t['status_trip']) === 'done'));
-
-/**
- * FUNGSI INI HANYA UNTUK MERENDER STATUS PEMBAYARAN DI DALAM MODAL
- * (Karena kita ingin tampilan modal sama dengan payment-status.php)
- */
-function format_status_detail($status)
-{
-    $s = strtolower($status ?? '');
-
-    $status_data = [
-        'text' => 'DIBATALKAN',
-        'color' => '#c62828',
-        'icon' => '<i class="fa-solid fa-times-circle"></i>'
-    ];
-
-    if ($s === 'paid' || $s === 'settlement' || $s === 'confirmed') {
-        $status_data['text'] = 'PEMBAYARAN DITERIMA';
-        $status_data['color'] = '#2e7d32';
-        $status_data['icon'] = '<i class="fa-solid fa-check-circle"></i>';
-    } elseif ($s === 'pending') {
-        $status_data['text'] = 'MENUNGGU PEMBAYARAN';
-        $status_data['color'] = '#e65100';
-        $status_data['icon'] = '<i class="fa-solid fa-hourglass-half"></i>';
-    } elseif ($s === 'expire') {
-        $status_data['text'] = 'SUDAH KEDALUWARSA';
-        $status_data['color'] = '#ad1457';
-        $status_data['icon'] = '<i class="fa-solid fa-clock-rotate-left"></i>';
-    } elseif ($s === 'cancelled' || $s === 'cancel' || $s === 'failed') {
-        $status_data['text'] = 'DIBATALKAN';
-        $status_data['color'] = '#dc3545';
-        $status_data['icon'] = '<i class="fa-solid fa-ban"></i>';
-    }
-
-    return "<span style='color:{$status_data['color']};font-weight:700;'>{$status_data['icon']} {$status_data['text']}</span>";
-}
+$pendingCount   = count(array_filter($myTrips, fn($t) => strtolower($t['status_booking']) === 'pending'));
+$paidCount      = count(array_filter($myTrips, fn($t) => in_array(strtolower($t['status_booking']), ['paid', 'confirmed'])));
+$finishedCount  = count(array_filter($myTrips, fn($t) => strtolower($t['status_trip']) === 'done'));
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trip Saya - Majelis MDPL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <title>Trip Saya | Majelis MDPL</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
+        :root {
+            --primary: #9C7E5C;
+            --primary-dark: #7B5E3A;
+            --primary-soft: #EFEBE9;
+            --bg-page: #FDFBF9;
+            --surface: #FFFFFF;
+            --text-main: #374151;
+            --text-muted: #9CA3AF;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+        }
+
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8dcc4 100%);
+            font-family: 'Poppins', sans-serif !important;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            padding-top: 120px;
             min-height: 100vh;
-            padding-top: 80px
+        }
+
+        .navbar {
+            font-family: 'Poppins', sans-serif !important;
+        }
+
+        .fa,
+        .fas,
+        .fa-solid,
+        .fa-regular,
+        .fa-brands {
+            font-family: "Font Awesome 6 Free" !important;
+            font-weight: 900;
+        }
+
+        .page-decor::before {
+            content: '';
+            position: absolute;
+            top: -120px;
+            left: 0;
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(180deg, #F3ECE7 0%, rgba(253, 251, 249, 0) 100%);
+            z-index: -1;
+            pointer-events: none;
         }
 
         .container {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 20px 15px
+            padding: 0 20px 60px;
+            position: relative;
+            z-index: 2;
         }
 
-        /* Header */
-        .header {
-            background: rgba(255, 255, 255, .95);
-            backdrop-filter: blur(20px);
-            border-radius: 18px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 2px solid rgba(169, 124, 80, .2);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, .08)
+        /* --- STATS --- */
+        .stats-section {
+            margin-bottom: 40px;
         }
 
-        .title {
-            font-size: 1.6rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #3D2F21 0%, #a97c50 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 6px;
+        .stats-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 12px
+            gap: 8px;
         }
 
-        .title i {
-            background: linear-gradient(135deg, #ffb800 0%, #a97c50 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.8rem
-        }
-
-        .subtitle {
-            font-size: .85rem;
-            color: #6B5847;
-            margin-bottom: 20px;
-            font-weight: 500
-        }
-
-        /* Stats */
-        .stats {
+        .stats-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px
+            gap: 15px;
         }
 
-        .stat {
-            background: linear-gradient(135deg, rgba(255, 255, 255, .8) 0%, rgba(255, 255, 255, .95) 100%);
-            border-radius: 12px;
-            padding: 16px 12px;
+        .stat-box {
+            background: var(--surface);
+            padding: 20px 15px;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 4px 20px rgba(156, 126, 92, 0.06);
+            border: 1px solid rgba(156, 126, 92, 0.1);
             text-align: center;
-            border: 2px solid rgba(169, 124, 80, .25);
-            transition: all .4s cubic-bezier(.34, 1.56, .64, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, .06)
+            transition: transform 0.2s;
         }
 
-        .stat::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .4), transparent);
-            transition: left .5s
-        }
-
-        .stat:hover::before {
-            left: 100%
-        }
-
-        .stat:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(169, 124, 80, .2);
-            border-color: rgba(169, 124, 80, .4)
+        .stat-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(156, 126, 92, 0.1);
         }
 
         .stat-icon {
@@ -265,715 +186,612 @@ function format_status_detail($status)
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
-            margin: 0 auto 10px;
-            transition: all .3s ease
+            margin: 0 auto 8px;
+            font-size: 1.1rem;
         }
 
-        .stat:hover .stat-icon {
-            transform: scale(1.1) rotate(-5deg)
+        .stat-box.total .stat-icon {
+            background: #EFEBE9;
+            color: #8D6E63;
         }
 
-        .stat.total .stat-icon {
-            background: linear-gradient(135deg, rgba(169, 124, 80, .15) 0%, rgba(212, 165, 116, .2) 100%);
-            color: #a97c50
+        .stat-box.pending .stat-icon {
+            background: #FFF8E1;
+            color: #FFA000;
         }
 
-        .stat.pending .stat-icon {
-            background: linear-gradient(135deg, rgba(255, 193, 7, .15) 0%, rgba(255, 193, 7, .2) 100%);
-            color: #ffc107
+        .stat-box.paid .stat-icon {
+            background: #E8F5E9;
+            color: #43A047;
         }
 
-        .stat.paid .stat-icon {
-            background: linear-gradient(135deg, rgba(40, 167, 69, .15) 0%, rgba(40, 167, 69, .2) 100%);
-            color: #28a745
+        .stat-box.done .stat-icon {
+            background: #ECEFF1;
+            color: #546E7A;
         }
 
-        .stat.finished .stat-icon {
-            background: linear-gradient(135deg, rgba(108, 117, 125, .15) 0%, rgba(108, 117, 125, .2) 100%);
-            color: #6c757d
-        }
-
-        .stat-value {
-            font-size: 1.6rem;
+        .stat-num {
+            font-size: 1.5rem;
             font-weight: 800;
-            color: #3D2F21;
+            color: var(--text-main);
             line-height: 1;
-            margin-bottom: 4px
         }
 
         .stat-label {
-            font-size: .7rem;
-            color: #6B5847;
+            font-size: 0.7rem;
             font-weight: 600;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: .5px
+            letter-spacing: 0.5px;
+            margin-top: 4px;
         }
 
-        /* Grid kartu */
+        /* --- CARD STYLE (SHADOW KOTAK) --- */
         .section-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: #3D2F21;
-            margin: 25px 0 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            padding-left: 12px;
+            border-left: 4px solid var(--primary);
         }
 
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 2px;
-            background: linear-gradient(90deg, rgba(169, 124, 80, .3), transparent)
-        }
-
-        .grid {
+        .trips-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
         }
 
-        .card {
-            background: rgba(255, 255, 255, .95);
-            backdrop-filter: blur(15px);
-            border-radius: 16px;
+        .trip-card {
+            background: var(--surface);
+            border-radius: 20px;
             overflow: hidden;
-            border: 1px solid rgba(169, 124, 80, .15);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
-            transition: all .4s cubic-bezier(.34, 1.56, .64, 1);
-            position: relative
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            /* Shadow Tegas */
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
-        .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
-            border-color: rgba(169, 124, 80, .3)
+        .trip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(156, 126, 92, 0.15);
         }
 
-        .card-img {
-            height: 170px;
-            background-size: cover;
-            background-position: center;
-            position: relative
+        .trip-img-box {
+            height: 180px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .card-img::before {
-            content: '';
+        .trip-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+        .trip-card:hover .trip-img-box img {
+            transform: scale(1.05);
+        }
+
+        .status-badge {
             position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, .7) 100%)
-        }
-
-        /* Badge status booking (atas kanan) */
-        .badge {
-            position: absolute;
-            top: 10px;
-            padding: 5px 12px;
-            border-radius: 15px;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.7rem;
             font-weight: 700;
-            font-size: .7rem;
             text-transform: uppercase;
-            letter-spacing: .5px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
-            z-index: 2;
             display: flex;
             align-items: center;
             gap: 5px;
-            white-space: nowrap;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .badge-status {
-            right: 10px;
+        .status-badge.pending {
+            color: #F59E0B;
         }
 
-        .badge-status i {
-            font-size: 0.8rem;
+        .status-badge.paid {
+            color: #10B981;
         }
 
-        .status-pending {
-            background: linear-gradient(135deg, #ffc107 0%, #ffb800 100%);
-            color: #333
+        .status-badge.cancelled {
+            color: #EF4444;
         }
 
-        .status-paid,
-        .status-confirmed {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: #fff
+        .status-badge.finished {
+            color: #6B7280;
         }
 
-        .status-cancelled {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: #fff
-        }
-
-        .status-finished {
-            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-            color: #fff
-        }
-
-        /* Overlay stempel DONE (hanya saat status_trip=done) */
-        .done-stamp {
-            position: absolute;
-            z-index: 3;
-            top: 52%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            width: min(72%, 340px);
-            opacity: .9;
-            pointer-events: none;
-            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .25));
-        }
-
-        .card-body {
-            padding: 16px
-        }
-
-        /* Tata Letak Judul & Tanggal */
-        .card-header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 6px;
-        }
-
-        .card-title {
-            font-size: 1.08rem;
-            font-weight: 800;
-            color: #3D2F21;
-            line-height: 1.28;
-            margin: 0;
-            flex-grow: 1;
-        }
-
-        .card-date {
-            font-size: .8rem;
-            font-weight: 600;
-            color: #3D2F21;
-            white-space: nowrap;
-            padding-left: 10px;
-            text-align: right;
-        }
-
-        .card-date i {
-            margin-right: 4px;
-            color: #d4a574;
-        }
-
-        .card-via {
-            color: #6B5847;
-            font-size: .8rem;
-            margin-bottom: 12px;
-            font-weight: 500
-        }
-
-        .card-meta {
+        .trip-body {
+            padding: 20px;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 14px;
-            padding: 12px;
-            background: linear-gradient(135deg, rgba(169, 124, 80, .05) 0%, rgba(212, 165, 116, .08) 100%);
-            border-radius: 12px;
-            border: 1px solid rgba(169, 124, 80, .1)
+        }
+
+        .trip-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        .trip-date {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .trip-date i {
+            color: var(--primary);
+        }
+
+        .trip-meta {
+            display: flex;
+            gap: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #EEE;
+            margin-bottom: 15px;
         }
 
         .meta-item {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: .8rem;
-            color: #6B5847
+            flex-direction: column;
+            gap: 2px;
         }
 
-        .meta-item i {
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 6px;
-            background: rgba(169, 124, 80, .12);
-            color: #a97c50;
-            font-size: .72rem
-        }
-
-        .meta-item strong {
-            color: #3D2F21;
-            font-weight: 700
-        }
-
-        .meta-item.type-badge strong {
-            font-weight: 700;
-            background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .meta-lbl {
+            font-size: 0.65rem;
             text-transform: uppercase;
-            font-size: 0.8rem;
-        }
-
-        .actions {
-            display: flex;
-            gap: 8px
-        }
-
-        .btn {
-            flex: 1;
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: .78rem;
-            font-weight: 800;
-            text-decoration: none;
-            text-align: center;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            transition: all .3s ease
-        }
-
-        .btn-detail {
-            background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
-            color: #fff;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, .2)
-        }
-
-        .btn-detail:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 18px rgba(0, 0, 0, .3)
-        }
-
-        .btn-payment {
-            background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
-            color: #fff;
-            box-shadow: 0 3px 12px rgba(169, 124, 80, .3)
-        }
-
-        .btn-payment:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 18px rgba(169, 124, 80, .5)
-        }
-
-        /* ----------------------------------------------------- */
-        /* CSS KHUSUS UNTUK TAMPILAN MODAL DETAIL (dari payment-status.php) */
-
-        .swal2-popup {
-            font-size: 0.85rem !important;
-            padding: 0 !important;
-            max-width: 700px !important;
-            width: 90% !important;
-            border-radius: 15px !important;
-        }
-
-        .swal2-title {
-            background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
-            color: #fff !important;
-            padding: 18px 25px !important;
-            margin: 0 !important;
-            font-size: 1.2rem !important;
-            font-weight: 700 !important;
-            border-radius: 15px 15px 0 0 !important;
-        }
-
-        .swal2-html-container {
-            max-height: 60vh !important;
-            overflow-y: auto !important;
-            margin: 0 !important;
-            padding: 20px 25px !important;
-        }
-
-        .info-group-modal {
-            margin-bottom: 15px;
-            border: 1px solid rgba(169, 124, 80, 0.12);
-            border-radius: 12px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        .info-group-modal h4 {
-            color: #3D2F21;
-            margin-bottom: 12px;
-            font-weight: 700;
-            font-size: 1rem;
-            border-bottom: 2px solid rgba(169, 124, 80, 0.12);
-            padding-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-row-modal {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            font-size: 0.8rem;
-            border-bottom: 1px dashed rgba(169, 124, 80, 0.08);
-        }
-
-        .info-row-modal:last-child {
-            border-bottom: none;
-        }
-
-        .info-row-modal span {
-            color: #6B5847;
-        }
-
-        .info-row-modal strong {
-            color: #3D2F21;
+            color: #9CA3AF;
             font-weight: 600;
         }
 
-        .price-total-modal {
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, #ffb800 0%, #a97c50 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-            font-weight: 800;
+        .meta-val {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
         }
 
-        .btn-map-modal {
-            background: linear-gradient(135deg, #000 0%, #4a4a4a 100%);
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
-            text-transform: uppercase;
-        }
-
-        /* ----------------------------------------------------- */
-
-        /* CSS BARU untuk Empty State (Menggunakan Ikon dengan Gaya Ilustrasi) */
-        .empty {
+        .trip-footer {
+            margin-top: auto;
             display: flex;
-            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-card {
+            flex: 1;
+            padding: 10px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
             align-items: center;
             justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary-soft);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-soft);
+            color: var(--primary-dark);
+        }
+
+        .btn-fill {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-fill:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 10px rgba(156, 126, 92, 0.25);
+        }
+
+        .empty-state {
             text-align: center;
             padding: 60px 20px;
-            background: rgba(255, 255, 255, .95);
-            backdrop-filter: blur(15px);
-            border-radius: 18px;
-            margin-top: 30px;
-            border: 2px solid rgba(169, 124, 80, .2);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, .08);
+            background: var(--surface);
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 2px dashed #E0E0E0;
         }
 
-        /* Gaya Ikon Besar */
-        .empty .empty-icon {
-            font-size: 6rem;
-            /* Ikon sangat besar */
-            margin-bottom: 25px;
-            /* Gunakan gradien yang sama dengan elemen penting lainnya */
-            background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 4px 8px rgba(169, 124, 80, 0.4));
-            /* Efek shadow untuk menonjolkan */
+        .empty-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            opacity: 0.5;
+            margin-bottom: 20px;
         }
 
-        .empty h2 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #3D2F21;
-            margin-bottom: 10px;
-            line-height: 1.3;
-        }
-
-        .empty p {
-            font-size: 1rem;
-            color: #6B5847;
-            margin-bottom: 35px;
-            max-width: 500px;
-            line-height: 1.6;
-        }
-
-        /* Tombol Coklat/Emas/Orange */
         .btn-explore {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 14px 30px;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 700;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50px;
+            font-weight: 600;
             text-decoration: none;
-            color: #fff;
-            background: linear-gradient(135deg, #a97c50 100%, #e6a700 0%);
-            /* Coklat ke Emas/Orange */
-            box-shadow: 0 5px 18px rgba(169, 124, 80, .4);
-            transition: all .3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
+            transition: 0.3s;
         }
 
         .btn-explore:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(169, 124, 80, .6);
-            background: linear-gradient(135deg, #d4a574 100%, #ffc107 0%);
+            background: var(--primary-dark);
+            transform: translateY(-2px);
         }
 
-        /* Akhir CSS BARU untuk Empty State */
-
-
-        /* Responsif */
-        @media (max-width: 768px) {
-            body {
-                padding-top: 70px
+        @media (max-width: 600px) {
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
             }
 
-            .container {
-                padding: 15px 10px
+            .trips-grid {
+                grid-template-columns: 1fr;
             }
 
-            .stats {
-                grid-template-columns: repeat(2, 1fr)
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
             }
 
-            .grid {
-                grid-template-columns: 1fr
-            }
-
-            .card-img {
-                height: 180px
-            }
-
-            .done-stamp {
-                width: min(78%, 320px);
-                top: 54%
-            }
-
-            .empty h2 {
-                font-size: 1.5rem;
-            }
-
-            .empty p {
-                font-size: 0.9rem;
-            }
-
-            .empty .empty-icon {
-                font-size: 5rem;
-            }
-
-            .btn-explore {
-                padding: 12px 25px;
-                font-size: 0.9rem;
+            .info-item {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
             }
         }
 
-        @media (min-width: 769px) and (max-width: 1200px) {
-            .container {
-                max-width: 1000px
-            }
-
-            .grid {
-                grid-template-columns: repeat(2, 1fr)
-            }
-
-            .done-stamp {
-                width: min(74%, 330px)
-            }
+        /* =========================================
+           POPUP STYLE (SMALL & COMPACT TICKET)
+           ========================================= */
+        .swal2-popup.small-ticket-popup {
+            width: 380px !important;
+            /* UKURAN KECIL (COMPACT) */
+            max-width: 90vw !important;
+            padding: 0 !important;
+            border-radius: 16px !important;
+            font-family: 'Poppins', sans-serif !important;
         }
 
-        @media (min-width: 1201px) {
-            .grid {
-                grid-template-columns: repeat(3, 1fr)
-            }
+        .st-header {
+            padding: 20px 20px 10px;
+            text-align: center;
+            background: #fff;
+        }
+
+        .st-icon {
+            width: 50px;
+            height: 50px;
+            background: #9C7E5C;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin: 0 auto 10px;
+            box-shadow: 0 4px 10px rgba(156, 126, 92, 0.2);
+        }
+
+        .st-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .st-pill {
+            background: #F3F4F6;
+            color: #6B7280;
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .st-divider {
+            border-bottom: 2px dashed #EEE;
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .st-body {
+            padding: 5px 25px 25px;
+            text-align: left;
+        }
+
+        .st-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+
+        .st-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .st-lbl {
+            text-transform: uppercase;
+            color: #9CA3AF;
+            font-weight: 600;
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+        }
+
+        .st-val {
+            font-weight: 600;
+            color: #374151;
+            text-align: right;
+            font-size: 0.85rem;
+        }
+
+        .st-val.highlight {
+            color: #9C7E5C;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .st-val.danger {
+            color: #DC2626;
+        }
+
+        .st-mp-box {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            background: #FAFAFA;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px dashed #DDD;
+        }
+
+        .st-mp-title {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .st-mp-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .btn-maps-small {
+            display: flex;
+            width: 100%;
+            padding: 10px;
+            background: #9C7E5C;
+            color: white;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-decoration: none;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+
+        .btn-maps-small:hover {
+            background: #7B5E3A;
+            box-shadow: 0 4px 12px rgba(156, 126, 92, 0.3);
+        }
+
+        .swal2-close {
+            color: #ccc !important;
+            font-size: 2rem !important;
+            top: 10px !important;
+            right: 10px !important;
+            box-shadow: none !important;
+        }
+
+        .swal2-close:hover {
+            color: #d33 !important;
+            background: transparent !important;
         }
     </style>
 </head>
 
 <body>
+
     <?php include '../navbar.php'; ?>
     <?php include '../auth-modals.php'; ?>
 
-    <div class="container">
-        <div class="header">
-            <h1 class="title"><i class="fa-solid fa-mountain-sun"></i><span>Trip Saya</span></h1>
-            <p class="subtitle">Kelola pemesanan petualangan pendakian Anda</p>
-            <div class="stats">
-                <div class="stat total">
-                    <div class="stat-icon"><i class="fa-solid fa-mountain"></i></div>
-                    <div class="stat-value"><?= $totalTrips ?></div>
-                    <div class="stat-label">Total</div>
-                </div>
-                <div class="stat pending">
-                    <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
-                    <div class="stat-value"><?= $pendingCount ?></div>
-                    <div class="stat-label">Menunggu</div>
-                </div>
-                <div class="stat paid">
-                    <div class="stat-icon"><i class="fa-solid fa-credit-card"></i></div>
-                    <div class="stat-value"><?= $paidCount ?></div>
-                    <div class="stat-label">Dibayar</div>
-                </div>
-                <div class="stat finished">
-                    <div class="stat-icon"><i class="fa-solid fa-flag-checkered"></i></div>
-                    <div class="stat-value"><?= $finishedCount ?></div>
-                    <div class="stat-label">Selesai</div>
+    <div class="page-decor">
+        <div class="container">
+
+            <div class="stats-section">
+                <div class="stats-title"><i class="fa-solid fa-chart-pie"></i> Ringkasan Aktivitas</div>
+                <div class="stats-container">
+                    <div class="stat-box total">
+                        <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+                        <div class="stat-num"><?= $totalTrips ?></div>
+                        <div class="stat-label">Total Trip</div>
+                    </div>
+                    <div class="stat-box pending">
+                        <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                        <div class="stat-num"><?= $pendingCount ?></div>
+                        <div class="stat-label">Menunggu</div>
+                    </div>
+                    <div class="stat-box paid">
+                        <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+                        <div class="stat-num"><?= $paidCount ?></div>
+                        <div class="stat-label">Lunas</div>
+                    </div>
+                    <div class="stat-box done">
+                        <div class="stat-icon"><i class="fa-solid fa-flag-checkered"></i></div>
+                        <div class="stat-num"><?= $finishedCount ?></div>
+                        <div class="stat-label">Selesai</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <?php if (empty($myTrips)): ?>
-            <div class="empty">
-                <i class="fa-solid fa-person-hiking empty-icon"></i>
-                <h2>Petualangan Menanti!</h2>
-                <p>Mulai pendakian impian Anda sekarang. Jelajahi paket trip kami!</p>
-                <a href="<?= getPageUrl('index.php') ?>#paketTrips" class="btn-explore">
-                    <i class="fa-solid fa-compass"></i> Jelajahi Paket Trip
-                </a>
-                </a>
-            </div>
-        <?php else: ?>
-            <h2 class="section-title"><i class="fa-solid fa-list"></i> Daftar Trip Anda</h2>
-            <div class="grid">
-                <?php foreach ($myTrips as $trip): ?>
-                    <div class="card">
-                        <div class="card-img" style="background-image: url('<?= htmlspecialchars($trip['gambar']); ?>');">
-                            <span class="badge badge-status status-<?= strtolower($trip['status_booking']); ?>" style="top:10px;right:10px">
-                                <?php
-                                $sb = strtolower($trip['status_booking']);
-                                if ($sb === 'pending')         echo '<i class="fa-solid fa-hourglass-half"></i> Menunggu';
-                                elseif ($sb === 'paid' || $sb === 'confirmed') echo '<i class="fa-solid fa-credit-card"></i> Dibayar';
-                                elseif ($sb === 'finished')     echo '<i class="fa-solid fa-flag-checkered"></i> Selesai';
-                                elseif ($sb === 'cancelled') echo '<i class="fa-solid fa-times-circle"></i> Dibatalkan';
-                                else echo '<i class="fa-solid fa-info-circle"></i> ' . htmlspecialchars(ucfirst($trip['status_booking']));
-                                ?>
-                            </span>
+            <?php if (empty($myTrips)): ?>
+                <div class="empty-state animate__animated animate__fadeInUp">
+                    <i class="fa-solid fa-person-hiking empty-icon"></i>
+                    <h3>Belum Ada Petualangan</h3>
+                    <p style="color:#999; font-size:0.9rem;">Mulai perjalanan Anda sekarang!</p>
+                    <a href="<?= getPageUrl('index.php') ?>#paketTrips" class="btn-explore">
+                        <i class="fa-solid fa-compass"></i> Cari Paket Trip
+                    </a>
+                </div>
+            <?php else: ?>
+                <div class="section-title">Riwayat Trip</div>
 
-                            <?php if (strtolower($trip['status_trip']) === 'done'): ?>
-                                <img src="<?= $navbarPath ?>assets/completed-stamp.png" alt="Completed Stamp" class="done-stamp" />
-                            <?php endif; ?>
-                        </div>
-
-                        <div class="card-body">
-                            <div class="card-header-flex">
-                                <h3 class="card-title"><?= htmlspecialchars($trip['nama_gunung']); ?></h3>
-                                <p class="card-date"><i class="fa-solid fa-calendar-alt"></i> <strong><?= date('d M Y', strtotime($trip['tanggal_trip'])); ?></strong></p>
-                            </div>
-                            <p class="card-via"><i class="fa-solid fa-route"></i> <?= htmlspecialchars($trip['via_gunung']); ?></p>
-                            <div class="card-meta">
-                                <div class="meta-item type-badge"><i class="fa-solid fa-tag"></i><span>Tipe: <strong><?= htmlspecialchars($trip['jenis_trip']); ?></strong></span></div>
-                                <div class="meta-item"><i class="fa-solid fa-clock"></i><span><?= htmlspecialchars($trip['durasi']); ?></span></div>
-                                <div class="meta-item"><i class="fa-solid fa-users"></i><span><?= $trip['jumlah_orang']; ?> Orang</span></div>
-                                <div class="meta-item"><i class="fa-solid fa-tag"></i><span>Total Harga: <strong>Rp <?= number_format($trip['total_harga'], 0, ',', '.'); ?></strong></span></div>
-                            </div>
-                            <div class="actions">
-                                <button class="btn btn-detail" onclick='openDetail(<?= htmlspecialchars(json_encode($trip), ENT_QUOTES); ?>)'>
-                                    <i class="fa-solid fa-eye"></i> Detail
-                                </button>
-                                <?php if (strtolower($trip['status_booking']) === 'pending'): ?>
-                                    <a href="<?= $navbarPath; ?>user/payment-status.php?booking_id=<?= $trip['id_booking']; ?>" class="btn btn-payment">
-                                        <i class="fa-solid fa-credit-card"></i> Bayar
-                                    </a>
+                <div class="trips-grid">
+                    <?php foreach ($myTrips as $trip):
+                        $sb = strtolower($trip['status_booking']);
+                        $statusInfo = [
+                            'pending' => ['class' => 'pending', 'icon' => 'fa-hourglass-half', 'text' => 'Menunggu'],
+                            'paid' => ['class' => 'paid', 'icon' => 'fa-check-circle', 'text' => 'Lunas'],
+                            'confirmed' => ['class' => 'paid', 'icon' => 'fa-check-circle', 'text' => 'Confirmed'],
+                            'finished' => ['class' => 'finished', 'icon' => 'fa-flag', 'text' => 'Selesai'],
+                            'cancelled' => ['class' => 'cancelled', 'icon' => 'fa-times-circle', 'text' => 'Batal']
+                        ][$sb] ?? ['class' => 'pending', 'icon' => 'fa-info-circle', 'text' => ucfirst($sb)];
+                    ?>
+                        <div class="trip-card">
+                            <div class="trip-img-box">
+                                <img src="<?= htmlspecialchars($trip['gambar']) ?>" alt="Gunung">
+                                <div class="status-badge <?= $statusInfo['class'] ?>">
+                                    <i class="fa-solid <?= $statusInfo['icon'] ?>"></i> <?= $statusInfo['text'] ?>
+                                </div>
+                                <?php if (strtolower($trip['status_trip']) === 'done'): ?>
+                                    <img src="<?= $navbarPath ?>assets/completed-stamp.png" style="position:absolute; bottom:10px; right:10px; width:80px; opacity:0.9;" alt="Selesai">
                                 <?php endif; ?>
                             </div>
+
+                            <div class="trip-body">
+                                <div class="trip-name"><?= htmlspecialchars($trip['nama_gunung']) ?></div>
+                                <div class="trip-date">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <?= date('d M Y', strtotime($trip['tanggal_trip'])) ?>
+                                </div>
+
+                                <div class="trip-meta">
+                                    <div class="meta-item">
+                                        <span class="meta-lbl">Jalur</span>
+                                        <span class="meta-val"><?= htmlspecialchars($trip['via_gunung']) ?></span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-lbl">Peserta</span>
+                                        <span class="meta-val"><?= $trip['jumlah_orang'] ?> Org</span>
+                                    </div>
+                                </div>
+
+                                <div class="trip-footer">
+                                    <button class="btn-card btn-outline" onclick='openDetail(<?= htmlspecialchars(json_encode($trip), ENT_QUOTES); ?>)'>
+                                        <i class="fa-regular fa-eye"></i> Detail
+                                    </button>
+                                    <?php if ($sb === 'pending'): ?>
+                                        <a href="<?= $navbarPath; ?>user/payment-status.php?booking_id=<?= $trip['id_booking']; ?>" class="btn-card btn-fill">
+                                            <i class="fa-solid fa-credit-card"></i> Bayar
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // FUNGSI JS untuk memformat status di modal (agar konsisten dengan payment-status.php)
-        const formatStatusDetailJs = (s) => {
-            let status_text_detail = 'DIBATALKAN';
-            let status_color = '#dc3545';
-            let status_icon = '<i class="fa-solid fa-ban"></i>';
+        const formatRupiah = (num) => 'Rp ' + parseInt(num).toLocaleString('id-ID');
 
-            if (s === 'paid' || s === 'settlement' || s === 'confirmed') {
-                status_text_detail = 'PEMBAYARAN DITERIMA';
-                status_color = '#2e7d32';
-                status_icon = '<i class="fa-solid fa-check-circle"></i>';
-            } else if (s === 'pending') {
-                status_text_detail = 'MENUNGGU PEMBAYARAN';
-                status_color = '#e65100';
-                status_icon = '<i class="fa-solid fa-hourglass-half"></i>';
-            } else if (s === 'expire') {
-                status_text_detail = 'SUDAH KEDALUWARSA';
-                status_color = '#ad1457';
-                status_icon = '<i class="fa-solid fa-clock-rotate-left"></i>';
-            } else if (s === 'cancelled' || s === 'cancel' || s === 'failed') {
-                status_text_detail = 'DIBATALKAN';
-                status_color = '#dc3545';
-                status_icon = '<i class="fa-solid fa-ban"></i>';
-            }
-
-            return `<span style="color:${status_color};font-weight:700;">${status_icon} ${status_text_detail}</span>`;
-        };
-
-        // FUNGSI openDetail YANG MENGGUNAKAN TAMPILAN MODAL YANG KONSISTEN
+        // FUNCTION OPEN DETAIL (SMALL TICKET)
         function openDetail(d) {
-            // Menggunakan status pembayaran dari data trip
-            const statusLabelHTML = formatStatusDetailJs(d.status_pembayaran);
-
-            const tBook = new Date(d.tanggal_booking).toLocaleDateString('id-ID', {
+            const tDate = new Date(d.tanggal_trip).toLocaleDateString('id-ID', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric'
             });
-            const tTrip = new Date(d.tanggal_trip).toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-
-            const mapsButton = d.link_map && d.link_map !== '#' ?
-                `<div style="text-align:center;padding-top:10px;border-top:1px solid rgba(169, 124, 80, 0.08);">
-                    <a href="${d.link_map}" target="_blank" class="btn-map-modal">
-                        <i class="fa-solid fa-map-location-dot"></i> Lihat Lokasi Kumpul
-                    </a>
-                </div>` : '';
+            const time = d.waktu_kumpul ? d.waktu_kumpul.substring(0, 5) + ' WIB' : '00:00 WIB';
 
             Swal.fire({
-                title: `<i class="fa-solid fa-route"></i> Detail Trip Anda`,
-                html: `<div style="text-align:left">
-                    <div class="info-group-modal">
-                        <h4><i class="fa-solid fa-receipt"></i> Ringkasan Pemesanan</h4>
-                        <div class="info-row-modal"><span>Nama Trip:</span><strong>${d.nama_gunung} (${d.jenis_trip})</strong></div>
-                        <div class="info-row-modal"><span>ID Pemesanan:</span><strong>#${d.id_booking}</strong></div>
-                        <div class="info-row-modal"><span>Tanggal Pesan:</span><strong>${tBook}</strong></div>
-                        <div class="info-row-modal"><span>Status Pembayaran:</span>${statusLabelHTML}</div>
-                        <div class="info-row-modal"><span>Peserta:</span><strong>${d.jumlah_orang} Orang</strong></div>
-                        <div class="info-row-modal"><span>Total Harga:</span><strong class="price-total-modal">Rp ${parseInt(d.total_harga).toLocaleString('id-ID')}</strong></div>
+                html: `
+                    <div class="st-header">
+                        <div class="st-icon"><i class="fa-solid fa-ticket"></i></div>
+                        <div class="st-title">${d.nama_gunung}</div>
+                        <div class="st-pill">ID Pesanan #${d.id_booking}</div>
                     </div>
-                    
-                    <div class="info-group-modal">
-                        <h4><i class="fa-solid fa-calendar-check"></i> Detail Pelaksanaan Trip</h4>
-                        <div class="info-row-modal"><span>Tanggal Trip:</span><strong>${tTrip}</strong></div>
-                        <div class="info-row-modal"><span>Via/Jalur:</span><strong>${d.via_gunung}</strong></div>
-                        <div class="info-row-modal"><span>Durasi:</span><strong>${d.durasi}</strong></div>
-                        <div class="info-row-modal"><span>Waktu Kumpul:</span><strong>${(d.waktu_kumpul || '00:00').substring(0,5)} WIB</strong></div>
-                        <div class="info-row-modal"><span>Lokasi Kumpul:</span><strong>${d.nama_lokasi}</strong></div>
-                    </div>
-                    
-                    ${mapsButton}
 
-                    <div class="info-group-modal">
-                        <h4><i class="fa-solid fa-list-check"></i> Informasi Biaya & Ketentuan</h4>
-                        <div style="padding:6px 0"><strong>Include:</strong><br><small style="display:block;margin-top:5px;color:#6B5847;line-height:1.5">${d.include}</small></div>
-                        <div style="padding:6px 0"><strong>Exclude:</strong><br><small style="display:block;margin-top:5px;color:#6B5847;line-height:1.5">${d.exclude}</small></div>
-                        <div style="padding:6px 0; border-top: 1px dashed rgba(169, 124, 80, 0.08); margin-top: 10px;"><strong>Syarat & Ketentuan:</strong><br><small style="display:block;margin-top:5px;color:#6B5847;line-height:1.5">${d.syaratKetentuan}</small></div>
+                    <div class="st-body">
+                        
+                        <div class="st-divider"></div>
+
+                        <div class="st-row">
+                            <span class="st-lbl">Tanggal Trip</span>
+                            <span class="st-val">${tDate}</span>
+                        </div>
+                        <div class="st-row">
+                            <span class="st-lbl">Via Jalur</span>
+                            <span class="st-val">${d.via_gunung}</span>
+                        </div>
+                        <div class="st-row">
+                            <span class="st-lbl">Jumlah Peserta</span>
+                            <span class="st-val">${d.jumlah_orang} Orang</span>
+                        </div>
+                        <div class="st-row">
+                            <span class="st-lbl">Waktu Kumpul</span>
+                            <span class="st-val danger">${time}</span>
+                        </div>
+
+                        <div class="st-divider"></div>
+
+                        <div class="st-row">
+                            <span class="st-lbl">Total Pembayaran</span>
+                            <span class="st-val highlight">${formatRupiah(d.total_harga)}</span>
+                        </div>
+
+                        <div class="st-mp-box">
+                            <div class="st-mp-title">TITIK KUMPUL / MEETING POINT</div>
+                            <div class="st-mp-name">${d.nama_lokasi}</div>
+                        </div>
+
+                        ${d.link_map ? `
+                        <a href="${d.link_map}" target="_blank" class="btn-maps-small">
+                            <i class="fa-solid fa-map-location-dot"></i> Buka Google Maps
+                        </a>` : ''}
                     </div>
-                </div>`,
-                width: '700px',
+                `,
+                showConfirmButton: false,
                 showCloseButton: true,
-                showConfirmButton: false
+                customClass: {
+                    popup: 'small-ticket-popup'
+                }
             });
         }
     </script>

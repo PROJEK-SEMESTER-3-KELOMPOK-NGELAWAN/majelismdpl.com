@@ -12,7 +12,9 @@ if (!isset($_SESSION['id_user']) || empty($_SESSION['id_user'])) {
 
 $id_user = $_SESSION['id_user'];
 
-// Auto-expire pending >24 jam (non-blocking ping)
+// --- LOGIKA PHP ASLI (TIDAK DIUBAH) ---
+
+// 1. Auto-expire pending >24 jam
 $expire_url = getPageUrl('backend/payment-api.php') . '?expire_stale=1';
 $chx = curl_init();
 curl_setopt($chx, CURLOPT_URL, $expire_url);
@@ -22,7 +24,7 @@ curl_setopt($chx, CURLOPT_SSL_VERIFYPEER, false);
 curl_exec($chx);
 curl_close($chx);
 
-// Auto-check pending payments (server-side) agar status segera tersinkron saat page load
+// 2. Auto-check pending payments
 $pendingStmt = $conn->prepare("SELECT DISTINCT p.order_id FROM payments p
     JOIN bookings b ON p.id_booking = b.id_booking
     WHERE b.id_user = ? AND p.status_pembayaran = 'pending' AND p.order_id IS NOT NULL AND p.order_id != ''");
@@ -46,10 +48,13 @@ if ($pendingStmt) {
     $pendingStmt->close();
 }
 
-// Get booking data
+// 3. Get booking data
 $stmt = $conn->prepare("SELECT b.id_booking, b.tanggal_booking, b.total_harga, b.jumlah_orang, b.status as booking_status,
-    t.nama_gunung, t.jenis_trip, p.id_payment, p.status_pembayaran, p.order_id, p.tanggal as payment_date
-    FROM bookings b JOIN paket_trips t ON b.id_trip = t.id_trip
+    t.nama_gunung, t.jenis_trip, t.gambar, t.durasi, d.nama_lokasi, d.waktu_kumpul, d.link_map,
+    p.id_payment, p.status_pembayaran, p.order_id, p.tanggal as payment_date
+    FROM bookings b 
+    JOIN paket_trips t ON b.id_trip = t.id_trip
+    LEFT JOIN detail_trips d ON t.id_trip = d.id_trip
     LEFT JOIN payments p ON b.id_booking = p.id_booking
     WHERE b.id_user = ? ORDER BY b.tanggal_booking DESC");
 
@@ -58,78 +63,8 @@ $stmt->execute();
 $result = $stmt->get_result();
 $booking_list = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
-
-function get_status_class($status)
-{
-    $s = strtolower($status ?? '');
-    if ($s === 'pending') return 'pending';
-    if ($s === 'paid' || $s === 'settlement') return 'paid';
-    return 'cancelled';
-}
-
-/**
- * REVISI: Fungsi untuk tampilan status di kartu (ikon di atas teks, 2 baris)
- */
-function format_status_card($status)
-{
-    $s = strtolower($status ?? '');
-    $icon = '';
-    $text = '';
-
-    if ($s === 'pending') {
-        $icon = 'fa-solid fa-hourglass-half';
-        $text = 'MENUNGGU<br>PEMBAYARAN';
-    } elseif ($s === 'paid' || $s === 'settlement') {
-        $icon = 'fa-solid fa-circle-check';
-        $text = 'PEMBAYARAN<br>DITERIMA';
-    } elseif ($s === 'expire') {
-        $icon = 'fa-solid fa-clock-rotate-left';
-        $text = 'SUDAH<br>KEDALUWARSA';
-    } else { // 'failed', 'cancel', default
-        $icon = 'fa-solid fa-ban';
-        $text = 'DIBATALKAN';
-    }
-
-    return [
-        'icon' => $icon,
-        'text' => $text
-    ];
-}
-
-/**
- * REVISI: Fungsi untuk tampilan status detail di modal (ikon di samping teks, 1 baris)
- */
-function format_status_detail($status)
-{
-    $s = strtolower($status ?? '');
-
-    $status_data = [
-        'text' => 'DIBATALKAN',
-        'color' => '#c62828',
-        'icon' => '<i class="fa-solid fa-times-circle"></i>'
-    ];
-
-    if ($s === 'paid' || $s === 'settlement') {
-        $status_data['text'] = 'PEMBAYARAN DITERIMA';
-        $status_data['color'] = '#2e7d32';
-        $status_data['icon'] = '<i class="fa-solid fa-check-circle"></i>';
-    } elseif ($s === 'pending') {
-        $status_data['text'] = 'MENUNGGU PEMBAYARAN';
-        $status_data['color'] = '#e65100';
-        $status_data['icon'] = '<i class="fa-solid fa-hourglass-half"></i>';
-    } elseif ($s === 'expire') {
-        $status_data['text'] = 'SUDAH KEDALUWARSA';
-        $status_data['color'] = '#ad1457';
-        $status_data['icon'] = '<i class="fa-solid fa-clock-rotate-left"></i>';
-    } elseif ($s === 'cancel' || $s === 'failed') {
-        $status_data['text'] = 'DIBATALKAN';
-        $status_data['color'] = '#dc3545';
-        $status_data['icon'] = '<i class="fa-solid fa-ban"></i>';
-    }
-
-    return "<span style='color:{$status_data['color']};font-weight:700;'>{$status_data['icon']} {$status_data['text']}</span>";
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -137,14 +72,28 @@ function format_status_detail($status)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Status Pembayaran - Majelis MDPL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-KFnuwUuiq_i1OUJf"></script>
 
     <style>
-        /* CSS DEFAULT DARI AWAL (DIUBAH HANYA BAGIAN STATUS CARD & EMPTY STATE) */
+        /* --- DESIGN SYSTEM --- */
+        :root {
+            --primary: #9C7E5C;
+            --primary-dark: #7B5E3A;
+            --bg-page: #FDFBF9;
+            --surface: #FFFFFF;
+            --text-main: #374151;
+            --text-muted: #9CA3AF;
+            --radius-xl: 24px;
+            --radius-md: 16px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -153,36 +102,48 @@ function format_status_detail($status)
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8dcc4 100%);
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            padding-top: 120px;
             min-height: 100vh;
-            padding-top: 80px;
+        }
+
+        /* Background Decor */
+        .page-decor::before {
+            content: '';
+            position: absolute;
+            top: -120px;
+            left: 0;
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(180deg, #F3ECE7 0%, rgba(253, 251, 249, 0) 100%);
+            z-index: -1;
+            pointer-events: none;
         }
 
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 20px 15px;
+            padding: 0 20px 60px;
+            position: relative;
+            z-index: 2;
         }
 
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 15px;
-            padding: 20px 25px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(169, 124, 80, 0.15);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        /* HEADER */
+        .dashboard-header {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(156, 126, 92, 0.06);
+            border: 1px solid rgba(156, 126, 92, 0.1);
             text-align: center;
         }
 
-        .title {
+        .header-title {
             font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #3D2F21 0%, #a97c50 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
+            font-weight: 800;
+            color: var(--primary-dark);
             margin-bottom: 5px;
             display: flex;
             align-items: center;
@@ -190,356 +151,265 @@ function format_status_detail($status)
             gap: 10px;
         }
 
-        .title i {
-            background: linear-gradient(135deg, #ffb800 0%, #a97c50 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
+        .header-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
-        .subtitle {
-            font-size: 0.8rem;
-            color: #6B5847;
-        }
-
-        .cards {
+        /* CARD LIST */
+        .payment-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 25px;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(169, 124, 80, 0.12);
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-            transition: all 0.3s ease;
+        .pay-card {
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(156, 126, 92, 0.1);
             display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
+            grid-template-columns: 240px 1fr;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        .pay-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(156, 126, 92, 0.12);
+            border-color: rgba(156, 126, 92, 0.2);
         }
 
-        .card-body {
-            padding: 18px;
+        .card-img {
+            position: relative;
+            height: 100%;
+            min-height: 200px;
+            overflow: hidden;
         }
 
-        .card-title {
-            font-size: 1.1rem;
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+        .pay-card:hover .card-img img {
+            transform: scale(1.05);
+        }
+
+        .status-float {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
             font-weight: 700;
-            color: #3D2F21;
-            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 2;
+        }
+
+        .status-float.pending {
+            color: #F59E0B;
+        }
+
+        .status-float.paid {
+            color: #10B981;
+        }
+
+        .status-float.cancelled {
+            color: #EF4444;
+        }
+
+        .status-float.expire {
+            color: #AD1457;
+        }
+
+        .card-content {
+            padding: 25px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .trip-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .booking-id {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: #F9FAFB;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #EFEBE9;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #9CA3AF;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .info-item div {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .info-item.price div {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-act {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .card-title i {
-            color: #a97c50;
-            font-size: 1rem;
-        }
-
-        .card-id {
-            font-size: 0.75rem;
-            color: #a97c50;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .card-info {
-            display: flex;
-            gap: 20px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(169, 124, 80, 0.1);
-        }
-
-        .info-item {
-            flex: 1;
-        }
-
-        .info-label {
-            font-size: 0.7rem;
-            color: #6B5847;
-            margin-bottom: 3px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .info-label i {
-            font-size: 0.7rem;
-        }
-
-        .info-value {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #3D2F21;
-        }
-
-        .info-value.price {
-            font-size: 1rem;
-            color: #a97c50;
-            font-weight: 700;
-        }
-
-        .card-sidebar {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 18px 15px;
-            border-left: 1px solid rgba(169, 124, 80, 0.1);
-            background: rgba(169, 124, 80, 0.02);
-            gap: 10px;
-            min-width: 170px;
-        }
-
-        /* CSS untuk tampilan status card (ikon di atas teks, 2 baris) */
-        .status-badge {
-            padding: 0;
-            font-weight: 700;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            white-space: normal;
-            text-align: center;
-            line-height: 1.1;
-        }
-
-        .status-badge i {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-        }
-
-        .status-badge span {
-            font-weight: 800;
-        }
-
-        .status-badge.pending {
-            color: #ffb800;
-        }
-
-        .status-badge.pending i {
-            background: linear-gradient(135deg, #ffc107 0%, #ffb800 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .status-badge.paid {
-            color: #28a745;
-        }
-
-        .status-badge.paid i {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .status-badge.cancelled {
-            color: #dc3545;
-        }
-
-        .status-badge.cancelled i {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-        }
-
-        /* Akhir CSS Status Card */
-
-        .actions {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            width: 100%;
-        }
-
-        .btn {
-            padding: 7px 12px;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-decoration: none;
-            text-align: center;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            transition: all 0.3s ease;
             white-space: nowrap;
         }
 
         .btn-detail {
-            background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid #E5E7EB;
         }
 
         .btn-detail:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            background: #F9FAFB;
+            border-color: #D1D5DB;
         }
 
         .btn-pay {
-            background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(169, 124, 80, 0.25);
+            background: var(--primary);
+            color: white;
+            padding: 10px 25px;
         }
 
         .btn-pay:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(169, 124, 80, 0.4);
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(156, 126, 92, 0.25);
         }
 
-        /* CSS BARU untuk Empty State (Mengikuti mytrip.php) */
-        .empty {
+        .btn-cancel-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #FEF2F2;
+            color: #DC2626;
+            cursor: pointer;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
+            transition: 0.2s;
+            margin-right: auto;
+            flex-shrink: 0;
+        }
+
+        .btn-cancel-icon:hover {
+            background: #FEE2E2;
+            transform: scale(1.1);
+        }
+
+        .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            border-radius: 18px;
-            margin-top: 30px;
-            border: 2px solid rgba(169, 124, 80, .2);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, .08);
+            padding: 80px 20px;
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 2px dashed #E0E0E0;
         }
 
-        /* Gaya Ikon Besar Baru */
-        .empty .empty-icon {
-            font-size: 6rem;
-            margin-bottom: 25px;
-            background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 4px 8px rgba(169, 124, 80, 0.4));
+        .empty-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            opacity: 0.5;
+            margin-bottom: 20px;
         }
 
-        .empty h2 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #3D2F21;
-            margin-bottom: 10px;
-            line-height: 1.3;
-        }
-
-        .empty p {
-            font-size: 1rem;
-            color: #6B5847;
-            margin-bottom: 35px;
-            max-width: 500px;
-            line-height: 1.6;
-        }
-
-        /* Tombol CTA Baru */
         .btn-explore {
-            display: inline-flex !important;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 14px 30px;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 700;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50px;
+            font-weight: 600;
             text-decoration: none;
-            color: #fff;
-            background: linear-gradient(135deg, #a97c50 100%, #e6a700 0%);
-            box-shadow: 0 5px 18px rgba(169, 124, 80, .4);
-            transition: all .3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
+            transition: 0.3s;
         }
 
         .btn-explore:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(169, 124, 80, .6);
-            background: linear-gradient(135deg, #d4a574 100%, #ffc107 0%);
-        }
-        /* Akhir CSS BARU untuk Empty State */
-
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: #fff;
-            padding: 25px 20px;
-            max-width: 400px;
-            width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            text-align: center;
-        }
-
-        .modal-text {
-            font-size: 0.9rem;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .modal-btn {
-            margin-top: 10px;
-            background: #eee;
-            border: 1px solid #ccc;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .modal-btn:hover {
-            background: #ddd;
+            background: var(--primary-dark);
+            transform: translateY(-2px);
         }
 
         .refresh-indicator {
             position: fixed;
             top: 90px;
             right: 20px;
-            background: rgba(169, 124, 80, 0.9);
+            background: rgba(156, 126, 92, 0.9);
             color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 8px 14px;
+            border-radius: 30px;
             font-size: 0.75rem;
             z-index: 1000;
             display: none;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s;
         }
 
         .refresh-indicator.show {
@@ -551,539 +421,368 @@ function format_status_detail($status)
         }
 
         @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
+            100% {
                 transform: rotate(360deg);
             }
         }
 
-        .swal2-popup {
-            font-size: 0.85rem !important;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =========================================
+           POPUP STYLE FINAL (COMPACT & RESPONSIVE)
+           ========================================= */
+
+        .swal2-popup.ticket-popup {
+            width: 600px !important;
+            /* UKURAN DIPERKECIL (COMPACT) */
+            max-width: 95vw !important;
             padding: 0 !important;
-            max-width: 700px !important;
-            width: 90% !important;
-            border-radius: 15px !important;
+            border-radius: 20px !important;
+            background: #fff !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2) !important;
+            overflow: hidden !important;
+            font-family: 'Poppins', sans-serif !important;
         }
 
-        .swal2-title {
-            background: linear-gradient(135deg, #a97c50 0%, #d4a574 100%);
-            color: #fff !important;
-            padding: 18px 25px !important;
-            margin: 0 !important;
-            font-size: 1.2rem !important;
-            font-weight: 700 !important;
-            border-radius: 15px 15px 0 0 !important;
+        /* Header Compact */
+        .ticket-header {
+            background: #A98762;
+            padding: 20px 25px;
+            text-align: center;
+            color: white;
+            position: relative;
         }
 
-        .swal2-html-container {
-            max-height: 60vh !important;
-            overflow-y: auto !important;
-            margin: 0 !important;
-            padding: 20px 25px !important;
+        .ticket-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
         }
 
-        .swal2-close {
-            font-size: 1.8rem !important;
-            color: rgba(255, 255, 255, 0.8) !important;
+        .ticket-sub {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 500;
         }
 
-        .info-group {
-            margin-bottom: 15px;
-            border: 1px solid rgba(169, 124, 80, 0.12);
+        /* Body Compact */
+        .ticket-body {
+            padding: 25px;
+            background: #fff;
+            text-align: left;
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #E5E7EB;
+        }
+
+        .info-group label {
+            display: block;
+            font-size: 0.7rem;
+            color: #9CA3AF;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .info-group div {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        /* Section Peserta (Scrollable) */
+        .participant-section {
+            margin-bottom: 20px;
+            background: #FAFAFA;
             border-radius: 12px;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid #F3F4F6;
         }
 
-        .info-group h4 {
-            color: #3D2F21;
-            margin-bottom: 12px;
+        .p-title {
+            font-size: 0.95rem;
             font-weight: 700;
-            font-size: 1rem;
-            border-bottom: 2px solid rgba(169, 124, 80, 0.12);
-            padding-bottom: 8px;
+            color: #5D4037;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            font-size: 0.8rem;
-            border-bottom: 1px dashed rgba(169, 124, 80, 0.08);
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-row span {
-            color: #6B5847;
-        }
-
-        .info-row strong {
-            color: #3D2F21;
-            font-weight: 600;
-        }
-
-        .price-total {
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, #ffb800 0%, #a97c50 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-            font-weight: 800;
-        }
-
-        .participant-list {
-            margin-top: 10px;
-            max-height: 150px;
+        /* SCROLL CONTAINER: Agar tidak memanjang ke bawah */
+        .p-list-container {
+            max-height: 180px;
+            /* Batas tinggi scroll */
             overflow-y: auto;
+            padding-right: 5px;
         }
 
-        .participant-item {
-            padding: 6px 0;
-            border-bottom: 1px dotted #e0e0e0;
+        /* Custom Scrollbar */
+        .p-list-container::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .participant-item:last-child {
-            border-bottom: none;
+        .p-list-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
         }
 
-        .participant-item p {
-            margin: 0;
-            font-weight: 600;
-            color: #444;
-            font-size: 0.85rem;
-            margin-bottom: 3px;
+        .p-list-container::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
         }
 
-        .participant-item small {
-            color: #777;
-            font-size: 0.7rem;
-            margin-right: 5px;
-        }
-
-        .btn-invoice {
-            margin-top: 12px;
-            background: linear-gradient(135deg, #333 0%, #000 100%);
-            color: #fff;
-            padding: 8px 16px;
+        /* Item Peserta */
+        .p-item-compact {
+            background: white;
+            border: 1px solid #E5E7EB;
             border-radius: 8px;
-            text-decoration: none;
-            display: inline-flex;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .p-item-compact:last-child {
+            margin-bottom: 0;
+        }
+
+        .p-name-row {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .p-contact-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .p-contact-row span {
+            display: flex;
             align-items: center;
             gap: 6px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
-            text-transform: uppercase;
-            border: none;
-            cursor: pointer;
         }
 
-        .btn-invoice:hover {
-            background: linear-gradient(135deg, #a97c50 0%, #8b5e3c 100%);
+        .p-contact-row i {
+            color: #A98762;
+        }
+
+        .ticket-footer {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn-invoice-only {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 30px;
+            background: #E5E7EB;
+            color: #6B7280;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .btn-invoice-only.active {
+            background: #374151;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-invoice-only.active:hover {
+            background: #1F2937;
             transform: translateY(-2px);
         }
 
-        .btn-invoice:disabled {
-            background: #ccc;
-            color: #777;
-            cursor: not-allowed;
+        .swal2-close {
+            color: #555 !important;
+            /* Ubah jadi Abu-abu Gelap agar terlihat */
+            font-size: 1.5rem !important;
+            top: 15px !important;
+            /* Jarak dari atas */
+            right: 15px !important;
+            /* Jarak dari kanan */
+            background: transparent !important;
+            opacity: 0.6 !important;
+            box-shadow: none !important;
+            outline: none !important;
+            z-index: 9999 !important;
+            /* Pastikan muncul di layer paling atas */
         }
 
+        .swal2-close:hover {
+            color: #DC2626 !important;
+            /* Berubah Merah saat diarahkan mouse */
+            background: rgba(0, 0, 0, 0.05) !important;
+            /* Efek kotak tipis saat hover */
+            opacity: 1 !important;
+            transform: scale(1.1);
+            /* Efek membesar sedikit */
+        }
+
+        /* RESPONSIVE MOBILE */
         @media (max-width: 768px) {
-            body {
-                padding-top: 70px;
-            }
-
-            .container {
-                padding: 15px 12px;
-            }
-
-            .header {
-                padding: 15px 18px;
-                border-radius: 12px;
-            }
-
-            .title {
-                font-size: 1.3rem;
-            }
-            
-            .title i {
-                font-size: 1.4rem; 
-            }
-
-            .card {
-                grid-template-columns: 1fr;
-            }
-            
-            .card-info {
+            .dashboard-header {
                 flex-direction: column;
                 gap: 10px;
             }
 
-            .card-sidebar {
-                border-left: none;
-                border-top: 1px solid rgba(169, 124, 80, .1);
-                /* Revisi: Ubah ke vertikal */
-                flex-direction: column; 
-                min-width: auto;
-                padding: 15px 15px; 
-                align-items: flex-start; 
-                gap: 12px; 
+            .pay-card {
+                grid-template-columns: 1fr;
             }
 
-            .card-sidebar .status-badge {
-                /* Status badge dalam mode horizontal, sekarang memanjang ke kiri */
-                flex-direction: row;
-                gap: 8px;
-                padding: 0;
-                font-size: 0.85rem;
-                text-align: left;
-                align-items: center;
-                width: 100%; 
+            .card-img {
+                height: 160px;
             }
-            
-            .card-sidebar .status-badge span {
-                display: inline;
-                font-size: 0.85rem; 
-                line-height: 1.2;
-            }
-
-            .card-sidebar .status-badge i {
-                font-size: 1.2rem;
-                margin-bottom: 0;
-            }
-
-            .actions {
-                /* Container untuk tombol "Detail" dan "Lanjut Bayar" */
-                flex-direction: row;
-                gap: 8px; 
-                width: 100%;
-                justify-content: flex-start;
-                flex-wrap: wrap; 
-            }
-            
-            /* Aturan khusus untuk tombol "Batalkan" agar selalu di bawah/terpisah di baris baru */
-            .actions .btn-detail[style*="b02a37"] { 
-                order: 3; /* Pastikan tombol ini di posisi ketiga */
-                width: 100%; /* Lebar penuh */
-                margin-top: 5px; 
-                font-size: 0.75rem;
-            }
-            
-            /* TARGET UTAMA: Membuat tombol "Detail" dan "Lanjut Bayar" sama lebarnya */
-            .actions .btn-detail,
-            .actions .btn-pay {
-                flex: 1; 
-                width: calc(50% - 4px); /* Paksa 50% lebar dikurangi setengah gap (8px/2 = 4px) */
-                padding: 8px 10px;
-                font-size: 0.7rem; 
-                min-width: 0; /* Hapus min-width agar kalkulasi 50% berhasil */
-                box-sizing: border-box; /* Pastikan padding/border dihitung dalam lebar */
-            }
-
 
             .info-row {
                 flex-direction: column;
-                gap: 2px;
+                align-items: flex-start;
+                gap: 15px;
             }
 
-            .refresh-indicator {
-                top: 75px;
-                right: 10px;
-                font-size: .7rem;
-                padding: 6px 10px;
+            .info-item {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
             }
 
-            /* Penyesuaian responsif untuk Empty State */
-            .empty h2 { font-size: 1.5rem; }
-            .empty p { font-size: 0.9rem; }
-            .empty .empty-icon { font-size: 5rem; }
-            .btn-explore { padding: 12px 25px; font-size: 0.9rem; }
-        }
-        
-        /* Tambahan: Media Query untuk layar sangat kecil */
-        @media (max-width: 400px) {
-            .card-sidebar {
-                padding: 12px 10px;
-                gap: 10px;
+            .card-actions {
+                justify-content: space-between;
+                width: 100%;
             }
-            
-            .actions {
-                gap: 5px; /* Kurangi gap */
-            }
-
-            .actions .btn-detail,
-            .actions .btn-pay {
-                font-size: 0.65rem;
-                padding: 7px 8px;
-                /* Ulangi kalkulasi lebar 50% dengan gap 5px (5px/2 = 2.5px) */
-                width: calc(50% - 2.5px); 
-            }
-            
-            .actions .btn-detail[style*="b02a37"] {
-                font-size: 0.7rem; 
-                margin-top: 5px;
-            }
-        }
-
-
-        /* --- Penyesuaian Global SweetAlert2 untuk Tampilan Ramping --- */
-        .swal2-popup.custom-warning-popup {
-            max-width: 450px !important;
-            /* Lebar pop-up yang lebih kecil */
-            padding: 20px 0 20px 0 !important;
-            /* Memberi sedikit padding atas/bawah */
-            border-radius: 20px !important;
-        }
-
-        /* Mengatur ulang style judul agar tebal dan tidak memiliki background */
-        .swal2-popup.custom-warning-popup .swal2-title {
-            font-size: 1.8rem !important;
-            font-weight: 700 !important;
-            color: #444 !important;
-            padding: 0 !important;
-            background: none !important;
-            border-radius: 0 !important;
-        }
-
-        /* Mengatur ulang style teks agar rapi */
-        .swal2-popup.custom-warning-popup .swal2-html-container {
-            font-size: 1rem !important;
-            color: #666;
-            margin: 0 30px 20px 30px !important;
-            padding: 0 !important;
-        }
-
-        /* Memastikan tombol Batal di kiri dan Ya, batalkan di kanan */
-        .swal2-actions {
-            gap: 15px !important;
-            margin-top: 20px !important;
-            flex-direction: row-reverse;
-        }
-
-        /* Gaya tombol Batal (Kiri, Abu-abu) */
-        .swal2-cancel {
-            background-color: #6c757d !important;
-            color: white !important;
-            padding: 10px 20px !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            order: 1 !important;
-        }
-
-        /* Gaya tombol Konfirmasi (Kanan, Ungu) */
-        .swal2-confirm {
-            background-color: #7568c8 !important;
-            color: white !important;
-            padding: 10px 20px !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            order: 2 !important;
-        }
-
-        /* --- CSS BARU UNTUK POP-UP BERHASIL / SUKSES (Centang Hijau Berbuletan) --- */
-        .swal2-popup.custom-success-popup {
-            max-width: 380px !important;
-            padding: 20px 0 20px 0 !important;
-            border-radius: 20px !important;
-        }
-
-        .custom-success-icon-wrapper {
-            width: 80px;
-            height: 80px;
-            border: 5px solid #a8e6cf;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 30px auto 20px auto;
-            box-sizing: border-box;
-        }
-
-        .custom-success-icon {
-            font-size: 48px;
-            color: #7bc07b;
-        }
-
-        /* Gaya Judul dan Teks untuk Pop-up Sukses */
-        .swal2-popup.custom-success-popup .swal2-title {
-            font-size: 1.8rem !important;
-            font-weight: 700 !important;
-            color: #444 !important;
-            padding: 0 !important;
-            background: none !important;
-            border-radius: 0 !important;
-        }
-
-        .swal2-popup.custom-success-popup .swal2-html-container {
-            font-size: 1rem !important;
-            color: #666;
-            margin: 0 30px 20px 30px !important;
-            padding: 0 !important;
-        }
-
-        /* Pastikan tombol OK untuk sukses pop-up juga Ungu */
-        .swal2-popup.custom-success-popup .swal2-confirm {
-            background-color: #7568c8 !important;
-            /* Ungu */
-        }
-
-
-        /* --- CSS BARU UNTUK POP-UP INFO / PENDING (Jam Pasir Berbuletan) --- */
-        .swal2-popup.custom-info-popup {
-            max-width: 380px !important;
-            padding: 20px 0 20px 0 !important;
-            border-radius: 20px !important;
-        }
-
-        .custom-info-icon-wrapper {
-            width: 80px;
-            height: 80px;
-            border: 5px solid #ffddb3;
-            /* Outline Oranye Muda */
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 30px auto 20px auto;
-            box-sizing: border-box;
-        }
-
-        .custom-info-icon {
-            font-size: 48px;
-            color: #ffb74d;
-            /* Ikon Oranye */
-        }
-
-        /* Gaya Judul dan Teks untuk Pop-up Info */
-        .swal2-popup.custom-info-popup .swal2-title {
-            font-size: 1.8rem !important;
-            font-weight: 700 !important;
-            color: #444 !important;
-            padding: 0 !important;
-            background: none !important;
-            border-radius: 0 !important;
-        }
-
-        .swal2-popup.custom-info-popup .swal2-html-container {
-            font-size: 1rem !important;
-            color: #666;
-            margin: 0 30px 20px 30px !important;
-            padding: 0 !important;
-        }
-
-        /* Pastikan tombol OK untuk info pop-up juga Ungu */
-        .swal2-popup.custom-info-popup .swal2-confirm {
-            background-color: #7568c8 !important;
-            /* Ungu */
         }
     </style>
 </head>
 
 <body>
+
     <?php include '../navbar.php'; ?>
     <?php include '../auth-modals.php'; ?>
 
-    <div id="refresh-indicator" class="refresh-indicator">
-        <i class="fa-solid fa-sync"></i>
-        <span>Memperbarui...</span>
-    </div>
-
-    <div class="container">
-        <div class="header">
-            <h1 class="title"><i class="fa-solid fa-credit-card"></i><span>Status Pembayaran</span></h1>
-            <p class="subtitle">Lacak transaksi pemesanan Anda</p>
+    <div class="page-decor">
+        <div id="refresh-indicator" class="refresh-indicator">
+            <i class="fa-solid fa-sync"></i> Update...
         </div>
 
-        <?php if (empty($booking_list)): ?>
-            <div class="empty">
-                <i class="fa-solid fa-money-bill-transfer empty-icon"></i> 
-                <h2>Belum Ada Transaksi</h2>
-                <p>Belum ada riwayat pembayaran yang tercatat. Mari mulai trip pertama Anda!</p>
-                <a href="<?= getPageUrl('index.php') ?>#paketTrips" class="btn-explore">
-                    <i class="fa-solid fa-compass"></i> Jelajahi Paket Trip
-                </a>
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="header-title"><i class="fa-solid fa-receipt"></i> Status Pembayaran</h1>
+                    <p class="header-desc">Pantau tagihan dan riwayat transaksi Anda.</p>
+                </div>
             </div>
+
+            <?php if (empty($booking_list)): ?>
+                <div class="empty-state">
+                    <i class="fa-solid fa-file-invoice-dollar empty-icon"></i>
+                    <h3>Tidak Ada Tagihan</h3>
+                    <p style="color:#999; margin-bottom:20px">Anda belum memiliki riwayat transaksi saat ini.</p>
+                    <a href="<?= getPageUrl('index.php') ?>#paketTrips" class="btn-explore">
+                        <i class="fa-solid fa-compass"></i> Cari Trip Baru
+                    </a>
+                </div>
             <?php else: ?>
-            <div class="cards">
-                <?php foreach ($booking_list as $b):
-                    $status = strtolower($b['status_pembayaran'] ?? 'pending');
-                    $status_class = get_status_class($status);
-
-                    // Menggunakan fungsi format_status_card
-                    $card_status_data = format_status_card($status);
-                ?>
-                    <div class="card" data-booking-id="<?= $b['id_booking']; ?>" data-order-id="<?= htmlspecialchars($b['order_id'] ?? ''); ?>">
-                        <div class="card-body">
-                            <h3 class="card-title">
-                                <i class="fa-solid fa-mountain-sun"></i>
-                                <?= htmlspecialchars($b['nama_gunung']); ?>
-                            </h3>
-                            <p class="card-id">Booking ID: #<?= $b['id_booking']; ?></p>
-                            <div class="card-info">
-                                <div class="info-item">
-                                    <p class="info-label"><i class="fa-solid fa-calendar-alt"></i> Tanggal</p>
-                                    <p class="info-value"><?= date("d M Y", strtotime($b['tanggal_booking'])); ?></p>
+                <div class="payment-list">
+                    <?php foreach ($booking_list as $b):
+                        $status = strtolower($b['status_pembayaran'] ?? 'pending');
+                        $statusInfo = [
+                            'pending' => ['class' => 'pending', 'icon' => 'fa-hourglass-half', 'text' => 'Menunggu'],
+                            'paid' => ['class' => 'paid', 'icon' => 'fa-check-circle', 'text' => 'Lunas'],
+                            'settlement' => ['class' => 'paid', 'icon' => 'fa-check-circle', 'text' => 'Lunas'],
+                            'expire' => ['class' => 'expire', 'icon' => 'fa-clock', 'text' => 'Expired'],
+                            'cancel' => ['class' => 'cancelled', 'icon' => 'fa-ban', 'text' => 'Batal'],
+                            'failed' => ['class' => 'cancelled', 'icon' => 'fa-times-circle', 'text' => 'Gagal']
+                        ][$status] ?? ['class' => 'pending', 'icon' => 'fa-info-circle', 'text' => ucfirst($status)];
+                        $img = !empty($b['gambar']) ? (strpos($b['gambar'], 'img/') === 0 ? $navbarPath . $b['gambar'] : $navbarPath . 'img/' . $b['gambar']) : $navbarPath . 'img/default-mountain.jpg';
+                    ?>
+                        <div class="pay-card" data-booking-id="<?= $b['id_booking']; ?>" data-order-id="<?= htmlspecialchars($b['order_id'] ?? ''); ?>">
+                            <div class="card-img">
+                                <img src="<?= htmlspecialchars($img) ?>" alt="Trip">
+                                <div class="status-float <?= $statusInfo['class'] ?>">
+                                    <i class="fa-solid <?= $statusInfo['icon'] ?>"></i> <?= $statusInfo['text'] ?>
                                 </div>
-                                <div class="info-item">
-                                    <p class="info-label"><i class="fa-solid fa-tag"></i> Total</p>
-                                    <p class="info-value price">Rp <?= number_format($b['total_harga'], 0, ',', '.'); ?></p>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-top">
+                                    <h3 class="trip-name"><?= htmlspecialchars($b['nama_gunung']) ?></h3>
+                                    <span class="booking-id">#<?= $b['id_booking'] ?></span>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-item">
+                                        <label>Tanggal Order</label>
+                                        <div><?= date("d M Y", strtotime($b['tanggal_booking'])) ?></div>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Peserta</label>
+                                        <div><?= $b['jumlah_orang'] ?> Orang</div>
+                                    </div>
+                                    <div class="info-item price">
+                                        <label>Total Tagihan</label>
+                                        <div>Rp <?= number_format($b['total_harga'], 0, ',', '.') ?></div>
+                                    </div>
+                                </div>
+                                <div class="card-actions">
+                                    <?php if ($status === 'pending'): ?>
+                                        <button class="btn-cancel-icon" onclick="cancelPayment(<?= $b['id_booking']; ?>)" title="Batalkan Pesanan">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                    <button class="btn-act btn-detail" onclick="showDetail(<?= $b['id_booking']; ?>)">
+                                        <i class="fa-regular fa-file-lines"></i> Detail
+                                    </button>
+                                    <?php if ($status === 'pending' && !empty($b['order_id'])): ?>
+                                        <button class="btn-act btn-pay" onclick="pay(<?= $b['id_booking']; ?>)">
+                                            <i class="fa-solid fa-wallet"></i> Bayar
+                                        </button>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-sidebar">
-                            <div class="status-badge <?= $status_class; ?>">
-                                <i class="<?= $card_status_data['icon']; ?>"></i>
-                                <span><?= $card_status_data['text']; ?></span>
-                            </div>
-                            <div class="actions">
-                                <button class="btn btn-detail" onclick="showDetail(<?= $b['id_booking']; ?>)">
-                                    <i class="fa-solid fa-search"></i> Detail
-                                </button>
-                                <?php if ($status === 'pending' && !empty($b['order_id'])): ?>
-                                    <button class="btn btn-pay" onclick="pay(<?= $b['id_booking']; ?>)">
-                                        <i class="fa-solid fa-credit-card"></i> Lanjut Bayar
-                                    </button>
-                                    <button class="btn btn-detail" style="background:linear-gradient(135deg,#b02a37 0%,#dc3545 100%);" onclick="cancelPayment(<?= $b['id_booking']; ?>)">
-                                        <i class="fa-solid fa-ban"></i> Batalkan
-                                    </button>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <div id="modal-payment" class="modal">
-        <div class="modal-content">
-            <p id="modal-text" class="modal-text">Menyiapkan pembayaran...</p>
-            <button onclick="closeModal()" class="modal-btn">Tutup</button>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
+
+    <div id="modal-payment" style="display:none;"></div>
 
     <script src="../frontend/registrasi.js"></script>
     <script src="../frontend/login.js"></script>
     <script>
-        // Memindahkan semua fungsi JS ke konteks global untuk mengatasi ReferenceError
+        const formatRupiah = (num) => 'Rp ' + parseInt(num).toLocaleString('id-ID');
 
         function periodicRefresh() {
-            const cards = Array.from(document.querySelectorAll('.card[data-order-id]'));
+            const cards = Array.from(document.querySelectorAll('.pay-card[data-order-id]'));
             const pendings = cards.filter(c => {
-                const badge = c.querySelector('.status-badge');
-                return badge && badge.classList.contains('pending');
+                const pill = c.querySelector('.status-float');
+                return pill && pill.classList.contains('pending');
             });
             pendings.forEach(c => {
                 const orderId = c.getAttribute('data-order-id');
@@ -1095,146 +794,55 @@ function format_status_detail($status)
             fetch('../backend/payment-api.php?check_status=' + encodeURIComponent(orderId))
                 .then(r => r.json())
                 .then(resp => {
-                    if (resp && resp.success) {
-                        if (['paid', 'failed', 'expire', 'cancel'].includes(resp.status)) {
-                            showRefresh();
-                            setTimeout(() => window.location.reload(), 800);
-                        }
-                    } else if (!quiet) {
-                        console.log('Status check info:', resp);
+                    if (resp && resp.success && ['paid', 'failed', 'expire', 'cancel'].includes(resp.status)) {
+                        document.getElementById('refresh-indicator').classList.add('show');
+                        setTimeout(() => window.location.reload(), 1000);
                     }
                 })
                 .catch(err => console.log('Check error:', err));
         }
 
-
-        function showRefresh() {
-            const ind = document.getElementById('refresh-indicator');
-            if (ind) ind.classList.add('show');
-        }
-
         function pay(bookingId) {
-            const modal = document.getElementById('modal-payment');
-            modal.classList.add('active');
-            document.getElementById('modal-text').textContent = "Meminta token pembayaran...";
-
+            Swal.fire({
+                title: 'Memproses...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
             fetch('../backend/payment-api.php?booking=' + bookingId)
                 .then(r => r.json())
                 .then(resp => {
+                    Swal.close();
                     if (resp.snap_token) {
-                        document.getElementById('modal-text').textContent = "Membuka halaman pembayaran...";
-                        setTimeout(() => {
-                            closeModal();
-                            window.snap.pay(resp.snap_token, {
-                                onSuccess: () => {
-                                    showRefresh();
-                                    fetch('../backend/payment-api.php?check_status=' + resp.order_id)
-                                        .then(r => r.json())
-                                        .then(s => {
-                                            // --- POP-UP PEMBAYARAN BERHASIL (Centang Hijau Berbuletan) ---
-                                            if (s.status === 'paid' || s.status === 'settlement') {
-                                                Swal.fire({
-                                                    html: `
-                                                <div class="custom-success-icon-wrapper">
-                                                    <i class="custom-success-icon fas fa-check"></i>
-                                                </div>
-                                                <div class="swal2-title" style="margin-bottom: 10px;">Pembayaran Berhasil!</div>
-                                                <div class="swal2-html-container" style="margin-bottom: 20px;">Pemesanan dikonfirmasi.</div>
-                                            `,
-                                                    customClass: {
-                                                        popup: 'custom-success-popup'
-                                                    },
-                                                    confirmButtonText: 'OK',
-                                                    confirmButtonColor: '#7568c8' // Tombol OK Ungu
-                                                }).then(() => window.location.reload());
-                                            } else {
-                                                // Status pending/diproses
-                                                Swal.fire({
-                                                    html: `
-                                                <div class="custom-info-icon-wrapper">
-                                                    <i class="custom-info-icon fas fa-hourglass-half"></i>
-                                                </div>
-                                                <div class="swal2-title" style="margin-bottom: 10px;">Pembayaran Diproses</div>
-                                                <div class="swal2-html-container" style="margin-bottom: 20px;">Menunggu konfirmasi pembayaran.</div>
-                                            `,
-                                                    customClass: {
-                                                        popup: 'custom-info-popup'
-                                                    },
-                                                    confirmButtonText: 'OK',
-                                                    confirmButtonColor: '#a97c50' // Warna tema cokelat/info
-                                                }).then(() => window.location.reload());
-                                            }
-                                        });
-                                },
-                                onPending: () => {
-                                    // --- POP-UP PEMBAYARAN MENUNGGU (Jam Pasir Berbuletan) ---
-                                    Swal.fire({
-                                        html: `
-                                    <div class="custom-info-icon-wrapper">
-                                        <i class="custom-info-icon fas fa-hourglass-half"></i>
-                                    </div>
-                                    <div class="swal2-title" style="margin-bottom: 10px;">Pembayaran Menunggu</div>
-                                    <div class="swal2-html-container" style="margin-bottom: 20px;">Mohon selesaikan pembayaran Anda di halaman Midtrans.</div>
-                                `,
-                                        customClass: {
-                                            popup: 'custom-info-popup'
-                                        },
-                                        confirmButtonText: 'OK',
-                                        confirmButtonColor: '#7568c8' // Tombol OK Ungu
-                                    }).then(() => window.location.reload());
-                                },
-                                onError: (r) => {
-                                    // --- POP-UP ERROR (Menggunakan ikon bawaan) ---
-                                    Swal.fire({
-                                        title: 'Pembayaran Gagal',
-                                        text: r.status_message || 'Terjadi kesalahan',
-                                        icon: 'error',
-                                        confirmButtonColor: '#a97c50'
-                                    });
-                                },
-                                onClose: () => setTimeout(() => window.location.reload(), 1000)
-                            });
-                        }, 500);
+                        window.snap.pay(resp.snap_token, {
+                            onSuccess: () => {
+                                document.getElementById('refresh-indicator').classList.add('show');
+                                setTimeout(() => window.location.reload(), 1000);
+                            },
+                            onPending: () => location.reload(),
+                            onError: () => Swal.fire('Error', 'Pembayaran gagal.', 'error')
+                        });
                     } else {
-                        throw new Error(resp.detail || resp.message || resp.error || 'Gagal mendapatkan token');
+                        Swal.fire('Gagal', resp.message || 'Token error', 'error');
                     }
                 })
-                .catch(err => {
-                    closeModal();
-                    Swal.fire({
-                        title: 'Kesalahan Pembayaran',
-                        text: err.message,
-                        icon: 'error',
-                        confirmButtonColor: '#a97c50'
-                    });
-                });
+                .catch(err => Swal.fire('Error', 'Koneksi gagal', 'error'));
         }
-
-        // ... (Di dalam tag <script> Anda)
 
         function cancelPayment(bookingId) {
             Swal.fire({
-                // Menggunakan icon bawaan SweetAlert2 (dengan asumsi CSS defaultnya sudah bagus)
+                title: 'Batalkan?',
+                text: "Pesanan akan dihapus permanen.",
                 icon: 'warning',
-                title: 'Batalkan Pembayaran?',
-                text: 'Peserta pada booking ini akan dihapus dan transaksi dibatalkan.',
-
-                // Kelas kustom untuk tata letak dan ukuran pop-up
-                customClass: {
-                    // Gunakan class CSS yang sama untuk ukuran pop-up
-                    popup: 'custom-warning-popup'
-                },
-
                 showCancelButton: true,
-                confirmButtonText: 'Ya, batalkan',
-                cancelButtonText: 'Tidak',
-
-                // Warna tombol persis seperti di gambar (Ungu dan Abu-abu)
-                confirmButtonColor: '#7568c8', // Ungu
-                cancelButtonColor: '#6c757d' // Abu-abu
-
-            }).then(res => {
-                if (res.isConfirmed) {
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#F5F5F5',
+                confirmButtonText: 'Ya, Batalkan',
+                cancelButtonText: '<span style="color:#555">Kembali</span>',
+                customClass: {
+                    popup: 'rounded-4'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
                     const form = new FormData();
                     form.append('cancel_booking', bookingId);
                     fetch('../backend/payment-api.php', {
@@ -1242,163 +850,130 @@ function format_status_detail($status)
                             body: form
                         })
                         .then(r => r.json())
-                        .then(j => {
-                            if (j.success) {
+                        .then(res => {
+                            if (res.success) {
                                 Swal.fire({
-                                    title: 'Berhasil!',
-                                    text: 'Transaksi telah dibatalkan.',
+                                    title: 'Dibatalkan',
                                     icon: 'success',
-                                    confirmButtonColor: '#a97c50'
-                                }).then(() => window.location.reload());
+                                    confirmButtonColor: '#9C7E5C'
+                                }).then(() => location.reload());
                             } else {
-                                Swal.fire({
-                                    title: 'Gagal',
-                                    text: j.error || 'Gagal membatalkan.',
-                                    icon: 'error',
-                                    confirmButtonColor: '#a97c50'
-                                });
+                                Swal.fire('Gagal', res.error, 'error');
                             }
-                        })
-                        .catch(err => {
-                            Swal.fire({
-                                title: 'Error',
-                                text: err.message,
-                                icon: 'error',
-                                confirmButtonColor: '#a97c50'
-                            });
                         });
                 }
-            });
+            })
         }
 
-        function closeModal() {
-            document.getElementById('modal-payment').classList.remove('active');
-        }
-
+        // ==========================================
+        //  FUNCTION SHOW DETAIL (FIXED SIZE & DATA WA)
+        // ==========================================
         function showDetail(bookingId) {
             Swal.fire({
-                title: 'Memuat...',
-                html: '<i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:#a97c50;"></i>',
+                html: '<div style="padding:20px; font-weight:600; color:#666;">Memuat data...</div>',
+                allowOutsideClick: false,
                 showConfirmButton: false,
-                allowOutsideClick: false
+                background: 'transparent',
+                didOpen: () => Swal.showLoading()
             });
 
             fetch(`../backend/get-booking-detail.php?id=${bookingId}`)
                 .then(r => r.json())
                 .then(d => {
-                    if (d.error) {
-                        Swal.fire({
-                            title: 'Kesalahan',
-                            text: d.error,
-                            icon: 'error',
-                            confirmButtonColor: '#a97c50'
-                        });
-                        return;
-                    }
-                    const inv = `INV-MDPL-${d.id_payment || 'N/A'}`;
-                    const isPaid = d.status_pembayaran === 'paid' || d.status_pembayaran === 'settlement';
-                    let parts = '<div class="participant-list">';
-                    if (d.participants && d.participants.length > 0) {
-                        d.participants.forEach((p, i) => {
-                            parts += `<div class="participant-item"><p><strong>${i+1}. ${p.nama}</strong></p>
-                <small>📧 ${p.email}</small><br>
-                <small>📱 ${p.no_wa}</small> | <small>🆔 ${p.nik}</small></div>`;
-                        });
-                    } else parts += '<p style="color:#999">Tidak ada data peserta</p>';
-                    parts += '</div>';
+                    Swal.close();
+                    if (d.error) return Swal.fire('Error', d.error, 'error');
 
-                    const invBtn = isPaid ?
-                        `<a href="view-invoice.php?payment_id=${d.id_payment}" class="btn-invoice">
-               <i class="fa-solid fa-file-invoice"></i> Lihat Invoice
-             </a>` :
-                        `<button disabled class="btn-invoice">
-               <i class="fa-solid fa-times-circle"></i> Invoice T/A
-             </button>`;
-
-                    // Fungsi JS untuk memformat status di modal (menggantikan fungsi PHP di sini)
-                    const formatStatusDetailJs = (s) => {
-                        let status_text_detail = 'DIBATALKAN';
-                        let status_color = '#c62828';
-                        let status_icon = '<i class="fa-solid fa-times-circle"></i>';
-
-                        if (s === 'paid' || s === 'settlement') {
-                            status_text_detail = 'PEMBAYARAN DITERIMA';
-                            status_color = '#2e7d32';
-                            status_icon = '<i class="fa-solid fa-check-circle"></i>';
-                        } else if (s === 'pending') {
-                            status_text_detail = 'MENUNGGU PEMBAYARAN';
-                            status_color = '#e65100';
-                            status_icon = '<i class="fa-solid fa-hourglass-half"></i>';
-                        } else if (s === 'expire') {
-                            status_text_detail = 'SUDAH KEDALUWARSA';
-                            status_color = '#ad1457';
-                            status_icon = '<i class="fa-solid fa-clock-rotate-left"></i>';
-                        } else if (s === 'cancel' || s === 'failed') {
-                            status_text_detail = 'DIBATALKAN';
-                            status_color = '#dc3545';
-                            status_icon = '<i class="fa-solid fa-ban"></i>';
-                        }
-                        return `<span style="color:${status_color};font-weight:700;">${status_icon} ${status_text_detail}</span>`;
+                    const options = {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
                     };
+                    const tBook = new Date(d.tanggal_booking).toLocaleDateString('id-ID', options);
+                    const jam = d.waktu_kumpul ? d.waktu_kumpul.substring(0, 5) + ' WIB' : '00:00 WIB';
+                    const lokasi = d.nama_lokasi || 'Basecamp Utama';
+                    const totalHarga = 'Rp ' + parseInt(d.total_harga).toLocaleString('id-ID');
+                    const orderId = d.order_id || d.id_booking;
 
-                    const fmt = formatStatusDetailJs(d.status_pembayaran);
+                    let pesertaHtml = '';
+                    if (d.participants && d.participants.length > 0) {
+                        d.participants.forEach((p, index) => {
+                            const pName = p.nama ? p.nama.toUpperCase() : 'PESERTA';
+                            const pEmail = p.email || '-';
+
+                            // PERBAIKAN: Ambil no_wa (sesuai database)
+                            const pPhone = p.no_wa || p.no_hp || p.phone || '-';
+
+                            pesertaHtml += `
+                                <div class="p-item-compact">
+                                    <div class="p-name-row">${index + 1}. ${pName}</div>
+                                    <div class="p-contact-row">
+                                        <span><i class="fa-solid fa-envelope"></i> ${pEmail}</span>
+                                        <span><i class="fa-brands fa-whatsapp"></i> ${pPhone}</span>
+                                    </div>
+                                </div>`;
+                        });
+                    } else {
+                        pesertaHtml = '<div style="text-align:center; color:#999; font-style:italic; padding:10px;">Data peserta belum diinput.</div>';
+                    }
+
+                    const isPaid = (d.status_pembayaran === 'paid' || d.status_pembayaran === 'settlement');
+                    let btnHtml = isPaid ? `
+                        <a href="view-invoice.php?payment_id=${d.id_payment}" target="_blank" class="btn-invoice-only active">
+                            <i class="fa-solid fa-print"></i> Invoice
+                        </a>` : `
+                        <div class="btn-invoice-only" style="cursor:not-allowed;">
+                            <i class="fa-solid fa-lock"></i> Invoice 
+                        </div>`;
 
                     Swal.fire({
-                        title: `Transaksi #${d.id_booking}`,
-                        html: `<div style="text-align:left">
-             <div class="info-group">
-               <h4><i class="fa-solid fa-receipt"></i> Ringkasan</h4>
-               <div class="info-row"><span>Invoice:</span><strong>${inv}</strong></div>
-               <div class="info-row"><span>Pemesanan:</span><strong>#${d.id_booking}</strong></div>
-               <div class="info-row"><span>Tanggal Transaksi:</span><strong>${d.tanggal_booking_formatted}</strong></div>
-               <div class="info-row"><span>Status:</span>${fmt}</div>
-               <div class="info-row"><span>Jumlah Peserta:</span><strong>${d.jumlah_orang} Orang</strong></div>
-               <div class="info-row"><span>Total Harga:</span><strong class="price-total">Rp ${parseInt(d.total_harga).toLocaleString('id-ID')}</strong></div>
-             </div>
-             <div class="info-group">
-               <h4><i class="fa-solid fa-mountain"></i> Detail Trip</h4>
-               <div class="info-row"><span>Gunung:</span><strong>${d.nama_gunung}</strong></div>
-               <div class="info-row"><span>Tipe:</span><strong>${d.jenis_trip||'N/A'}</strong></div>
-               <div class="info-row"><span>Tanggal Trip:</span><strong>${d.tanggal_trip_formatted}</strong></div>
-               <div class="info-row"><span>Durasi:</span><strong>${d.durasi||'N/A'}</strong></div>
-               <div class="info-row"><span>Waktu Kumpul:</span><strong>${d.waktu_kumpul||'N/A'} WIB</strong></div>
-               <div class="info-row"><span>Lokasi Kumpul:</span><strong>${d.nama_lokasi||'N/A'}</strong></div>
-             </div>
-             <div class="info-group">
-               <h4><i class="fa-solid fa-users"></i> Peserta (${d.jumlah_orang})</h4>
-               ${parts}
-             </div>
-             <div style="text-align:center;padding-top:10px;border-top:1px solid #ddd">${invBtn}</div>
-           </div>`,
-                        width: '700px',
+                        html: `
+                            <div class="ticket-header">
+                                <div class="ticket-title">Transaksi #${orderId}</div>
+                                <div class="ticket-sub">${d.nama_gunung}</div>
+                            </div>
+                            <div class="ticket-body">
+                                <div class="info-grid">
+                                    <div class="info-group">
+                                        <label>Tanggal Order</label>
+                                        <div>${tBook}</div>
+                                    </div>
+                                    <div class="info-group" style="text-align:right;">
+                                        <label>Total Tagihan</label>
+                                        <div style="color:#A98762;">${totalHarga}</div>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Lokasi Kumpul</label>
+                                        <div>${lokasi}</div>
+                                    </div>
+                                    <div class="info-group" style="text-align:right;">
+                                        <label>Waktu Kumpul</label>
+                                        <div style="color:#DC2626;">${jam}</div>
+                                    </div>
+                                </div>
+                                <div class="participant-section">
+                                    <div class="p-title">
+                                        <i class="fa-solid fa-users"></i> Daftar Peserta (${d.participants ? d.participants.length : 0})
+                                    </div>
+                                    <div class="p-list-container">
+                                        ${pesertaHtml}
+                                    </div>
+                                </div>
+                                <div class="ticket-footer">${btnHtml}</div>
+                            </div>`,
+                        width: 600,
+                        /* Lebar Compact */
+                        showConfirmButton: false,
                         showCloseButton: true,
-                        showConfirmButton: false
+                        customClass: {
+                            popup: 'ticket-popup'
+                        }
                     });
                 })
-                .catch(err => {
-                    Swal.fire({
-                        title: 'Kesalahan',
-                        text: err.message,
-                        icon: 'error',
-                        confirmButtonColor: '#a97c50'
-                    });
-                });
+                .catch(err => Swal.fire('Gagal', 'Koneksi terputus.', 'error'));
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // 0) Trigger auto-expire di backend (sudah dipanggil server-side juga)
-            fetch('../backend/payment-api.php?expire_stale=1').catch(() => {});
-
-            // 1) Cek status untuk setiap kartu pending saat halaman selesai load
-            document.querySelectorAll('.card[data-order-id]').forEach(card => {
-                const orderId = card.getAttribute('data-order-id');
-                const badge = card.querySelector('.status-badge');
-                if (orderId && orderId.trim() !== '' && badge && badge.classList.contains('pending')) {
-                    checkStatus(orderId);
-                }
-            });
-            // 2) Polling ringan setiap 12 detik untuk kartu pending
-            setInterval(periodicRefresh, 12000);
+        document.addEventListener('DOMContentLoaded', () => {
+            setInterval(periodicRefresh, 10000);
         });
     </script>
 </body>
