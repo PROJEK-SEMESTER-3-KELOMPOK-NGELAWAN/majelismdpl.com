@@ -495,6 +495,24 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
         .swal2-confirm:hover {
             background-color: #8b6332 !important;
         }
+
+        /* Tambahkan di dalam tag <style> di master-admin.php */
+        .swal2-confirm-no-border {
+            /* Menghilangkan border */
+            border: none !important;
+            /* Mengatur ulang bayangan jika SweetAlert menambahkannya */
+            box-shadow: none !important;
+            /* Menggunakan warna tombol Hapus di gambar (cokelat tua) */
+            background: #a97c50 !important;
+            color: white !important;
+        }
+
+        .swal2-cancel {
+            /* Mengatur tombol Batal agar serasi */
+            background: #6c757d !important;
+            border: none !important;
+            color: white !important;
+        }
     </style>
 </head>
 
@@ -570,7 +588,7 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="userModalLabel">
-                        <i class="bi bi-shield-plus"></i> <span id="modalTitle">Tambah Administrator Baru</span>
+                        <i class="bi bi-shield-plus me-2"></i> <span id="modalTitle">Tambah Administrator Baru</span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -581,59 +599,43 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
                         <input type="hidden" id="actionType" name="action" value="create">
 
                         <div class="row">
-                            <!-- Username -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="username" class="form-label">
                                         <i class="bi bi-person-circle me-1"></i> Username
                                     </label>
-                                    <div class="input-with-icon">
-                                        <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username" required>
-                                        <i class="bi bi-person-badge input-icon"></i>
-                                    </div>
+                                    <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username" required>
                                     <div class="invalid-feedback">Username harus diisi (minimal 3 karakter)</div>
                                 </div>
                             </div>
-
-                            <!-- Email -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email" class="form-label">
                                         <i class="bi bi-envelope-at me-1"></i> Email
                                     </label>
-                                    <div class="input-with-icon">
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="admin@example.com" required>
-                                        <i class="bi bi-envelope input-icon"></i>
-                                    </div>
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="admin@example.com" required>
                                     <div class="invalid-feedback">Email harus berformat yang benar</div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row">
-                            <!-- Password -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password" class="form-label">
                                         <i class="bi bi-shield-lock me-1"></i> Password
                                     </label>
-                                    <div class="input-with-icon">
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Minimal 6 karakter" required>
-                                        <i class="bi bi-key input-icon"></i>
-                                    </div>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Minimal 6 karakter" required>
                                     <div class="form-text">Kosongkan jika tidak ingin mengubah (saat edit)</div>
                                     <div class="invalid-feedback">Password minimal 6 karakter</div>
                                 </div>
                             </div>
-
-                            <!-- Role -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="role" class="form-label">
                                         <i class="bi bi-shield-check me-1"></i> Role Administrator
                                     </label>
                                     <div class="custom-select-wrapper">
-                                        <i class="bi bi-shield-check select-icon"></i>
                                         <select class="custom-select" id="role" name="role" required onchange="updateRoleInfo()">
                                             <option value="">Pilih Role Administrator</option>
                                             <?php foreach (RoleHelper::getAdminRoles() as $roleKey => $roleName): ?>
@@ -649,36 +651,26 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
                             </div>
                         </div>
 
-                        <!-- Role Information -->
                         <div id="roleInfo" class="role-info-card" style="display: none;">
                             <div id="roleInfoContent"></div>
                         </div>
 
-                        <div class="row">
-                            <!-- WhatsApp -->
+                        <div class="row mt-2">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="no_wa" class="form-label">
                                         <i class="bi bi-whatsapp me-1"></i> No. WhatsApp <small class="text-muted">(opsional)</small>
                                     </label>
-                                    <div class="input-with-icon">
-                                        <input type="text" class="form-control" id="no_wa" name="no_wa" placeholder="628xxxxxxxxxx">
-                                        <i class="bi bi-phone input-icon"></i>
-                                    </div>
+                                    <input type="text" class="form-control" id="no_wa" name="no_wa" placeholder="628xxxxxxxxxx">
                                     <div class="form-text">Format: 628xxxxxxxxxx</div>
                                 </div>
                             </div>
-
-                            <!-- Alamat -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="alamat" class="form-label">
                                         <i class="bi bi-geo-alt me-1"></i> Alamat <small class="text-muted">(opsional)</small>
                                     </label>
-                                    <div class="input-with-icon">
-                                        <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Alamat lengkap">
-                                        <i class="bi bi-house input-icon"></i>
-                                    </div>
+                                    <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Alamat lengkap">
                                 </div>
                             </div>
                         </div>
@@ -686,17 +678,18 @@ if (!RoleHelper::canAccessMasterAdmin($user_role)) {
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle me-1"></i> Batal
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="saveUser()">
-                        <i class="bi bi-save me-1"></i> <span id="saveButtonText">Simpan</span>
-                    </button>
+                    <div class="d-flex ms-auto btn-group-equal" style="gap: 10px;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i> Batal
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="saveUser()">
+                            <i class="bi bi-save me-1"></i> <span id="saveButtonText">Simpan</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

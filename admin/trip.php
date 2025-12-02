@@ -442,6 +442,28 @@ $user_role = $user_role ?? 'user';
             color: #6c757d;
             margin-top: 24px;
         }
+
+        .modal-footer .btn-group-equal {
+            width: auto;
+        }
+
+        .modal-footer .btn-group-equal>.btn {
+            flex-grow: 1;
+            min-width: 100px;
+        }
+
+        .modal-dialog.modal-custom-trip {
+            max-width: 650px;
+        }
+
+        .modal-footer .btn-group-equal {
+            width: auto;
+        }
+
+        .modal-footer .btn-group-equal>.btn {
+            flex-grow: 1;
+            min-width: 100px;
+        }
     </style>
 
 </head>
@@ -467,122 +489,129 @@ $user_role = $user_role ?? 'user';
     </main>
 
     <div class="modal fade" id="tambahTripModal" tabindex="-1" aria-labelledby="tambahTripModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <form class="modal-content" id="formTambahTrip" enctype="multipart/form-data">
-                <input type="hidden" id="tripIdInput" name="id_trip">
-                <input type="hidden" id="actionType" name="action" value="addTrip">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="tambahTripModalLabel">
-                        <i class="bi bi-compass me-2"></i>
-                        <span id="modalTitleText">Tambah Trip Baru</span>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                </div>
 
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="nama_gunung" class="form-label"><i class="bi bi-mountain me-1"></i> Nama Gunung</label>
-                                <input type="text" class="form-control" id="nama_gunung" name="nama_gunung" required placeholder="Cth: Gunung Bromo" />
+            <div class="modal-dialog modal-custom-trip modal-dialog-centered">
+                <form class="modal-content" id="formTambahTrip" enctype="multipart/form-data">
+                    <input type="hidden" id="tripIdInput" name="id_trip">
+                    <input type="hidden" id="actionType" name="action" value="addTrip">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="tambahTripModalLabel">
+                            <i class="bi bi-compass me-2"></i>
+                            <span id="modalTitleText">Tambah Trip Baru</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nama_gunung" class="form-label"><i class="bi bi-mountain me-1"></i> Nama Gunung</label>
+                                    <input type="text" class="form-control" id="nama_gunung" name="nama_gunung" required placeholder="Cth: Gunung Bromo" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="tanggal" class="form-label"><i class="bi bi-calendar-event me-1"></i> Tanggal Trip</label>
+                                    <input type="date" class="form-control" id="tanggal" name="tanggal" required />
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="tanggal" class="form-label"><i class="bi bi-calendar-event me-1"></i> Tanggal Trip</label>
-                                <input type="date" class="form-control" id="tanggal" name="tanggal" required />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="slot" class="form-label"><i class="bi bi-person-check-fill me-1"></i> Slot</label>
+                                    <input type="number" class="form-control" id="slot" name="slot" required min="1" placeholder="Kuota" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="durasi" class="form-label"><i class="bi bi-clock-fill me-1"></i> Durasi</label>
+                                    <input type="text" class="form-control" id="durasi" name="durasi" placeholder="misal: 2 Hari 1 Malam" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="jenis_trip" class="form-label"><i class="bi bi-bag-fill me-1"></i> Jenis Trip</label>
+                                    <select class="form-select" id="jenis_trip" name="jenis_trip" required>
+                                        <option value="" selected disabled>Pilih...</option>
+                                        <option value="Tektok">Tektok</option>
+                                        <option value="Camp">Camp</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="harga" class="form-label"><i class="bi bi-currency-dollar me-1"></i> Harga (Rp)</label>
+                                    <input type="number" class="form-control" id="harga" name="harga" required min="0" placeholder="Biaya per orang" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="via_gunung" class="form-label"><i class="bi bi-signpost me-1"></i> Jalur / Via</label>
+                                    <input type="text" class="form-control" id="via_gunung" name="via_gunung" required placeholder="Cth: Via Sembalun" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="gambar" class="form-label"><i class="bi bi-image-fill me-1"></i> Upload Gambar</label>
+                                    <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="status" class="form-label"><i class="bi bi-info-circle-fill me-1"></i> Status</label>
+                                    <select class="form-select" id="status" name="status" required>
+                                        <option value="available">Available</option>
+                                        <option value="sold">Sold</option>
+                                        <option value="done">Done</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3" id="linkDriveContainerContent" style="opacity: 0; height: 0; overflow: hidden; transition: all 0.2s ease-in-out;">
+                                    <label for="link_drive" class="form-label"><i class="bi bi-link-45deg me-1"></i> Link Google Drive (Opsional)</label>
+                                    <input type="url" class="form-control" id="link_drive" name="link_drive" placeholder="Masukkan link Google Drive Album Foto Trip" />
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="slot" class="form-label"><i class="bi bi-person-check-fill me-1"></i> Slot</label>
-                                <input type="number" class="form-control" id="slot" name="slot" required min="1" placeholder="Kuota" />
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="durasi" class="form-label"><i class="bi bi-clock-fill me-1"></i> Durasi</label>
-                                <input type="text" class="form-control" id="durasi" name="durasi" placeholder="misal: 2 Hari 1 Malam" required />
-                            </div>
+                    <div class="modal-footer">
+                        <div class="d-flex ms-auto btn-group-equal" style="gap: 10px;">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x-circle me-1"></i> Tutup
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="saveButton">
+                                <i class="bi bi-save me-1"></i> Simpan
+                            </button>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="jenis_trip" class="form-label"><i class="bi bi-bag-fill me-1"></i> Jenis Trip</label>
-                                <select class="form-select" id="jenis_trip" name="jenis_trip" required>
-                                    <option value="" selected disabled>Pilih...</option>
-                                    <option value="Tektok">Tektok</option>
-                                    <option value="Camp">Camp</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="harga" class="form-label"><i class="bi bi-currency-dollar me-1"></i> Harga (Rp)</label>
-                                <input type="number" class="form-control" id="harga" name="harga" required min="0" placeholder="Biaya per orang" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="via_gunung" class="form-label"><i class="bi bi-signpost me-1"></i> Jalur / Via</label>
-                                <input type="text" class="form-control" id="via_gunung" name="via_gunung" required placeholder="Cth: Via Sembalun" />
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="gambar" class="form-label"><i class="bi bi-image-fill me-1"></i> Upload Gambar</label>
-                                <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="status" class="form-label"><i class="bi bi-info-circle-fill me-1"></i> Status</label>
-                                <select class="form-select" id="status" name="status" required>
-                                    <option value="available">Available</option>
-                                    <option value="sold">Sold</option>
-                                    <option value="done">Done</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="mb-3" id="linkDriveContainerContent" style="opacity: 0; height: 0; overflow: hidden; transition: all 0.2s ease-in-out;">
-                                <label for="link_drive" class="form-label"><i class="bi bi-link-45deg me-1"></i> Link Google Drive (Opsional)</label>
-                                <input type="url" class="form-control" id="link_drive" name="link_drive" placeholder="Masukkan link Google Drive Album Foto Trip" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i> Tutup</button>
-                    <button type="submit" class="btn btn-primary" id="saveButton"><i class="bi bi-save me-1"></i> Simpan</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- LOAD CONFIG.JS TERLEBIH DAHULU (CRITICAL!) -->
-    <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
+        <!-- LOAD CONFIG.JS TERLEBIH DAHULU (CRITICAL!) -->
+        <script src="<?php echo getAssetsUrl('frontend/config.js'); ?>"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- BARU LOAD TRIP.JS -->
-    <script src="<?php echo getAssetsUrl('frontend/trip.js'); ?>"></script>
+        <!-- BARU LOAD TRIP.JS -->
+        <script src="<?php echo getAssetsUrl('frontend/trip.js'); ?>"></script>
 </body>
 
 </html>

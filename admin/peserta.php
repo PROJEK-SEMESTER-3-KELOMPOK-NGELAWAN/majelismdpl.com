@@ -466,6 +466,32 @@ $user_role = $user_role ?? 'user';
     tbody tr:hover td.col-number {
       color: #a97c50;
     }
+
+    .modal-dialog.modal-custom-peserta {
+      max-width: 650px;
+    }
+
+    /* Kunci untuk menyamakan lebar tombol di modal footer */
+    .modal-footer .btn-group-equal {
+      width: auto;
+    }
+
+    .modal-footer .btn-group-equal>.btn {
+      flex-grow: 1;
+      /* Memaksa tombol membagi ruang sama rata */
+      min-width: 120px;
+      /* Atur lebar minimum agar tidak terlalu kecil */
+    }
+
+    /* Pastikan CSS ini ada di <style> file peserta.php */
+    .modal-footer .btn-group-equal {
+      width: auto;
+    }
+
+    .modal-footer .btn-group-equal>.btn {
+      flex-grow: 1;
+      min-width: 120px;
+    }
   </style>
 
 </head>
@@ -543,7 +569,7 @@ $user_role = $user_role ?? 'user';
 
     <!-- Modal Edit Peserta -->
     <div class="modal fade" id="editPesertaModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-dialog modal-custom-peserta modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-brown text-white">
             <h5 class="modal-title"><i class="bi bi-person-fill-gear"></i> Edit Data Peserta</h5>
@@ -575,8 +601,14 @@ $user_role = $user_role ?? 'user';
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Batal</button>
-              <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Simpan Perubahan</button>
+              <div class="d-flex ms-auto btn-group-equal" style="gap: 10px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                  <i class="bi bi-x-circle"></i> Batal
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-check-circle"></i> Simpan Perubahan
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -607,8 +639,15 @@ $user_role = $user_role ?? 'user';
             <div class="participant-info me-auto">
               <small class="text-muted"><strong id="previewParticipantName">-</strong><span class="mx-2">•</span>NIK: <span id="previewParticipantNIK">-</span></small>
             </div>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Tutup</button>
-            <a id="previewDownloadBtn" href="#" class="btn btn-primary" download><i class="bi bi-download"></i> Download</a>
+
+            <div class="d-flex btn-group-equal" style="gap: 10px;">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                <i class="bi bi-x-circle"></i> Tutup
+              </button>
+              <a id="previewDownloadBtn" href="#" class="btn btn-primary" download>
+                <i class="bi bi-download"></i> Download
+              </a>
+            </div>
           </div>
         </div>
       </div>

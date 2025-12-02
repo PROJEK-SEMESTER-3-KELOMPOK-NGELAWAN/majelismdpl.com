@@ -232,7 +232,7 @@ $user_role = $user_role ?? 'user';
     }
 
     .btn-close-black {
-      filter: none;
+      filter: invert(1);
       opacity: 0.8;
       transition: all 0.3s ease;
     }
@@ -522,6 +522,10 @@ $user_role = $user_role ?? 'user';
       color: #432f17;
       font-weight: 600;
     }
+
+    .modal-dialog.modal-custom-payment {
+      max-width: 600px;
+    }
   </style>
 
 </head>
@@ -633,7 +637,7 @@ $user_role = $user_role ?? 'user';
 
   <!-- Modal Detail Payment -->
   <div class="modal fade" id="detailPaymentModal" tabindex="-1" aria-labelledby="detailPaymentLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-custom-payment">
       <div class="modal-content rounded-4 shadow border-0">
         <div class="modal-header">
           <h5 class="modal-title" id="detailPaymentLabel"><i class="bi bi-receipt-cutoff me-2"></i> Detail Pembayaran</h5>

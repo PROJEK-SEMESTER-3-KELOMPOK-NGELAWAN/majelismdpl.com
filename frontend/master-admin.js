@@ -260,78 +260,94 @@ function editAdministrator(userId) {
 }
 
 /**
- * Delete administrator with confirmation
+ * Delete administrator with confirmation (REVISI AKHIR: Sangat Ramping + Custom Style)
  */
 function deleteAdministrator(userId) {
-  $.ajax({
-    url: getApiUrl("master-admin-api.php"),
-    method: "GET",
-    data: { id: userId },
-    dataType: "json",
-    success: function (response) {
-      if (
-        response.success &&
-        (response.data.role === "admin" || response.data.role === "super_admin")
-      ) {
-        const roleDisplay =
-          response.data.role === "admin" ? "Admin" : "Super Admin";
-        const admin = response.data;
+    $.ajax({
+        url: getApiUrl("master-admin-api.php"),
+        method: "GET",
+        data: { id: userId },
+        dataType: "json",
+        success: function (response) {
+            if (
+                response.success &&
+                (response.data.role === "admin" || response.data.role === "super_admin")
+            ) {
+                const admin = response.data;
+                const roleDisplay = admin.role === "admin" ? "Admin" : "Super Admin";
+                const isSuperAdmin = admin.role === "super_admin";
 
-        Swal.fire({
-          title: `Konfirmasi Hapus ${roleDisplay}`,
-          html: `
-            <div class="text-start">
-              <div class="alert alert-info mb-3">
-                <h6 class="mb-2"><i class="bi bi-info-circle me-2"></i>Data Administrator:</h6>
-                <p class="mb-1"><strong>Username:</strong> ${admin.username}</p>
-                <p class="mb-1"><strong>Email:</strong> ${admin.email}</p>
-                <p class="mb-0"><strong>Role:</strong> <span class="badge ${
-                  admin.role === "admin" ? "bg-brown" : "bg-danger"
-                }">${roleDisplay}</span></p>
-              </div>
-              <div class="alert alert-warning mb-0">
-                <i class="bi bi-exclamation-triangle me-2"></i> 
-                ${
-                  admin.role === "super_admin"
-                    ? "<strong>Peringatan:</strong> Menghapus Super Admin akan menghilangkan akses penuh!"
-                    : "<strong>Perhatian:</strong> Tindakan ini tidak dapat dibatalkan!"
-                }
-              </div>
-            </div>
-          `,
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#dc3545",
-          cancelButtonColor: "#6c757d",
-          confirmButtonText: `<i class="bi bi-trash3 me-2"></i>Ya, Hapus`,
-          cancelButtonText: '<i class="bi bi-x-circle me-2"></i>Batal',
-          reverseButtons: true,
-          customClass: {
-            popup: "rounded-3",
-          },
-        }).then((result) => {
-          if (result.isConfirmed) {
-            performDelete(userId, admin.username, roleDisplay);
-          }
-        });
-      } else {
-        showAlert(
-          "error",
-          "Akses Ditolak",
-          "Anda hanya dapat menghapus pengguna dengan role Administrator"
-        );
-      }
-    },
-    error: function (xhr, status, error) {
-      console.error("Error validating administrator:", error);
-      showAlert(
-        "error",
-        "Error",
-        "Terjadi kesalahan saat validasi administrator"
-      );
-    },
-  });
+                // Mempersiapkan badge dan teks peringatan
+                const roleBadge = `<span class="badge ${isSuperAdmin ? "bg-danger" : "bg-brown"}">${roleDisplay}</span>`;
+                const warningText = isSuperAdmin
+                    ? "Menghapus Super Admin akan **menghilangkan akses penuh**!"
+                    : "Tindakan ini tidak dapat dibatalkan.";
+
+                // Struktur HTML yang sangat ringkas
+                const confirmationHtml = `
+                    <div class="text-start p-2">
+                        <div class="p-2 mb-3 rounded" style="background-color: #f7ffef; border: 1px solid #e2e6e9;">
+                            <dl class="row mb-0 small text-dark">
+                                <dt class="col-sm-4 text-muted">Username</dt>
+                                <dd class="col-sm-8 mb-0 fw-semibold">${admin.username}</dd>
+
+                                <dt class="col-sm-4 text-muted">Email</dt>
+                                <dd class="col-sm-8 mb-0">${admin.email}</dd>
+
+                                <dt class="col-sm-4 text-muted">Role</dt>
+                                <dd class="col-sm-8 mb-0">${roleBadge}</dd>
+                            </dl>
+                        </div>
+                        
+                        <div class="alert alert-warning p-2 mb-0 d-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+                            <span class="small">${warningText}</span>
+                        </div>
+                    </div>
+                `;
+
+                Swal.fire({
+                    // 1. Judul konfirmasi diubah warnanya menjadi merah (danger)
+                    title: `<span class="text-brown">Konfirmasi Hapus ${roleDisplay}</span>`,
+                    html: confirmationHtml,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#a97c50", // Warna cokelat agar serasi dengan tombol di gambar
+                    cancelButtonColor: "#6c757d",
+                    confirmButtonText: `<i class="bi bi-trash3 me-2"></i> Ya, Hapus`,
+                    cancelButtonText: '<i class="bi bi-x-circle me-2"></i> Batal',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: "rounded-3",
+                        // 2. Tambahkan kelas custom untuk tombol confirm
+                        confirmButton: 'swal2-confirm-no-border' 
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        performDelete(userId, admin.username, roleDisplay);
+                    }
+                });
+            } else {
+                showAlert(
+                    "error",
+                    "Akses Ditolak",
+                    "Anda hanya dapat menghapus pengguna dengan role Administrator"
+                );
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error validating administrator:", error);
+            showAlert(
+                "error",
+                "Error",
+                "Terjadi kesalahan saat validasi administrator"
+            );
+        },
+    });
 }
+
+// Catatan: Warna Judul diubah ke 'text-danger' (merah) karena icon peringatan SweetAlert default-nya kuning.
+// Judul merah lebih efektif untuk menekankan bahaya dan konsisten dengan tombol 'danger' di aplikasi Anda.
 
 /**
  * Perform delete operation
