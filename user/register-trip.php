@@ -12,15 +12,6 @@ if (!$isLogin) {
     exit();
 }
 
-$userLogin = null;
-if ($isLogin) {
-    $stmt = $conn->prepare("SELECT username, email, alamat, no_wa FROM users WHERE id_user=?");
-    $stmt->bind_param("i", $_SESSION['id_user']);
-    $stmt->execute();
-    $userLogin = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-}
-
 // 2. Ambil ID Trip
 $id_trip = $_GET['id'] ?? null;
 if (!$id_trip) {
@@ -271,6 +262,21 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
             font-size: 0.75rem;
         }
 
+        /* Age Warning Style */
+        .age-warning {
+            color: #f44336;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .age-warning i {
+            font-size: 0.85rem;
+        }
+
         /* SLIDE CONTROLS (Footer) */
         .slide-controls {
             display: flex;
@@ -295,7 +301,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
         }
 
         .slide-dot.active {
-            background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);;
+            background: linear-gradient(135deg, #b49666 0%, #a97c50 100%);
             width: 24px;
             border-radius: 3px;
             box-shadow: 0 4px 15px rgba(180, 150, 102, 0.3);
@@ -542,18 +548,19 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                             <div class="form-row">
                                 <div class="form-control">
                                     <label>Nama Lengkap</label>
-                                    <input type="text" name="nama[]" required value="<?= htmlspecialchars($userLogin['username'] ?? '', ENT_QUOTES) ?>">
+                                    <input type="text" name="nama[]" required>
                                 </div>
                                 <div class="form-control">
                                     <label>Email</label>
-                                    <input type="email" name="email[]" required value="<?= htmlspecialchars($userLogin['email'] ?? '', ENT_QUOTES) ?>">
+                                    <input type="email" name="email[]" required>
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-control">
                                     <label>Tanggal Lahir</label>
-                                    <input type="date" name="tanggal_lahir[]" required>
+                                    <input type="date" name="tanggal_lahir[]" class="input-tanggal-lahir" required>
+                                    <div class="age-warning-container"></div>
                                 </div>
                                 <div class="form-control">
                                     <label>Tempat Lahir</label>
@@ -571,7 +578,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                             <div class="form-row">
                                 <div class="form-control">
                                     <label>No. WA</label>
-                                    <input type="text" name="no_wa[]" required value="<?= htmlspecialchars($userLogin['no_wa'] ?? '', ENT_QUOTES) ?>">
+                                    <input type="text" name="no_wa[]" required>
                                 </div>
                                 <div class="form-control">
                                     <label>No. Darurat</label>
@@ -582,7 +589,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                             <div class="form-row full">
                                 <div class="form-control">
                                     <label>Alamat</label>
-                                    <textarea name="alamat[]" required><?= htmlspecialchars($userLogin['alamat'] ?? '', ENT_QUOTES) ?></textarea>
+                                    <textarea name="alamat[]" required></textarea>
                                 </div>
                             </div>
 
@@ -651,11 +658,71 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
         const slotTersedia = <?= $slotTersedia ?>;
         const hargaPerPeserta = <?= $hargaPerPeserta ?>;
 
+        // Array untuk track validasi umur per peserta
+        let ageValidationStatus = [true]; // Default peserta 1 valid
+
         // URL untuk mengarahkan ke halaman status pembayaran
         const paymentStatusUrl = '<?= getPageUrl("user/payment-status.php") ?>';
 
         // Nama key untuk menyimpan data di localStorage. Gunakan ID Trip dan ID User agar unik
         const STORAGE_KEY = `trip_booking_data_<?= $id_trip ?>_<?= $_SESSION['id_user'] ?>`;
+
+        // --- FUNGSI VALIDASI UMUR ---
+        function calculateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+
+        function validateAge(inputElement, pesertaIndex) {
+            const warningContainer = inputElement.parentElement.querySelector('.age-warning-container');
+            
+            if (!inputElement.value) {
+                warningContainer.innerHTML = '';
+                ageValidationStatus[pesertaIndex] = true;
+                return;
+            }
+
+            const age = calculateAge(inputElement.value);
+            
+            if (age < 18) {
+                warningContainer.innerHTML = `
+                    <div class="age-warning">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span>Umur harus minimal 18 tahun (umur Anda: ${age} tahun)</span>
+                    </div>
+                `;
+                ageValidationStatus[pesertaIndex] = false;
+                
+                // Tambahkan border merah pada input
+                inputElement.style.borderColor = '#f44336';
+            } else {
+                warningContainer.innerHTML = '';
+                ageValidationStatus[pesertaIndex] = true;
+                inputElement.style.borderColor = '';
+            }
+        }
+
+        // Event listener untuk semua input tanggal lahir
+        function attachAgeValidation() {
+            const dateInputs = document.querySelectorAll('.input-tanggal-lahir');
+            dateInputs.forEach((input, index) => {
+                input.addEventListener('change', function() {
+                    validateAge(this, index);
+                });
+                
+                input.addEventListener('blur', function() {
+                    validateAge(this, index);
+                });
+            });
+        }
 
         // --- TEMPLATE PESERTA BARU (Digunakan untuk addPeserta dan restoreFormData) ---
         function getPesertaTemplate(pesertaNum) {
@@ -674,7 +741,8 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
         <div class="form-row">
             <div class="form-control">
                 <label>Tanggal Lahir</label>
-                <input type="date" name="tanggal_lahir[]" required>
+                <input type="date" name="tanggal_lahir[]" class="input-tanggal-lahir" required>
+                <div class="age-warning-container"></div>
             </div>
             <div class="form-control">
                 <label>Tempat Lahir</label>
@@ -772,6 +840,18 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                     });
                     return;
                 }
+                
+                // Cek validasi umur
+                if (!ageValidationStatus[currentSlide]) {
+                    Swal.fire({
+                        title: 'Umur Tidak Memenuhi Syarat',
+                        html: 'Peserta harus berumur minimal <strong>18 tahun</strong> untuk mengikuti trip ini.<br><br>Silakan perbaiki tanggal lahir atau gunakan data peserta lain yang memenuhi syarat.',
+                        icon: 'error',
+                        confirmButtonColor: '#f44336'
+                    });
+                    return;
+                }
+                
                 currentSlide++;
                 updateSlideUI();
             }
@@ -846,11 +926,13 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                 newSlide.innerHTML = getPesertaTemplate(totalPeserta + 1);
                 wrapper.appendChild(newSlide);
                 totalPeserta++;
+                ageValidationStatus.push(true); // Add validation status for new peserta
             }
             // Hapus slide jika lebih
             while (totalPeserta > targetPeserta && totalPeserta > 1) {
                 wrapper.removeChild(wrapper.lastChild);
                 totalPeserta--;
+                ageValidationStatus.pop(); // Remove validation status
             }
 
             document.getElementById('jumlah-peserta').value = totalPeserta;
@@ -905,6 +987,9 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
             // 3. Update UI dan navigasi
             currentSlide = 0;
             updateSlideUI();
+            
+            // 4. Re-attach age validation
+            attachAgeValidation();
         }
 
         function loadFormData() {
@@ -969,16 +1054,28 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                 });
                 return;
             }
-
+            
+            // Cek validasi umur sebelum menambah peserta
+            if (!ageValidationStatus[currentSlide]) {
+                Swal.fire({
+                    title: 'Umur Tidak Memenuhi Syarat',
+                    html: 'Peserta ' + (currentSlide + 1) + ' belum memenuhi syarat umur minimal <strong>18 tahun</strong>.<br><br>Silakan perbaiki data terlebih dahulu sebelum menambah peserta.',
+                    icon: 'error',
+                    confirmButtonColor: '#f44336'
+                });
+                return;
+            }
 
             newSlide.innerHTML = getPesertaTemplate(totalPeserta + 1);
 
             wrapper.appendChild(newSlide);
             totalPeserta++;
+            ageValidationStatus.push(true); // Add validation status for new peserta
             document.getElementById('jumlah-peserta').value = totalPeserta;
 
             currentSlide = totalPeserta - 1;
             updateSlideUI();
+            attachAgeValidation(); // Re-attach validation for new inputs
             saveFormData(); // Simpan data setelah menambah peserta
         }
 
@@ -987,6 +1084,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                 const wrapper = document.getElementById('formSlideWrapper');
                 wrapper.removeChild(wrapper.lastChild);
                 totalPeserta--;
+                ageValidationStatus.pop(); // Remove validation status
                 document.getElementById('jumlah-peserta').value = totalPeserta;
 
                 if (currentSlide >= totalPeserta) {
@@ -1006,6 +1104,27 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                     text: 'Mohon lengkapi semua field yang wajib diisi dan pastikan format input sudah benar pada Peserta ' + (currentSlide + 1) + '. **Pastikan Foto KTP sudah di-upload!**',
                     icon: 'warning',
                     confirmButtonColor: '#FFB800'
+                });
+                return;
+            }
+            
+            // Validasi umur semua peserta sebelum submit
+            let hasUnderageParticipant = false;
+            let underageParticipantNumbers = [];
+            
+            ageValidationStatus.forEach((isValid, index) => {
+                if (!isValid) {
+                    hasUnderageParticipant = true;
+                    underageParticipantNumbers.push(index + 1);
+                }
+            });
+            
+            if (hasUnderageParticipant) {
+                Swal.fire({
+                    title: 'Validasi Umur Gagal',
+                    html: `Peserta berikut tidak memenuhi syarat umur minimal 18 tahun:<br><strong>Peserta ${underageParticipantNumbers.join(', ')}</strong><br><br>Silakan perbaiki data atau hapus peserta yang tidak memenuhi syarat.`,
+                    icon: 'error',
+                    confirmButtonColor: '#f44336'
                 });
                 return;
             }
@@ -1165,7 +1284,6 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
                 });
         }
 
-
         function closePayment() {
             document.getElementById('modal-payment').style.display = 'none';
         }
@@ -1174,6 +1292,7 @@ $tanggalTrip = date('d M Y', strtotime($trip['tanggal']));
         document.addEventListener('DOMContentLoaded', () => {
             updateSlideUI();
             loadFormData();
+            attachAgeValidation(); // Attach age validation on initial load
 
             // Tambahkan event listener untuk menyimpan data setiap ada perubahan pada form
             const form = document.getElementById('form-book-trip');
