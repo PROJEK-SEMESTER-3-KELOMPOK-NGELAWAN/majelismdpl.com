@@ -36,20 +36,24 @@ section.gallery-cardstyle {
 
 /* === CUSTOM ANIMATIONS === */
 @keyframes floatAnimation {
+
   0%,
   100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-20px);
   }
 }
 
 @keyframes pulseGlow {
+
   0%,
   100% {
     box-shadow: 0 0 10px rgba(169, 124, 80, 0.3);
   }
+
   50% {
     box-shadow: 0 0 25px rgba(169, 124, 80, 0.6);
   }
@@ -60,6 +64,7 @@ section.gallery-cardstyle {
     transform: translateX(-100%);
     opacity: 0;
   }
+
   100% {
     transform: translateX(0);
     opacity: 1;
@@ -71,6 +76,7 @@ section.gallery-cardstyle {
     transform: translateX(100%);
     opacity: 0;
   }
+
   100% {
     transform: translateX(0);
     opacity: 1;
@@ -82,6 +88,7 @@ section.gallery-cardstyle {
     transform: scale(0.8);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -156,12 +163,10 @@ section.gallery-cardstyle {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(169, 124, 80, 0.3),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(169, 124, 80, 0.3),
+      transparent);
   transition: left 0.5s;
 }
 
@@ -242,11 +247,13 @@ section.gallery-cardstyle {
     padding: 10px 10px;
     font-size: 0.97em;
   }
+
   .navbar-menu,
   .navbar-actions,
   .navbar-icons {
     display: none;
   }
+
   .hamburger {
     display: block;
     cursor: pointer;
@@ -257,6 +264,7 @@ section.gallery-cardstyle {
     margin-left: 18px;
     z-index: 1201;
   }
+
   .navbar.active .navbar-menu,
   .navbar.active .navbar-actions,
   .navbar.active .navbar-icons {
@@ -273,6 +281,7 @@ section.gallery-cardstyle {
     align-items: flex-start;
     box-shadow: 0 4px 16px rgba(123, 93, 254, 0.13);
   }
+
   .navbar.active .navbar-menu a,
   .navbar.active .navbar-actions .btn {
     margin: 0 0 9px 24px;
@@ -280,6 +289,7 @@ section.gallery-cardstyle {
     font-size: 1.09rem;
   }
 }
+
 .hamburger {
   display: none;
 }
@@ -334,11 +344,9 @@ section.gallery-cardstyle {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.1) 0%,
-    rgba(0, 0, 0, 0.5) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(0, 0, 0, 0.1) 0%,
+      rgba(0, 0, 0, 0.5) 100%);
   z-index: 2;
 }
 
@@ -347,7 +355,8 @@ section.gallery-cardstyle {
   position: relative;
   z-index: 5;
   color: #fff;
-  padding: 40px 50px; /* ← PADDING NORMAL KEMBALI */
+  padding: 40px 50px;
+  /* ← PADDING NORMAL KEMBALI */
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -382,10 +391,12 @@ section.gallery-cardstyle {
 }
 
 @keyframes pulseGlow {
+
   0%,
   100% {
     text-shadow: 0 5px 20px rgba(199, 133, 37, 0.8);
   }
+
   50% {
     text-shadow: 0 8px 30px rgba(255, 212, 74, 1);
   }
@@ -562,13 +573,16 @@ section.gallery-cardstyle {
     opacity: 0;
     transform: translateY(40px) scale(0.9);
   }
+
   60% {
     opacity: 1;
     transform: translateY(-8px) scale(1.02);
   }
+
   80% {
     transform: translateY(4px) scale(0.98);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -626,32 +640,31 @@ section.gallery-cardstyle {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(139, 115, 85, 0.12) 40%,
-    rgba(107, 84, 70, 0.2) 100%
-  );
+  background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(139, 115, 85, 0.12) 40%,
+      rgba(107, 84, 70, 0.2) 100%);
   backdrop-filter: blur(8px) saturate(150%);
   -webkit-backdrop-filter: blur(8px) saturate(150%);
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 25%,
-    black 100%
-  );
+  -webkit-mask-image: linear-gradient(to bottom,
+      transparent 0%,
+      black 25%,
+      black 100%);
   mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 100%);
 }
 
 @keyframes waveFloat {
+
   0%,
   100% {
     transform: translateX(0) scaleY(1);
   }
+
   33% {
     transform: translateX(-12px) scaleY(1.02);
   }
+
   66% {
     transform: translateX(12px) scaleY(0.98);
   }
@@ -668,12 +681,16 @@ section.gallery-cardstyle {
   }
 
   .hero-content {
-    padding: 22px 37px 120px 37px; /* ← UBAH PADDING */
-    padding-left: 50px; /* ← UBAH */
+    padding: 22px 37px 120px 37px;
+    /* ← UBAH PADDING */
+    padding-left: 50px;
+    /* ← UBAH */
     max-width: 100%;
     align-items: flex-start;
-    transform: scale(0.75); /* ← TAMBAHKAN */
-    transform-origin: left center; /* ← TAMBAHKAN */
+    transform: scale(0.75);
+    /* ← TAMBAHKAN */
+    transform-origin: left center;
+    /* ← TAMBAHKAN */
   }
 
   .hero-title {
@@ -702,9 +719,12 @@ section.gallery-cardstyle {
 /* Responsive untuk layar sangat besar (Monitor 27 inch ke atas) */
 @media (min-width: 1600px) {
   .hero-content {
-    padding: 50px 80px 100px 100px; /* ← UBAH PADDING */
-    transform: scale(1); /* ← TAMBAHKAN (100% normal) */
-    transform-origin: left center; /* ← TAMBAHKAN */
+    padding: 50px 80px 100px 100px;
+    /* ← UBAH PADDING */
+    transform: scale(1);
+    /* ← TAMBAHKAN (100% normal) */
+    transform-origin: left center;
+    /* ← TAMBAHKAN */
   }
 
   .hero-title {
@@ -747,7 +767,8 @@ section.gallery-cardstyle {
     position: relative;
     z-index: 5;
     color: #fff;
-    padding: 40px 50px; /* ← PADDING NORMAL KEMBALI */
+    padding: 40px 50px;
+    /* ← PADDING NORMAL KEMBALI */
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
@@ -797,15 +818,18 @@ section.gallery-cardstyle {
     position: relative;
     z-index: 5;
     color: #fff;
-    padding: 180px 60px 100px 55px; /* ← Lebih banyak padding untuk ruang carousel */
+    padding: 180px 60px 100px 55px;
+    /* ← Lebih banyak padding untuk ruang carousel */
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: center; /* ← Konten lebih ke tengah vertikal */
-    transform: scale(0.85); /* ← 85% bukan 75%, jadi lebih besar */
+    justify-content: center;
+    /* ← Konten lebih ke tengah vertikal */
+    transform: scale(0.85);
+    /* ← 85% bukan 75%, jadi lebih besar */
     transform-origin: left center;
   }
 
@@ -815,7 +839,8 @@ section.gallery-cardstyle {
   }
 
   .hero-title {
-    font-size: 5em; /* ← Lebih besar dari 2.8em */
+    font-size: 5em;
+    /* ← Lebih besar dari 2.8em */
     line-height: 1.1;
     margin-bottom: 10px;
   }
@@ -825,16 +850,20 @@ section.gallery-cardstyle {
   }
 
   .hero-days {
-    font-size: 2em; /* ← Lebih besar dari 1.4em */
+    font-size: 2em;
+    /* ← Lebih besar dari 1.4em */
   }
 
   .highlight {
-    font-size: 1.5em; /* ← Lebih besar dari 1.4em */
+    font-size: 1.5em;
+    /* ← Lebih besar dari 1.4em */
   }
 
   .hero-desc {
-    font-size: 1.05em; /* ← Lebih besar dari 1em */
-    max-width: 550px; /* ← Lebih lebar */
+    font-size: 1.05em;
+    /* ← Lebih besar dari 1em */
+    max-width: 550px;
+    /* ← Lebih lebar */
     line-height: 1.6;
     margin: 12px 0 18px 0;
   }
@@ -851,8 +880,10 @@ section.gallery-cardstyle {
   }
 
   .carousel-item {
-    width: 120px; /* ← Lebih besar dari 90px */
-    height: 100px; /* ← Lebih besar dari 62px */
+    width: 120px;
+    /* ← Lebih besar dari 90px */
+    height: 100px;
+    /* ← Lebih besar dari 62px */
   }
 
   .blur-wave-wrapper {
@@ -873,8 +904,10 @@ section.gallery-cardstyle {
     padding: 100px 60px 50px 30px;
     align-items: flex-start;
     justify-content: center;
-    transform: scale(1); /* ← TAMBAHKAN - reset ke normal */
-    transform-origin: center; /* ← TAMBAHKAN */
+    transform: scale(1);
+    /* ← TAMBAHKAN - reset ke normal */
+    transform-origin: center;
+    /* ← TAMBAHKAN */
   }
 
   .hero-title {
@@ -975,15 +1008,8 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg,
-    #5c3922 0%,
-    #6b5446 25%,
-    #8b7355 50%,
-    #a68a64 75%,
-    #b49666 100%
-  );
-  opacity: 0.9;
+  background: linear-gradient(180deg, #e8dcc4 0%, #f8f5f0 100%);
+  opacity: 1;
   z-index: 0;
 }
 
@@ -1033,13 +1059,16 @@ html {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translate(0, 0) scale(1);
   }
+
   33% {
     transform: translate(30px, -30px) scale(1.1);
   }
+
   66% {
     transform: translate(-30px, 30px) scale(0.9);
   }
@@ -1080,10 +1109,12 @@ html {
 
 /* Remove gradient animation */
 @keyframes gradientShift {
+
   0%,
   100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
@@ -1091,7 +1122,7 @@ html {
 
 .style-4 .profile-subtitle {
   font-size: 1.15rem;
-  color: #e8dcc4;
+  color: #666666;
   max-width: 600px;
   margin: 0 auto;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -1147,7 +1178,7 @@ html {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.style-4 .main-feature-card > p {
+.style-4 .main-feature-card>p {
   font-size: 1rem;
   color: #e8dcc4;
   line-height: 1.7;
@@ -1316,6 +1347,7 @@ html {
 
 /* Mobile Large & Tablet */
 @media (max-width: 768px) {
+
   /* FULL SCREEN - 100vh di mobile */
   .why-explorer.style-4 {
     min-height: 100vh;
@@ -1348,6 +1380,7 @@ html {
 
 /* Mobile Small */
 @media (max-width: 600px) {
+
   /* FULL SCREEN - 100vh di mobile small */
   .why-explorer.style-4 {
     min-height: 100vh;
@@ -1389,25 +1422,31 @@ html {
 /* Laptop Acer Swift 3 & Similar (1024px - 1366px) */
 @media (min-width: 1024px) and (max-width: 1366px) {
   .why-explorer.style-4 {
-    padding: 60px 5vw 60px; /* ← Lebih kecil untuk laptop */
-    gap: 35px; /* ← Gap lebih kecil */
+    padding: 60px 5vw 60px;
+    /* ← Lebih kecil untuk laptop */
+    gap: 35px;
+    /* ← Gap lebih kecil */
   }
 
   .style-4 .profile-header {
-    margin-bottom: 0; /* ← Hilangkan margin bawah */
+    margin-bottom: 0;
+    /* ← Hilangkan margin bawah */
   }
 
   .style-4 .profile-title {
-    font-size: 2.8rem; /* ← Lebih kecil dari 3.5rem */
+    font-size: 2.8rem;
+    /* ← Lebih kecil dari 3.5rem */
     margin-bottom: 15px;
   }
 
   .style-4 .profile-subtitle {
-    font-size: 1rem; /* ← Lebih kecil dari 1.15rem */
+    font-size: 1rem;
+    /* ← Lebih kecil dari 1.15rem */
   }
 
   .style-4 .glass-cards-wrapper {
-    gap: 25px; /* ← Kurangi gap antar cards */
+    gap: 25px;
+    /* ← Kurangi gap antar cards */
   }
 }
 
@@ -1435,8 +1474,320 @@ html {
 }
 
 /* ============================================
-   PAKET TRIP SECTION - MODERN LIGHTWEIGHT
+   VARIABEL DAN GAYA DASAR
    ============================================ */
+
+:root {
+  --text-dark: #3a3a3a;
+  --text-light: #f0f0f0;
+  /* PUTIH */
+
+  --bg-dark-mobile-screen: #e0d9d0;
+  --gold-light: #f0c458;
+  --gold-dark: #b89f6d;
+
+  /* Warna Gradient Cokelat (Dominan A97C50) */
+  --color-stop-1: #5c3922;
+  --color-stop-5: #b49666;
+}
+
+body {
+  /* Background Gradient UTAMA: Simple Clean Gradient (Putih ke Krem) */
+  background: linear-gradient(180deg, #f8f5f0 0%, #e8dcc4 100%);
+  opacity: 1;
+  z-index: 0;
+
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-dark);
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Tombol Chat WhatsApp telah DIHAPUS */
+.chat-whatsapp-btn {
+  display: none !important;
+}
+
+/* ============================================
+   MAIN LAYOUT STYLES (PROFILE PAGE)
+   ============================================ */
+
+.main-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 50px;
+  gap: 50px;
+  min-height: 100vh;
+  z-index: 1;
+}
+
+/* Kiri: Konten Utama */
+.left-content {
+  max-width: 450px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.left-content h1 {
+  font-size: 4em;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+  margin: 0 0 10px 0;
+}
+
+/* Animasi Hover Judul */
+.left-content h1:hover {
+  color: var(--text-dark);
+  transform: scale(1.02);
+}
+
+.left-content h1 .highlight {
+  color: var(--gold-light);
+  transition: color 0.3s ease-in-out;
+}
+
+.left-content .subtitle {
+  font-size: 1.2em;
+  color: var(--text-dark);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.left-content .links a {
+  color: var(--text-dark);
+  text-decoration: underline;
+  margin-right: 15px;
+  font-size: 0.9em;
+  transition: color 0.3s ease-in-out;
+}
+
+/* --- DOWNLOAD BOX (GLASSMORPHISM & INLINE) --- */
+.download-box {
+  /* Menghilangkan properti floating (position: fixed) */
+  position: static;
+  z-index: auto;
+
+  /* Style Glassmorphism */
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+
+  padding: 30px;
+  border-radius: 20px;
+  margin-top: 30px;
+  /* Jarak dari Terms of Service */
+
+  width: 300px;
+  color: var(--text-dark);
+
+  /* Mengatur layout internal */
+  display: block;
+  text-align: left;
+}
+
+.download-box .official-release {
+  font-size: 0.8em;
+  font-weight: 600;
+  color: #4CAF50;
+  margin-bottom: 5px;
+}
+
+.download-box h2 {
+  font-size: 1.8em;
+  margin: 0 0 5px 0;
+  color: var(--text-dark);
+}
+
+.download-box p {
+  margin: 0 0 15px 0;
+  font-size: 0.9em;
+  color: #555;
+}
+
+.download-button {
+  background-color: var(--gold-light);
+  color: var(--text-dark);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.9em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s;
+}
+
+.download-button:hover {
+  background-color: #ffc93c;
+  transform: translateY(-2px);
+}
+
+/* --- Simulasi Mobile Frame (KANAN) --- */
+.right-content.single-frame {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  padding-bottom: 0;
+}
+
+.mobile-frame {
+  width: 20vw;
+  height: 40vw;
+  min-width: 230px;
+  max-width: 350px;
+
+  border: 10px solid #222;
+  border-radius: 25px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(0, 0, 0, 0.4);
+
+  background-color: var(--bg-dark-mobile-screen);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobile-screen-content {
+  /* PERBAIKAN: Pastikan ini Flex Container Vertikal */
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  flex-grow: 1;
+  /* Mengisi seluruh ruang vertikal yang tersisa di HP frame */
+  width: 100%;
+  position: relative;
+  /* PENTING: Tambahkan height: 100% untuk kepastian turunan */
+  height: 100%;
+}
+
+/* --- STYLING SLIDER (Carousel) --- */
+
+.image-slider {
+  width: 100%;
+  height: 100%;
+  flex-grow: 1;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0;
+}
+
+.slider-wrapper {
+  display: flex;
+  width: 300%;
+  height: 100%;
+  transition: transform 0.5s ease-in-out;
+}
+
+.phone-image {
+  width: calc(100% / 3);
+  min-width: calc(100% / 3);
+  max-height: 100%;
+  object-fit: contain;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 0;
+  touch-action: pan-y;
+}
+
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  position: absolute;
+  bottom: 5px;
+  width: 100%;
+  z-index: 10;
+}
+
+.dot {
+  height: 8px;
+  width: 8px;
+  margin: 0 4px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.dot.active {
+  background-color: var(--gold-light);
+  transform: scale(1.2);
+}
+
+/* ============================================
+   RESPONSIVE MAIN LAYOUT (MOBILE)
+   ============================================ */
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    gap: 30px;
+    min-height: unset;
+  }
+
+  /* Membalik urutan di mobile: Konten Kiri (Teks) di atas HP */
+  .left-content {
+    order: -1;
+    max-width: 100%;
+    text-align: center;
+    align-items: center;
+  }
+
+  .right-content.single-frame {
+    order: 0;
+    width: 100%;
+    padding-bottom: 0;
+  }
+
+  .download-box {
+    position: static;
+    margin: 30px auto 0;
+    width: 100%;
+    max-width: 350px;
+    text-align: left;
+  }
+
+  .mobile-frame {
+    width: 80vw;
+    height: 160vw;
+    max-width: 320px;
+    max-height: 600px;
+    min-width: unset;
+  }
+
+  .left-content .links {
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  .left-content .links a {
+    display: block;
+    margin: 5px 0;
+  }
+}
+
+
+/* ============================================
+  PAKET TRIP SECTION STYLES
+  ============================================ */
 
 .paket-trip-section {
   width: 100%;
@@ -1451,8 +1802,8 @@ html {
   box-sizing: border-box;
   scroll-margin-top: 80px;
 
-  /* Simple Clean Gradient */
-  background: linear-gradient(180deg, #f8f5f0 0%, #e8dcc4 100%);
+  /* Perbaikan: Hapus gradient yang berulang, gunakan background body */
+  background: transparent;
 }
 
 /* Simple Pattern Background - SUPER LIGHTWEIGHT */
@@ -1463,20 +1814,16 @@ html {
   width: 100%;
   height: 100%;
   opacity: 0.03;
-  background-image: repeating-linear-gradient(
-      45deg,
+  background-image: repeating-linear-gradient(45deg,
       #8b5e3c 0,
       #8b5e3c 1px,
       transparent 0,
-      transparent 50%
-    ),
-    repeating-linear-gradient(
-      -45deg,
+      transparent 50%),
+    repeating-linear-gradient(-45deg,
       #8b5e3c 0,
       #8b5e3c 1px,
       transparent 0,
-      transparent 50%
-    );
+      transparent 50%);
   background-size: 30px 30px;
   pointer-events: none;
   z-index: 1;
@@ -1572,7 +1919,7 @@ html {
   justify-content: center !important;
 }
 
-.carousel-track:has(.destination-card:only-child) ~ .scroll-indicators {
+.carousel-track:has(.destination-card:only-child)~.scroll-indicators {
   display: none !important;
 }
 
@@ -1862,7 +2209,9 @@ html {
   border: 0;
 }
 
-/* Mountain Wave Divider - Static */
+/* ============================================
+  Mountain Wave Divider - Static (UPDATED DUA WARNA LIGHT)
+  ============================================ */
 .mountain-wave-divider {
   position: absolute;
   bottom: 0;
@@ -1872,6 +2221,8 @@ html {
   overflow: hidden;
   z-index: 5;
   pointer-events: none;
+  /* MENGAKTIFKAN DIVIDER */
+  display: block;
 }
 
 .mountain-wave-divider svg {
@@ -1883,9 +2234,29 @@ html {
   display: block;
 }
 
+/* --- TARGET WARNA SVG PATH/LAYER DI DALAMNYA --- */
+
+/* Layer 1 (Paling Belakang / Paling Atas - Light :hover) */
+.mountain-wave-divider svg path:nth-child(1) {
+  fill: #D9D3C9;
+  /* Warna Paling Terang */
+}
+
+/* Layer 2 (Tengah - Disamakan dengan Lapisan Depan) */
+.mountain-wave-divider svg path:nth-child(2) {
+  fill: #E5D9CB;
+  /* Warna Cokelat Terang Berikutnya */
+}
+
+/* Layer 3 (Paling Depan / Paling Bawah - Light :active) */
+.mountain-wave-divider svg path:nth-child(3) {
+  fill: #AC8456;
+  /* Warna Cokelat Terang Berikutnya */
+}
+
 /* ============================================
-   RESPONSIVE
-   ============================================ */
+  RESPONSIVE
+  ============================================ */
 
 @media (max-width: 1024px) {
   .section-title {
@@ -1932,7 +2303,7 @@ html {
   .carousel-track .destination-card:only-child {
     min-width: 320px !important;
     max-width: 320px !important;
-    margin: 0 !important; /* Remove auto margin */
+    margin: 0 !important;
   }
 
   .destination-card {
@@ -1954,6 +2325,7 @@ html {
     min-width: 290px !important;
     max-width: 290px !important;
   }
+
   .paket-trip-section {
     padding: 90px 0 120px;
   }
@@ -1993,14 +2365,15 @@ html {
   }
 
   /* Hide scroll buttons untuk single card di desktop */
-  .carousel-track:has(.destination-card:only-child) ~ .scroll-indicators {
+  .carousel-track:has(.destination-card:only-child)~.scroll-indicators {
     display: none !important;
   }
 }
 
 /* ============================================
-   GALLERY SECTION - TITLE MOVED UP
-   ============================================ */
+  GALLERY SECTION - TITLE MOVED UP
+  (Disesuaikan dengan kode yang Anda berikan)
+  ============================================ */
 
 /* Main Section - REDUCED TOP PADDING */
 section.gallery-cardstyle {
@@ -2008,20 +2381,16 @@ section.gallery-cardstyle {
   max-width: none !important;
   min-height: 100vh !important;
   margin: 0 !important;
-  padding: 80px 5vw 80px 5vw !important; /* REDUCED from 120px to 80px */
+  padding: 80px 5vw 80px 5vw !important;
+  /* REDUCED from 120px to 80px */
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important;
   align-items: center !important;
 
-  background: linear-gradient(
-    180deg,
-    #6b5446 0%,
-    #8b7355 25%,
-    #a68a64 50%,
-    #c4a57b 75%,
-    #d9c7a8 100%
-  );
+  background: linear-gradient(180deg,
+      #C9AF90 0%,
+      #e8dcc4 100%);
 
   position: relative !important;
   overflow: hidden !important;
@@ -2038,16 +2407,12 @@ section.gallery-cardstyle::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-      circle at 20% 30%,
+  background: radial-gradient(circle at 20% 30%,
       rgba(255, 255, 255, 0.08) 0%,
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at 80% 70%,
+      transparent 40%),
+    radial-gradient(circle at 80% 70%,
       rgba(255, 212, 74, 0.06) 0%,
-      transparent 40%
-    );
+      transparent 40%);
   pointer-events: none;
   z-index: 2;
 }
@@ -2066,7 +2431,8 @@ section.gallery-cardstyle::before {
 /* Gallery Header - REDUCED MARGIN */
 .gallery-header {
   text-align: center;
-  margin: 0 auto 40px auto; /* REDUCED from 60px to 40px */
+  margin: 0 auto 40px auto;
+  /* REDUCED from 60px to 40px */
   position: relative;
   width: 100%;
   max-width: 900px;
@@ -2078,7 +2444,8 @@ section.gallery-cardstyle::before {
   font-size: 3.5rem;
   font-weight: 900;
   color: #5c3922 !important;
-  margin: 0 auto 20px; /* Keep this as is */
+  margin: 0 auto 20px;
+  /* Keep this as is */
   letter-spacing: -0.5px;
   line-height: 1.3;
   position: relative;
@@ -2118,7 +2485,7 @@ section.gallery-cardstyle::before {
 
 .gallery-subtitle {
   font-size: 1.15rem;
-  color: #ffffff !important;
+  color: #666666 !important;
   margin: 30px auto 0;
   font-weight: 400;
   letter-spacing: 0.3px;
@@ -2169,11 +2536,9 @@ section.gallery-cardstyle::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(92, 57, 34, 0.8) 100%
-  );
+  background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(92, 57, 34, 0.8) 100%);
   opacity: 0;
   transition: opacity 0.4s ease;
   z-index: 2;
@@ -2251,8 +2616,8 @@ section.gallery-cardstyle::before {
 }
 
 /* ============================================
-   RESPONSIVE
-   ============================================ */
+  RESPONSIVE
+  ============================================ */
 
 @media (max-width: 1024px) {
   .card-grid {
@@ -2263,7 +2628,8 @@ section.gallery-cardstyle::before {
 
 @media (max-width: 768px) {
   section.gallery-cardstyle {
-    padding: 70px 3vw 60px 3vw !important; /* Reduced top padding for mobile */
+    padding: 70px 3vw 60px 3vw !important;
+    /* Reduced top padding for mobile */
   }
 
   .gallery-header {
@@ -2288,6 +2654,10 @@ section.gallery-cardstyle::before {
   .gallery-cardstyle .card img {
     height: 220px;
   }
+
+  .mountain-wave-divider {
+    height: 150px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2301,6 +2671,27 @@ section.gallery-cardstyle::before {
 
   .gallery-cardstyle .card img {
     height: 200px;
+  }
+
+  .mountain-wave-divider {
+    height: 120px;
+  }
+}
+
+/* Desktop: Single card tetap centered dan lebih besar */
+@media (min-width: 769px) {
+  .carousel-track:has(.destination-card:only-child) {
+    justify-content: center !important;
+  }
+
+  .carousel-track .destination-card:only-child {
+    min-width: 400px !important;
+    max-width: 400px !important;
+  }
+
+  /* Hide scroll buttons untuk single card di desktop */
+  .carousel-track:has(.destination-card:only-child)~.scroll-indicators {
+    display: none !important;
   }
 }
 
@@ -2318,14 +2709,9 @@ section.gallery-cardstyle::before {
   align-items: center;
 
   /* Brown Gradient - Matching Theme */
-  background: linear-gradient(
-    135deg,
-    #1a1612 0%,
-    #2d2419 25%,
-    #3d3020 50%,
-    #4a3a28 75%,
-    #5c4a35 100%
-  );
+  background: linear-gradient(135deg,
+      #E8DCC4 0%,
+      #DAC7A6 100%);
 }
 
 /* Animated Mesh Background - Brown Tones */
@@ -2336,46 +2722,39 @@ section.gallery-cardstyle::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-      circle at 15% 20%,
+  background: radial-gradient(circle at 15% 20%,
       rgba(255, 212, 74, 0.12) 0%,
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at 85% 30%,
+      transparent 40%),
+    radial-gradient(circle at 85% 30%,
       rgba(169, 124, 80, 0.1) 0%,
-      transparent 45%
-    ),
-    radial-gradient(
-      circle at 50% 60%,
+      transparent 45%),
+    radial-gradient(circle at 50% 60%,
       rgba(92, 57, 34, 0.08) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 20% 80%,
+      transparent 50%),
+    radial-gradient(circle at 20% 80%,
       rgba(255, 215, 0, 0.08) 0%,
-      transparent 35%
-    ),
-    radial-gradient(
-      circle at 90% 85%,
+      transparent 35%),
+    radial-gradient(circle at 90% 85%,
       rgba(139, 115, 85, 0.1) 0%,
-      transparent 40%
-    );
+      transparent 40%);
   animation: meshMove 20s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
 }
 
 @keyframes meshMove {
+
   0%,
   100% {
     opacity: 0.4;
     transform: translate(0, 0) scale(1);
   }
+
   33% {
     opacity: 0.6;
     transform: translate(20px, -20px) scale(1.05);
   }
+
   66% {
     opacity: 0.5;
     transform: translate(-20px, 20px) scale(0.95);
@@ -2389,10 +2768,8 @@ section.gallery-cardstyle::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: linear-gradient(
-      rgba(255, 212, 74, 0.03) 1px,
-      transparent 1px
-    ),
+  background-image: linear-gradient(rgba(255, 212, 74, 0.03) 1px,
+      transparent 1px),
     linear-gradient(90deg, rgba(255, 212, 74, 0.03) 1px, transparent 1px);
   background-size: 60px 60px;
   opacity: 0.4;
@@ -2402,10 +2779,12 @@ section.gallery-cardstyle::before {
 }
 
 @keyframes gridPulse {
+
   0%,
   100% {
     opacity: 0.3;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -2419,12 +2798,10 @@ section.gallery-cardstyle::before {
   left: 50%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(
-    circle,
-    rgba(255, 212, 74, 0.08) 0%,
-    rgba(169, 124, 80, 0.05) 35%,
-    transparent 70%
-  );
+  background: radial-gradient(circle,
+      rgba(255, 212, 74, 0.08) 0%,
+      rgba(169, 124, 80, 0.05) 35%,
+      transparent 70%);
   transform: translate(-50%, -50%);
   animation: orbPulse 8s ease-in-out infinite;
   pointer-events: none;
@@ -2433,11 +2810,13 @@ section.gallery-cardstyle::before {
 }
 
 @keyframes orbPulse {
+
   0%,
   100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 0.3;
   }
+
   50% {
     transform: translate(-50%, -50%) scale(1.2);
     opacity: 0.5;
@@ -2462,7 +2841,7 @@ section.gallery-cardstyle::before {
 .title-large {
   font-size: 3.5rem;
   font-weight: 900;
-  color: #e2cfbd;
+  color: #5C3922;
   text-shadow: 0 2px 15px rgba(255, 212, 74, 0.4);
   transition: all 0.3s ease;
 }
@@ -2475,7 +2854,7 @@ section.gallery-cardstyle::before {
 
 .testimonial-subtitle {
   font-size: 1.15rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(102, 102, 102, 100);
   margin-top: 15px;
   text-shadow: 0 2px 10px rgba(169, 124, 80, 0.3);
 }
@@ -2486,24 +2865,20 @@ section.gallery-cardstyle::before {
   overflow: hidden;
   margin-bottom: 14px;
 
-  mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    transparent 10%,
-    black 20%,
-    black 80%,
-    transparent 90%,
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    transparent 10%,
-    black 20%,
-    black 80%,
-    transparent 90%,
-    transparent 100%
-  );
+  mask-image: linear-gradient(to right,
+      transparent 0%,
+      transparent 10%,
+      black 20%,
+      black 80%,
+      transparent 90%,
+      transparent 100%);
+  -webkit-mask-image: linear-gradient(to right,
+      transparent 0%,
+      transparent 10%,
+      black 20%,
+      black 80%,
+      transparent 90%,
+      transparent 100%);
 }
 
 .testimonial-track {
@@ -2520,6 +2895,7 @@ section.gallery-cardstyle::before {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -2533,6 +2909,7 @@ section.gallery-cardstyle::before {
   0% {
     transform: translateX(-50%);
   }
+
   100% {
     transform: translateX(0);
   }
@@ -2573,13 +2950,11 @@ section.gallery-cardstyle::before {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 212, 74, 0.2),
-    rgba(169, 124, 80, 0.15),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 212, 74, 0.2),
+      rgba(169, 124, 80, 0.15),
+      transparent);
   transition: left 0.8s;
   z-index: 1;
 }
@@ -2695,14 +3070,17 @@ section.gallery-cardstyle::before {
   .testimonials {
     padding: 80px 0 60px;
   }
+
   .title-large {
     font-size: 2.5rem;
   }
+
   .testimonial-card {
     width: 220px;
     padding: 14px;
     min-height: 140px;
   }
+
   .testimonial-row {
     margin-bottom: 12px;
   }
@@ -2712,11 +3090,13 @@ section.gallery-cardstyle::before {
   .title-large {
     font-size: 2rem;
   }
+
   .testimonial-card {
     width: 200px;
     padding: 12px;
     min-height: 130px;
   }
+
   .testimonial-text {
     font-size: 0.75rem;
   }
@@ -2791,6 +3171,7 @@ section.gallery-cardstyle::before {
   #signUpModal .login-box {
     max-width: 95vw;
   }
+
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -2897,6 +3278,7 @@ section {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2943,7 +3325,8 @@ section {
 
   position: relative;
   overflow: hidden;
-  order: 2; /* Button di bawah */
+  order: 2;
+  /* Button di bawah */
 }
 
 /* Shimmer Effect */
@@ -2954,21 +3337,21 @@ section {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.3) 50%,
-    transparent 70%
-  );
+  background: linear-gradient(45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 70%);
   transform: rotate(45deg);
   animation: shimmer 3s ease-in-out infinite;
 }
 
 @keyframes shimmer {
+
   0%,
   100% {
     transform: translateX(-100%) translateY(-100%) rotate(45deg);
   }
+
   50% {
     transform: translateX(100%) translateY(100%) rotate(45deg);
   }
@@ -2995,6 +3378,7 @@ section {
     height: 100%;
     opacity: 0.8;
   }
+
   100% {
     width: 140%;
     height: 180%;
@@ -3022,22 +3406,28 @@ section {
 
 /* Cute Wobble Animation */
 @keyframes wobble {
+
   0%,
   100% {
     transform: rotate(0deg) scale(1);
   }
+
   15% {
     transform: rotate(-15deg) scale(1.1);
   }
+
   30% {
     transform: rotate(10deg) scale(1.05);
   }
+
   45% {
     transform: rotate(-10deg) scale(1.1);
   }
+
   60% {
     transform: rotate(5deg) scale(1);
   }
+
   75% {
     transform: rotate(-5deg) scale(1.05);
   }
@@ -3058,11 +3448,13 @@ section {
 }
 
 @keyframes ping {
+
   0%,
   100% {
     transform: scale(1);
     opacity: 1;
   }
+
   50% {
     transform: scale(1.3);
     opacity: 0.8;
@@ -3090,13 +3482,16 @@ section {
 
 /* Shake Animation on Hover */
 @keyframes shake {
+
   0%,
   100% {
     transform: translateX(0) rotate(0deg);
   }
+
   25% {
     transform: translateX(-8px) rotate(-10deg);
   }
+
   75% {
     transform: translateX(8px) rotate(10deg);
   }
@@ -3129,15 +3524,18 @@ section {
 
   position: relative;
   white-space: nowrap;
-  order: 1; /* Tooltip di atas */
+  order: 1;
+  /* Tooltip di atas */
 }
 
 /* Tooltip Arrow - SEKARANG MENUNJUK KE BAWAH */
 .whatsapp-tooltip::after {
   content: "";
   position: absolute;
-  bottom: -6px; /* Arrow di bawah tooltip */
-  right: 40px; /* Posisi arrow */
+  bottom: -6px;
+  /* Arrow di bawah tooltip */
+  right: 40px;
+  /* Posisi arrow */
   width: 12px;
   height: 12px;
   background: white;
@@ -3156,10 +3554,12 @@ section {
 
 /* Bounce animation untuk tooltip */
 @keyframes tooltipBounce {
+
   0%,
   100% {
     transform: translateY(0) scale(1);
   }
+
   50% {
     transform: translateY(-5px) scale(1.02);
   }
@@ -3242,6 +3642,7 @@ section {
       opacity: 0;
       transform: translateX(-10px);
     }
+
     to {
       opacity: 1;
       transform: translateX(0);
@@ -3291,6 +3692,7 @@ section {
 
 /* ========== ACCESSIBILITY ========== */
 @media (prefers-reduced-motion: reduce) {
+
   .whatsapp-button,
   .whatsapp-button i,
   .whatsapp-button::before,
@@ -3343,28 +3745,26 @@ section {
   bottom: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(139, 115, 85, 0.15) 50%,
-    rgba(107, 84, 70, 0.25) 100%
-  );
+  background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(139, 115, 85, 0.15) 50%,
+      rgba(107, 84, 70, 0.25) 100%);
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
   pointer-events: none;
 }
 
 @keyframes waveMove {
+
   0%,
   100% {
-    d: path(
-      "M0,96L48,112C96,128,192,160,288,154.7C384,149,480,107,576,101.3C672,96,768,128,864,133.3C960,139,1056,117,1152,106.7C1248,96,1344,96,1392,96L1440,96L1440,200L0,200Z"
-    );
+    d: path("M0,96L48,112C96,128,192,160,288,154.7C384,149,480,107,576,101.3C672,96,768,128,864,133.3C960,139,1056,117,1152,106.7C1248,96,1344,96,1392,96L1440,96L1440,200L0,200Z"
+      );
   }
+
   50% {
-    d: path(
-      "M0,128L48,112C96,96,192,64,288,69.3C384,75,480,117,576,128C672,139,768,117,864,112C960,107,1056,117,1152,122.7C1248,128,1344,128,1392,128L1440,128L1440,200L0,200Z"
-    );
+    d: path("M0,128L48,112C96,96,192,64,288,69.3C384,75,480,117,576,128C672,139,768,117,864,112C960,107,1056,117,1152,122.7C1248,128,1344,128,1392,128L1440,128L1440,200L0,200Z"
+      );
   }
 }
 
@@ -3383,51 +3783,59 @@ section {
 }
 
 .colored-toast .swal2-progress-bar {
-  background-color: #38a169 !important; /* Warna hijau yang lebih gelap */
+  background-color: #38a169 !important;
+  /* Warna hijau yang lebih gelap */
 }
 
 /* Pastikan SweetAlert2 CSS sudah terload */
 
 /* 1. Mengubah Border-Radius Popup secara keseluruhan */
 .swal2-popup {
-    border-radius: 15px !important; /* Nilai yang lebih tinggi untuk efek lebih melengkung */
-    font-family: 'Poppins', sans-serif; /* Ganti dengan font yang Anda gunakan di aplikasi Anda */
-    /* Menghilangkan bayangan default jika diinginkan */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+  border-radius: 15px !important;
+  /* Nilai yang lebih tinggi untuk efek lebih melengkung */
+  font-family: 'Poppins', sans-serif;
+  /* Ganti dengan font yang Anda gunakan di aplikasi Anda */
+  /* Menghilangkan bayangan default jika diinginkan */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* 2. Menyesuaikan Ikon Peringatan/Info (untuk mirip ikon '!' di gambar) */
 /* Ikon default SweetAlert2 sulit diubah menjadi ikon seperti gambar Anda tanpa SVG/HTML kustom.
    Namun, Anda bisa menyesuaikan warna ikon jika menggunakan 'warning' atau 'info' */
-.swal2-icon.swal2-warning, .swal2-icon.swal2-info {
-    /* Jika Anda memutuskan menggunakan 'warning' atau 'info' untuk Kesalahan/Logout */
-    border-color: #a9865a; 
-    color: #a9865a; 
+.swal2-icon.swal2-warning,
+.swal2-icon.swal2-info {
+  /* Jika Anda memutuskan menggunakan 'warning' atau 'info' untuk Kesalahan/Logout */
+  border-color: #a9865a;
+  color: #a9865a;
 }
 
 /* 3. Menyesuaikan Tombol Konfirmasi (Ya, Logout / Lanjutkan / Coba Lagi) */
 .swal2-custom-confirm-button {
-    /* SweetAlert2 menggunakan !important, jadi kita tambahkan */
-    background-color: #a9865a !important; /* Warna Ya, Logout */
-    color: white !important;
-    border-radius: 12px !important; /* Border radius tombol */
-    border: none !important;
-    font-size: 1em !important;
-    font-weight: 600 !important; /* Menyesuaikan ketebalan font */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* SweetAlert2 menggunakan !important, jadi kita tambahkan */
+  background-color: #a9865a !important;
+  /* Warna Ya, Logout */
+  color: white !important;
+  border-radius: 12px !important;
+  /* Border radius tombol */
+  border: none !important;
+  font-size: 1em !important;
+  font-weight: 600 !important;
+  /* Menyesuaikan ketebalan font */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* 4. Menyesuaikan Tombol Batal (Batal / Tutup) */
 .swal2-custom-cancel-button {
-    background-color: #6c757d !important; /* Warna Batal */
-    color: white !important;
-    border-radius: 12px !important;
-    border: none !important;
-    font-size: 1em !important;
-    font-weight: 600 !important;
+  background-color: #6c757d !important;
+  /* Warna Batal */
+  color: white !important;
+  border-radius: 12px !important;
+  border: none !important;
+  font-size: 1em !important;
+  font-weight: 600 !important;
 }
 
 /* 5. Mengatur Jarak antara tombol (opsional, jika perlu) */
 .swal2-actions {
-    margin-top: 20px;
+  margin-top: 20px;
 }

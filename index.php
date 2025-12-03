@@ -56,6 +56,8 @@ session_start();
   </section>
 
   <!-- profile -->
+
+  <!-- profile -->
   <section class="why-explorer style-4" id="profile">
     <!-- Animated Gradient Background - Brown Theme -->
     <div class="gradient-bg"></div>
@@ -148,6 +150,50 @@ session_start();
     </div>
   </section>
 
+  <div class="main-layout">
+    <div class="left-content">
+      <h1>Download <br><span class="highlight">Majelis MDPL</span></h1>
+      <p class="subtitle">Bergabunglah dengan ribuan traveler yang telah merasakan pengalaman mendaki tak terlupakan
+        bersama kami.</p>
+
+      <div class="links">
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+
+      <div class="download-box">
+        <div class="official-release">
+          <i class="fas fa-check-circle"></i> OFFICIAL RELEASE
+        </div>
+        <h2>Download APK</h2>
+        <p>Versi terbaru 1.0.0 • Android 7.0+</p>
+        <button class="download-button">
+          <i class="fas fa-download"></i> Download Sekarang
+        </button>
+      </div>
+
+    </div>
+
+    <div class="right-content single-frame">
+      <div class="mobile-frame">
+        <div class="mobile-screen-content">
+          <div class="image-slider">
+            <img class="phone-image-static" src="assets/mountain.jpg" alt="Majelis MDPL">
+          </div>
+
+        </div>
+
+        <div class="slider-dots">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  </div>
+
   <!-- Paket Trip Section -->
   <section class="paket-trip-section" id="paketTrips">
     <!-- Simple Pattern Background -->
@@ -166,7 +212,8 @@ session_start();
     </div>
 
     <!-- Destination Carousel -->
-    <div class="destination-carousel" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300" data-aos-once="true">
+    <div class="destination-carousel" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300"
+      data-aos-once="true">
       <!-- Carousel Track (Horizontal Scroll) -->
       <div class="carousel-track">
         <!-- Loading spinner -->
@@ -197,8 +244,12 @@ session_start();
             <stop offset="100%" style="stop-color:#5c3922;stop-opacity:0.8" />
           </linearGradient>
         </defs>
-        <path fill="url(#mountainGradient)" d="M0,150 L60,130 L120,145 L180,120 L240,135 L300,110 L360,125 L420,100 L480,115 L540,95 L600,110 L660,90 L720,105 L780,85 L840,100 L900,80 L960,95 L1020,75 L1080,90 L1140,70 L1200,85 L1260,65 L1320,80 L1380,60 L1440,75 L1440,200 L0,200 Z"></path>
-        <path fill="#4b3625" opacity="0.5" d="M0,165 L80,155 L160,165 L240,150 L320,160 L400,145 L480,155 L560,140 L640,150 L720,135 L800,145 L880,130 L960,140 L1040,125 L1120,135 L1200,120 L1280,130 L1360,115 L1440,125 L1440,200 L0,200 Z"></path>
+        <path fill="url(#mountainGradient)"
+          d="M0,150 L60,130 L120,145 L180,120 L240,135 L300,110 L360,125 L420,100 L480,115 L540,95 L600,110 L660,90 L720,105 L780,85 L840,100 L900,80 L960,95 L1020,75 L1080,90 L1140,70 L1200,85 L1260,65 L1320,80 L1380,60 L1440,75 L1440,200 L0,200 Z">
+        </path>
+        <path fill="#4b3625" opacity="0.5"
+          d="M0,165 L80,155 L160,165 L240,150 L320,160 L400,145 L480,155 L560,140 L640,150 L720,135 L800,145 L880,130 L960,140 L1040,125 L1120,135 L1200,120 L1280,130 L1360,115 L1440,125 L1440,200 L0,200 Z">
+        </path>
       </svg>
     </div>
   </section>
@@ -267,39 +318,45 @@ session_start();
         <div class="testimonial-track">
           <div class="testimonial-card">
             <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Trip ke Rinjani sangat terorganisir. Guide-nya asik dan perhatian. Saya yang pemula merasa aman banget!</p>
+            <p class="testimonial-text">Trip ke Rinjani sangat terorganisir. Guide-nya asik dan perhatian. Saya yang
+              pemula merasa aman banget!</p>
             <div class="testimonial-author">
               <div class="author-image"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Rudi"></div>
               <div class="author-details">
                 <h4>Rudi Saputra</h4>
                 <p>Jakarta</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
               </div>
             </div>
           </div>
 
           <div class="testimonial-card">
             <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Sunrise di Bromo, camping di savana, semua sempurna. Majelis MDPL benar-benar profesional!</p>
+            <p class="testimonial-text">Sunrise di Bromo, camping di savana, semua sempurna. Majelis MDPL benar-benar
+              profesional!</p>
             <div class="testimonial-author">
               <div class="author-image"><img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Andi"></div>
               <div class="author-details">
                 <h4>Andi Pratama</h4>
                 <p>Surabaya</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
               </div>
             </div>
           </div>
 
           <div class="testimonial-card">
             <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Fasilitas lengkap, harga terjangkau, pelayanan memuaskan. Recommended banget!</p>
+            <p class="testimonial-text">Fasilitas lengkap, harga terjangkau, pelayanan memuaskan. Recommended banget!
+            </p>
             <div class="testimonial-author">
               <div class="author-image"><img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Sarah"></div>
               <div class="author-details">
                 <h4>Sarah Wijaya</h4>
                 <p>Yogyakarta</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
               </div>
             </div>
           </div>
@@ -311,26 +368,30 @@ session_start();
         <div class="testimonial-track">
           <div class="testimonial-card">
             <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Baru pertama kali ikut open trip, tapi langsung jatuh cinta. Banyak teman baru dan pengalaman tak terlupakan.</p>
+            <p class="testimonial-text">Baru pertama kali ikut open trip, tapi langsung jatuh cinta. Banyak teman baru
+              dan pengalaman tak terlupakan.</p>
             <div class="testimonial-author">
               <div class="author-image"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dewi"></div>
               <div class="author-details">
                 <h4>Dewi Lestari</h4>
                 <p>Bandung</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
               </div>
             </div>
           </div>
 
           <div class="testimonial-card">
             <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Tim guide sangat berpengalaman dan ramah. Perjalanan jadi lebih seru dan aman. Pasti bakal ikut lagi!</p>
+            <p class="testimonial-text">Tim guide sangat berpengalaman dan ramah. Perjalanan jadi lebih seru dan aman.
+              Pasti bakal ikut lagi!</p>
             <div class="testimonial-author">
               <div class="author-image"><img src="https://randomuser.me/api/portraits/men/85.jpg" alt="Budi"></div>
               <div class="author-details">
                 <h4>Budi Hermawan</h4>
                 <p>Semarang</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
               </div>
             </div>
           </div>
@@ -343,7 +404,8 @@ session_start();
               <div class="author-details">
                 <h4>Nina Agustina</h4>
                 <p>Malang</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
               </div>
             </div>
           </div>
@@ -355,39 +417,45 @@ session_start();
         <div class="testimonial-track">
           <div class="testimonial-card">
             <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Pengalaman hiking terbaik! View spektakuler, persiapan matang, semua worth it banget.</p>
+            <p class="testimonial-text">Pengalaman hiking terbaik! View spektakuler, persiapan matang, semua worth it
+              banget.</p>
             <div class="testimonial-author">
               <div class="author-image"><img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Doni"></div>
               <div class="author-details">
                 <h4>Doni Prasetyo</h4>
                 <p>Bekasi</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
               </div>
             </div>
           </div>
 
           <div class="testimonial-card">
             <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Pelayanan ramah, harga bersahabat, destinasi keren. Majelis MDPL is the best!</p>
+            <p class="testimonial-text">Pelayanan ramah, harga bersahabat, destinasi keren. Majelis MDPL is the best!
+            </p>
             <div class="testimonial-author">
               <div class="author-image"><img src="https://randomuser.me/api/portraits/women/55.jpg" alt="Rina"></div>
               <div class="author-details">
                 <h4>Rina Sari</h4>
                 <p>Tangerang</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
               </div>
             </div>
           </div>
 
           <div class="testimonial-card">
             <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Open trip paling seru yang pernah saya ikuti. Semua terorganisir dengan baik!</p>
+            <p class="testimonial-text">Open trip paling seru yang pernah saya ikuti. Semua terorganisir dengan baik!
+            </p>
             <div class="testimonial-author">
               <div class="author-image"><img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Eko"></div>
               <div class="author-details">
                 <h4>Eko Prabowo</h4>
                 <p>Solo</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
               </div>
             </div>
           </div>
@@ -431,14 +499,14 @@ session_start();
     });
 
     // ========== WHATSAPP BUTTON - CUTE & RESPONSIVE ==========
-    (function() {
+    (function () {
       const whatsappBtn = document.getElementById('whatsappBtn');
 
       if (whatsappBtn) {
         let expandTimeout;
         let isExpanded = false;
 
-        whatsappBtn.addEventListener('click', function(e) {
+        whatsappBtn.addEventListener('click', function (e) {
           if (window.innerWidth <= 768) {
             if (!isExpanded) {
               e.preventDefault();
@@ -458,7 +526,7 @@ session_start();
           }
         });
 
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
           if (window.innerWidth > 768) {
             whatsappBtn.classList.remove('expanded');
             isExpanded = false;
@@ -466,7 +534,7 @@ session_start();
           }
         });
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
           if (window.innerWidth <= 768 && isExpanded) {
             if (!whatsappBtn.contains(e.target)) {
               whatsappBtn.classList.remove('expanded');
@@ -517,26 +585,26 @@ session_start();
     // ========== SECTION HERO HOME ==========
     document.addEventListener('DOMContentLoaded', () => {
       const heroSlides = [{
-          image: "assets/herooo.jpg",
-          title: "GUNUNG BROMO",
-          offer: "BEST OFFERS",
-          days: "1 HARI",
-          desc: "Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan"
-        },
-        {
-          image: "assets/ijen.jpg",
-          title: "GUNUNG IJEN",
-          offer: "IJEN ADVENTURE",
-          days: "2 HARI",
-          desc: "Nikmati mendaki gunung berapi biru di Jawa Timur."
-        },
-        {
-          image: "assets/rinjani.jpg",
-          title: "GUNUNG RINJANI",
-          offer: "RINJANI EXPEDITION",
-          days: "3 HARI",
-          desc: "Rasakan petualangan mendaki puncak tertinggi di Nusa Tenggara Barat."
-        }
+        image: "assets/herooo.jpg",
+        title: "GUNUNG BROMO",
+        offer: "BEST OFFERS",
+        days: "1 HARI",
+        desc: "Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan"
+      },
+      {
+        image: "assets/ijen.jpg",
+        title: "GUNUNG IJEN",
+        offer: "IJEN ADVENTURE",
+        days: "2 HARI",
+        desc: "Nikmati mendaki gunung berapi biru di Jawa Timur."
+      },
+      {
+        image: "assets/rinjani.jpg",
+        title: "GUNUNG RINJANI",
+        offer: "RINJANI EXPEDITION",
+        days: "3 HARI",
+        desc: "Rasakan petualangan mendaki puncak tertinggi di Nusa Tenggara Barat."
+      }
       ];
 
       const heroBg = document.getElementById('hero-bg');
@@ -638,7 +706,7 @@ session_start();
     });
 
     // ========== PARTICLES JS ==========
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       if (typeof particlesJS !== 'undefined') {
         particlesJS('particles-js', {
           particles: {
@@ -707,7 +775,7 @@ session_start();
     });
 
     // ========== COUNTER ANIMATION ==========
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const counters = document.querySelectorAll('.stat-number');
       const speed = 200;
 
@@ -742,7 +810,7 @@ session_start();
     });
 
     // ========== TESTIMONIAL INFINITE MARQUEE ==========
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const rows = document.querySelectorAll('.testimonial-row');
 
       rows.forEach(row => {

@@ -1,60 +1,52 @@
 <footer class="footer">
-    <div class="container">
-      <!-- Kolom Kiri -->
-      <div class="footer-col">
-        <h3 class="brand">Pendakian Majelis MDPL</h3>
-        <p>
-          ✨ Nikmati pengalaman tak terlupakan bersama Majelis MDPL Open Trip. <br>
-          Ikuti serunya pendakian tektok maupun camping, rasakan panorama puncak
-          yang menakjubkan, dan ciptakan kenangan berharga di setiap perjalanan. 🌲🏔
-        </p>
-        <div class="social-links">
-          <a href="#"><i class="fa-brands fa-facebook"></i></a>
-          <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-          <a href="#"><i class="fa-brands fa-instagram"></i></a>
-          <a href="#"><i class="fa-brands fa-youtube"></i></a>
-        </div>
-      </div>
-      <!-- Kolom Tengah -->
-      <div class="footer-col">
-        <h3>Kontak <span>Kami</span></h3>
-        <p><strong>Alamat Kami</strong><br>Jl. aseleole, Kaliwates, Jember 55582</p>
-        <p><strong>Whatsapp</strong><br>08562898933</p>
-        <p><strong>Email</strong><br>majelismdpl@gmail.com</p>
-      </div>
-      <!-- Kolom Kanan -->
-      <div class="footer-col">
-        <h3>Quick <span>Link</span></h3>
-        <ul>
-          <li><a href="#">Profile</a></li>
-          <li><a href="#">Paket Open Trip</a></li>
-          <li><a href="#">Kontak</a></li>
-        </ul>
+  <div class="container">
+    <div class="footer-col">
+      <h3 class="brand">Pendakian Majelis MDPL</h3>
+      <p>
+        ✨ Nikmati pengalaman tak terlupakan bersama Majelis MDPL Open Trip. <br>
+        Ikuti serunya pendakian tektok maupun camping, rasakan panorama puncak
+        yang menakjubkan, dan ciptakan kenangan berharga di setiap perjalanan. 🌲🏔
+      </p>
+      <div class="social-links">
+        <a href="https://www.tiktok.com/@majelis.mdpl?_r=1&_t=ZS-91uZgzyDdqf"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://www.instagram.com/majelis.mdpl?igsh=cmFpZHVpbjFmMTB3"><i class="fa-brands fa-instagram"></i></a>
       </div>
     </div>
-    <div class="copyright">
-      <p>Copyright © 2025 Majelis Mdpl. All rights reserved. Developed with ❤ by Ngelawans Gang</p>
+    <div class="footer-col">
+      <h3>Kontak <span>Kami</span></h3>
+      <p><strong>Alamat Kami</strong><br>Jl. aseleole, Kaliwates, Jember 55582</p>
+      <p><strong>Whatsapp</strong><br>08562898933</p>
+      <p><strong>Email</strong><br>majelismdpl@gmail.com</p>
     </div>
-  </footer>
+    <div class="footer-col">
+      <h3>Quick <span>Link</span></h3>
+      <ul>
+        <li><a href="#">Profile</a></li>
+        <li><a href="#">Paket Open Trip</a></li>
+        <li><a href="#">Kontak</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="copyright">
+    <p>Copyright © 2025 Majelis Mdpl. All rights reserved. Developed with ❤ by Ngelawans Gang</p>
+  </div>
+</footer>
 
 <style>
   /* ============================================
-   FOOTER - MODERN FUTURISTIC BROWN THEME
-   ============================================ */
+    FOOTER - MODERN FUTURISTIC BROWN THEME
+    ============================================ */
 
 .footer {
   position: relative;
   overflow: hidden;
   padding: 60px 20px 20px;
 
-  /* Dark Brown Gradient Background */
+  /* Dark Brown Gradient Background (Warna Baru) */
   background: linear-gradient(
     135deg,
-    #0f0d0a 0%,
-    #1a1612 25%,
-    #2d2419 50%,
-    #1f1a15 75%,
-    #0a0908 100%
+    #B29262 0%,
+    #AB8053 100%
   );
 
   color: #fff;
@@ -335,8 +327,8 @@
 }
 
 /* ============================================
-   RESPONSIVE
-   ============================================ */
+    RESPONSIVE
+    ============================================ */
 
 /* Tablet */
 @media (max-width: 900px) {
