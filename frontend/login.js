@@ -3,8 +3,8 @@
  * CSS INJECTION FOR CUSTOM SWEETALERT STYLING
  * ============================================
  * Update:
- * 1. Tombol 'No' (Deny) DIHAPUS TOTAL (via CSS & JS).
- * 2. Tombol Coba Lagi & Batal berdampingan (50:50).
+ * 1. Tombol 'No' (Deny) DIHAPUS TOTAL.
+ * 2. Tombol Success & Error terpusat (Center).
  * 3. Styling warna Emas & Abu-abu.
  */
 document.addEventListener("DOMContentLoaded", function () {
@@ -40,19 +40,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         /* CONTAINER TOMBOL (FLEXBOX ROW) */
+        /* REVISI: Menggunakan center agar tombol tunggal berada di tengah */
         .swal2-actions {
             width: 100% !important;
             display: flex !important;
             flex-direction: row !important;
-            justify-content: space-between !important;
-            gap: 15px !important; /* Jarak antar tombol */
+            justify-content: center !important; /* SEBELUMNYA space-between */
+            gap: 15px !important; 
             margin-top: 0 !important;
             box-sizing: border-box !important;
         }
 
         /* TOMBOL UMUM */
         .swal2-styled {
-            flex: 1 !important; /* KUNCI: Lebar 50:50 */
+            flex: 1 !important; /* Tombol akan mengisi ruang (Full width jika sendiri, 50:50 jika berdua) */
             width: auto !important;
             border-radius: 10px !important; 
             border: none !important;
@@ -68,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
             transition: all 0.3s ease !important;
         }
 
-        /* TOMBOL KONFIRMASI (Coba Lagi) */
+        /* TOMBOL KONFIRMASI (Lanjutkan / Coba Lagi) */
         .swal2-styled.swal2-confirm {
             background-color: ${PRIMARY_COLOR} !important;
             color: white !important;
@@ -95,23 +96,17 @@ document.addEventListener("DOMContentLoaded", function () {
             box-shadow: 0 6px 15px rgba(108, 117, 125, 0.3) !important;
         }
 
-        /* --- [FIX] HAPUS PAKSA TOMBOL DENY (MERAH) --- */
+        /* HAPUS PAKSA TOMBOL DENY */
         .swal2-deny {
             display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            border: none !important;
         }
 
-        /* Icon Styles */
-        .swal2-icon.swal2-error { border-color: ${PRIMARY_COLOR} !important; }
-        .swal2-icon.swal2-error [class^=swal2-x-mark-line] { background-color: ${PRIMARY_COLOR} !important; }
+        /* Icon Styles - Menyesuaikan warna icon dengan tema */
+        .swal2-icon.swal2-success { border-color: ${PRIMARY_COLOR} !important; }
         .swal2-icon.swal2-success [class^=swal2-success-line] { background-color: ${PRIMARY_COLOR} !important; }
         .swal2-icon.swal2-success .swal2-success-ring { border-color: ${PRIMARY_COLOR} !important; }
-        .swal2-custom-background { background: none !important; }
-
+        .swal2-icon.swal2-error { border-color: #d33 !important; } /* Error tetap merah agar kontras */
+        
         /* Responsif HP */
         @media (max-width: 480px) {
             .swal2-popup {
@@ -120,10 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             .swal2-actions {
                 gap: 10px !important;
-            }
-            .swal2-styled {
-                font-size: 0.85rem !important;
-                padding: 10px 0 !important;
             }
         }
     `;
@@ -159,7 +150,8 @@ function showLoginErrorModal(errorMessage) {
   const errorModal = document.getElementById("login-error-modal");
   const errorMessageEl = document.getElementById("login-error-message");
   if (errorModal && errorMessageEl) {
-    errorMessageEl.textContent = errorMessage || "Terjadi kesalahan. Silakan coba lagi.";
+    errorMessageEl.textContent =
+      errorMessage || "Terjadi kesalahan. Silakan coba lagi.";
     errorModal.classList.add("show");
   }
 }
@@ -177,7 +169,8 @@ function hideLoginErrorModal() {
  * ============================================
  */
 function handleGoogleLogin() {
-  window.location.href = getPageUrl("backend/google-oauth.php") + "?type=login";
+  window.location.href =
+    getPageUrl("backend/google-oauth.php") + "?type=login";
 }
 
 function getBasePath() {
@@ -226,17 +219,38 @@ document.addEventListener("DOMContentLoaded", function () {
         const result = await response.json();
 
         if (result.success) {
-          // ✅ LOGIN BERHASIL
+          // ✅ LOGIN BERHASIL (DENGAN POPUP CENTER)
           closeLoginModal();
-          if (["admin", "super_admin"].includes(result.role)) {
-            window.location.href = getPageUrl("admin/index.php");
+
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: "success",
+              title: "Login Berhasil!",
+              text: `Selamat datang kembali, ${result.username || "User"}`, // Menggunakan username dari result jika ada
+              confirmButtonText: "Lanjutkan",
+              buttonsStyling: true, // Menggunakan style custom kita
+              backdrop: `rgba(0,0,0,0.5)`,
+            }).then(() => {
+              // Redirect setelah tombol diklik
+              if (["admin", "super_admin"].includes(result.role)) {
+                window.location.href = getPageUrl("admin/index.php");
+              } else {
+                window.location.href = getPageUrl("index.php");
+              }
+            });
           } else {
-            window.location.href = getPageUrl("index.php");
+            // Fallback jika Swal tidak load
+            if (["admin", "super_admin"].includes(result.role)) {
+              window.location.href = getPageUrl("admin/index.php");
+            } else {
+              window.location.href = getPageUrl("index.php");
+            }
           }
         } else {
-          // ❌ LOGIN GAGAL (POPUP FIXED)
+          // ❌ LOGIN GAGAL
           closeLoginModal();
-          const errorMessage = result.message || "Username atau kata sandi salah.";
+          const errorMessage =
+            result.message || "Username atau kata sandi salah.";
 
           setTimeout(() => {
             if (typeof Swal !== "undefined") {
@@ -244,21 +258,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 title: "Login Gagal",
                 text: errorMessage,
                 icon: "error",
-                
-                // Konfigurasi Tombol
                 showConfirmButton: true,
                 confirmButtonText: "Coba Lagi",
-                
                 showCancelButton: true,
-                cancelButtonText: "Batal", 
-
-                // 🔥 MATIKAN TOMBOL NO (DENY) 🔥
-                showDenyButton: false,
-                denyButtonText: "", 
-
+                cancelButtonText: "Batal",
+                showDenyButton: false, // Mematikan tombol deny
                 backdrop: `rgba(0,0,0,0.5)`,
-                buttonsStyling: true, // CSS Custom di atas akan mengambil alih
-                customClass: {}
+                buttonsStyling: true,
               }).then((action) => {
                 if (action.isConfirmed) {
                   // Jika klik Coba Lagi
@@ -284,7 +290,6 @@ document.addEventListener("DOMContentLoaded", function () {
               icon: "error",
               confirmButtonText: "Tutup",
               showCancelButton: false,
-              showDenyButton: false
             });
           }
         }, 300);
@@ -302,7 +307,8 @@ document.addEventListener("DOMContentLoaded", function () {
       hideLoginErrorModal();
       setTimeout(() => {
         const loginModal = document.getElementById("loginModal");
-        if (loginModal && typeof openModal === "function") openModal(loginModal);
+        if (loginModal && typeof openModal === "function")
+          openModal(loginModal);
       }, 300);
     });
   }
@@ -329,7 +335,10 @@ document.addEventListener("DOMContentLoaded", function () {
  * GOOGLE LISTENER CHECK
  * ============================================
  */
-if (document.readyState === "complete" || document.readyState === "interactive") {
+if (
+  document.readyState === "complete" ||
+  document.readyState === "interactive"
+) {
   setTimeout(attachGoogleLoginListener, 100);
 }
 
