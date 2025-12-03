@@ -12,7 +12,7 @@ if (!isset($_SESSION['id_user']) || empty($_SESSION['id_user'])) {
 
 $id_user = $_SESSION['id_user'];
 
-// --- LOGIKA PHP ASLI (TIDAK DIUBAH) ---
+// --- LOGIKA PHP ASLI ---
 
 // 1. Auto-expire pending >24 jam
 $expire_url = getPageUrl('backend/payment-api.php') . '?expire_stale=1';
@@ -439,12 +439,11 @@ $stmt->close();
         }
 
         /* =========================================
-           POPUP STYLE FINAL (COMPACT & RESPONSIVE)
+           POPUP STYLE FINAL
            ========================================= */
 
         .swal2-popup.ticket-popup {
             width: 600px !important;
-            /* UKURAN DIPERKECIL (COMPACT) */
             max-width: 95vw !important;
             padding: 0 !important;
             border-radius: 20px !important;
@@ -452,6 +451,11 @@ $stmt->close();
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2) !important;
             overflow: hidden !important;
             font-family: 'Poppins', sans-serif !important;
+        }
+
+        /* FIX PENTING: Matikan paksa area tombol yang di-override oleh login.js */
+        .swal2-popup.ticket-popup .swal2-actions {
+            display: none !important;
         }
 
         /* Header Compact */
@@ -508,7 +512,7 @@ $stmt->close();
             color: #374151;
         }
 
-        /* Section Peserta (Scrollable) */
+        /* Section Peserta */
         .participant-section {
             margin-bottom: 20px;
             background: #FAFAFA;
@@ -527,15 +531,12 @@ $stmt->close();
             gap: 8px;
         }
 
-        /* SCROLL CONTAINER: Agar tidak memanjang ke bawah */
         .p-list-container {
             max-height: 180px;
-            /* Batas tinggi scroll */
             overflow-y: auto;
             padding-right: 5px;
         }
 
-        /* Custom Scrollbar */
         .p-list-container::-webkit-scrollbar {
             width: 5px;
         }
@@ -622,28 +623,21 @@ $stmt->close();
 
         .swal2-close {
             color: #555 !important;
-            /* Ubah jadi Abu-abu Gelap agar terlihat */
             font-size: 1.5rem !important;
             top: 15px !important;
-            /* Jarak dari atas */
             right: 15px !important;
-            /* Jarak dari kanan */
             background: transparent !important;
             opacity: 0.6 !important;
             box-shadow: none !important;
             outline: none !important;
             z-index: 9999 !important;
-            /* Pastikan muncul di layer paling atas */
         }
 
         .swal2-close:hover {
             color: #DC2626 !important;
-            /* Berubah Merah saat diarahkan mouse */
             background: rgba(0, 0, 0, 0.05) !important;
-            /* Efek kotak tipis saat hover */
             opacity: 1 !important;
             transform: scale(1.1);
-            /* Efek membesar sedikit */
         }
 
         /* RESPONSIVE MOBILE */
@@ -866,7 +860,7 @@ $stmt->close();
         }
 
         // ==========================================
-        //  FUNCTION SHOW DETAIL (FIXED SIZE & DATA WA)
+        //  FUNCTION SHOW DETAIL
         // ==========================================
         function showDetail(bookingId) {
             Swal.fire({
@@ -899,8 +893,6 @@ $stmt->close();
                         d.participants.forEach((p, index) => {
                             const pName = p.nama ? p.nama.toUpperCase() : 'PESERTA';
                             const pEmail = p.email || '-';
-
-                            // PERBAIKAN: Ambil no_wa (sesuai database)
                             const pPhone = p.no_wa || p.no_hp || p.phone || '-';
 
                             pesertaHtml += `
@@ -961,8 +953,9 @@ $stmt->close();
                                 <div class="ticket-footer">${btnHtml}</div>
                             </div>`,
                         width: 600,
-                        /* Lebar Compact */
+                        /* Matikan paksa tombol bawaan */
                         showConfirmButton: false,
+                        showCancelButton: false,
                         showCloseButton: true,
                         customClass: {
                             popup: 'ticket-popup'
