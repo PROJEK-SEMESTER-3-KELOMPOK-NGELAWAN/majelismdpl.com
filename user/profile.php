@@ -485,6 +485,81 @@ $initials = strtoupper(substr($userData['username'], 0, 1));
                 background: #FDFBF7;
             }
         }
+
+        /* RESPONSIVE MOBILE (SOLUSI AGAR TIDAK ZOOM OUT & RAPI) */
+        @media (max-width: 768px) {
+
+            /* Container full width di HP */
+            .container {
+                padding: 0 15px 80px;
+                width: 100%;
+                overflow-x: hidden;
+            }
+
+            /* Ubah kartu jadi vertikal */
+            .pay-card {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .card-img-wrap {
+                height: 180px;
+            }
+
+            .card-content {
+                padding: 20px;
+            }
+
+            /* Judul lebih kecil di HP */
+            .trip-name {
+                font-size: 1.2rem;
+            }
+
+            /* Info Grid tetap 2 kolom atau jadi 1 kolom jika sempit */
+            .info-grid {
+                gap: 10px;
+            }
+
+            /* Total Section */
+            .total-section {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .total-val {
+                font-size: 1.3rem;
+            }
+
+            /* Tombol Stack Vertikal atau Flex Wrap */
+            .card-actions {
+                flex-wrap: nowrap;
+                gap: 8px;
+            }
+
+            /* Tombol hapus tetep kecil, sisanya flex */
+            .btn-del {
+                width: 40px;
+                height: 40px;
+                flex-shrink: 0;
+            }
+
+            .btn-det,
+            .btn-pay {
+                flex: 1;
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+
+            /* Modal Responsive */
+            .swal2-popup.custom-popup {
+                width: 95% !important;
+                margin: 0 auto;
+            }
+
+            .popup-body {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 

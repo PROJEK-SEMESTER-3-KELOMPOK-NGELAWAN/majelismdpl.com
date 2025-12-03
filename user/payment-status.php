@@ -678,6 +678,28 @@ $stmt->close();
                 width: 100%;
             }
         }
+
+        .custom-success-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border: 5px solid #a8e6cf;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px auto 20px auto;
+        }
+
+        .custom-success-icon {
+            font-size: 48px;
+            color: #7bc07b;
+        }
+
+        .swal2-popup.custom-success-popup {
+            max-width: 380px !important;
+            padding: 20px 0 !important;
+            border-radius: 20px !important;
+        }
     </style>
 </head>
 
@@ -795,31 +817,71 @@ $stmt->close();
                 .then(r => r.json())
                 .then(resp => {
                     if (resp && resp.success && ['paid', 'failed', 'expire', 'cancel'].includes(resp.status)) {
-                        document.getElementById('refresh-indicator').classList.add('show');
-                        setTimeout(() => window.location.reload(), 1000);
+                        // Jika status berubah jadi sukses, reload halaman agar list terupdate
+                        if (!quiet) {
+                            showSuccessPopup();
+                        } else {
+                            document.getElementById('refresh-indicator').classList.add('show');
+                            setTimeout(() => window.location.reload(), 1000);
+                        }
                     }
                 })
                 .catch(err => console.log('Check error:', err));
         }
 
+        // FUNGSI POPUP SUKSES BAYAR (KONSISTEN)
+        function showSuccessPopup() {
+            Swal.fire({
+                html: `
+                    <div class="custom-success-icon-wrapper">
+                        <i class="custom-success-icon fas fa-check"></i>
+                    </div>
+                    <div class="swal2-title" style="background:none !important; color:#333 !important; padding-bottom:0 !important; margin-bottom:10px;">Pembayaran Berhasil!</div>
+                    <div class="swal2-html-container" style="color:#666;">Terima kasih, pembayaran Anda telah kami terima.</div>
+                `,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#7568c8', // Ungu atau Coklat (#9C7E5C) sesuai tema
+                customClass: {
+                    popup: 'custom-success-popup' // Gunakan class CSS global yang sudah ada
+                },
+                allowOutsideClick: false
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+
+        // FUNGSI BAYAR (MIDTRANS)
         function pay(bookingId) {
             Swal.fire({
                 title: 'Memproses...',
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
+
             fetch('../backend/payment-api.php?booking=' + bookingId)
                 .then(r => r.json())
                 .then(resp => {
                     Swal.close();
                     if (resp.snap_token) {
                         window.snap.pay(resp.snap_token, {
-                            onSuccess: () => {
-                                document.getElementById('refresh-indicator').classList.add('show');
-                                setTimeout(() => window.location.reload(), 1000);
+                            onSuccess: function(result) {
+                                // PANGGIL POPUP SUKSES DISINI (SEBELUM RELOAD)
+                                showSuccessPopup();
+
+                                // Panggil API backend untuk update status di database segera
+                                fetch('../backend/payment-api.php?check_status=' + resp.order_id);
                             },
-                            onPending: () => location.reload(),
-                            onError: () => Swal.fire('Error', 'Pembayaran gagal.', 'error')
+                            onPending: function(result) {
+                                Swal.fire('Menunggu Pembayaran', 'Silakan selesaikan pembayaran Anda.', 'info')
+                                    .then(() => location.reload());
+                            },
+                            onError: function(result) {
+                                Swal.fire('Pembayaran Gagal', 'Terjadi kesalahan saat pembayaran.', 'error');
+                            },
+                            onClose: function() {
+                                // Opsional: Cek status jika user menutup popup tanpa bayar (siapa tahu sudah bayar di tab lain)
+                                checkStatus(resp.order_id, true);
+                            }
                         });
                     } else {
                         Swal.fire('Gagal', resp.message || 'Token error', 'error');
@@ -865,15 +927,10 @@ $stmt->close();
             })
         }
 
-        // ==========================================
-        //  FUNCTION SHOW DETAIL (FIXED SIZE & DATA WA)
-        // ==========================================
         function showDetail(bookingId) {
+            // ... (Isi fungsi showDetail SAMA PERSIS dengan kode sebelumnya) ...
             Swal.fire({
-                html: '<div style="padding:20px; font-weight:600; color:#666;">Memuat data...</div>',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                background: 'transparent',
+                title: 'Memuat...',
                 didOpen: () => Swal.showLoading()
             });
 
@@ -881,14 +938,16 @@ $stmt->close();
                 .then(r => r.json())
                 .then(d => {
                     Swal.close();
-                    if (d.error) return Swal.fire('Error', d.error, 'error');
+                    if (d.error) {
+                        Swal.fire('Error', d.error, 'error');
+                        return;
+                    }
 
-                    const options = {
+                    const tBook = new Date(d.tanggal_booking).toLocaleDateString('id-ID', {
                         day: 'numeric',
                         month: 'long',
                         year: 'numeric'
-                    };
-                    const tBook = new Date(d.tanggal_booking).toLocaleDateString('id-ID', options);
+                    });
                     const jam = d.waktu_kumpul ? d.waktu_kumpul.substring(0, 5) + ' WIB' : '00:00 WIB';
                     const lokasi = d.nama_lokasi || 'Basecamp Utama';
                     const totalHarga = 'Rp ' + parseInt(d.total_harga).toLocaleString('id-ID');
@@ -899,18 +958,16 @@ $stmt->close();
                         d.participants.forEach((p, index) => {
                             const pName = p.nama ? p.nama.toUpperCase() : 'PESERTA';
                             const pEmail = p.email || '-';
-
-                            // PERBAIKAN: Ambil no_wa (sesuai database)
                             const pPhone = p.no_wa || p.no_hp || p.phone || '-';
 
                             pesertaHtml += `
-                                <div class="p-item-compact">
-                                    <div class="p-name-row">${index + 1}. ${pName}</div>
-                                    <div class="p-contact-row">
-                                        <span><i class="fa-solid fa-envelope"></i> ${pEmail}</span>
-                                        <span><i class="fa-brands fa-whatsapp"></i> ${pPhone}</span>
-                                    </div>
-                                </div>`;
+                                 <div class="p-item-compact">
+                                     <div class="p-name-row">${index + 1}. ${pName}</div>
+                                     <div class="p-contact-row">
+                                         <span><i class="fa-solid fa-envelope"></i> ${pEmail}</span>
+                                         <span><i class="fa-brands fa-whatsapp"></i> ${pPhone}</span>
+                                     </div>
+                                 </div>`;
                         });
                     } else {
                         pesertaHtml = '<div style="text-align:center; color:#999; font-style:italic; padding:10px;">Data peserta belum diinput.</div>';
@@ -918,50 +975,49 @@ $stmt->close();
 
                     const isPaid = (d.status_pembayaran === 'paid' || d.status_pembayaran === 'settlement');
                     let btnHtml = isPaid ? `
-                        <a href="view-invoice.php?payment_id=${d.id_payment}" target="_blank" class="btn-invoice-only active">
-                            <i class="fa-solid fa-print"></i> Invoice
-                        </a>` : `
-                        <div class="btn-invoice-only" style="cursor:not-allowed;">
-                            <i class="fa-solid fa-lock"></i> Invoice 
-                        </div>`;
+                         <a href="view-invoice.php?payment_id=${d.id_payment}" target="_blank" class="btn-invoice-only active">
+                             <i class="fa-solid fa-print"></i> Invoice
+                         </a>` : `
+                         <div class="btn-invoice-only" style="cursor:not-allowed;">
+                             <i class="fa-solid fa-lock"></i> Invoice 
+                         </div>`;
 
                     Swal.fire({
                         html: `
-                            <div class="ticket-header">
-                                <div class="ticket-title">Transaksi #${orderId}</div>
-                                <div class="ticket-sub">${d.nama_gunung}</div>
-                            </div>
-                            <div class="ticket-body">
-                                <div class="info-grid">
-                                    <div class="info-group">
-                                        <label>Tanggal Order</label>
-                                        <div>${tBook}</div>
-                                    </div>
-                                    <div class="info-group" style="text-align:right;">
-                                        <label>Total Tagihan</label>
-                                        <div style="color:#A98762;">${totalHarga}</div>
-                                    </div>
-                                    <div class="info-group">
-                                        <label>Lokasi Kumpul</label>
-                                        <div>${lokasi}</div>
-                                    </div>
-                                    <div class="info-group" style="text-align:right;">
-                                        <label>Waktu Kumpul</label>
-                                        <div style="color:#DC2626;">${jam}</div>
-                                    </div>
-                                </div>
-                                <div class="participant-section">
-                                    <div class="p-title">
-                                        <i class="fa-solid fa-users"></i> Daftar Peserta (${d.participants ? d.participants.length : 0})
-                                    </div>
-                                    <div class="p-list-container">
-                                        ${pesertaHtml}
-                                    </div>
-                                </div>
-                                <div class="ticket-footer">${btnHtml}</div>
-                            </div>`,
+                             <div class="ticket-header">
+                                 <div class="ticket-title">Transaksi #${orderId}</div>
+                                 <div class="ticket-sub">${d.nama_gunung}</div>
+                             </div>
+                             <div class="ticket-body">
+                                 <div class="info-grid">
+                                     <div class="info-group">
+                                         <label>Tanggal Order</label>
+                                         <div>${tBook}</div>
+                                     </div>
+                                     <div class="info-group" style="text-align:right;">
+                                         <label>Total Tagihan</label>
+                                         <div style="color:#A98762;">${totalHarga}</div>
+                                     </div>
+                                     <div class="info-group">
+                                         <label>Lokasi Kumpul</label>
+                                         <div>${lokasi}</div>
+                                     </div>
+                                     <div class="info-group" style="text-align:right;">
+                                         <label>Waktu Kumpul</label>
+                                         <div style="color:#DC2626;">${jam}</div>
+                                     </div>
+                                 </div>
+                                 <div class="participant-section">
+                                     <div class="p-title">
+                                         <i class="fa-solid fa-users"></i> Daftar Peserta (${d.participants ? d.participants.length : 0})
+                                     </div>
+                                     <div class="p-list-container">
+                                         ${pesertaHtml}
+                                     </div>
+                                 </div>
+                                 <div class="ticket-footer">${btnHtml}</div>
+                             </div>`,
                         width: 600,
-                        /* Lebar Compact */
                         showConfirmButton: false,
                         showCloseButton: true,
                         customClass: {

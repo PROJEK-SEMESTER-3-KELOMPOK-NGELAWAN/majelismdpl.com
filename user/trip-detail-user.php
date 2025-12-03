@@ -1116,6 +1116,146 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             position: relative;
         }
 
+        /* ============================================================ */
+        /* 🔥 FIX RESPONSIVE SWEETALERT DI LAYAR HP & BUTTON BERDAMPINGAN 🔥 */
+        /* ============================================================ */
+
+        /* Kustomisasi Container Popup SweetAlert */
+        .swal2-popup.custom-theme-popup {
+            border-radius: 30px !important;
+            padding: 2.5rem 2rem !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2) !important;
+            width: 90% !important;
+            /* Lebar 90% untuk default */
+            max-width: 500px !important;
+            /* Maksimal lebar di desktop */
+            box-sizing: border-box !important;
+        }
+
+        .swal2-actions {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 8px !important;
+            /* Mengurangi jarak antar tombol agar lebih berdempetan */
+            width: 100% !important;
+            justify-content: center !important;
+            margin-top: 1.5rem !important;
+            padding: 0 1rem !important;
+            /* Memberi padding samping pada container tombol */
+        }
+
+        /* Kustomisasi Ikon */
+        .swal-custom-icon-container {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            box-shadow: 0 10px 20px -5px rgba(156, 126, 92, 0.4);
+        }
+
+        .swal-custom-icon-container i {
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        /* Text Styling */
+        .swal-custom-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .swal-custom-text {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-body-gray);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-swal-custom {
+            padding: 0.7rem 0.5rem !important;
+            /* Mengurangi padding vertikal agar tombol sedikit lebih pendek */
+            border-radius: 10px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            /* Sedikit mengecilkan font agar muat */
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 0 !important;
+            /* Hapus margin default */
+            width: 45% !important;
+            /* Lebar tombol agar berdempetan tapi tetap ada spasi */
+            flex: 1;
+            /* Memastikan kedua tombol membagi ruang secara adil */
+        }
+
+        .btn-swal-confirm {
+            background-color: var(--primary) !important;
+            color: white !important;
+        }
+
+        .btn-swal-confirm:hover {
+            background-color: var(--primary-dark) !important;
+            transform: translateY(-3px);
+        }
+
+        .btn-swal-cancel {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+
+        .btn-swal-cancel:hover {
+            background-color: #5a6268 !important;
+            transform: translateY(-3px);
+        }
+
+        /* --- MEDIA QUERY KHUSUS MOBILE UNTUK SWEETALERT --- */
+        @media (max-width: 480px) {
+            .swal2-popup.custom-theme-popup {
+                padding: 1.5rem 1rem !important;
+                width: 95% !important;
+                /* Lebih lebar di HP kecil */
+            }
+
+            .swal-custom-icon-container {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 1rem;
+            }
+
+            .swal-custom-icon-container i {
+                font-size: 1.8rem;
+            }
+
+            .swal-custom-title {
+                font-size: 1.4rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .swal-custom-text {
+                font-size: 0.9rem;
+            }
+
+            .btn-swal-custom {
+                font-size: 0.85rem;
+                padding: 10px 0 !important;
+            }
+
+            /* Di HP Tetap Row (Berdampingan) */
+            .swal2-actions {
+                flex-direction: row !important;
+            }
+        }
+
         /* ... sisa CSS di bawahnya (header, content, footer) sudah benar ... */
     </style>
 </head>
