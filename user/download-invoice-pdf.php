@@ -1,8 +1,7 @@
 <?php
 // user/download-invoice-pdf.php
-// PASTIKAN TIDAK ADA SPASI ATAU BARIS KOSONG DI ATAS INI
 
-require_once '../vendor/autoload.php';
+require_once '../vendor/autoload.php'; // Pastikan path ini benar sesuai struktur folder Anda
 require_once '../backend/koneksi.php';
 session_start();
 
@@ -14,12 +13,14 @@ if ($payment_id <= 0) {
     die('Error: Invalid payment ID');
 }
 
-// 1. Query Data Invoice
+// ==========================================
+// 1. AMBIL DATA DARI DATABASE
+// ==========================================
 $stmt = $conn->prepare("
     SELECT 
         p.id_payment, p.order_id, p.jumlah_bayar, p.tanggal, p.metode, p.status_pembayaran,
         b.id_booking, b.tanggal_booking, b.total_harga, b.jumlah_orang,
-        t.id_trip, t.nama_gunung, t.jenis_trip, t.tanggal as trip_date, t.durasi, t.harga,
+        t.id_trip, t.nama_gunung, t.jenis_trip, t.via_gunung, t.tanggal as trip_date, t.durasi, t.harga,
         d.nama_lokasi, d.alamat,
         u.username, u.email, u.no_wa
     FROM payments p
@@ -39,329 +40,323 @@ if (!$invoiceData) {
     die('Error: Invoice not found or not paid');
 }
 
-// 2. Query Participants
-$stmtPart = $conn->prepare("
-    SELECT nama, tanggal_lahir, tempat_lahir, nik 
-    FROM participants 
-    WHERE id_booking = ?
-");
+// Ambil Data Peserta
+$stmtPart = $conn->prepare("SELECT nama, nik FROM participants WHERE id_booking = ?");
 $stmtPart->bind_param("i", $invoiceData['id_booking']);
 $stmtPart->execute();
 $resultPart = $stmtPart->get_result();
 $participants = $resultPart->fetch_all(MYSQLI_ASSOC);
 $stmtPart->close();
 
-
-// 3. Format Data
-$invoiceNumber = 'INV-MDPL-' . date('Ymd', strtotime($invoiceData['tanggal'])) . '-' . str_pad($payment_id, 4, '0', STR_PAD_LEFT);
-$formatDate = fn($date) => date('d M Y', strtotime($date));
+// ==========================================
+// 2. FORMAT DATA & LOGO
+// ==========================================
+$invoiceNumber = 'INV/' . date('Ymd', strtotime($invoiceData['tanggal'])) . '/' . str_pad($payment_id, 5, '0', STR_PAD_LEFT);
+$formatDate = fn($date) => date('d F Y', strtotime($date));
 $formatCurrency = fn($amount) => 'Rp ' . number_format($amount, 0, ',', '.');
 
+// Persiapan Logo (Convert ke Base64 agar aman di PDF)
+$logoPath = '../assets/majelis.png'; // Pastikan path file benar
+$logoSrc = '';
+if (file_exists($logoPath)) {
+    $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+    $data = file_get_contents($logoPath);
+    $logoSrc = 'data:image/' . $type . ';base64,' . base64_encode($data);
+}
 
-// 4. Mulai Output Buffering untuk menangkap HTML
+// ==========================================
+// 3. MULAI HTML BUFFFERING
+// ==========================================
 ob_start();
 ?>
 <!DOCTYPE html>
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Invoice - <?php echo $invoiceNumber; ?></title>
+    <meta charset="UTF-8">
+    <title>Invoice <?php echo $invoiceNumber; ?></title>
     <style>
-        /* --- CSS Dioptimasi untuk mPDF (Menggunakan PT dan HEX Codes) --- */
-        
         body {
             font-family: sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #fff;
-            color: #333;
+            font-size: 10pt;
+            color: #1F2937;
             line-height: 1.5;
-            font-size: 10pt; /* Ukuran standar PDF */
-        }
-        
-        .invoice-wrapper {
-            max-width: 100%;
-            margin: 0;
-            padding: 0; 
-            box-shadow: none;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .paid-stamp-overlay::before {
-            content: "PAID";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 150pt; 
-            color: #2e7d32; /* Warna Success */
-            opacity: 0.1;
-            font-weight: 800;
-            white-space: nowrap;
         }
 
-        /* Header */
-        .invoice-header {
-            display: table;
+        /* Layout Tables */
+        table {
             width: 100%;
-            border-bottom: 5px solid #a97c50; /* Warna Dark */
+            border-collapse: collapse;
+        }
+
+        td {
+            vertical-align: top;
+        }
+
+        /* Header Styles */
+        .header-container {
+            border-bottom: 3px solid #9C7E5C;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
-        
-        .logo-box, .invoice-meta {
-            display: table-cell;
-            vertical-align: middle;
-            width: 50%;
-        }
 
-        .logo-box {
-            display: flex;
-            align-items: center;
-        }
-
-        .logo-box div h2 {
-            font-size: 20pt;
+        .company-name {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #7B5E3A;
             margin: 0;
-            font-weight: 800;
-            color: #a97c50; /* Warna Dark */
         }
 
-        .logo-box div p {
-            margin: 0;
-            font-size: 8pt;
-            color: #777;
+        .company-address {
+            font-size: 9pt;
+            color: #6B7280;
         }
 
-        .invoice-meta {
+        .invoice-title {
+            font-size: 26pt;
+            font-weight: bold;
+            color: #E5E7EB;
+            /* Warna abu-abu terang seperti di desain */
             text-align: right;
+            line-height: 1;
         }
 
-        .invoice-meta h1 {
-            color: #333;
-            font-size: 28pt; 
-            margin: 0;
-            font-weight: 700;
+        .invoice-details {
+            text-align: right;
+            font-size: 9pt;
+            color: #374151;
         }
 
-        /* Info Grid (Menggunakan display: table untuk mPDF) */
-        .info-container {
-            display: table;
-            width: 100%; 
-            border-spacing: 20px 0; 
-            margin-bottom: 30px;
-        }
-        
-        .info-container > div {
-            display: table-cell;
-            width: 50%;
-            vertical-align: top;
-        }
-        
-        .info-box {
-            padding: 15px; 
-            background: #fcfcfc;
-            border-radius: 5px;
-        }
-        
-        .info-box.pemesan-box { border-left: 5px solid #d6b38c; /* Warna Light */ }
-        .info-box.trip-box { border-left: 5px solid #a97c50; /* Warna Dark */ }
-
-        .info-box h4 {
-            color: #a97c50; /* Warna Dark */
+        .status-paid {
+            color: #03543F;
+            font-weight: bold;
+            text-transform: uppercase;
             font-size: 10pt;
-            margin-bottom: 8px;
-            font-weight: 700;
         }
 
-        .info-row {
-            display: table;
-            width: 100%;
-            padding: 2px 0;
+        /* Info Boxes */
+        .info-box {
+            background-color: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            padding: 15px;
+        }
+
+        .info-title {
             font-size: 8pt;
-        }
-        
-        .info-row span, .info-row strong { display: table-cell; }
-
-        .info-row span:first-child { width: 45%; color: #777; }
-        .info-row strong { width: 55%; color: #333; }
-        
-        /* Section Title */
-        .section-title-table {
-            font-size: 12pt;
-            color: #a97c50; /* Warna Dark */
-            margin-bottom: 10px;
-            font-weight: 700;
-            border-bottom: 2px solid #d6b38c; /* Warna Light */
+            text-transform: uppercase;
+            color: #6B7280;
+            font-weight: bold;
+            border-bottom: 1px solid #E5E7EB;
+            margin-bottom: 8px;
             padding-bottom: 5px;
         }
 
-        /* Table */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 8pt;
+        .info-text {
+            font-size: 10pt;
+            margin-bottom: 2px;
         }
 
-        .data-table th {
-            background-color: #f4f4f4;
-            color: #555;
-            padding: 8px 10px;
+        .info-label {
+            color: #6B7280;
+            font-size: 9pt;
+        }
+
+        /* Main Table */
+        .main-table th {
             text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid #ddd;
+            padding: 10px;
+            background-color: #f3f4f6;
+            color: #6B7280;
+            font-size: 9pt;
+            text-transform: uppercase;
+            border-bottom: 2px solid #E5E7EB;
         }
 
-        .data-table td {
-            padding: 6px 10px;
-            border-bottom: 1px dashed #eee;
-        }
-        
-        /* Gaya sub-tabel peserta */
-        .sub-participant-list {
-            margin-top: 5px;
-            padding: 5px 0 0 0;
-            border-top: 1px dashed #ddd;
-            font-size: 7pt;
-            color: #555;
-        }
-        
-        .sub-participant-list strong {
-            display: block;
-            margin-bottom: 3px;
-            color: #333;
+        .main-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 10pt;
         }
 
-        /* Footer */
-        .invoice-footer {
-            clear: both;
-            border-top: 1px dashed #ddd;
-            padding-top: 10px;
-            margin-top: 20px;
+        /* Helpers */
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
             text-align: center;
         }
 
-        .invoice-footer p {
-            font-size: 7pt;
-            color: #555;
-            margin: 3px 0;
+        .font-bold {
+            font-weight: bold;
         }
-        
-        /* Menghilangkan Font Awesome Ikon */
-        .fa-solid { display: none; } 
 
-        @page { margin: 15mm; }
+        .accent-color {
+            color: #9C7E5C;
+        }
+
+        /* Totals */
+        .total-row td {
+            padding: 5px 10px;
+            font-size: 10pt;
+        }
+
+        .grand-total td {
+            border-top: 2px solid #9C7E5C;
+            padding-top: 10px;
+            font-size: 12pt;
+            font-weight: bold;
+            color: #7B5E3A;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 8pt;
+            color: #9CA3AF;
+            border-top: 1px solid #E5E7EB;
+            padding-top: 20px;
+        }
     </style>
 </head>
 
 <body>
-    <div class="invoice-wrapper">
-        <div class="paid-stamp-overlay"></div>
 
-        <header class="invoice-header">
-            <div class="logo-box">
-                <div>
-                    <h2>MAJELIS MDPL</h2>
-                    <p>E-Invoice & Tiket Pendakian</p>
-                </div>
-            </div>
+    <div class="header-container">
+        <table width="100%">
+            <tr>
+                <td width="60%">
+                    <table width="100%">
+                        <tr>
+                            <?php if ($logoSrc): ?>
+                                <td width="70" style="padding-right: 15px;">
+                                    <img src="<?php echo $logoSrc; ?>" width="60" style="display:block;">
+                                </td>
+                            <?php endif; ?>
+                            <td valign="middle">
+                                <div class="company-name">MAJELIS MDPL</div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="company-address" style="margin-top: 10px;">
+                        Jl. Pendaki No. 12, Jawa Timur, Indonesia<br>
+                        admin@majelismdpl.com
+                    </div>
+                </td>
 
-            <div class="invoice-meta">
-                <h1>INVOICE</h1>
-                <p>No. Invoice: <strong><?php echo $invoiceNumber; ?></strong></p>
-                <p>Status: <strong style="color: #2e7d32;">PAID</strong></p>
-                <p style="font-size: 8pt; margin-top: 10px;">
-                    Dibayar: <strong><?php echo $formatDate($invoiceData['tanggal']); ?></strong> (Metode: <?php echo $invoiceData['metode']; ?>)
-                </p>
-            </div>
-        </header>
-        
-        <div class="info-container">
-            <div class="info-box pemesan-box">
-                <h4>Detail Pemesan</h4>
-                <div class="info-row"><span>Nama:</span> <strong><?php echo $invoiceData['username']; ?></strong></div>
-                <div class="info-row"><span>Email:</span> <strong><?php echo $invoiceData['email']; ?></strong></div>
-                <div class="info-row"><span>Telepon:</span> <strong><?php echo $invoiceData['no_wa']; ?></strong></div>
-            </div>
-
-            <div class="info-box trip-box">
-                <h4>Detail Trip Pendakian</h4>
-                <div class="info-row"><span>Tujuan:</span> <strong style="color: #a97c50;"><?php echo $invoiceData['nama_gunung']; ?></strong></div>
-                <div class="info-row"><span>Via/Jenis Trip:</span> <strong><?php echo $invoiceData['jenis_trip']; ?></strong></div>
-                <div class="info-row"><span>Tgl/Durasi:</span> <strong><?php echo $formatDate($invoiceData['trip_date']); ?> / <?php echo $invoiceData['durasi']; ?></strong></div>
-                <div class="info-row"><span>Basecamp:</span> <strong><?php echo $invoiceData['nama_lokasi']; ?></strong></div>
-            </div>
-        </div>
-        
-        <div class="section-title-table">Rincian Biaya</div>
-        <table class="data-table cost-table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">#</th>
-                    <th style="width: 55%;">Deskripsi</th>
-                    <th style="width: 10%; text-align: center;">Qty</th>
-                    <th style="width: 15%;">Harga Satuan (Rp)</th>
-                    <th style="width: 15%;">Total (Rp)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Paket Trip Pendakian <?php echo $invoiceData['nama_gunung']; ?> (<?php echo $invoiceData['durasi']; ?>)</td>
-                    <td style="text-align: center;"><?php echo $invoiceData['jumlah_orang']; ?></td>
-                    <td style="text-align: right;"><?php echo number_format($invoiceData['harga'], 0, ',', '.'); ?></td>
-                    <td style="text-align: right;"><?php echo number_format($invoiceData['total_harga'], 0, ',', '.'); ?></td>
-                </tr>
-
-                <tr style="border-top: 2px solid #a97c50; font-weight: 700; background: #fcfcfc;">
-                    <td colspan="4" style="text-align: right; padding-top: 15px;">TOTAL DIBAYARKAN</td>
-                    <td style="text-align: right; padding-top: 15px; color: #2e7d32; font-size: 11pt;">
-                        <?php echo number_format($invoiceData['total_harga'], 0, ',', '.'); ?>
-                    </td>
-                </tr>
-            </tbody>
+                <td width="40%" align="right">
+                    <div class="invoice-title">INVOICE</div>
+                    <div class="invoice-details" style="margin-top: 5px;">
+                        <strong>#<?php echo $invoiceNumber; ?></strong><br>
+                        Terbit: <?php echo $formatDate($invoiceData['tanggal']); ?><br>
+                        <span class="status-paid">LUNAS / PAID</span>
+                    </div>
+                </td>
+            </tr>
         </table>
-        <div style="clear: both;"></div>
-
-        <div class="section-title-table" style="margin-top: 20px;">Daftar Peserta Trip (<?php echo count($participants); ?> Orang)</div>
-        <table class="data-table participants-table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">#</th>
-                    <th style="width: 40%;">Nama Lengkap</th>
-                    <th style="width: 25%;">Tanggal Lahir</th>
-                    <th style="width: 30%;">NIK/ID</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php $no = 1; ?>
-                <?php foreach ($participants as $p): ?>
-                    <tr>
-                        <td><?php echo $no++; ?></td>
-                        <td><?php echo htmlspecialchars($p['nama']); ?></td>
-                        <td><?php echo $p['tempat_lahir'] . ', ' . date('d M Y', strtotime($p['tanggal_lahir'])); ?></td>
-                        <td><?php echo $p['nik']; ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-        
-        <div class="invoice-footer">
-            <p><strong>DOKUMEN VALID DIBUAT SECARA DIGITAL</strong></p>
-            <p>Invoice ini adalah bukti pembayaran sah untuk pemesanan trip Anda. Tidak diperlukan tanda tangan basah.</p>
-            <p style="margin-top: 3px; color: #a97c50;"><strong>Terima kasih atas kepercayaan Anda kepada Majelis MDPL.</strong></p>
-        </div>
     </div>
+
+    <table width="100%" style="margin-bottom: 30px;" cellspacing="0" cellpadding="0">
+        <tr>
+            <td width="48%" class="info-box">
+                <div class="info-title">Ditagihkan Kepada</div>
+                <div class="info-text"><strong><?php echo htmlspecialchars($invoiceData['username']); ?></strong></div>
+                <div class="info-text"><span class="info-label">Email:</span> <?php echo htmlspecialchars($invoiceData['email']); ?></div>
+                <div class="info-text"><span class="info-label">No. WA:</span> <?php echo htmlspecialchars($invoiceData['no_wa']); ?></div>
+            </td>
+            <td width="4%"></td>
+            <td width="48%" class="info-box">
+                <div class="info-title">Detail Perjalanan</div>
+                <div class="info-text"><strong><?php echo htmlspecialchars($invoiceData['nama_gunung']); ?></strong></div>
+                <div class="info-text"><span class="info-label">Via:</span> <?php echo htmlspecialchars($invoiceData['via_gunung']); ?></div>
+                <div class="info-text"><span class="info-label">Tanggal:</span> <?php echo $formatDate($invoiceData['trip_date']); ?></div>
+                <div class="info-text"><span class="info-label">Durasi:</span> <?php echo htmlspecialchars($invoiceData['durasi']); ?></div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="main-table" width="100%">
+        <thead>
+            <tr>
+                <th width="5%">No</th>
+                <th width="50%">Deskripsi Layanan</th>
+                <th width="15%" class="text-center">Qty</th>
+                <th width="15%" class="text-right">Harga</th>
+                <th width="15%" class="text-right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>
+                    <strong>Paket Open Trip <?php echo htmlspecialchars($invoiceData['nama_gunung']); ?></strong><br>
+                    <span style="font-size: 8pt; color: #6B7280;">Meeting Point: <?php echo htmlspecialchars($invoiceData['nama_lokasi']); ?></span>
+                </td>
+                <td class="text-center"><?php echo $invoiceData['jumlah_orang']; ?> Pax</td>
+                <td class="text-right"><?php echo $formatCurrency($invoiceData['harga']); ?></td>
+                <td class="text-right font-bold"><?php echo $formatCurrency($invoiceData['total_harga']); ?></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table width="100%" style="margin-top: 10px;">
+        <tr>
+            <td width="60%"></td>
+            <td width="40%">
+                <table width="100%">
+                    <tr class="total-row">
+                        <td class="text-right" style="color:#6B7280;">Subtotal</td>
+                        <td class="text-right"><?php echo $formatCurrency($invoiceData['total_harga']); ?></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td class="text-right" style="color:#6B7280;">Biaya Layanan</td>
+                        <td class="text-right">Rp 0</td>
+                    </tr>
+                    <tr class="total-row grand-total">
+                        <td class="text-right">Total Bayar</td>
+                        <td class="text-right"><?php echo $formatCurrency($invoiceData['total_harga']); ?></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <div style="margin-top: 40px; border: 1px dashed #D1D5DB; padding: 15px; background: #F9FAFB;">
+        <div style="font-size: 9pt; font-weight: bold; color: #6B7280; text-transform: uppercase; margin-bottom: 10px;">
+            Daftar Peserta (<?php echo count($participants); ?>)
+        </div>
+        <table width="100%">
+            <tr>
+                <?php foreach ($participants as $i => $p): ?>
+                    <td width="50%" style="padding-bottom: 5px; font-size: 9pt;">
+                        &#10003; <strong><?php echo htmlspecialchars($p['nama']); ?></strong>
+                        <span style="color: #9CA3AF;">(<?php echo !empty($p['nik']) ? $p['nik'] : '-'; ?>)</span>
+                    </td>
+                    <?php if (($i + 1) % 2 == 0): ?>
+            </tr>
+            <tr><?php endif; ?>
+        <?php endforeach; ?>
+        <?php if (count($participants) % 2 != 0): ?><td width="50%"></td><?php endif; ?>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        <strong>Terima Kasih atas Kepercayaan Anda!</strong><br>
+        Dokumen ini sah dan diterbitkan secara otomatis oleh sistem Majelis MDPL.<br>
+        Simpan dokumen ini sebagai bukti pembayaran yang sah.
+    </div>
+
 </body>
 
 </html>
 <?php
 $html = ob_get_clean();
 
-// 6. Generate PDF dengan mPDF
+// ==========================================
+// 4. GENERATE PDF (MPDF)
+// ==========================================
 try {
     $mpdf = new Mpdf([
         'mode' => 'utf-8',
@@ -369,33 +364,23 @@ try {
         'margin_left' => 15,
         'margin_right' => 15,
         'margin_top' => 15,
-        'margin_bottom' => 15,
+        'margin_bottom' => 15
     ]);
 
-    $mpdf->SetWatermarkText('PAID', 0.08);
+    // SETTINGS WATERMARK (LUNAS)
+    // Ini membuat tulisan LUNAS besar, miring, dan transparan di background
+    $mpdf->SetWatermarkText('LUNAS');
     $mpdf->showWatermarkText = true;
-    $mpdf->watermarkTextAlpha = 0.08;
-    
-    $mpdf->SetTitle('Invoice - ' . $invoiceNumber);
-    $mpdf->SetAuthor('Majelis MDPL');
-    
+    $mpdf->watermarkTextAlpha = 0.1; // Transparansi (0.1 - 1)
+
+    $mpdf->SetTitle("Invoice #" . $invoiceNumber);
+    $mpdf->SetAuthor("Majelis MDPL");
+
     $mpdf->WriteHTML($html);
 
-    // 7. Output PDF
-    $filename = $invoiceNumber . '.pdf';
-    
-    // Matikan semua output buffer sebelum mengirim file biner
-    if (ob_get_level() > 0) {
-        ob_clean();
-    }
-    
-    $mpdf->Output($filename, 'D');
-
+    // Download PDF
+    $mpdf->Output($invoiceNumber . '.pdf', 'D');
 } catch (\Mpdf\MpdfException $e) {
-    // Jika gagal, tampilkan pesan error yang jelas
-    if (ob_get_level() > 0) {
-        ob_end_clean();
-    }
-    header('Content-Type: text/plain');
-    die('Error generating PDF: ' . $e->getMessage() . ' | Harap cek file koneksi.php dan file lain yang di-include untuk spasi di luar tag PHP.');
+    echo "Terjadi kesalahan saat membuat PDF: " . $e->getMessage();
 }
+?>
