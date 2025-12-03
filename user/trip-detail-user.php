@@ -130,6 +130,7 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
+            /* PADDING DESKTOP DEFAULT */
             padding-top: 80px;
         }
 
@@ -175,6 +176,8 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
             padding-bottom: 4rem;
             margin-bottom: 0;
             overflow: hidden;
+            /* Pastikan tidak ada margin top */
+            margin-top: 0; 
         }
 
         .trip-hero-bg {
@@ -836,6 +839,9 @@ Setiap peserta bertanggung jawab penuh atas barang bawaan pribadi.
         @media (max-width: 992px) {
             body {
                 padding-bottom: 100px;
+                /* REVISI DI SINI: Mengurangi padding-top mobile agar tidak ada gap */
+                /* Ubah angka 60px ini jika navbar Anda lebih kecil/besar, atau set 0 jika navbar tidak fixed */
+                padding-top: 60px; 
             }
 
             .trip-hero {
