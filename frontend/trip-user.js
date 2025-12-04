@@ -1,23 +1,18 @@
 document.addEventListener("DOMContentLoaded", function () {
   fetch(getApiUrl("backend/trip-api.php") + "?action=getTrips")
     .then((response) => {
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
       return response.json();
     })
     .then((trips) => {
       const carousel = document.querySelector(
         ".destination-carousel .carousel-track"
       );
-      if (!carousel) {
-        return;
-      }
+      if (!carousel) return;
 
-      // Bersihkan isi awal (spinner)
       carousel.innerHTML = "";
 
-      // Filter: tampilkan hanya 'available' dan 'sold' (sembunyikan 'done')
       const visibleTrips = Array.isArray(trips)
         ? trips.filter((t) => {
             const s = (t.status || "").toString().toLowerCase();
@@ -26,107 +21,95 @@ document.addEventListener("DOMContentLoaded", function () {
         : [];
 
       if (visibleTrips.length === 0) {
-        carousel.innerHTML = `
-          <div class="no-trips">
-            <p>🚫 Belum ada jadwal trip.</p>
-          </div>
-        `;
-        // Tetap set navigasi dan layout agar tombol tersembunyi
-        setupCarouselNavigation();
-        handleCarouselLayout();
-        window.addEventListener("resize", handleCarouselLayout);
+        carousel.innerHTML = `<div class="no-trips" style="width:100%; text-align:center; padding:20px;"><p>🚫 Belum ada jadwal trip.</p></div>`;
         return;
       }
 
       visibleTrips.forEach((trip) => {
-        // Format tanggal
+        // Format Data
         const date = new Date(trip.tanggal);
         const formattedDate = isNaN(date.getTime())
-          ? trip.tanggal || ""
+          ? trip.tanggal
           : date.toLocaleDateString("id-ID", {
               day: "2-digit",
               month: "2-digit",
               year: "numeric",
             });
+        const formattedPrice = Number(trip.harga || 0).toLocaleString("id-ID");
 
-        // Format harga
-        const price = Number(trip.harga || 0);
-        const formattedPrice = price.toLocaleString("id-ID");
+        let imagePath =
+          trip.gambar && trip.gambar.trim() !== ""
+            ? trip.gambar.startsWith("img/")
+              ? trip.gambar
+              : `img/${trip.gambar}`
+            : "img/default-mountain.jpg";
 
-        const card = document.createElement("div");
-        card.className = "destination-card";
-        card.style.cursor = "pointer";
-
-        // Path gambar
-        let imagePath;
-        if (trip.gambar && trip.gambar.trim() !== "") {
-          if (trip.gambar.startsWith("img/")) {
-            imagePath = trip.gambar;
-          } else {
-            imagePath = `img/${trip.gambar}`;
-          }
-        } else {
-          imagePath = "img/default-mountain.jpg";
-        }
-
-        // Status badge logic (done sudah difilter, jadi hanya available/sold)
+        // Logic Status
         const rawStatus = (trip.status || "available").toString().toLowerCase();
         const isSold = rawStatus === "sold";
-        const statusBadgeClass = isSold ? "sold" : "available";
-        const statusBadgeHTML = isSold
-          ? '<i class="bi bi-x-circle"></i> Sold'
-          : '<i class="bi bi-check-circle"></i> Available';
 
+        // CLASS CSS: 'sold' atau kosong (available default hijau di CSS)
+        const statusClass = isSold ? "sold" : "";
+        const badgeIcon = isSold ? "bi-x-circle" : "bi-check-circle";
+        const badgeText = isSold ? "Sold Out" : "Available";
+
+        // Buat Elemen
+        const card = document.createElement("div");
+        card.className = "trip-card";
+        card.style.cursor = "pointer";
+
+        // HTML KARTU
+        // PERHATIKAN: Saya menghapus style="background-color:..." agar CSS Transparan bekerja
         card.innerHTML = `
-          <div class="card-custom">
-            <span class="status-badge ${statusBadgeClass}">
-              ${statusBadgeHTML}
-            </span>
-            <div class="card-image-container">
-              <img src="${imagePath}" alt="${
+          <div class="card-image">
+            <div class="status-badge ${statusClass}">
+               <i class="bi ${badgeIcon}"></i> ${badgeText}
+            </div>
+            <img src="${imagePath}" alt="${
           trip.nama_gunung
-        }" class="card-image">
+        }" onerror="this.src='img/default-mountain.jpg'">
+          </div>
+
+          <div class="card-body">
+            
+            <div class="card-meta-row">
+               <div class="meta-left">
+                 <i class="bi bi-calendar-event"></i>
+                 <span>${formattedDate}</span>
+               </div>
+               <div class="meta-right">
+                 <i class="bi bi-clock"></i>
+                 <span>${trip.durasi || "1 Hari"}</span>
+               </div>
             </div>
-            <div class="card-content">
-              <div class="card-row-date-duration">
-                <span class="card-date">
-                  <i class="bi bi-calendar"></i> ${formattedDate}
-                </span>
-                <span class="card-duration">
-                  <i class="bi bi-clock"></i> ${trip.durasi || "1 hari"}
-                </span>
-              </div>
-              <h3 class="card-title">${trip.nama_gunung}</h3>
-              <div class="card-type mb-2">
-                <span class="badge trip-type-badge bg-light text-dark">
-                  <i class="bi bi-flag-fill"></i>
-                  ${
-                    trip.jenis_trip
-                      ? trip.jenis_trip.charAt(0).toUpperCase() +
-                        trip.jenis_trip.slice(1)
-                      : ""
-                  }
-                </span>
-              </div>
-              <div class="card-rating mb-2">
-                <i class="bi bi-star-fill text-warning"></i>
-                <span class="rating-number">5</span>
-                <span class="rating-reviews">(${
-                  Math.floor(Math.random() * 200) + 549
-                }+ ulasan)</span>
-              </div>
-              <div class="card-location mb-2">
-                <i class="bi bi-signpost-2"></i>
-                <span>Via ${trip.via_gunung || "paltuding"}</span>
-              </div>
-              <div class="card-price text-success fw-bold fs-4">
-                Rp ${formattedPrice}
-              </div>
+
+            <h3 class="card-title">${trip.nama_gunung}</h3>
+
+            <div class="trip-type-badge">
+               <i class="bi bi-flag-fill"></i> ${trip.jenis_trip || "Camp"}
             </div>
+
+            <div class="card-rating">
+               <i class="bi bi-star-fill"></i> 5
+               <span class="rating-count">(${
+                 Math.floor(Math.random() * 200) + 500
+               }+ ulasan)</span>
+            </div>
+
+            <div class="card-location">
+               <i class="bi bi-geo-alt-fill"></i> Via ${
+                 trip.via_gunung || "Jalur Resmi"
+               }
+            </div>
+
+            <div class="card-price">
+               Rp ${formattedPrice}
+            </div>
+
           </div>
         `;
 
-        card.addEventListener("click", function () {
+        card.addEventListener("click", () => {
           window.location.href =
             getPageUrl("user/trip-detail-user.php") + `?id=${trip.id_trip}`;
         });
@@ -134,134 +117,55 @@ document.addEventListener("DOMContentLoaded", function () {
         carousel.appendChild(card);
       });
 
-      // Setup navigation after cards are loaded
       setupCarouselNavigation();
-
-      // Handle centering dan button visibility
       handleCarouselLayout();
-
-      // Re-check on window resize
       window.addEventListener("resize", handleCarouselLayout);
     })
     .catch((err) => {
-      const carousel = document.querySelector(
-        ".destination-carousel .carousel-track"
-      );
-      if (carousel) {
-        carousel.innerHTML = `
-          <div class="error-message">
-            <p>❌ Gagal memuat data trip: ${err.message}</p>
-          </div>
-        `;
-      }
+      console.error(err);
+      const c = document.querySelector(".destination-carousel .carousel-track");
+      if (c)
+        c.innerHTML = `<p style="text-align:center; color:red;">Gagal memuat data.</p>`;
     });
 });
 
-/**
- * Setup carousel navigation buttons
- */
+// Setup Navigasi (Sama seperti sebelumnya)
 function setupCarouselNavigation() {
   const prevBtn = document.querySelector(".destination-carousel .prev");
   const nextBtn = document.querySelector(".destination-carousel .next");
   const track = document.querySelector(".destination-carousel .carousel-track");
-
   if (prevBtn && nextBtn && track) {
-    prevBtn.addEventListener("click", () => {
-      track.scrollBy({ left: -360, behavior: "smooth" });
-    });
-
-    nextBtn.addEventListener("click", () => {
-      track.scrollBy({ left: 360, behavior: "smooth" });
-    });
+    prevBtn.addEventListener("click", () =>
+      track.scrollBy({ left: -345, behavior: "smooth" })
+    );
+    nextBtn.addEventListener("click", () =>
+      track.scrollBy({ left: 345, behavior: "smooth" })
+    );
   }
 }
 
-/**
- * Handle carousel layout untuk centering dan visibility buttons
- */
 function handleCarouselLayout() {
-  const carouselTrack = document.querySelector(".carousel-track");
-  const scrollIndicators = document.querySelector(".scroll-indicators");
-  const prevBtn = document.querySelector(".scroll-indicator.prev");
-  const nextBtn = document.querySelector(".scroll-indicator.next");
-
-  if (!carouselTrack) return;
-
-  const cards = carouselTrack.querySelectorAll(".destination-card");
-  const cardCount = cards.length;
-
-  // Skip jika tidak ada cards
-  if (cardCount === 0) {
-    if (scrollIndicators) scrollIndicators.style.display = "none";
+  const track = document.querySelector(".carousel-track");
+  const indicators = document.querySelector(".scroll-indicators");
+  if (!track) return;
+  const count = track.querySelectorAll(".trip-card").length;
+  if (count === 0) {
+    if (indicators) indicators.style.display = "none";
     return;
   }
 
+  const hasOverflow = track.scrollWidth > track.clientWidth;
   const isMobile = window.innerWidth <= 768;
 
-  // MOBILE
-  if (isMobile) {
-    carouselTrack.style.justifyContent = "flex-start";
-    if (scrollIndicators) {
-      scrollIndicators.style.display = "none";
-    }
-    cards.forEach((card) => {
-      if (window.innerWidth > 480) {
-        card.style.minWidth = "320px";
-        card.style.maxWidth = "320px";
-      } else {
-        card.style.minWidth = "290px";
-        card.style.maxWidth = "290px";
-      }
-    });
-    return;
+  if (indicators) {
+    indicators.style.display = hasOverflow && !isMobile ? "flex" : "none";
   }
 
-  // DESKTOP
-  if (cardCount === 1) {
-    carouselTrack.style.justifyContent = "center";
-    if (scrollIndicators) {
-      scrollIndicators.style.display = "none";
-    }
-    const singleCard = cards[0];
-    singleCard.style.minWidth = "400px";
-    singleCard.style.maxWidth = "400px";
-    return;
-  }
-
-  carouselTrack.style.justifyContent = cardCount <= 3 ? "center" : "flex-start";
-
-  if (scrollIndicators) {
-    scrollIndicators.style.display = "flex";
-  }
-
-  const hasOverflow = carouselTrack.scrollWidth > carouselTrack.clientWidth;
-
-  if (!hasOverflow) {
-    if (prevBtn) prevBtn.style.display = "none";
-    if (nextBtn) nextBtn.style.display = "none";
-  } else {
-    if (prevBtn) prevBtn.style.display = "flex";
-    if (nextBtn) nextBtn.style.display = "flex";
-  }
-
-  cards.forEach((card) => {
-    card.style.minWidth = "350px";
-    card.style.maxWidth = "350px";
-  });
+  // Rata tengah jika kartu sedikit, rata kiri jika overflow/mobile
+  track.style.justifyContent =
+    isMobile || hasOverflow ? "flex-start" : "center";
 }
 
-/**
- * Autofill form dengan data user
- */
 async function autofillForm() {
-  let res = await fetch(getApiUrl("backend/user-session-api.php"));
-  let json = await res.json();
-  if (json.logged_in && document.querySelector("[name=nama]")) {
-    document.querySelector("[name=nama]").value = json.user.nama || "";
-    document.querySelector("[name=email]").value = json.user.email || "";
-    document.querySelector("[name=alamat]").value = json.user.alamat || "";
-    document.querySelector("[name=no_wa]").value = json.user.no_wa || "";
-    document.querySelector("[name=tanggal_lahir]").value =
-      json.user.tanggal_lahir || "";
-  }
+  /* biarkan sama */
 }

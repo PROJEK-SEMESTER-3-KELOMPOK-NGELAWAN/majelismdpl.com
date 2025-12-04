@@ -33,433 +33,395 @@ session_start();
   <?php include 'flash_handler.php'; ?>
 
   <!-- Hero -->
-  <section class="hero-home" id="home">
-    <div class="hero-bg-container">
-      <img src="assets/profil_foto.jpeg" alt="Gunung Bromo" class="hero-bg" id="hero-bg">
-      <div class="hero-overlay"></div>
-    </div>
-    <div class="hero-content">
-      <span class="hero-offer" id="hero-offer">BEST OFFERS</span>
-      <h1 class="hero-title" id="hero-title">GUNUNG BROMO</h1>
-      <div class="hero-days hero-days-wrapper">
-        <span class="highlight" id="hero-days">1 HARI</span>
-      </div>
-      <p class="hero-desc" id="hero-desc">Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan</p>
-      <a href="#paketTrips" class="hero-btn" style="text-decoration: none; ">DETAIL</a>
+  <section class="hero-slider-section" id="home">
 
-      <div class="hero-carousel" id="hero-carousel">
-        <img src="assets/herooo.jpg" alt="Gunung Bromo" class="carousel-item active" data-index="0">
-        <img src="assets/ijen.jpg" alt="Sunrise" class="carousel-item" data-index="1">
-        <img src="assets/rinjani.jpg" alt="Forest" class="carousel-item" data-index="2">
+    <div class="slider-container">
+
+      <div class="slide active">
+        <div class="slide-bg">
+          <div class="overlay"></div>
+          <img src="assets/Gunung.jpg" alt="Mountain View">
+        </div>
+        <div class="container slide-content">
+          <span class="slide-badge">MAJELIS MDPL ADVENTURE</span>
+          <h1>YOUR BEST PARTNER<br>FOR HIKING ADVENTURE</h1>
+          <p>Layanan pendakian profesional dengan prioritas keamanan, kenyamanan, dan dokumentasi terbaik.</p>
+          <div class="btn-wrapper">
+            <a href="#paketTrips" class="hero-btn primary">Lihat Layanan Kami</a>
+          </div>
+        </div>
       </div>
+
+      <div class="slide">
+        <div class="slide-bg">
+          <div class="overlay"></div>
+          <img src="assets/Prau.jpg" alt="Gunung Prau Dieng">
+        </div>
+        <div class="container slide-content">
+          <span class="slide-badge">GOLDEN HOUR</span>
+          <h1>MAGICAL<br>MT. PRAU</h1>
+          <p>Nikmati pesona matahari terbit terbaik di Asia Tenggara dengan jalur pendakian yang ramah bagi pemula. Latar megah Sindoro-Sumbing siap memanjakan mata Anda.</p>
+          <div class="btn-wrapper">
+            <a href="#paketTrips" class="hero-btn primary">Lihat Destinasi</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide">
+        <div class="slide-bg">
+          <div class="overlay"></div>
+          <img src="assets/Anjani.jpg" alt="Hiking Challenge">
+        </div>
+        <div class="container slide-content">
+          <span class="slide-badge">THE JOURNEY</span>
+          <h1>LIMITLESS<br>EXPEDITION</h1>
+          <p>Setiap puncak mengajarkan tentang perjuangan dan kerendahan hati. Kami hadir sebagai pendukung teknis agar Anda fokus pada tujuan.</p>
+          <div class="btn-wrapper">
+            <a href="#paketTrips" class="hero-btn primary">Mulai Petualangan</a>
+          </div>
+        </div>
+      </div>
+
     </div>
+
+    <button class="slider-nav prev" onclick="moveSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+    <button class="slider-nav next" onclick="moveSlide(1)"><i class="fas fa-chevron-right"></i></button>
+
   </section>
 
-  <!-- profile -->
+  <!-- Why Us Section -->
+  <section class="why-us-section" id="profile">
+    <div class="bg-pattern-dots"></div>
 
-  <!-- profile -->
-  <section class="why-explorer style-4" id="profile">
-    <!-- Animated Gradient Background - Brown Theme -->
-    <div class="gradient-bg"></div>
-    <div class="blur"></div>
-    <div class="floating-shapes">
-      <div class="shape shape-1"></div>
-      <div class="shape shape-2"></div>
-      <div class="shape shape-3"></div>
-    </div>
+    <div class="container">
 
-    <!-- Header -->
-    <div class="profile-header" data-aos="fade-down" data-aos-duration="600" data-aos-once="true">
-      <h2 class="profile-title">
-        <span class="gradient-text">Kenapa Pilih</span>
-        <span class="gradient-text">Majelis Mdpl?</span>
-      </h2>
-      <p class="profile-subtitle">
-        Pengalaman petualangan yang tak terlupakan dimulai dari sini
-      </p>
-    </div>
-
-    <!-- Glass Cards Container -->
-    <div class="glass-cards-wrapper">
-      <!-- Left: Large Feature Card -->
-      <div class="main-feature-card" data-aos="fade-right" data-aos-delay="200" data-aos-once="true">
-        <div class="feature-badge">
-          <i class="fas fa-award"></i>
-          <span>Trusted Partner</span>
-        </div>
-        <h3>5000+ Happy Travelers</h3>
-        <p>Bergabunglah dengan ribuan traveler yang telah merasakan pengalaman tak terlupakan bersama kami</p>
-
-        <div class="feature-stats">
-          <div class="stat-mini">
-            <div class="stat-icon"><i class="fas fa-star"></i></div>
-            <div class="stat-info">
-              <div class="stat-num">4.9</div>
-              <div class="stat-text">Rating</div>
-            </div>
-          </div>
-          <div class="stat-mini">
-            <div class="stat-icon"><i class="fas fa-mountain"></i></div>
-            <div class="stat-info">
-              <div class="stat-num">50+</div>
-              <div class="stat-text">Destinations</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Image Preview (Not Video) -->
-        <div class="image-preview">
-          <img src="assets/profil_foto.jpeg" alt="Adventure">
-        </div>
+      <div class="section-header text-center" data-aos="fade-up">
+        <span class="header-tagline">
+          <i class="fas fa-crown"></i> KEUNGGULAN KAMI
+        </span>
+        <h2 class="section-title">
+          Gak Perlu Ribet, <span class="text-highlight">Tinggal Berangkat!</span>
+        </h2>
+        <p class="section-subtitle">
+          Mendaki itu soal menikmati perjalanan. Biarkan kami yang mengurus
+          logistik, keamanan, dan kenyamanan Anda sampai puncak.
+        </p>
       </div>
 
-      <!-- Right: Grid of Small Cards (No Learn More Button) -->
       <div class="features-grid">
-        <div class="glass-card" data-aos="zoom-in" data-aos-delay="300" data-aos-once="true">
-          <div class="card-icon gradient-icon">
-            <i class="fas fa-route"></i>
-          </div>
-          <h4>Flexible Routes</h4>
-          <p>Pilih destinasi sesuai keinginan dengan berbagai pilihan rute</p>
-        </div>
 
-        <div class="glass-card" data-aos="zoom-in" data-aos-delay="400" data-aos-once="true">
-          <div class="card-icon gradient-icon">
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="icon-box">
             <i class="fas fa-shield-alt"></i>
           </div>
-          <h4>Safety First</h4>
-          <p>Keamanan prioritas dengan guide bersertifikat</p>
+          <div class="feature-content">
+            <h3>Aman Terkendali</h3>
+            <p>Safety first. Tim kami bersertifikasi P3K dan sangat paham prosedur keamanan pendakian.</p>
+          </div>
         </div>
 
-        <div class="glass-card" data-aos="zoom-in" data-aos-delay="500" data-aos-once="true">
-          <div class="card-icon gradient-icon">
-            <i class="fas fa-credit-card"></i>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="icon-box">
+            <i class="fas fa-user-friends"></i>
           </div>
-          <h4>Easy Payment</h4>
-          <p>Berbagai metode pembayaran modern dan aman</p>
+          <div class="feature-content">
+            <h3>Guide Asik</h3>
+            <p>Guide berpengalaman yang tidak hanya hafal jalur, tapi juga seru diajak ngobrol sepanjang jalan.</p>
+          </div>
         </div>
 
-        <div class="glass-card" data-aos="zoom-in" data-aos-delay="600" data-aos-once="true">
-          <div class="card-icon gradient-icon">
-            <i class="fas fa-headset"></i>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="icon-box">
+            <i class="fas fa-utensils"></i>
           </div>
-          <h4>24/7 Support</h4>
-          <p>Tim support siap membantu kapan saja</p>
+          <div class="feature-content">
+            <h3>Makan Enak</h3>
+            <p>Logistik terjamin! Menu makanan bergizi dan lezat dimasak langsung oleh koki gunung.</p>
+          </div>
+        </div>
+
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="icon-box">
+            <i class="fas fa-campground"></i>
+          </div>
+          <div class="feature-content">
+            <h3>Alat Premium</h3>
+            <p>Tenda, matras, dan sleeping bag selalu dicuci bersih, wangi, dan dalam kondisi prima.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Mobile App Showcase Section -->
+  <section class="app-showcase-section" id="mobile-app">
+    <div class="container">
+      <div class="app-wrapper">
+
+        <div class="app-content">
+          <span class="app-badge">COMING SOON</span>
+          <h2 class="app-title">Petualangan dalam<br>Genggamanmu.</h2>
+          <p class="app-desc">
+            Nikmati kemudahan booking, cek jadwal trip, dan diskusi dengan guide langsung dari smartphone. Aplikasi Majelis MDPL hadir untuk mempermudah setiap langkahmu.
+          </p>
+
+          <ul class="app-features">
+            <li><i class="fas fa-check-circle"></i> Booking Cepat & Mudah</li>
+            <li><i class="fas fa-check-circle"></i> Notifikasi Jadwal Real-time</li>
+            <li><i class="fas fa-check-circle"></i> Chat Guide & Porter</li>
+          </ul>
+
+          <div class="store-buttons">
+            <a href="#" class="store-btn">
+              <i class="fab fa-google-play"></i>
+              <div class="btn-text">
+                <small>GET IT ON</small>
+                <span>Google Play</span>
+              </div>
+            </a>
+            <a href="#" class="store-btn">
+              <i class="fab fa-apple"></i>
+              <div class="btn-text">
+                <small>Download on the</small>
+                <span>App Store</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="app-visual">
+          <div class="circle-bg"></div>
+
+          <div class="phones-container">
+
+            <div class="phone-frame side-phone left">
+              <div class="notch"></div>
+              <img src="assets/Mountain.jpg" class="app-screen" alt="Screen 1">
+            </div>
+
+            <div class="phone-frame side-phone right">
+              <div class="notch"></div>
+              <img src="assets/Mobile1.jpg" class="app-screen" alt="Screen 2">
+            </div>
+
+            <div class="phone-frame center-phone">
+              <div class="notch"></div>
+              <img src="assets/Mobile2.jpg" class="app-screen" alt="Main Screen">
+            </div>
+          </div>
+
+          <div class="floating-alert">
+            <div class="icon-box">
+              <i class="fas fa-bell"></i>
+            </div>
+            <div class="alert-text">
+              <strong>Trip Reminder</strong>
+              <span>Besok, 08:00 WIB - Mt. Prau</span>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   </section>
-
-  <div class="main-layout">
-    <div class="left-content">
-      <h1>Download <br><span class="highlight">Majelis MDPL</span></h1>
-      <p class="subtitle">Bergabunglah dengan ribuan traveler yang telah merasakan pengalaman mendaki tak terlupakan
-        bersama kami.</p>
-
-      <div class="links">
-        <a href="#">Terms of Service</a>
-        <a href="#">Privacy Policy</a>
-      </div>
-
-      <div class="download-box">
-        <div class="official-release">
-          <i class="fas fa-check-circle"></i> OFFICIAL RELEASE
-        </div>
-        <h2>Download APK</h2>
-        <p>Versi terbaru 1.0.0 • Android 7.0+</p>
-        <button class="download-button">
-          <i class="fas fa-download"></i> Download Sekarang
-        </button>
-      </div>
-
-    </div>
-
-    <div class="right-content single-frame">
-      <div class="mobile-frame">
-        <div class="mobile-screen-content">
-          <div class="image-slider">
-            <img class="phone-image-static" src="assets/mountain.jpg" alt="Majelis MDPL">
-          </div>
-
-        </div>
-
-        <div class="slider-dots">
-          <span class="dot active"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-        </div>
-
-      </div>
-    </div>
-  </div>
-  </div>
 
   <!-- Paket Trip Section -->
   <section class="paket-trip-section" id="paketTrips">
-    <!-- Simple Pattern Background -->
     <div class="bg-pattern-simple"></div>
 
-    <!-- Section Header -->
-    <div class="section-header" data-aos="fade-up" data-aos-duration="600" data-aos-once="true">
+    <div class="section-header" data-aos="fade-up" data-aos-duration="800">
+      <span class="header-tagline">
+        <i class="fas fa-map-marked-alt"></i> EXPLORE INDONESIA
+      </span>
       <h2 class="section-title">
-        <span data-aos="fade-right" data-aos-delay="100" data-aos-once="true">Paket</span>
-        <span data-aos="fade-left" data-aos-delay="200" data-aos-once="true">Trip</span>
-        <span data-aos="fade-right" data-aos-delay="300" data-aos-once="true">Kami</span>
+        Paket <span class="text-highlight">Trip Kami.</span>
       </h2>
-      <p class="section-subtitle" data-aos="fade-up" data-aos-delay="400" data-aos-once="true">
-        Pilihan destinasi petualangan terbaik untuk liburan Anda
+      <p class="section-subtitle">
+        Temukan destinasi petualangan terbaik dengan fasilitas lengkap,
+        aman, dan pengalaman tak terlupakan.
       </p>
+
     </div>
 
-    <!-- Destination Carousel -->
-    <div class="destination-carousel" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300"
-      data-aos-once="true">
-      <!-- Carousel Track (Horizontal Scroll) -->
+    <div class="destination-carousel" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300" data-aos-once="true">
+
       <div class="carousel-track">
-        <!-- Loading spinner -->
-        <div class="loading-container">
-          <div class="spinner-border" role="status">
+        <div class="loading-container" style="width: 100%; display: flex; justify-content: center; padding: 50px;">
+          <div class="spinner-border" role="status" style="width: 3rem; height: 3rem; border: 4px solid #ddd; border-top: 4px solid #2ecc71; border-radius: 50%; animation: spin 1s linear infinite;">
             <span class="sr-only">Loading...</span>
           </div>
         </div>
       </div>
 
-      <!-- Scroll Indicators -->
       <div class="scroll-indicators">
-        <button class="scroll-indicator prev" aria-label="Scroll Left">
+        <button class="scroll-indicator prev" aria-label="Scroll Left" onclick="document.querySelector('.carousel-track').scrollBy({left: -320, behavior: 'smooth'})">
           <i class="fas fa-chevron-left"></i>
         </button>
-        <button class="scroll-indicator next" aria-label="Scroll Right">
+        <button class="scroll-indicator next" aria-label="Scroll Right" onclick="document.querySelector('.carousel-track').scrollBy({left: 320, behavior: 'smooth'})">
           <i class="fas fa-chevron-right"></i>
         </button>
       </div>
-    </div>
 
-    <!-- Mountain Wave Divider -->
-    <div class="mountain-wave-divider">
-      <svg viewBox="0 0 1440 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="mountainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" style="stop-color:#8b5e3c;stop-opacity:0.6" />
-            <stop offset="100%" style="stop-color:#5c3922;stop-opacity:0.8" />
-          </linearGradient>
-        </defs>
-        <path fill="url(#mountainGradient)"
-          d="M0,150 L60,130 L120,145 L180,120 L240,135 L300,110 L360,125 L420,100 L480,115 L540,95 L600,110 L660,90 L720,105 L780,85 L840,100 L900,80 L960,95 L1020,75 L1080,90 L1140,70 L1200,85 L1260,65 L1320,80 L1380,60 L1440,75 L1440,200 L0,200 Z">
-        </path>
-        <path fill="#4b3625" opacity="0.5"
-          d="M0,165 L80,155 L160,165 L240,150 L320,160 L400,145 L480,155 L560,140 L640,150 L720,135 L800,145 L880,130 L960,140 L1040,125 L1120,135 L1200,120 L1280,130 L1360,115 L1440,125 L1440,200 L0,200 Z">
-        </path>
-      </svg>
     </div>
   </section>
 
+  <style>
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+
   <!-- Gallery Section -->
-  <section class="gallery-cardstyle" id="gallerys">
-    <!-- Particles.js Background (reduced) -->
+  <section class="gallery-section" id="gallerys">
+
     <div id="particles-js"></div>
+    <div class="container">
+      <div class="section-header text-center" data-aos="fade-up">
+        <span class="header-tagline">
+          <i class="fas fa-camera"></i> DOKUMENTASI
+        </span>
+        <h2 class="section-title">
+          Galeri <span class="text-highlight">Petualangan.</span>
+        </h2>
+        <p class="section-subtitle">
+          Kumpulan momen terbaik para pendaki bersama Majelis MDPL.
+        </p>
+      </div>
 
-    <!-- Gallery Header -->
-    <div class="gallery-header">
-      <h2 class="gallery-title">
-        <span>Galeri</span>
-        <span>Foto</span>
-        <span>Kami</span>
-      </h2>
-      <p class="gallery-subtitle">
-        Dokumentasi perjalanan petualangan yang tak terlupakan
-      </p>
-    </div>
-
-    <!-- Card Grid -->
-    <div class="card-grid">
-      <div class="card">
-        <div class="card-overlay"></div>
-        <img src="assets/gambar3.jpg" alt="Gunung Bromo" />
-        <div class="caption">
-          <i class="fas fa-mountain"></i>
-          Gunung Bromo Sunrise
+      <div class="card-grid" id="galleryContainer">
+        <div class="loading-container" style="grid-column: 1/-1; display: flex; justify-content: center; padding: 50px;">
+          <div class="spinner-border text-warning" role="status" style="width: 3rem; height: 3rem;">
+            <span class="sr-only">Loading...</span>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-overlay"></div>
-        <img src="assets/gambar2.jpg" alt="Camping" />
-        <div class="caption">
-          <i class="fas fa-campground"></i>
-          Camping Savana
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-overlay"></div>
-        <img src="assets/gambar1.jpg" alt="Trip Bersama" />
-        <div class="caption">
-          <i class="fas fa-users"></i>
-          Trip Seru Bersama
-        </div>
-      </div>
     </div>
   </section>
 
   <!-- Testimonials -->
-  <section id="testimonials" class="testimonials">
-    <!-- Modern Background Pattern -->
-    <div class="testimonial-bg-pattern"></div>
-
-    <div class="container">
-      <div class="testimonial-header" data-aos="fade-up" data-aos-once="true">
-        <h2><span class="title-large">Apa Kata Mereka?</span></h2>
-        <p class="testimonial-subtitle">Pengalaman nyata dari para traveler kami</p>
+  <section class="testimonial-section" id="testimonials">
+    <div class="container-fluid">
+      <div class="section-header text-center" data-aos="fade-up">
+        <span class="header-tagline">
+          <i class="fas fa-comments"></i> KATA MEREKA
+        </span>
+        <h2 class="section-title">
+          Cerita para <span class="text-highlight">Pendaki.</span>
+        </h2>
+        <p class="section-subtitle">
+          Pengalaman nyata tak terlupakan bersama Majelis MDPL.
+        </p>
       </div>
 
-      <!-- Row 1: Moving LEFT -->
-      <div class="testimonial-row row-left">
-        <div class="testimonial-track">
-          <div class="testimonial-card">
-            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Trip ke Rinjani sangat terorganisir. Guide-nya asik dan perhatian. Saya yang
-              pemula merasa aman banget!</p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Rudi"></div>
-              <div class="author-details">
-                <h4>Rudi Saputra</h4>
-                <p>Jakarta</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
+      <div class="marquee-wrapper">
+
+        <div class="marquee-row scroll-left">
+          <div class="marquee-content">
+            <div class="testi-card">
+              <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+              <p class="testi-text">"Trip ke Rinjani sangat terorganisir. Guide-nya asik, logistik melimpah. Saya pemula tapi merasa sangat aman!"</p>
+              <div class="user-info">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                <div>
+                  <h5>Rudi Saputra</h5>
+                  <span>Jakarta</span>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Sunrise di Bromo, camping di savana, semua sempurna. Majelis MDPL benar-benar
-              profesional!</p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Andi"></div>
-              <div class="author-details">
-                <h4>Andi Pratama</h4>
-                <p>Surabaya</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <div class="testi-card">
+              <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+              <p class="testi-text">"Gak nyesel ikut open trip di sini. Temen baru seru-seru, makanannya enak banget kayak di resto!"</p>
+              <div class="user-info">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
+                <div>
+                  <h5>Siti Aminah</h5>
+                  <span>Bandung</span>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Fasilitas lengkap, harga terjangkau, pelayanan memuaskan. Recommended banget!
-            </p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Sarah"></div>
-              <div class="author-details">
-                <h4>Sarah Wijaya</h4>
-                <p>Yogyakarta</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <div class="testi-card">
+              <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+              <p class="testi-text">"Dokumentasinya juara! Pulang trip langsung bisa pamer di Instagram tanpa perlu edit lagi."</p>
+              <div class="user-info">
+                <img src="https://randomuser.me/api/portraits/men/85.jpg" alt="User">
+                <div>
+                  <h5>Budi Santoso</h5>
+                  <span>Surabaya</span>
+                </div>
+              </div>
+            </div>
+            <div class="testi-card">
+              <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+              <p class="testi-text">"Pelayanan ramah dan fast respon. Alat camping wangi dan bersih. Recommended banget!"</p>
+              <div class="user-info">
+                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User">
+                <div>
+                  <h5>Sarah Wijaya</h5>
+                  <span>Yogyakarta</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Row 2: Moving RIGHT -->
-      <div class="testimonial-row row-right">
-        <div class="testimonial-track">
-          <div class="testimonial-card">
-            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Baru pertama kali ikut open trip, tapi langsung jatuh cinta. Banyak teman baru
-              dan pengalaman tak terlupakan.</p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dewi"></div>
-              <div class="author-details">
-                <h4>Dewi Lestari</h4>
-                <p>Bandung</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
+        <div class="marquee-row scroll-right">
+          <div class="marquee-content">
+            <div class="testi-card">
+              <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+              <p class="testi-text">"Pengalaman sunrise di Prau yang magis. Terima kasih Majelis MDPL sudah mewujudkan mimpi saya."</p>
+              <div class="user-info">
+                <img src="https://randomuser.me/api/portraits/women/90.jpg" alt="User">
+                <div>
+                  <h5>Nina Agustina</h5>
+                  <span>Malang</span>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Tim guide sangat berpengalaman dan ramah. Perjalanan jadi lebih seru dan aman.
-              Pasti bakal ikut lagi!</p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/men/85.jpg" alt="Budi"></div>
-              <div class="author-details">
-                <h4>Budi Hermawan</h4>
-                <p>Semarang</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <div class="testi-card">
+              <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+              <p class="testi-text">"Porter sangat membantu, guide sabar banget nungguin saya yang jalannya lambat. Top service!"</p>
+              <div class="user-info">
+                <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="User">
+                <div>
+                  <h5>Doni Prasetyo</h5>
+                  <span>Bekasi</span>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Dokumentasi keren, momen tak terlupakan. Customer service responsif banget!</p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/women/90.jpg" alt="Nina"></div>
-              <div class="author-details">
-                <h4>Nina Agustina</h4>
-                <p>Malang</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <div class="testi-card">
+              <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+              <p class="testi-text">"Harga sangat affordable untuk fasilitas selengkap ini. Pasti bakal repeat order ke Semeru nanti."</p>
+              <div class="user-info">
+                <img src="https://randomuser.me/api/portraits/women/55.jpg" alt="User">
+                <div>
+                  <h5>Rina Sari</h5>
+                  <span>Tangerang</span>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Row 3: Moving LEFT -->
-      <div class="testimonial-row row-left">
-        <div class="testimonial-track">
-          <div class="testimonial-card">
-            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Pengalaman hiking terbaik! View spektakuler, persiapan matang, semua worth it
-              banget.</p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Doni"></div>
-              <div class="author-details">
-                <h4>Doni Prasetyo</h4>
-                <p>Bekasi</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Pelayanan ramah, harga bersahabat, destinasi keren. Majelis MDPL is the best!
-            </p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/women/55.jpg" alt="Rina"></div>
-              <div class="author-details">
-                <h4>Rina Sari</h4>
-                <p>Tangerang</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="testimonial-card">
-            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-            <p class="testimonial-text">Open trip paling seru yang pernah saya ikuti. Semua terorganisir dengan baik!
-            </p>
-            <div class="testimonial-author">
-              <div class="author-image"><img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Eko"></div>
-              <div class="author-details">
-                <h4>Eko Prabowo</h4>
-                <p>Solo</p>
-                <div class="rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                    class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            <div class="testi-card">
+              <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+              <p class="testi-text">"Solid banget timnya. Trek susah jadi berasa ringan karena suasananya fun abis."</p>
+              <div class="user-info">
+                <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="User">
+                <div>
+                  <h5>Fajar Nugraha</h5>
+                  <span>Bogor</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -489,6 +451,20 @@ session_start();
 
   <!-- Global functions that might be needed -->
   <script>
+    /* =========================================
+   INFINITE MARQUEE LOGIC
+   ========================================= */
+    document.addEventListener("DOMContentLoaded", function() {
+      const marquees = document.querySelectorAll(".marquee-content");
+
+      marquees.forEach((marquee) => {
+        // Clone (Duplikat) semua isi kartu agar loop tidak putus
+        const content = marquee.innerHTML;
+        marquee.innerHTML = content + content + content; // Duplikat 3x biar aman di layar lebar
+      });
+    });
+
+
     // Initialize AOS
     AOS.init({
       duration: 800,
@@ -499,14 +475,14 @@ session_start();
     });
 
     // ========== WHATSAPP BUTTON - CUTE & RESPONSIVE ==========
-    (function () {
+    (function() {
       const whatsappBtn = document.getElementById('whatsappBtn');
 
       if (whatsappBtn) {
         let expandTimeout;
         let isExpanded = false;
 
-        whatsappBtn.addEventListener('click', function (e) {
+        whatsappBtn.addEventListener('click', function(e) {
           if (window.innerWidth <= 768) {
             if (!isExpanded) {
               e.preventDefault();
@@ -526,7 +502,7 @@ session_start();
           }
         });
 
-        window.addEventListener('resize', function () {
+        window.addEventListener('resize', function() {
           if (window.innerWidth > 768) {
             whatsappBtn.classList.remove('expanded');
             isExpanded = false;
@@ -534,7 +510,7 @@ session_start();
           }
         });
 
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
           if (window.innerWidth <= 768 && isExpanded) {
             if (!whatsappBtn.contains(e.target)) {
               whatsappBtn.classList.remove('expanded');
@@ -548,7 +524,7 @@ session_start();
 
     // ========== BUKA WHATSAPP FUNCTION ==========
     function bukaWhatsapp() {
-      const nomor = "6285233463360";
+      const nomor = "6281358609650";
       const pesan = encodeURIComponent("Halo! Saya ingin bertanya tentang paket trip Majelis MDPL.");
       const url = `https://wa.me/${nomor}?text=${pesan}`;
 
@@ -563,151 +539,104 @@ session_start();
       }
     }
 
-    // ========== GALERI API ==========
+    // ========== GALERI API (FIXED) ==========
     fetch(getApiUrl('galeri-api.php') + '?action=get')
       .then(response => response.json())
       .then(result => {
-        if (result.success) {
-          const galleryContainer = document.querySelector('.card-grid');
-          galleryContainer.innerHTML = '';
-          result.data.forEach(item => {
+        const galleryContainer = document.getElementById('galleryContainer'); // Gunakan ID
+        if (galleryContainer && result.success) {
+          galleryContainer.innerHTML = ''; // Bersihkan loader
+
+          result.data.forEach((item, index) => {
+            // Buat elemen div container kartu
             const card = document.createElement('div');
-            card.classList.add('card');
-            card.innerHTML = `<img src="img/${item.gallery}" alt="Foto" />`;
+
+            // PENTING: Gunakan class 'gallery-card' agar CSS terbaca!
+            card.className = 'gallery-card';
+
+            // Tambahkan animasi AOS
+            card.setAttribute('data-aos', 'fade-up');
+            card.setAttribute('data-aos-delay', index * 100);
+
+            // Cek path gambar (jaga-jaga)
+            let imgPath = item.gallery;
+            if (!imgPath.includes('/')) {
+              imgPath = 'img/' + imgPath;
+            }
+
+            // Struktur HTML yang Cocok dengan CSS
+            card.innerHTML = `
+                <img src="${imgPath}" alt="Foto Galeri" loading="lazy">
+                <div class="card-overlay">
+                    <div class="caption">
+                        <h4><i class="fas fa-camera"></i> Momen Seru</h4>
+                        <p>Dokumentasi perjalanan Majelis MDPL</p>
+                    </div>
+                </div>
+            `;
+
             galleryContainer.appendChild(card);
           });
         } else {
-          console.error(result.message);
+          console.error("Gagal mengambil data galeri atau data kosong");
         }
       })
       .catch(err => console.error(err));
 
-    // ========== SECTION HERO HOME ==========
-    document.addEventListener('DOMContentLoaded', () => {
-      const heroSlides = [{
-        image: "assets/herooo.jpg",
-        title: "GUNUNG BROMO",
-        offer: "BEST OFFERS",
-        days: "1 HARI",
-        desc: "Rasakan keindahan golden sunrise Gunung Bromo yang menyegarkan"
-      },
-      {
-        image: "assets/ijen.jpg",
-        title: "GUNUNG IJEN",
-        offer: "IJEN ADVENTURE",
-        days: "2 HARI",
-        desc: "Nikmati mendaki gunung berapi biru di Jawa Timur."
-      },
-      {
-        image: "assets/rinjani.jpg",
-        title: "GUNUNG RINJANI",
-        offer: "RINJANI EXPEDITION",
-        days: "3 HARI",
-        desc: "Rasakan petualangan mendaki puncak tertinggi di Nusa Tenggara Barat."
-      }
-      ];
+    // ========== HERO SLIDER LOGIC (NO DOTS) ==========
+    document.addEventListener('DOMContentLoaded', function() {
+      const slides = document.querySelectorAll('.slide');
 
-      const heroBg = document.getElementById('hero-bg');
-      const carouselItems = document.querySelectorAll('.carousel-item');
-      const titleElem = document.getElementById('hero-title');
-      const offerElem = document.getElementById('hero-offer');
-      const daysElem = document.getElementById('hero-days');
-      const descElem = document.getElementById('hero-desc');
+      // Cek jika elemen slide ada
+      if (slides.length > 0) {
+        let currentSlideIndex = 0;
+        let slideInterval;
+        const intervalTime = 6000; // 6 detik per slide
 
-      if (!heroBg || !titleElem || !offerElem || !daysElem || !descElem) {
-        console.error('Hero elements not found!');
-        return;
-      }
-
-      const daysWrapper = daysElem.closest('.hero-days-wrapper') || daysElem.parentElement;
-
-      let currentIndex = 0;
-      let slideInterval;
-      let isAnimating = false;
-      const total = heroSlides.length;
-
-      function setActiveIndex(index) {
-        if (isAnimating) return;
-        isAnimating = true;
-
-        carouselItems.forEach((item, i) => {
-          item.classList.toggle('active', i === index);
-        });
-
-        const textElements = [offerElem, titleElem, daysWrapper, descElem];
-
-        textElements.forEach(elem => {
-          if (elem) {
-            elem.classList.remove('fade-in');
-            elem.classList.add('fade-out');
+        // Fungsi Ganti Slide
+        function showSlide(index) {
+          if (index >= slides.length) {
+            currentSlideIndex = 0;
+          } else if (index < 0) {
+            currentSlideIndex = slides.length - 1;
+          } else {
+            currentSlideIndex = index;
           }
-        });
 
-        setTimeout(() => {
-          heroBg.classList.remove('fade-in');
-          heroBg.classList.add('fade-out');
-        }, 300);
+          // Hapus class active dari semua slide
+          slides.forEach(slide => slide.classList.remove('active'));
 
-        setTimeout(() => {
-          heroBg.src = heroSlides[index].image;
+          // Tambah class active ke slide sekarang
+          slides[currentSlideIndex].classList.add('active');
+        }
 
-          heroBg.classList.remove('fade-out');
-          void heroBg.offsetWidth;
-          heroBg.classList.add('fade-in');
+        // Fungsi Timer Otomatis
+        function startTimer() {
+          slideInterval = setInterval(() => {
+            showSlide(currentSlideIndex + 1);
+          }, intervalTime);
+        }
 
-        }, 900);
-
-        setTimeout(() => {
-          titleElem.textContent = heroSlides[index].title;
-          offerElem.textContent = heroSlides[index].offer;
-          daysElem.textContent = heroSlides[index].days;
-          descElem.textContent = heroSlides[index].desc;
-
-          textElements.forEach(elem => {
-            if (elem) elem.classList.remove('fade-out');
-          });
-
-          void offerElem.offsetWidth;
-
-          setTimeout(() => offerElem.classList.add('fade-in'), 100);
-          setTimeout(() => titleElem.classList.add('fade-in'), 250);
-          setTimeout(() => {
-            if (daysWrapper) daysWrapper.classList.add('fade-in');
-          }, 400);
-          setTimeout(() => descElem.classList.add('fade-in'), 550);
-
-          currentIndex = index;
-
-          setTimeout(() => {
-            isAnimating = false;
-          }, 1000);
-
-        }, 1400);
-      }
-
-      function startSlideShow() {
-        slideInterval = setInterval(() => {
-          let nextIndex = (currentIndex + 1) % total;
-          setActiveIndex(nextIndex);
-        }, 6000);
-      }
-
-      carouselItems.forEach(item => {
-        item.addEventListener('click', () => {
-          if (isAnimating) return;
+        function resetTimer() {
           clearInterval(slideInterval);
-          setActiveIndex(parseInt(item.dataset.index));
-          setTimeout(startSlideShow, 2000);
-        });
-      });
+          startTimer();
+        }
 
-      setActiveIndex(0);
-      startSlideShow();
+        // Expose fungsi ke window untuk tombol panah
+        window.moveSlide = function(step) {
+          showSlide(currentSlideIndex + step);
+          resetTimer();
+        }
+
+        // Jalankan slide pertama & timer
+        showSlide(0);
+        startTimer();
+      }
     });
 
     // ========== PARTICLES JS ==========
-    document.addEventListener('DOMContentLoaded', function () {
-      if (typeof particlesJS !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof particlesJS !== 'undefined' && document.getElementById('particles-js')) {
         particlesJS('particles-js', {
           particles: {
             number: {
@@ -775,7 +704,7 @@ session_start();
     });
 
     // ========== COUNTER ANIMATION ==========
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       const counters = document.querySelectorAll('.stat-number');
       const speed = 200;
 
@@ -810,19 +739,20 @@ session_start();
     });
 
     // ========== TESTIMONIAL INFINITE MARQUEE ==========
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       const rows = document.querySelectorAll('.testimonial-row');
 
       rows.forEach(row => {
         const track = row.querySelector('.testimonial-track');
-        const cards = Array.from(track.children);
-
-        cards.forEach(card => {
-          const clone1 = card.cloneNode(true);
-          const clone2 = card.cloneNode(true);
-          track.appendChild(clone1);
-          track.appendChild(clone2);
-        });
+        if (track) {
+          const cards = Array.from(track.children);
+          cards.forEach(card => {
+            const clone1 = card.cloneNode(true);
+            const clone2 = card.cloneNode(true);
+            track.appendChild(clone1);
+            track.appendChild(clone2);
+          });
+        }
       });
     });
   </script>
