@@ -1,8 +1,7 @@
 <footer class="footer">
   <div class="footer-pattern"></div>
 
-  <div class="container">
-    
+<div class="container footer-inner">    
     <div class="footer-col brand-col">
       <div class="brand-wrapper">
         <h3 class="brand-title">Majelis <span>MDPL</span></h3>
@@ -66,7 +65,7 @@
   </div>
 
   <div class="copyright">
-    <div class="container">
+    <div class="container"><div class="container footer-inner">
       <p>&copy; 2025 <strong>Majelis MDPL</strong>. All Rights Reserved.</p>
       <p class="dev-credit">Developed with <i class="fas fa-heart text-danger"></i> by Ngelawans Gang</p>
     </div>
@@ -98,17 +97,19 @@
     pointer-events: none;
 }
 
-.footer .container {
+/* Container utama footer (tiga kolom) */
+.footer-inner {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 40px;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 20px 20px 20px;
     position: relative;
     z-index: 2;
 }
+
 
 /* --- KOLOM FOOTER --- */
 .footer-col {
@@ -262,21 +263,30 @@
 
 /* COPYRIGHT BAR */
 .copyright {
-    background: #231b14; /* Lebih gelap dari footer utama */
-    padding: 25px 0;
+    background: #231b14;
+    padding: 20px 0;
     margin-top: 40px;
     border-top: 1px solid rgba(255,255,255,0.05);
     font-size: 0.9rem;
     color: #888;
 }
 
+/* inner copyright pakai flex di desktop */
 .copyright .container {
-    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
 }
 
-.copyright strong { color: #fff; }
-.copyright .dev-credit { margin: 0; }
+/* Selector benar */
+copyright strong { color: #fff; }          /* seharusnya: .copyright strong */
+copyright .dev-credit { margin: 0; }       /* seharusnya: .copyright .dev-credit */
+
+
 
 .text-danger { color: #e74c3c; }
 

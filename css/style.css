@@ -770,7 +770,7 @@ html {
 
 /* Aksen Warna */
 .text-highlight {
-  color: #2ecc71; /* Hijau */
+  color: #a9865a;
   position: relative;
   display: inline-block;
 }
@@ -783,7 +783,7 @@ html {
   left: 0;
   width: 100%;
   height: 10px;
-  background-color: rgba(46, 204, 113, 0.2);
+  background-color: rgba(154, 125, 67, 0.2);
   z-index: -1;
   border-radius: 4px;
 }
@@ -801,9 +801,19 @@ html {
 /* RESPONSIVE MOBILE */
 @media (max-width: 768px) {
   .section-title {
-    font-size: 2.2rem;
+    font-size: 2rem;           /* sedikit lebih kecil dari 2.2 */
+    line-height: 1.25;
   }
 }
+
+  .section-title .text-highlight {
+    font-size: 1.8rem;         /* kecilkan supaya tidak terlalu panjang */
+    display: inline-block;
+  }
+
+    .section-title .text-highlight::after {
+    height: 8px;               /* garis bawah ikut diperkecil */
+  }
 
 /* Track Carousel */
 .carousel-track {
@@ -1696,3 +1706,75 @@ html {
     border-bottom-color: rgba(37, 211, 102, 0.3);
   }
 }
+
+
+
+
+/* RESPONSIVE APP SHOWCASE - MOBILE OPTIMIZED */
+@media (max-width: 968px) {
+  .app-showcase-section {
+    padding: 60px 0 80px 0;
+  }
+
+  .app-wrapper {
+    flex-direction: column !important;
+    text-align: center;
+    padding-top: 20px;
+    gap: 30px;
+  }
+
+  .app-content {
+    max-width: 100% !important;
+    order: 1;
+  }
+
+  /* FIX JUDUL H2 - MOBILE */
+  .app-title {
+    font-size: 2rem !important;
+    line-height: 1.25 !important;
+    margin-bottom: 20px !important;
+    padding: 0 16px;
+    word-spacing: 0.15em;     /* jarak antar kata supaya spasi kelihatan */
+    letter-spacing: 0;        /* jangan terlalu rapat */
+    white-space: normal;      /* biar bisa pindah baris bebas */
+  }
+
+  /* HAPUS <br> DI MOBILE */
+  .app-title br {
+    display: none !important;
+  }
+
+  /* DESKRIPSI MOBILE */
+  .app-desc {
+    font-size: 1.05rem !important;
+    line-height: 1.7 !important;
+    max-width: 95% !important;
+    margin: 0 auto 25px auto !important;
+    padding: 0 15px;
+  }
+
+  /* FEATURES LIST - CENTER & COMPACT */
+  .app-features {
+    margin-bottom: 30px !important;
+    padding: 0 10px;
+  }
+
+  .app-features li {
+    justify-content: center !important;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 1.8rem !important;
+    word-spacing: 0.18em;   /* sedikit lebih longgar di HP kecil */
+  }
+
+  .app-desc {
+    font-size: 1rem !important;
+  }
+}
+
+

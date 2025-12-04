@@ -3,21 +3,43 @@ require_once '../config.php';
 require_once '../backend/koneksi.php';
 session_start();
 
-// ✅ Ambil ID Pembayaran
+// ✅ Ambil ID Pembayaran dari URL
 $payment_id = intval($_GET['payment_id'] ?? 0);
 
 if ($payment_id <= 0) {
-    die("ID Pembayaran tidak valid.");
+    die("
+    <div style='font-family: Poppins, sans-serif; text-align: center; padding-top: 50px;'>
+        <h1 style='color: #dc3545;'>Invoice Tidak Valid</h1>
+        <p>ID Pembayaran tidak ditemukan.</p>
+        <a href='payment-status.php' style='padding: 10px 20px; background: #a97c50; color: white; border: none; border-radius: 5px; text-decoration: none;'>Kembali ke Status Pembayaran</a>
+    </div>
+    ");
 }
 
-// ✅ Query Data Invoice
+// ✅ Query Data Invoice dari Database
 $stmt = $conn->prepare("
     SELECT 
-        p.id_payment, p.order_id, p.jumlah_bayar, p.tanggal, p.metode, p.status_pembayaran,
-        b.id_booking, b.tanggal_booking, b.total_harga, b.jumlah_orang,
-        t.id_trip, t.nama_gunung, t.jenis_trip, t.via_gunung, t.tanggal as trip_date, t.durasi, t.harga,
-        d.nama_lokasi, d.alamat,
-        u.username, u.email, u.no_wa
+        p.id_payment,
+        p.order_id,
+        p.jumlah_bayar,
+        p.tanggal,
+        p.metode,
+        p.status_pembayaran,
+        b.id_booking,
+        b.tanggal_booking,
+        b.total_harga,
+        b.jumlah_orang,
+        t.id_trip,
+        t.nama_gunung,
+        t.jenis_trip,
+        t.tanggal as trip_date,
+        t.durasi,
+        t.harga,
+        d.nama_lokasi,
+        d.alamat,
+        u.username,
+        u.email,
+        u.no_wa
     FROM payments p
     JOIN bookings b ON p.id_booking = b.id_booking
     JOIN paket_trips t ON b.id_trip = t.id_trip
@@ -32,12 +54,23 @@ $result = $stmt->get_result();
 $invoiceData = $result->fetch_assoc();
 $stmt->close();
 
+// ✅ Cek apakah invoice exist dan sudah dibayar
 if (!$invoiceData) {
-    die("Invoice tidak tersedia atau belum lunas.");
+    die("
+    <div style='font-family: Poppins, sans-serif; text-align: center; padding-top: 50px;'>
+        <h1 style='color: #dc3545;'>Invoice Tidak Tersedia</h1>
+        <p>Invoice hanya dapat dilihat untuk transaksi yang berstatus LUNAS/PAID.</p>
+        <a href='payment-status.php' style='padding: 10px 20px; background: #a97c50; color: white; border: none; border-radius: 5px; text-decoration: none;'>Kembali ke Status Pembayaran</a>
+    </div>
+    ");
 }
 
 // ✅ Query Participants
-$stmtPart = $conn->prepare("SELECT nama, tanggal_lahir, nik FROM participants WHERE id_booking = ?");
+$stmtPart = $conn->prepare("
+    SELECT nama, tanggal_lahir, tempat_lahir, nik 
+    FROM participants 
+    WHERE id_booking = ?
+");
 $stmtPart->bind_param("i", $invoiceData['id_booking']);
 $stmtPart->execute();
 $resultPart = $stmtPart->get_result();
@@ -45,14 +78,14 @@ $participants = $resultPart->fetch_all(MYSQLI_ASSOC);
 $stmtPart->close();
 
 // ✅ Format Data
-$invoiceNumber = 'INV/' . date('Ymd', strtotime($invoiceData['tanggal'])) . '/' . str_pad($payment_id, 5, '0', STR_PAD_LEFT);
-$formatDate = fn($date) => date('d F Y', strtotime($date));
+$invoiceNumber = 'INV-MDPL-' . date('Ymd', strtotime($invoiceData['tanggal'])) . '-' . str_pad($payment_id, 4, '0', STR_PAD_LEFT);
+$formatDate = fn($date) => date('d M Y', strtotime($date));
 $formatCurrency = fn($amount) => 'Rp ' . number_format($amount, 0, ',', '.');
 
-// ✅ Company Details
+// Detail Perusahaan
 $companyDetails = [
-    'name' => 'MAJELIS MDPL',
-    'address' => 'Jl. Pendaki No. 12, Jawa Timur, Indonesia',
+    'name' => 'Majelis MDPL',
+    'address' => 'Jl. Pendaki No. 12, Puncak Sejati',
     'email' => 'admin@majelismdpl.com',
     'logo_path' => '../assets/majelis.png'
 ];
@@ -62,553 +95,451 @@ $companyDetails = [
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1024">
-
-    <title>Invoice #<?php echo $invoiceNumber; ?></title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - <?php echo $invoiceNumber; ?></title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-
     <style>
+        /* --- VAR CSS --- */
         :root {
-            --primary: #9C7E5C;
-            --primary-dark: #7B5E3A;
-            --dark: #1F2937;
-            --gray: #6B7280;
-            --light: #F3F4F6;
-            --border: #E5E7EB;
-            --success-bg: #DEF7EC;
-            --success-text: #03543F;
-            --white: #FFFFFF;
+            --color-mdpl-dark: #a97c50;
+            --color-mdpl-light: #d6b38c;
+            --color-success: #2e7d32;
+            --color-primary-btn: #4a90e2;
+
+            /* Font Sizes - Mobile First Approach */
+            --font-size-xxs: 0.65rem; 
+            --font-size-xs: 0.75rem; 
+            --font-size-sm: 0.85rem; 
+            --font-size-base: 0.95rem; 
+            --font-size-md: 1.1rem;
+            --font-size-lg: 1.3rem;
+            --font-size-xl: 1.6rem;
+            --font-size-xxl: 2rem;
         }
 
+        /* --- GLOBAL --- */
         body {
-            font-family: 'Inter', sans-serif;
-            background: #FFFFFF;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
-            padding: 40px 0;
-            color: var(--dark);
-            font-size: 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            -webkit-print-color-adjust: exact;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333;
+            line-height: 1.6;
+            font-size: var(--font-size-base);
         }
 
-        /* --- ACTION BAR --- */
+        /* 📌 PENYESUAIAN A4 SIZE */
+        .invoice-wrapper {
+            max-width: 793.7px; /* A4 width in px at 96dpi (210mm) */
+            margin: 30px auto;
+            padding: 40px;
+            background: #fff;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
         .action-bar {
-            width: 794px;
-            margin-bottom: 25px;
+            text-align: center;
+            max-width: 793.7px;
+            margin: 20px auto;
             display: flex;
             justify-content: flex-end;
-            align-items: center;
             gap: 15px;
         }
 
         .btn {
-            text-decoration: none;
-            padding: 10px 24px;
+            padding: 12px 25px;
+            border: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 0.85rem;
-            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-            border: none;
-            cursor: pointer;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .btn-back {
-            background: #f3f4f6;
-            color: var(--dark);
-            border: 1px solid #d1d5db;
-        }
-
-        .btn-back:hover {
-            background: #e5e7eb;
-        }
-
-        .btn-print {
-            background: var(--primary);
+        .btn-primary {
+            background: var(--color-primary-btn);
             color: white;
-            box-shadow: 0 4px 12px rgba(156, 126, 92, 0.25);
         }
 
-        .btn-print:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
         }
 
-        /* --- KERTAS INVOICE (A4) --- */
-        .invoice-box {
-            width: 794px;
-            min-height: 1000px;
-            background: var(--white);
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-            position: relative;
+        .paid-stamp-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-            border-top: 8px solid var(--primary);
+            z-index: 10;
+            pointer-events: none;
         }
 
-        /* WATERMARK (DIPERJELAS) */
-        .watermark {
+        .paid-stamp-overlay::before {
+            content: "PAID";
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 10rem;
-            font-weight: 900;
-            color: var(--dark);
-            opacity: 0.15; /* REVISI: Opacity dinaikkan agar lebih jelas */
-            font-family: 'Poppins', sans-serif;
-            letter-spacing: 10px;
-            z-index: 0;
-            pointer-events: none;
-            border: 5px dashed rgba(0,0,0,0.1); /* Opsional: Border agar lebih tegas */
-            padding: 0 20px;
-            border-radius: 20px;
+            font-size: 15em;
+            color: var(--color-success);
+            opacity: 0.1;
+            font-weight: 800;
+            white-space: nowrap;
         }
 
-        /* HEADER */
-        .inv-header {
-            padding: 50px 50px 30px;
+        /* Header */
+        .invoice-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-            z-index: 1;
+            align-items: center;
+            border-bottom: 5px solid var(--color-mdpl-dark);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
         }
 
-        /* REVISI LAYOUT BRANDING (KIRI) */
-        .company-branding {
-            display: flex;
-            flex-direction: column; /* Stack vertikal: Atas (Logo+Teks), Bawah (Alamat) */
-            align-items: flex-start;
-            gap: 8px;
-        }
-
-        .brand-top-row {
-            display: flex;
-            align-items: center; /* Sejajar vertikal antara logo dan teks */
-            gap: 15px;
-        }
-
-        .company-logo {
-            height: 60px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .company-name {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.8rem; /* Sedikit diperbesar */
-            color: var(--primary-dark);
-            font-weight: 800;
-            margin: 0;
-            line-height: 1;
-            letter-spacing: -0.5px;
-        }
-
-        .company-addr {
-            color: var(--gray);
-            font-size: 0.9rem;
-            line-height: 1.5;
-            max-width: 350px;
-            margin-top: 5px; /* Jarak dari logo+judul */
-        }
-
-        /* Details Kanan */
-        .invoice-details {
-            text-align: right;
-        }
-
-        .invoice-label {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #E2E8F0;
-            line-height: 0.8;
-            letter-spacing: 2px;
-            margin: 0 0 10px;
-        }
-
-        .invoice-num {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--dark);
-            background: var(--light);
-            padding: 5px 12px;
-            border-radius: 6px;
-            display: inline-block;
-        }
-
-        .invoice-date {
-            font-size: 0.85rem;
-            color: var(--gray);
-            margin-top: 6px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            background: var(--success-bg);
-            color: var(--success-text);
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-top: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* BODY CONTENT */
-        .inv-body {
-            padding: 40px 50px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Info Grid */
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            margin-bottom: 50px;
-        }
-
-        .info-block h3 {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--gray);
-            letter-spacing: 1.5px;
-            margin-bottom: 12px;
-            font-weight: 700;
-            font-family: 'Poppins', sans-serif;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 6px;
-        }
-
-        .info-content div {
-            margin-bottom: 4px;
-            font-size: 0.95rem;
-            color: var(--dark);
-        }
-
-        .info-content strong {
-            font-weight: 600;
-            font-size: 1.05rem;
-            display: block;
-            margin-bottom: 4px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .info-content .sub {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        /* TABLE STYLE */
-        .table-container {
-            margin-bottom: 40px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead th {
-            text-align: left;
-            padding: 12px 0;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: var(--gray);
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid var(--border);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        th.th-right,
-        td.td-right {
-            text-align: right;
-        }
-        
-        th.th-center,
-        td.td-center {
-            text-align: center;
-        }
-
-        tbody td {
-            padding: 18px 0;
-            border-bottom: 1px solid var(--border);
-            vertical-align: top;
-            font-size: 0.95rem;
-            color: var(--dark);
-        }
-
-        .item-name {
-            font-weight: 600;
-            color: var(--dark);
-            font-size: 1rem;
-            display: block;
-            margin-bottom: 4px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .item-desc {
-            font-size: 0.85rem;
-            color: var(--gray);
-            display: block;
-        }
-
-        .price-total {
-            font-weight: 700;
-            color: var(--dark);
-            font-size: 1rem;
-        }
-
-        /* TOTAL SUMMARY */
-        .summary-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 50px;
-        }
-
-        .summary-box {
-            width: 320px;
-        }
-
-        .sum-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: var(--gray);
-        }
-
-        .sum-row.final {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid var(--primary);
-            font-size: 1.2rem;
-            color: var(--primary-dark);
-            font-weight: 700;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        /* PARTICIPANTS LIST */
-        .participants-section {
-            margin-top: 20px;
-        }
-
-        .p-head {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .p-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px 30px;
-        }
-
-        .p-item {
+        .logo-box {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            color: var(--dark);
         }
 
-        .p-item i {
-            color: var(--primary);
-            font-size: 0.8rem;
+        .logo-box img {
+            height: 60px;
+            margin-right: 15px;
         }
 
-        /* FOOTER */
-        .inv-footer {
-            position: absolute;
-            bottom: 0;
+        .logo-box div h2 {
+            font-size: 2em;
+            margin: 0;
+            font-weight: 800;
+            color: var(--color-mdpl-dark);
+        }
+
+        .logo-box div p {
+            margin: 0;
+            font-size: 0.8em;
+            color: #777;
+        }
+
+        .invoice-meta {
+            text-align: right;
+        }
+
+        .invoice-meta h1 {
+            color: #333;
+            font-size: 3em;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .invoice-meta strong {
+            color: var(--color-mdpl-dark);
+            font-weight: 700;
+        }
+
+        /* Info Grid - Dipertahankan 2 kolom untuk desktop */
+        .info-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Default: Berdampingan di Desktop */
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        /* Tambahan style untuk kotak info Pemesan/Trip */
+        .info-box.pemesan-box {
+            border-left: 5px solid var(--color-mdpl-light);
+        }
+
+        .info-box.trip-box {
+            border-left: 5px solid var(--color-mdpl-dark);
+        }
+
+        .info-box {
+            padding: 20px;
+            background: #fcfcfc;
+            border-radius: 5px;
+        }
+
+        .info-box h4 {
+            color: var(--color-mdpl-dark);
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 3px 0;
+            font-size: 0.9em;
+        }
+
+        .info-row span:first-child {
+            width: 45%;
+            color: #777;
+        }
+
+        .info-row strong {
+            width: 55%;
+            color: #333;
+        }
+        
+        /* Section Title */
+        .section-title-table {
+            font-size: 1.4em;
+            color: var(--color-mdpl-dark);
+            margin-bottom: 15px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--color-mdpl-light);
+            padding-bottom: 5px;
+        }
+
+        /* Table */
+        .data-table {
             width: 100%;
-            background: var(--light);
-            padding: 30px 50px;
-            text-align: center;
-            color: var(--gray);
-            font-size: 0.8rem;
-            box-sizing: border-box;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
 
-        .inv-footer strong {
-            color: var(--primary-dark);
+        .data-table th {
+            background-color: #f4f4f4;
+            color: #555;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .data-table td {
+            padding: 8px 15px;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.9em;
+        }
+        
+        /* Gaya sub-tabel peserta */
+        .sub-participant-list {
+            margin-top: 10px;
+            padding: 5px 0 0 0;
+            border-top: 1px dashed #ddd;
+            font-size: 0.85em;
+            color: #555;
+        }
+        
+        .sub-participant-list strong {
             display: block;
             margin-bottom: 5px;
+            color: #333;
         }
 
-        @media print {
-            body {
-                background: white;
-                padding: 0;
+        /* Footer */
+        .invoice-footer {
+            clear: both;
+            border-top: 1px dashed #ddd;
+            padding-top: 20px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .invoice-footer p {
+            font-size: 0.8em;
+            color: #555;
+        }
+
+        /* --- MEDIA QUERIES --- */
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .invoice-wrapper {
+                margin: 15px;
+                padding: 20px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
             }
 
             .action-bar {
+                margin: 10px auto;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .invoice-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+            }
+
+            .invoice-meta {
+                text-align: left;
+                margin-top: 15px;
+                width: 100%;
+            }
+
+            .info-container {
+                grid-template-columns: 1fr; /* Stack columns on mobile */
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                width: 100%; 
+            }
+            
+            .data-table, .participants-table {
+                table-layout: auto; 
+            }
+
+            .data-table th, .data-table td {
+                padding: 8px 10px;
+            }
+
+            .paid-stamp-overlay::before {
+                font-size: 8em;
+            }
+        }
+        
+        /* Print (A4) */
+        @media print {
+            @page {
+                size: A4;
+                margin: 20mm;
+            }
+            body {
+                background-color: #fff;
+            }
+            .action-bar {
                 display: none;
             }
-
-            .invoice-box {
+            .invoice-wrapper {
                 box-shadow: none;
-                border: none;
                 margin: 0;
-            }
-
-            .inv-header,
-            .inv-body,
-            .inv-footer {
-                padding: 20px 0;
-            }
-
-            .watermark {
-                opacity: 0.15 !important; /* Pastikan tetap terlihat saat print */
-                -webkit-print-color-adjust: exact;
-                border: none; /* Hilangkan border putus-putus saat print jika diinginkan */
+                border-radius: 0;
+                max-width: 100%;
+                padding: 0;
             }
         }
     </style>
 </head>
 
 <body>
-
     <div class="action-bar">
-        <a href="payment-status.php" class="btn btn-back">
-            <i class="fa-solid fa-arrow-left"></i> Kembali
-        </a>
-        <a href="download-invoice-pdf.php?payment_id=<?php echo $payment_id; ?>" class="btn btn-print">
-            <i class="fa-solid fa-download"></i> Download PDF
-        </a>
+        <a href="payment-status.php" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
+        <a href="download-invoice-pdf.php?payment_id=<?php echo $payment_id; ?>" class="btn btn-primary"><i class="fa-solid fa-download"></i> Unduh PDF</a>
     </div>
 
-    <div class="invoice-box">
-        <div class="watermark">LUNAS</div>
+    <div class="invoice-wrapper">
+        <div class="paid-stamp-overlay"></div>
 
-        <header class="inv-header">
-            <div class="company-branding">
-                <div class="brand-top-row">
-                    <img src="<?php echo $companyDetails['logo_path']; ?>" alt="Logo" class="company-logo" onerror="this.style.display='none'">
-                    <h2 class="company-name"><?php echo $companyDetails['name']; ?></h2>
-                </div>
-                
-                <div class="company-addr">
-                    <?php echo $companyDetails['address']; ?><br>
-                    <?php echo $companyDetails['email']; ?>
+        <header class="invoice-header">
+            <div class="logo-box">
+                <img src="<?php echo $companyDetails['logo_path']; ?>" alt="Logo Majelis MDPL" onerror="this.src='https://via.placeholder.com/60x60?text=Logo'">
+                <div>
+                    <h2>MAJELIS MDPL</h2>
+                    <p>E-Invoice & Tiket Pendakian</p>
                 </div>
             </div>
 
-            <div class="invoice-details">
-                <h1 class="invoice-label">INVOICE</h1>
-                <div class="invoice-num">#<?php echo $invoiceNumber; ?></div>
-                <div class="invoice-date">Terbit: <?php echo $formatDate($invoiceData['tanggal']); ?></div>
-                <span class="status-badge">LUNAS / PAID</span>
+            <div class="invoice-meta">
+                <h1>INVOICE</h1>
+                <p>No. Invoice: <strong><?php echo $invoiceNumber; ?></strong></p>
+                <p>Status: <strong style="color: var(--color-success);">PAID</strong></p>
+                <p style="font-size: 0.8em; margin-top: 10px;">
+                </p>
             </div>
         </header>
-
-        <div class="inv-body">
-
-            <div class="info-grid">
-                <div class="info-block">
-                    <h3>Ditagihkan Kepada</h3>
-                    <div class="info-content">
-                        <strong><?php echo htmlspecialchars($invoiceData['username']); ?></strong>
-                        <div class="sub"><?php echo htmlspecialchars($invoiceData['email']); ?></div>
-                        <div class="sub"><?php echo htmlspecialchars($invoiceData['no_wa']); ?></div>
-                    </div>
-                </div>
-                <div class="info-block">
-                    <h3>Detail Perjalanan</h3>
-                    <div class="info-content">
-                        <strong><?php echo htmlspecialchars($invoiceData['nama_gunung']); ?></strong>
-                        <div class="sub">Via: <?php echo htmlspecialchars($invoiceData['via_gunung']); ?></div>
-                        <div class="sub">Tgl: <?php echo $formatDate($invoiceData['trip_date']); ?></div>
-                        <div class="sub">Durasi: <?php echo htmlspecialchars($invoiceData['durasi']); ?></div>
-                    </div>
-                </div>
+        
+        <div class="info-container">
+            <div class="info-box pemesan-box">
+                <h4><i class="fa-solid fa-user"></i> Detail Pemesan</h4>
+                <div class="info-row"><span>Nama:</span> <strong><?php echo $invoiceData['username']; ?></strong></div>
+                <div class="info-row"><span>Email:</span> <strong><?php echo $invoiceData['email']; ?></strong></div>
+                <div class="info-row"><span>Telepon:</span> <strong><?php echo $invoiceData['no_wa']; ?></strong></div>
             </div>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th width="5%">No</th>
-                            <th width="50%">Deskripsi Layanan</th>
-                            <th width="10%" class="th-center">Qty</th>
-                            <th width="15%" class="th-right">Harga</th>
-                            <th width="20%" class="th-right">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>
-                                <span class="item-name">Paket Open Trip <?php echo htmlspecialchars($invoiceData['nama_gunung']); ?></span>
-                                <span class="item-desc">Meeting Point: <?php echo htmlspecialchars($invoiceData['nama_lokasi']); ?></span>
-                            </td>
-                            <td class="td-center"><?php echo $invoiceData['jumlah_orang']; ?> Pax</td>
-                            <td class="td-right"><?php echo $formatCurrency($invoiceData['harga']); ?></td>
-                            <td class="td-right price-total"><?php echo $formatCurrency($invoiceData['total_harga']); ?></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="info-box trip-box">
+                <h4><i class="fa-solid fa-mountain-sun"></i> Detail Trip Pendakian</h4>
+                <div class="info-row"><span>Tujuan:</span> <strong style="color: var(--color-mdpl-dark);"><?php echo $invoiceData['nama_gunung']; ?></strong></div>
+                <div class="info-row"><span>Via/Jenis Trip:</span> <strong><?php echo $invoiceData['jenis_trip']; ?></strong></div>
+                <div class="info-row"><span>Tgl/Durasi:</span> <strong><?php echo $formatDate($invoiceData['trip_date']); ?> / <?php echo $invoiceData['durasi']; ?></strong></div>
+                <div class="info-row"><span>Basecamp:</span> <strong><?php echo $invoiceData['nama_lokasi']; ?></strong></div>
             </div>
-
-            <div class="summary-container">
-                <div class="summary-box">
-                    <div class="sum-row">
-                        <span>Subtotal</span>
-                        <span><?php echo $formatCurrency($invoiceData['total_harga']); ?></span>
-                    </div>
-                    <div class="sum-row">
-                        <span>Biaya Layanan</span>
-                        <span>Rp 0</span>
-                    </div>
-                    <div class="sum-row final">
-                        <span>Total Bayar</span>
-                        <span><?php echo $formatCurrency($invoiceData['total_harga']); ?></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="participants-section">
-                <div class="p-head">Daftar Peserta (<?php echo count($participants); ?>)</div>
-                <div class="p-list">
-                    <?php foreach ($participants as $index => $p): ?>
-                        <div class="p-item">
-                            <i class="fa-solid fa-circle-check"></i>
-                            <?php echo ($index + 1) . '. ' . htmlspecialchars($p['nama']); ?>
-                            <?php if (!empty($p['nik'])): ?>
-                                <span style="font-size:0.8rem; color:#9ca3af;">(<?php echo htmlspecialchars($p['nik']); ?>)</span>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-
         </div>
+        
+        <div class="section-title-table">Rincian Biaya</div>
+        <table class="data-table cost-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 55%;">Deskripsi</th>
+                    <th style="width: 10%; text-align: center;">Qty</th>
+                    <th style="width: 15%; text-align: right;">Harga Satuan (Rp)</th>
+                    <th style="width: 15%; text-align: right;">Total (Rp)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Paket Trip Pendakian <?php echo $invoiceData['nama_gunung']; ?> (<?php echo $invoiceData['durasi']; ?>)</td>
+                    <td style="text-align: center;"><?php echo $invoiceData['jumlah_orang']; ?></td>
+                    <td style="text-align: right;"><?php echo number_format($invoiceData['harga'], 0, ',', '.'); ?></td>
+                    <td style="text-align: right;"><?php echo number_format($invoiceData['total_harga'], 0, ',', '.'); ?></td>
+                </tr>
 
-        <footer class="inv-footer">
-            <strong>Terima Kasih atas Kepercayaan Anda!</strong>
-            Dokumen ini sah dan diterbitkan secara otomatis oleh sistem Majelis MDPL.<br>
-            Simpan dokumen ini sebagai bukti pembayaran yang sah.
-        </footer>
+                <tr style="border-top: 2px solid var(--color-mdpl-dark); font-weight: 700; background: #fcfcfc;">
+                    <td colspan="4" style="text-align: right; padding-top: 15px;">TOTAL DIBAYARKAN</td>
+                    <td style="text-align: right; padding-top: 15px; color: var(--color-success); font-size: 1.1em;">
+                        <?php echo number_format($invoiceData['total_harga'], 0, ',', '.'); ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="clear: both;"></div>
+
+        <div class="section-title-table" style="margin-top: 20px;">Daftar Peserta Trip (<?php echo count($participants); ?> Orang)</div>
+        <table class="data-table participants-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 40%;">Nama Lengkap</th>
+                    <th style="width: 25%;">Tanggal Lahir</th>
+                    <th style="width: 30%;">NIK/ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php $no = 1; ?>
+                <?php foreach ($participants as $p): ?>
+                    <tr>
+                        <td><?php echo $no++; ?></td>
+                        <td><?php echo htmlspecialchars($p['nama']); ?></td>
+                        <td><?php echo $p['tempat_lahir'] . ', ' . date('d M Y', strtotime($p['tanggal_lahir'])); ?></td>
+                        <td><?php echo $p['nik']; ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        
+        <div class="invoice-footer">
+            <div style="text-align: center;">
+                <p><strong>DOKUMEN VALID DIBUAT SECARA DIGITAL</strong></p>
+                <p style="font-size: 0.9em;">Invoice ini adalah bukti pembayaran sah untuk pemesanan trip Anda. Tidak diperlukan tanda tangan basah.</p>
+            </div>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.8em; color: var(--color-mdpl-dark);">
+                Terima kasih atas kepercayaan Anda kepada Majelis MDPL.
+            </p>
+        </div>
     </div>
-
 </body>
 
 </html>

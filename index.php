@@ -162,7 +162,7 @@ session_start();
 
         <div class="app-content">
           <span class="app-badge">COMING SOON</span>
-          <h2 class="app-title">Petualangan dalam<br>Genggamanmu.</h2>
+          <h2 class="app-title">Petualangan dalam <br>Genggamanmu.</h2>
           <p class="app-desc">
             Nikmati kemudahan booking, cek jadwal trip, dan diskusi dengan guide langsung dari smartphone. Aplikasi Majelis MDPL hadir untuk mempermudah setiap langkahmu.
           </p>
@@ -209,16 +209,6 @@ session_start();
             <div class="phone-frame center-phone">
               <div class="notch"></div>
               <img src="assets/Mobile2.jpg" class="app-screen" alt="Main Screen">
-            </div>
-          </div>
-
-          <div class="floating-alert">
-            <div class="icon-box">
-              <i class="fas fa-bell"></i>
-            </div>
-            <div class="alert-text">
-              <strong>Trip Reminder</strong>
-              <span>Besok, 08:00 WIB - Mt. Prau</span>
             </div>
           </div>
 
